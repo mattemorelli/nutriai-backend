@@ -6,9 +6,13 @@ const { creaRichiedeAuth, verificaProprieta } = require('./auth-middleware');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const app = express();
-app.use(cors());
+
+// In produzione accetta solo il frontend pubblicato; in locale accetta tutto.
+const ORIGINI = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : true;
+app.use(cors({ origin: ORIGINI }));
 app.use(express.json());
-const PORT = 3000;
+
+const PORT = process.env.PORT || 3000;
 
 // Guardiano: verifica il token e mette l'utente in req.utente
 const richiedeAuth = creaRichiedeAuth(supabase);
@@ -116,7 +120,6 @@ app.get('/dishes/:id', async (req, res) => {
 
 // ---------- PIANI (protetti) ----------
 
-// Id del piano piu' recente di CHI STA CHIEDENDO (nessun id nell'URL)
 app.get('/piano-corrente', richiedeAuth, async (req, res) => {
   const { data, error } = await supabase
     .from('plans')
@@ -132,7 +135,6 @@ app.get('/piano-corrente', richiedeAuth, async (req, res) => {
   res.json({ plan_id: data.id });
 });
 
-// Contenuto di un piano: l'id serve, ma il piano deve essere di chi lo chiede
 app.get('/piano/:planId', richiedeAuth, async (req, res) => {
   try {
     const ok = await verificaProprieta(supabase, res, 'plans', req.params.planId, req.utente.id);
@@ -250,10 +252,9 @@ app.post('/preferenze', richiedeAuth, async (req, res) => {
 // ---------- RADICE ----------
 
 app.get('/', (req, res) => {
-  res.send('NutriAI backend attivo. /dishes per i piatti; /piano-corrente e /piano/:planId richiedono autenticazione.');
+  res.send('NutriAI backend attivo.');
 });
 
 app.listen(PORT, () => {
-  console.log(`\nServer avviato su http://localhost:${PORT}`);
-  console.log(`Prova ad aprire http://localhost:${PORT}/dishes nel browser\n`);
+  console.log(`\nServer avviato sulla porta ${PORT}`);
 });
