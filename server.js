@@ -1,15 +1,45 @@
+console.log('[server] avviato', new Date().toISOString());
+const { calcolaESalvaTarget } = require('./fabbisogno');
+const { generaESalva } = require('./genera');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
-const { creaRichiedeAuth, verificaProprieta } = require('./auth-middleware');
+const { creaRichiedeAuth } = require('./auth-middleware');
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+// Il backend deve usare la service_role: con RLS attivo la chiave anon
+// non puo' leggere le tabelle personali (users, plans, ...).
+const CHIAVE = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
+const supabase = createClient(process.env.SUPABASE_URL, CHIAVE);
+
+// Avviso all'avvio se stiamo girando con la chiave sbagliata
+try {
+  const payload = JSON.parse(Buffer.from(CHIAVE.split('.')[1], 'base64').toString());
+  if (payload.role !== 'service_role') {
+    console.warn(`\n[ATTENZIONE] Il backend sta usando una chiave con ruolo "${payload.role}".`);
+    console.warn('Serve la service_role, altrimenti le tabelle protette da RLS daranno "permission denied".\n');
+  }
+} catch {
+  console.warn('\n[ATTENZIONE] Impossibile leggere il ruolo della chiave Supabase.\n');
+}
+
 const app = express();
 
 // In produzione accetta solo il frontend pubblicato; in locale accetta tutto.
-const ORIGINI = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : true;
-app.use(cors({ origin: ORIGINI }));
+const ORIGINI = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map(s => s.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
+app.use(cors({
+  origin(origine, callback) {
+    if (!origine) return callback(null, true);              // curl, server-to-server
+    if (ORIGINI.length === 0) return callback(null, true);  // sviluppo locale
+    if (ORIGINI.includes(origine.replace(/\/$/, ''))) return callback(null, true);
+    callback(new Error('Origine non consentita'));
+  },
+}));
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
@@ -129,7 +159,10 @@ app.get('/piano-corrente', richiedeAuth, async (req, res) => {
     .limit(1)
     .maybeSingle();
 
-  if (error) return res.status(500).json({ errore: error.message });
+  if (error) {
+    console.error('ERRORE /piano-corrente:', error);
+    return res.status(500).json({ errore: error.message });
+  }
   if (!data) return res.status(404).json({ errore: 'Nessun piano per questo utente' });
 
   res.json({ plan_id: data.id });
@@ -137,70 +170,87 @@ app.get('/piano-corrente', richiedeAuth, async (req, res) => {
 
 app.get('/piano/:planId', richiedeAuth, async (req, res) => {
   try {
-    const ok = await verificaProprieta(supabase, res, 'plans', req.params.planId, req.utente.id);
-    if (!ok) return;
+    const { planId } = req.params;
 
-    const { data: items, error } = await supabase
+    const { data: piano, error: errPiano } = await supabase
+      .from('plans')
+      .select('id, user_id, week_start, generated_at, corpus_version')
+      .eq('id', planId)
+      .single();
+
+    if (errPiano || !piano) return res.status(404).json({ errore: 'Piano non trovato' });
+    if (piano.user_id !== req.utente.id) return res.status(403).json({ errore: 'Non autorizzato' });
+
+    const { data: righe, error: errItems } = await supabase
       .from('plan_items')
-      .select('day_of_week, meal, slot, dish_id, dishes (name, name_en, prep_min, steps, steps_en)')
-      .eq('plan_id', req.params.planId)
-      .order('day_of_week')
-      .order('meal');
+      .select(`
+        id, day_of_week, meal, slot, portion_g, avanzi,
+        kcal, protein_g, sat_fat_g, fibre_g, salt_g,
+        dishes ( name, name_en, prep_min, steps, steps_en, health_score )
+      `)
+      .eq('plan_id', planId)
+      .order('day_of_week');
 
-    if (error) throw error;
-    if (!items.length) return res.status(404).json({ errore: 'Piano non trovato o vuoto' });
+    if (errItems) return res.status(500).json({ errore: errItems.message });
 
-    const NOMI_GIORNO = ['', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
-    const giorni = {};
+    const ordinePasto = { colazione: 1, pranzo: 2, spuntino: 3, cena: 4 };
+    const ordineSlot = { colazione: 1, primo: 2, secondo: 3, contorno: 4, spuntino: 5, dolce: 6 };
 
-    for (const item of items) {
-      const vals = await calcolaPiatto(item.dish_id);
-      const g = item.day_of_week;
-      if (!giorni[g]) {
-        giorni[g] = {
-          giorno: NOMI_GIORNO[g],
-          pasti: [],
-          totale: { kcal: 0, saturi_g: 0, fibra_g: 0, sale_g: 0 },
-        };
-      }
-      giorni[g].pasti.push({
-        pasto: item.meal,
-        slot: item.slot,
-        piatto: item.dishes.name,
-        piatto_en: item.dishes.name_en || null,
-        kcal: Math.round(vals.kcal),
-        saturi_g: Number(vals.satFat.toFixed(1)),
-        fibra_g: Number(vals.fibre.toFixed(1)),
-        sale_g: Number(vals.salt.toFixed(2)),
-        prep_min: item.dishes.prep_min,
-        passaggi: item.dishes.steps,
-        passaggi_en: item.dishes.steps_en || null,
+    const perGiorno = {};
+    for (const r of righe) {
+      const d = r.dishes || {};
+      if (!perGiorno[r.day_of_week]) perGiorno[r.day_of_week] = [];
+      perGiorno[r.day_of_week].push({
+        plan_item_id: r.id,
+        pasto: r.meal,
+        slot: r.slot,
+        piatto: d.name,
+        piatto_en: d.name_en,
+        passaggi: d.steps || [],
+        passaggi_en: d.steps_en || null,
+        prep_min: d.prep_min,
+        // I valori arrivano da plan_items: sono gia' scalati sul fabbisogno.
+        porzione_g: r.portion_g,
+        kcal: Math.round(Number(r.kcal) || 0),
+        proteine_g: Number(r.protein_g) || 0,
+        saturi_g: Number(r.sat_fat_g) || 0,
+        fibra_g: Number(r.fibre_g) || 0,
+        sale_g: Number(r.salt_g) || 0,
+        health_score: d.health_score,
+        avanzi: r.avanzi,
       });
-      giorni[g].totale.kcal     += vals.kcal;
-      giorni[g].totale.saturi_g += vals.satFat;
-      giorni[g].totale.fibra_g  += vals.fibre;
-      giorni[g].totale.sale_g   += vals.salt;
     }
 
-    const risultato = Object.values(giorni).map(g => ({
-      giorno: g.giorno,
-      pasti: g.pasti,
-      totale_giorno: {
-        kcal: Math.round(g.totale.kcal),
-        saturi_g: Number(g.totale.saturi_g.toFixed(1)),
-        fibra_g: Number(g.totale.fibra_g.toFixed(1)),
-        sale_g: Number(g.totale.sale_g.toFixed(2)),
-      },
-      verifica: {
-        saturi: g.totale.saturi_g <= LIMITI.satMaxGiorno ? 'OK' : 'SFORA',
-        sale: g.totale.sale_g <= LIMITI.saleMaxGiorno ? 'OK' : 'SFORA',
-        fibra: g.totale.fibra_g >= LIMITI.fibraMinGiorno ? 'OK' : 'BASSA',
-      },
-    }));
+    const giorni = Object.keys(perGiorno)
+      .map(Number)
+      .sort((a, b) => a - b)
+      .map((g) => ({
+        giorno: g,
+        pasti: perGiorno[g].sort((a, b) =>
+          (ordinePasto[a.pasto] || 9) - (ordinePasto[b.pasto] || 9) ||
+          (ordineSlot[a.slot] || 9) - (ordineSlot[b.slot] || 9)
+        ),
+      }));
 
-    res.json(risultato);
-  } catch (err) {
-    res.status(500).json({ errore: err.message });
+    const { data: obiettivi } = await supabase
+      .from('energy_targets')
+      .select('kcal, protein_g_min, fibre_g_min, sat_fat_g_max, salt_g_max')
+      .eq('user_id', piano.user_id)
+      .order('computed_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    res.json({
+      plan_id: piano.id,
+      week_start: piano.week_start,
+      generated_at: piano.generated_at,
+      corpus_version: piano.corpus_version,
+      dati: giorni,
+      giorni,
+      obiettivi: obiettivi || null,
+    });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
   }
 });
 
@@ -212,7 +262,10 @@ app.get('/preferenze', richiedeAuth, async (req, res) => {
     .select('cucina, rank')
     .eq('user_id', req.utente.id);
 
-  if (error) return res.status(500).json({ errore: error.message });
+  if (error) {
+    console.error('ERRORE /preferenze:', error);
+    return res.status(500).json({ errore: error.message });
+  }
   res.json(data);
 });
 
@@ -245,7 +298,10 @@ app.post('/preferenze', richiedeAuth, async (req, res) => {
     .upsert(righe, { onConflict: 'user_id,cucina' })
     .select();
 
-  if (error) return res.status(500).json({ errore: error.message });
+  if (error) {
+    console.error('ERRORE POST /preferenze:', error);
+    return res.status(500).json({ errore: error.message });
+  }
   res.json({ messaggio: 'Preferenze salvate.', preferenze: data });
 });
 
@@ -254,6 +310,181 @@ app.post('/preferenze', richiedeAuth, async (req, res) => {
 app.get('/', (req, res) => {
   res.send('NutriAI backend attivo.');
 });
+
+// ---------- ONBOARDING ----------
+
+// Dice al frontend se il profilo e' completo
+app.get('/profilo', richiedeAuth, async (req, res) => {
+  const { data, error } = await supabase
+    .from('users')
+    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, household_size, evening_minutes')
+    .eq('id', req.utente.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('ERRORE /profilo:', error);
+    return res.status(500).json({ errore: error.message });
+  }
+
+  const completo = Boolean(
+    data && data.sex && data.birth_year && data.height_cm && data.goal
+  );
+
+  res.json({ completo, profilo: data || null });
+});
+
+// Salva le risposte, calcola il fabbisogno, genera il primo piano
+app.post('/onboarding', richiedeAuth, async (req, res) => {
+  const utenteId = req.utente.id;
+  const b = req.body || {};
+
+  // --- validazione ---
+  const annoCorrente = new Date().getFullYear();
+  const errori = [];
+
+  if (!['M', 'F'].includes(b.sex)) errori.push('sesso non valido');
+  if (!Number.isInteger(b.birth_year) || b.birth_year < annoCorrente - 100 || b.birth_year > annoCorrente - 16)
+    errori.push('anno di nascita non valido');
+  if (!(b.height_cm >= 120 && b.height_cm <= 230)) errori.push('altezza non valida');
+  if (!(b.weight_kg >= 35 && b.weight_kg <= 300)) errori.push('peso non valido');
+  if (!['dimagrimento', 'mantenimento', 'massa'].includes(b.goal)) {
+    errori.push(`obiettivo non valido: ricevuto "${b.goal}"`);
+  }
+  if (![1.4, 1.6, 1.8, 2.0].includes(Number(b.pal))) errori.push('livello di attivita non valido');
+  if (!Array.isArray(b.cuisines) || b.cuisines.length === 0) errori.push('preferenze cucina mancanti');
+
+  if (errori.length) return res.status(400).json({ errore: errori.join('; ') });
+
+  const CUCINE_VALIDE = ['europea', 'usa', 'asiatica', 'sud_americana', 'australiana'];
+  if (b.cuisines.some(c => !CUCINE_VALIDE.includes(c)))
+    return res.status(400).json({ errore: 'Cucina non riconosciuta' });
+
+  const oggi = new Date().toISOString().slice(0, 10);
+
+  try {
+    // 1. profilo
+    const { error: e1 } = await supabase
+      .from('users')
+      .update({
+        sex: b.sex,
+        birth_year: b.birth_year,
+        height_cm: b.height_cm,
+        city: b.city || null,
+        region_zone: b.region_zone || null,
+        goal: b.goal,
+        cook_days: Array.isArray(b.cook_days) && b.cook_days.length ? b.cook_days : [1,2,3,4,5,6,7],
+        lunch_away: Boolean(b.lunch_away),
+        household_size: Number(b.household_size) || 1,
+        evening_minutes: Number(b.evening_minutes) || 45,
+      })
+      .eq('id', utenteId);
+    if (e1) throw new Error(`profilo: ${e1.message}`);
+
+    // 2. peso
+    const { error: e2 } = await supabase
+      .from('body_measurements')
+      .insert({ user_id: utenteId, measured_on: oggi, weight_kg: Number(b.weight_kg), source: 'utente' });
+    if (e2) throw new Error(`peso: ${e2.message}`);
+
+    // 3. livello di attivita'
+    const { error: e3 } = await supabase
+      .from('activity_periods')
+      .insert({ user_id: utenteId, pal: b.pal, valid_from: oggi, valid_to: null });
+    if (e3) throw new Error(`attivita: ${e3.message}`);
+
+    // 4. vincoli alimentari (facoltativi)
+    if (Array.isArray(b.constraints) && b.constraints.length) {
+      const righe = b.constraints
+        .filter(c => c && c.subject)
+        .slice(0, 40)
+        .map(c => ({
+          user_id: utenteId,
+          kind: c.kind || 'non_gradito',
+          subject: String(c.subject).trim().slice(0, 80),
+          severity: c.severity || 'preferibile',
+          declared_at: new Date().toISOString(),
+        }));
+      if (righe.length) {
+        const { error: e4 } = await supabase.from('user_constraints').insert(righe);
+        if (e4) throw new Error(`vincoli: ${e4.message}`);
+      }
+    }
+
+    // 5. preferenze cucina (l'ordine dell'array e' il rank)
+    const prefs = b.cuisines.map((c, i) => ({ user_id: utenteId, cucina: c, rank: i + 1 }));
+    const { error: e5 } = await supabase
+      .from('user_cuisine_preferences')
+      .upsert(prefs, { onConflict: 'user_id,cucina' });
+    if (e5) throw new Error(`preferenze: ${e5.message}`);
+
+    // 6. fabbisogno energetico
+    const target = await calcolaESalvaTarget(supabase, utenteId);
+
+    // 7. primo piano
+    const piano = await generaESalva(supabase, utenteId);
+
+    res.json({ ok: true, kcal: target.kcal, ...piano });
+  } catch (err) {
+    console.error('ERRORE /onboarding:', err);
+    res.status(500).json({ errore: err.message });
+  }
+});
+
+// Rigenera il piano per chi ha gia' un profilo
+app.post('/genera-piano', richiedeAuth, async (req, res) => {
+  try {
+    const piano = await generaESalva(supabase, req.utente.id);
+    res.json({ ok: true, ...piano });
+  } catch (err) {
+    console.error('ERRORE /genera-piano:', err);
+    res.status(500).json({ errore: err.message });
+  }
+});
+
+// Registra cosa e' successo davvero a un piatto del piano.
+// E' il dato piu' prezioso che raccogliamo: dice se il piano regge la vita vera.
+app.post('/esito', richiedeAuth, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const stati = ['cucinato', 'modificato', 'saltato'];
+    const motivi = ['tempo', 'gusto', 'ingredienti', 'fuori_casa', 'altro'];
+
+    if (!b.plan_item_id) return res.status(400).json({ errore: 'plan_item_id mancante' });
+    if (!stati.includes(b.status)) return res.status(400).json({ errore: 'stato non valido' });
+    if (b.skip_reason && !motivi.includes(b.skip_reason)) {
+      return res.status(400).json({ errore: 'motivo non valido' });
+    }
+
+    // Verifica che la riga appartenga davvero a questo utente
+    const { data: riga } = await supabase
+      .from('plan_items')
+      .select('id, dish_id, plans!inner(user_id)')
+      .eq('id', b.plan_item_id)
+      .single();
+
+    if (!riga || riga.plans.user_id !== req.utente.id) {
+      return res.status(403).json({ errore: 'Non autorizzato' });
+    }
+
+    const { error } = await supabase.from('meal_outcomes').upsert({
+      user_id: req.utente.id,
+      plan_item_id: b.plan_item_id,
+      dish_id: riga.dish_id,
+      status: b.status,
+      skip_reason: b.status === 'saltato' ? (b.skip_reason || 'altro') : null,
+      liked: b.liked ? Number(b.liked) : null,
+      recorded_at: new Date().toISOString(),
+    }, { onConflict: 'plan_item_id' });
+
+    if (error) return res.status(500).json({ errore: error.message });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+console.log('[server] file:', __filename);
+console.log('[server] avviato', new Date().toLocaleTimeString('it-IT'));
 
 app.listen(PORT, () => {
   console.log(`\nServer avviato sulla porta ${PORT}`);
