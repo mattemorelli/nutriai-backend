@@ -164,7 +164,7 @@ function limiteEfficace(secondi, profili, minutiDichiarati, minimoRichiesto) {
 async function caricaPiatti(supabase, famiglie) {
   const { data: piatti, error } = await supabase
     .from('dishes')
-    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile')
+    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese')
     .gte('health_score', 7)
     .not('profilo', 'is', null)
     .in('occasione', ['quotidiano', 'lungo'])
@@ -231,7 +231,7 @@ async function generaESalva(supabase, userId) {
 
   const { data: profiloUtente } = await supabase
     .from('users')
-    .select('cook_days, lunch_away, evening_minutes, household_size')
+    .select('cook_days, lunch_away, evening_minutes, household_size, diet, paesi')
     .eq('id', userId)
     .maybeSingle();
 
@@ -240,6 +240,56 @@ async function generaESalva(supabase, userId) {
     : [1, 2, 3, 4, 5, 6, 7];
   const pranzoFuori = Boolean(profiloUtente && profiloUtente.lunch_away);
   const minutiSera = (profiloUtente && Number(profiloUtente.evening_minutes)) || 45;
+
+  const paesiScelti = (profiloUtente && profiloUtente.paesi) || [];
+  const GENERICI = ['mediterraneo_generico', 'asia_generico', 'latino_generico'];
+
+  // Il paese scelto domina, il generico della famiglia lo accompagna,
+  // gli altri paesi restano possibili ma rari: e' cosi' che mangia una persona.
+  const pesoPaese = (p) => {
+    if (!paesiScelti.length) return 1;
+    if (paesiScelti.includes(p.paese)) return 25;
+    if (GENERICI.includes(p.paese)) return 6;
+    return 1;
+  };
+
+  const { data: vincoli } = await supabase
+    .from('user_constraints').select('kind, subject, severity').eq('user_id', userId);
+
+  const esclusi = new Set((vincoli || []).map(v => v.subject));
+  const dieta = profiloUtente?.diet || 'onnivoro';
+
+  const ammesso = (p) => {
+    if (esclusi.has('glutine') && p.contiene_glutine) return false;
+    if (esclusi.has('lattosio') && p.contiene_lattosio) return false;
+    if (esclusi.has('frutta_secca') && p.contiene_frutta_secca) return false;
+
+    if (dieta === 'vegano' && ['carne_rossa','carne_bianca','pesce','uova','formaggio'].includes(p.gruppo)) return false;
+    if (dieta === 'vegetariano' && ['carne_rossa','carne_bianca','pesce'].includes(p.gruppo)) return false;
+    if (dieta === 'pescetariano' && ['carne_rossa','carne_bianca'].includes(p.gruppo)) return false;
+
+    return true;
+  };
+
+  // Cosa l'utente ha deciso di tenere dalla settimana precedente
+  const { data: pianoVecchio } = await supabase
+    .from('plans').select('id')
+    .eq('user_id', userId)
+    .order('generated_at', { ascending: false }).limit(1).maybeSingle();
+
+  const bloccatiPerGiorno = {};
+  if (pianoVecchio) {
+    const { data: righeBloccate } = await supabase
+      .from('plan_items')
+      .select('day_of_week, meal, slot, dish_id, portion_g, kcal, protein_g, sat_fat_g, fibre_g, salt_g')
+      .eq('plan_id', pianoVecchio.id)
+      .eq('bloccato', true);
+
+    for (const r of (righeBloccate || [])) {
+      if (!bloccatiPerGiorno[r.day_of_week]) bloccatiPerGiorno[r.day_of_week] = [];
+      bloccatiPerGiorno[r.day_of_week].push(r);
+    }
+  }
 
   const cucinaOggi = (g) => giorniCottura.includes(g);
   const ferialeG = (g) => g <= 5;
@@ -366,6 +416,16 @@ async function generaESalva(supabase, userId) {
         : profiloSettimana;
       if (!profiloGiorno) { valido = false; break; }
 
+      // Se la giornata è bloccata per intero, si riporta identica
+      const bloccatiOggi = bloccatiPerGiorno[g] || [];
+      const giornoInteroBloccato = bloccatiOggi.some(b => b.slot === 'secondo')
+        && bloccatiOggi.some(b => b.slot === 'primo');
+
+      if (giornoInteroBloccato) {
+        settimana.push({ giorno: g, profilo: profiloGiorno, bloccati: bloccatiOggi, conforme: true, pasti: [] });
+        continue;
+      }
+
       // ---- 1. Gli avanzi si cercano PRIMA di ogni altra cosa ----
       let secondo = null;
       let secondoEAvanzo = false;
@@ -386,19 +446,21 @@ async function generaESalva(supabase, userId) {
       if (!secondo) {
         const gruppoRichiesto = sequenza[g - 1];
 
-        secondo = pescaCasuale(secondi, p =>
-          p.profilo === profiloGiorno && !usati.has(p.id) && !rifiutato(p) &&
+        const candidati = secondi.filter(p =>
+          p.profilo === profiloGiorno && !usati.has(p.id) && !rifiutato(p) && ammesso(p) &&
           (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
           (!p.salsa_industriale || usoSalse < 1) &&
           (!gruppoRichiesto || p.gruppo === gruppoRichiesto)
         );
+        secondo = pescaPesato(candidati, pesoPaese);
 
         if (!secondo) {
-          secondo = pescaCasuale(secondi, p =>
-            p.profilo === profiloGiorno && !usati.has(p.id) && !rifiutato(p) &&
+          const larghi = secondi.filter(p =>
+            p.profilo === profiloGiorno && !usati.has(p.id) && !rifiutato(p) && ammesso(p) &&
             (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
             (!p.salsa_industriale || usoSalse < 1)
           );
+          secondo = pescaPesato(larghi, pesoPaese);
         }
 
         if (secondo && secondo.salsa_industriale) usoSalse++;
@@ -406,43 +468,44 @@ async function generaESalva(supabase, userId) {
 
       if (!secondo) { motivi.secondo++; valido = false; break; }
 
-      const primo = pescaCasuale(primi, p =>
-        compatibile(p, profiloGiorno) && !usati.has(p.id) && !rifiutato(p) &&
+      const candidatiPrimo = primi.filter(p =>
+        compatibile(p, profiloGiorno) && !usati.has(p.id) && !rifiutato(p) && ammesso(p) &&
         (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
         (!pranzoFuori || p.trasportabile)
       );
+      const primo = pescaPesato(candidatiPrimo, pesoPaese);
       if (!primo) { motivi.primo++; valido = false; break; }
 
       const contornoCena = pescaCasuale(contorni, c =>
         compatibile(c, profiloGiorno) && accompagnaBene(c, secondo) &&
-        !usati.has(c.id) && !rifiutato(c) &&
+        !usati.has(c.id) && !rifiutato(c) && ammesso(c) &&
         (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g)
       );
 
       const contornoPranzo = pescaCasuale(contorni, c =>
         compatibile(c, profiloGiorno) && accompagnaBene(c, primo) &&
-        !usati.has(c.id) && !rifiutato(c) &&
+        !usati.has(c.id) && !rifiutato(c) && ammesso(c) &&
         c.id !== (contornoCena && contornoCena.id) &&
         (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g) &&
         (!pranzoFuori || c.trasportabile)
       );
 
       const colazione = pescaCasuale(colazioni, p =>
-        compatibile(p, profiloGiorno) && !usati.has(p.id) && (p.prep_min || 10) <= 15
+        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) && (p.prep_min || 10) <= 15
       );
       const spuntino = pescaCasuale(spuntini, p =>
-        compatibile(p, profiloGiorno) && !usati.has(p.id) && (p.prep_min || 5) <= 10
+        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) && (p.prep_min || 5) <= 10
       );
 
       // ---- 4. Base amidacea a cena ----
       let base = null;
       const cenaHaAmido = secondo.ha_amido || (contornoCena && contornoCena.ha_amido);
       if (!cenaHaAmido) {
-        base = pescaCasuale(piatti.filter(p => p.base_amidacea), b => !usati.has(b.id));
+        base = pescaCasuale(piatti.filter(p => p.base_amidacea), b => !usati.has(b.id) && ammesso(b));
       }
 
       const spuntino2 = pescaCasuale(spuntini, p =>
-        compatibile(p, profiloGiorno) && !usati.has(p.id) &&
+        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) &&
         p.id !== (spuntino && spuntino.id) && (p.prep_min || 5) <= 10
       );
 
@@ -492,10 +555,16 @@ async function generaESalva(supabase, userId) {
 
     motivi.completati++;
 
-    const conformi = settimana.filter(g => g.conforme).length;
-    const completezza = settimana.reduce((s, g) => s + g.pasti.length, 0) / (7 * 6);
-    const mediaSalute = settimana.reduce((s, g) =>
-      s + g.pasti.reduce((a, p) => a + (p.piatto.health_score || 0), 0) / g.pasti.length, 0) / 7;
+    // I giorni bloccati non hanno pasti generati: non entrano nei calcoli sotto.
+    const conPasti = settimana.filter(g => g.pasti.length > 0);
+    const conformi = conPasti.filter(g => g.conforme).length;
+    const completezza = conPasti.length
+      ? conPasti.reduce((s, g) => s + g.pasti.length, 0) / (conPasti.length * 6)
+      : 1;
+    const mediaSalute = conPasti.length
+      ? conPasti.reduce((s, g) =>
+          s + g.pasti.reduce((a, p) => a + (p.piatto.health_score || 0), 0) / g.pasti.length, 0) / conPasti.length
+      : 0;
     const punteggio = conformi + completezza * 2 + mediaSalute * 0.5;
 
     if (punteggio > migliorPunteggio) {
@@ -506,9 +575,9 @@ async function generaESalva(supabase, userId) {
 
   if (!migliore) {
     throw new Error(
-      'Nessuna settimana completabile. Cause: secondo mancante ' + motivi.secondo +
-      ', primo mancante ' + motivi.primo + ', tempo eccessivo ' + motivi.tempo +
-      ', completate ' + motivi.completati + ' su ' + TENTATIVI
+      `Nessuna settimana completabile. Miglior punteggio: ${migliorPunteggio}. ` +
+      `Cause: secondo mancante ${motivi.secondo}, primo mancante ${motivi.primo}, ` +
+      `tempo eccessivo ${motivi.tempo}, completate ${motivi.completati} su ${TENTATIVI}`
     );
   }
 
@@ -529,7 +598,7 @@ async function generaESalva(supabase, userId) {
       week_start: lunediCorrente(),
       generated_at: new Date().toISOString(),
       energy_target_id: target?.id ?? null,
-      corpus_version: 'v7-contesto-utente',
+      corpus_version: 'v8-paesi',
     })
     .select('id')
     .single();
@@ -537,6 +606,12 @@ async function generaESalva(supabase, userId) {
 
   const righe = [];
   for (const g of migliore) {
+    if (g.bloccati && g.bloccati.length && !g.pasti.length) {
+      for (const b of g.bloccati) {
+        righe.push({ plan_id: piano.id, ...b, bloccato: true });
+      }
+      continue;
+    }
     const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo) : g.pasti.map(p => ({ p, f: 1 }));
     for (const x of adattati) {
       const p = x.p, f = x.f;

@@ -184,7 +184,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
     const { data: righe, error: errItems } = await supabase
       .from('plan_items')
       .select(`
-        id, day_of_week, meal, slot, portion_g, avanzi,
+        id, day_of_week, meal, slot, portion_g, avanzi, bloccato,
         kcal, protein_g, sat_fat_g, fibre_g, salt_g,
         dishes ( name, name_en, prep_min, steps, steps_en, health_score )
       `)
@@ -218,6 +218,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
         sale_g: Number(r.salt_g) || 0,
         health_score: d.health_score,
         avanzi: r.avanzi,
+        bloccato: r.bloccato,
       });
     }
 
@@ -317,7 +318,7 @@ app.get('/', (req, res) => {
 app.get('/profilo', richiedeAuth, async (req, res) => {
   const { data, error } = await supabase
     .from('users')
-    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, household_size, evening_minutes')
+    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, household_size, evening_minutes, paesi')
     .eq('id', req.utente.id)
     .maybeSingle();
 
@@ -350,7 +351,9 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
   if (!['dimagrimento', 'mantenimento', 'massa'].includes(b.goal)) {
     errori.push(`obiettivo non valido: ricevuto "${b.goal}"`);
   }
-  if (![1.4, 1.6, 1.8, 2.0].includes(Number(b.pal))) errori.push('livello di attivita non valido');
+  const LAVORI_VALIDI = ['sedentario', 'in_piedi', 'fisico', 'molto_fisico'];
+  const lavoroValido = LAVORI_VALIDI.includes(b.occupation_level);
+  if (!lavoroValido) errori.push('livello di attività non valido');
   if (!Array.isArray(b.cuisines) || b.cuisines.length === 0) errori.push('preferenze cucina mancanti');
 
   if (errori.length) return res.status(400).json({ errore: errori.join('; ') });
@@ -376,21 +379,38 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
         lunch_away: Boolean(b.lunch_away),
         household_size: Number(b.household_size) || 1,
         evening_minutes: Number(b.evening_minutes) || 45,
+        diet: ['onnivoro','vegetariano','vegano','pescetariano'].includes(b.diet) ? b.diet : 'onnivoro',
+        paesi: Array.isArray(b.paesi) ? b.paesi : [],
+        occupation_level: lavoroValido ? b.occupation_level : null,
       })
       .eq('id', utenteId);
     if (e1) throw new Error(`profilo: ${e1.message}`);
 
+    // Il PAL resta scritto per compatibilità con i profili vecchi,
+    // ma il calcolo userà occupation_level e training_sessions.
+    if (Array.isArray(b.training_sessions) && b.training_sessions.length) {
+      await supabase.from('training_sessions').delete().eq('user_id', req.utente.id);
+      await supabase.from('training_sessions').insert(
+        b.training_sessions.map((t) => ({
+          user_id: req.utente.id,
+          activity: t.activity,
+          minutes_per_week: Math.min(1200, Math.max(0, Number(t.minutes_per_week) || 0)),
+          intensity: ['leggera', 'moderata', 'intensa'].includes(t.intensity) ? t.intensity : 'moderata',
+        }))
+      );
+    }
+
     // 2. peso
     const { error: e2 } = await supabase
       .from('body_measurements')
-      .insert({ user_id: utenteId, measured_on: oggi, weight_kg: Number(b.weight_kg), source: 'utente' });
+      .insert({
+        user_id: utenteId,
+        measured_on: oggi,
+        weight_kg: Number(b.weight_kg),
+        source: 'utente',
+        body_fat_pct: b.body_fat_pct || null,
+      });
     if (e2) throw new Error(`peso: ${e2.message}`);
-
-    // 3. livello di attivita'
-    const { error: e3 } = await supabase
-      .from('activity_periods')
-      .insert({ user_id: utenteId, pal: b.pal, valid_from: oggi, valid_to: null });
-    if (e3) throw new Error(`attivita: ${e3.message}`);
 
     // 4. vincoli alimentari (facoltativi)
     if (Array.isArray(b.constraints) && b.constraints.length) {
@@ -475,6 +495,47 @@ app.post('/esito', richiedeAuth, async (req, res) => {
       liked: b.liked ? Number(b.liked) : null,
       recorded_at: new Date().toISOString(),
     }, { onConflict: 'plan_item_id' });
+
+    if (error) return res.status(500).json({ errore: error.message });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+// Blocca o sblocca un piatto: alla prossima generazione resterà dov'è.
+app.post('/blocca', richiedeAuth, async (req, res) => {
+  try {
+    const { plan_item_id, bloccato, day_of_week } = req.body || {};
+
+    if (day_of_week) {
+      // blocca l'intera giornata
+      const { data: piano } = await supabase
+        .from('plans').select('id')
+        .eq('user_id', req.utente.id)
+        .order('generated_at', { ascending: false }).limit(1).single();
+
+      const { error } = await supabase
+        .from('plan_items')
+        .update({ bloccato: Boolean(bloccato) })
+        .eq('plan_id', piano.id)
+        .eq('day_of_week', day_of_week);
+
+      if (error) return res.status(500).json({ errore: error.message });
+      return res.json({ ok: true });
+    }
+
+    const { data: riga } = await supabase
+      .from('plan_items')
+      .select('id, plans!inner(user_id)')
+      .eq('id', plan_item_id).single();
+
+    if (!riga || riga.plans.user_id !== req.utente.id) {
+      return res.status(403).json({ errore: 'Non autorizzato' });
+    }
+
+    const { error } = await supabase
+      .from('plan_items').update({ bloccato: Boolean(bloccato) }).eq('id', plan_item_id);
 
     if (error) return res.status(500).json({ errore: error.message });
     res.json({ ok: true });
