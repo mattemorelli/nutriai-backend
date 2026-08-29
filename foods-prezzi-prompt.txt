@@ -1,0 +1,24 @@
+Ricevi un array JSON di alimenti da un database nutrizionale italiano.
+Ogni elemento ha: id, name_it (nome italiano), reparto, unita.
+
+Per ciascuno stima il prezzo medio al chilogrammo (o al litro per i liquidi)
+nella grande distribuzione italiana, prodotto standard di marca commerciale,
+non biologico e non premium.
+
+Restituisci un oggetto con:
+- id: lo stesso id ricevuto
+- prezzo_kg: numero in euro al chilo, con due decimali
+- confidenza: "alta" se è un alimento comune di cui conosci bene il prezzo,
+  "media" se stimi per analogia con alimenti simili,
+  "bassa" se è un alimento raro o molto variabile
+
+Riferimenti indicativi per tararti: pasta secca 1,50; pane 3,50; riso 2,50;
+latte 1,30 al litro; uova 4,00 al kg; petto di pollo 9,00; manzo 15,00;
+merluzzo 14,00; salmone 22,00; pomodori 2,50; patate 1,50; mele 2,00;
+olio extravergine 8,00 al litro; parmigiano 16,00; mozzarella 8,00;
+lenticchie secche 3,00; mandorle 14,00.
+
+Per le spezie e le erbe indica il prezzo al chilo reale anche se si comprano
+in quantità minime (origano 30,00; zafferano 3000,00).
+
+Rispondi SOLO con l'array JSON, senza testo prima o dopo, senza backtick.

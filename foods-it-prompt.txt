@@ -1,0 +1,27 @@
+Ricevi un array JSON di alimenti da un database nutrizionale. Ogni elemento ha:
+- id: identificatore
+- name: il nome nel database (inglese tecnico USDA o italiano)
+- name_en: il nome inglese già ripulito
+
+Per ciascuno restituisci un oggetto con:
+
+- id: lo stesso id ricevuto, invariato
+- name_it: il nome italiano come lo scriveresti su una lista della spesa.
+  Breve e naturale. Esempi: "Cod" -> "Merluzzo"; "Olive oil" -> "Olio di oliva";
+  "Chicken breast" -> "Petto di pollo"; "Rolled oats" -> "Fiocchi d'avena".
+- sinonimi: array di altri modi in cui quell'alimento compare sulle confezioni
+  italiane, tutto minuscolo, senza accenti se possibile.
+  Includi: varianti regionali, forme commerciali, tagli, nomi di specie affini
+  che il consumatore considera lo stesso prodotto.
+  Esempi:
+    "Merluzzo" -> ["merluzzo", "baccala", "stoccafisso", "nasello"]
+    "Zucchina" -> ["zucchina", "zucchine", "zucchino"]
+    "Passata di pomodoro" -> ["passata", "polpa di pomodoro", "pelati", "pomodoro"]
+    "Petto di pollo" -> ["petto di pollo", "fesa di pollo", "filetto di pollo"]
+  Da 1 a 6 voci. NON includere parole di 3 lettere o meno.
+  NON includere parole generiche che compaiono in mille prodotti
+  (come "olio", "sale", "acqua") a meno che non siano l'alimento stesso.
+
+Rispondi SOLO con l'array JSON, senza testo prima o dopo, senza backtick
+e senza blocchi markdown. Un oggetto per ogni alimento ricevuto, nello
+stesso ordine.

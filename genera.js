@@ -1,5 +1,22 @@
 console.log('[genera] v6-piano-proteico caricato');
 
+// Il generico è ammesso solo dentro la sua famiglia: un piatto
+// "mediterraneo generico" sta bene in una giornata italiana,
+// non in una giapponese.
+const GENERICO_DI = {
+  italia: 'mediterraneo_generico', francia: 'mediterraneo_generico',
+  spagna: 'mediterraneo_generico', grecia: 'mediterraneo_generico',
+  portogallo: 'mediterraneo_generico',
+  germania: 'centro_nord_generico', regno_unito: 'centro_nord_generico',
+  giappone: 'asia_generico', cina: 'asia_generico', thailandia: 'asia_generico',
+  corea: 'asia_generico', vietnam: 'asia_generico',
+  messico: 'latino_generico', argentina: 'latino_generico',
+  brasile: 'latino_generico', ande: 'latino_generico',
+  stati_uniti: null, australia: null,
+};
+
+const CORPUS_VERSION = 'v8-paesi-e-vincoli';
+
 // Quanto ogni elemento puo' essere scalato. Le ancore hanno margini stretti,
 // le leve margini ampi. E' questa distinzione che evita le porzioni assurde.
 const LIMITI_SCALA = {
@@ -162,15 +179,27 @@ function limiteEfficace(secondi, profili, minutiDichiarati, minimoRichiesto) {
 }
 
 async function caricaPiatti(supabase, famiglie) {
-  const { data: piatti, error } = await supabase
-    .from('dishes')
-    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese')
-    .gte('health_score', 7)
-    .not('profilo', 'is', null)
-    .in('occasione', ['quotidiano', 'lungo'])
-    .in('famiglia', [...famiglie, 'neutra']);
+  // PostgREST impone un tetto di righe per risposta (di default 1000)
+  // indipendente da .limit(): con 1741 piatti nel db va paginato con
+  // .range(), altrimenti i piatti inseriti per ultimi (es. centro_nord_generico)
+  // restano sempre fuori dal generatore.
+  const piatti = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await supabase
+      .from('dishes')
+      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese')
+      .gte('health_score', 7)
+      .not('profilo', 'is', null)
+      .in('occasione', ['quotidiano', 'lungo'])
+      .in('famiglia', [...famiglie, 'neutra'])
+      .range(offset, offset + PAGINA - 1);
 
-  if (error) throw new Error(error.message);
+    if (error) throw new Error(error.message);
+    piatti.push(...blocco);
+    if (blocco.length < PAGINA) break;
+  }
+
   if (!piatti?.length) throw new Error('Nessun piatto etichettato per le cucine scelte');
 
   const ids = piatti.map(p => p.id);
@@ -242,7 +271,7 @@ async function generaESalva(supabase, userId) {
   const minutiSera = (profiloUtente && Number(profiloUtente.evening_minutes)) || 45;
 
   const paesiScelti = (profiloUtente && profiloUtente.paesi) || [];
-  const GENERICI = ['mediterraneo_generico', 'asia_generico', 'latino_generico'];
+  const GENERICI = ['mediterraneo_generico', 'asia_generico', 'latino_generico', 'centro_nord_generico'];
 
   // Il paese scelto domina, il generico della famiglia lo accompagna,
   // gli altri paesi restano possibili ma rari: e' cosi' che mangia una persona.
@@ -253,23 +282,75 @@ async function generaESalva(supabase, userId) {
     return 1;
   };
 
+  // --- Espansione dei vincoli tramite categorie_alimenti ---
+
+  // 1. I vincoli dell'utente
   const { data: vincoli } = await supabase
-    .from('user_constraints').select('kind, subject, severity').eq('user_id', userId);
+    .from('user_constraints')
+    .select('kind, subject, severity')
+    .eq('user_id', userId);
 
-  const esclusi = new Set((vincoli || []).map(v => v.subject));
+  // 2. Le categorie con i loro sinonimi
+  const { data: categorie } = await supabase
+    .from('categorie')
+    .select('codice, sinonimi');
+
+  // 3. Per ogni subject dichiarato, l'insieme dei food_id da escludere
+  const foodIdVietati = new Set();
+
+  for (const v of (vincoli || [])) {
+    const s = (v.subject || '').trim().toLowerCase();
+    if (!s) continue;
+
+    // Il subject corrisponde a una categoria (per codice o per sinonimo)?
+    const cat = (categorie || []).find(
+      (c) => c.codice === s || (c.sinonimi || []).some((sin) => sin.toLowerCase() === s)
+    );
+
+    if (cat) {
+      const { data: righe } = await supabase
+        .from('categorie_alimenti')
+        .select('food_id')
+        .eq('categoria', cat.codice);
+      for (const r of (righe || [])) foodIdVietati.add(r.food_id);
+      continue;
+    }
+
+    // Altrimenti e' un singolo alimento: prendo TUTTE le corrispondenze
+    const { data: cibi } = await supabase
+      .from('foods')
+      .select('id')
+      .or(`name.ilike.%${s}%,name_it.ilike.%${s}%`);
+    for (const c of (cibi || [])) foodIdVietati.add(c.id);
+  }
+
+  // 4. Le categorie escluse dalla dieta
   const dieta = profiloUtente?.diet || 'onnivoro';
+  const categorieDieta = {
+    vegano:       ['carne_rossa', 'carne_bianca', 'pesce', 'crostacei', 'uova', 'latticini'],
+    vegetariano:  ['carne_rossa', 'carne_bianca', 'pesce', 'crostacei'],
+    pescetariano: ['carne_rossa', 'carne_bianca'],
+  };
 
+  for (const codice of (categorieDieta[dieta] || [])) {
+    const { data: righe } = await supabase
+      .from('categorie_alimenti')
+      .select('food_id')
+      .eq('categoria', codice);
+    for (const r of (righe || [])) foodIdVietati.add(r.food_id);
+  }
+
+  // 5. Il filtro: un piatto e' ammesso se nessuno dei suoi ingredienti e' vietato
   const ammesso = (p) => {
-    if (esclusi.has('glutine') && p.contiene_glutine) return false;
-    if (esclusi.has('lattosio') && p.contiene_lattosio) return false;
-    if (esclusi.has('frutta_secca') && p.contiene_frutta_secca) return false;
-
-    if (dieta === 'vegano' && ['carne_rossa','carne_bianca','pesce','uova','formaggio'].includes(p.gruppo)) return false;
-    if (dieta === 'vegetariano' && ['carne_rossa','carne_bianca','pesce'].includes(p.gruppo)) return false;
-    if (dieta === 'pescetariano' && ['carne_rossa','carne_bianca'].includes(p.gruppo)) return false;
-
+    const ingredienti = p.ingredienti || p.dish_ingredients || [];
+    for (const i of ingredienti) {
+      const fid = i.food_id || (i.foods && i.foods.id);
+      if (fid && foodIdVietati.has(fid)) return false;
+    }
     return true;
   };
+
+  console.log(`Vincoli: ${foodIdVietati.size} alimenti esclusi (dieta: ${dieta})`);
 
   // Cosa l'utente ha deciso di tenere dalla settimana precedente
   const { data: pianoVecchio } = await supabase
@@ -306,7 +387,11 @@ async function generaESalva(supabase, userId) {
   const famiglie = Object.keys(pesoFamiglia);
   if (!famiglie.length) throw new Error('Nessuna famiglia di sapori derivabile dalle preferenze');
 
-  const piatti = await caricaPiatti(supabase, famiglie);
+  let piatti = await caricaPiatti(supabase, famiglie);
+
+  // La dieta è un vincolo assoluto: si applica una volta sola, a monte,
+  // così quote, piano proteico e selezione lavorano già su piatti ammessi.
+  piatti = piatti.filter(ammesso);
 
   // Cosa e' successo nelle settimane precedenti
   const { data: esiti } = await supabase
@@ -416,6 +501,27 @@ async function generaESalva(supabase, userId) {
         : profiloSettimana;
       if (!profiloGiorno) { valido = false; break; }
 
+      // Un paese per giornata, come il profilo. Senza questo, il pranzo
+      // è italiano e la cena messicana, e nascono accostamenti che nessuno mangia.
+      const paeseGiorno = paesiScelti.length
+        ? paesiScelti[(g - 1) % paesiScelti.length]
+        : null;
+
+      const genericoOggi = paeseGiorno ? GENERICO_DI[paeseGiorno] : null;
+
+      const paeseOk = (p) => {
+        if (!paeseGiorno) return true;
+        return p.paese === paeseGiorno || (genericoOggi && p.paese === genericoOggi);
+      };
+
+      // Colazione e spuntino sono gli unici pasti dove frutta, yogurt e
+      // frutta secca restano universali: un tedesco che mangia un mandarino
+      // non rompe la coerenza della giornata come farebbe a pranzo o cena.
+      // Qui si accetta anche mediterraneo_generico, molto piu' ampio degli
+      // altri generici, per non sacrificare varieta' su questi due slot.
+      const paeseOkLeggero = (p) =>
+        paeseOk(p) || p.paese === 'mediterraneo_generico';
+
       // Se la giornata è bloccata per intero, si riporta identica
       const bloccatiOggi = bloccatiPerGiorno[g] || [];
       const giornoInteroBloccato = bloccatiOggi.some(b => b.slot === 'secondo')
@@ -447,7 +553,7 @@ async function generaESalva(supabase, userId) {
         const gruppoRichiesto = sequenza[g - 1];
 
         const candidati = secondi.filter(p =>
-          p.profilo === profiloGiorno && !usati.has(p.id) && !rifiutato(p) && ammesso(p) &&
+          p.profilo === profiloGiorno && !usati.has(p.id) && !rifiutato(p) && ammesso(p) && paeseOk(p) &&
           (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
           (!p.salsa_industriale || usoSalse < 1) &&
           (!gruppoRichiesto || p.gruppo === gruppoRichiesto)
@@ -456,11 +562,21 @@ async function generaESalva(supabase, userId) {
 
         if (!secondo) {
           const larghi = secondi.filter(p =>
-            p.profilo === profiloGiorno && !usati.has(p.id) && !rifiutato(p) && ammesso(p) &&
+            p.profilo === profiloGiorno && !usati.has(p.id) && !rifiutato(p) && ammesso(p) && paeseOk(p) &&
             (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
             (!p.salsa_industriale || usoSalse < 1)
           );
           secondo = pescaPesato(larghi, pesoPaese);
+        }
+
+        if (!secondo && paeseGiorno) {
+          // Ultimo tentativo: solo il generico della famiglia,
+          // mai un altro paese. Meglio un piatto neutro che uno fuori posto.
+          const generici = secondi.filter(p =>
+            p.paese === genericoOggi && !usati.has(p.id) && !rifiutato(p) && ammesso(p) &&
+            (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g)
+          );
+          secondo = pescaCasuale(generici, () => true);
         }
 
         if (secondo && secondo.salsa_industriale) usoSalse++;
@@ -468,46 +584,108 @@ async function generaESalva(supabase, userId) {
 
       if (!secondo) { motivi.secondo++; valido = false; break; }
 
-      const candidatiPrimo = primi.filter(p =>
-        compatibile(p, profiloGiorno) && !usati.has(p.id) && !rifiutato(p) && ammesso(p) &&
+      let primo = pescaPesato(primi.filter(p =>
+        compatibile(p, profiloGiorno) && !usati.has(p.id) && !rifiutato(p) && ammesso(p) && paeseOk(p) &&
         (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
         (!pranzoFuori || p.trasportabile)
-      );
-      const primo = pescaPesato(candidatiPrimo, pesoPaese);
+      ), pesoPaese);
+
+      if (!primo && paeseGiorno) {
+        // Come per il secondo: se il profilo del giorno non ha primi propri
+        // nel paese/generico scelto, meglio un primo neutro del generico
+        // che niente. I profili centro-nord (europeo-*) sono minoritari nel
+        // catalogo rispetto ai mediterranei, quindi il profiloGiorno quasi
+        // mai coincide: qui si ignora il profilo, non il paese.
+        const generici = primi.filter(p =>
+          p.paese === genericoOggi && !usati.has(p.id) && !rifiutato(p) && ammesso(p) &&
+          (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
+          (!pranzoFuori || p.trasportabile)
+        );
+        primo = pescaCasuale(generici, () => true);
+      }
+
       if (!primo) { motivi.primo++; valido = false; break; }
 
-      const contornoCena = pescaCasuale(contorni, c =>
+      let contornoCena = pescaCasuale(contorni, c =>
         compatibile(c, profiloGiorno) && accompagnaBene(c, secondo) &&
-        !usati.has(c.id) && !rifiutato(c) && ammesso(c) &&
+        !usati.has(c.id) && !rifiutato(c) && ammesso(c) && paeseOk(c) &&
         (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g)
       );
 
-      const contornoPranzo = pescaCasuale(contorni, c =>
+      // I contorni sono l'unico slot dove il neutro non stona, ma restano
+      // dentro il paese o il suo generico: mai un altro paese, come per il secondo.
+      if (!contornoCena) {
+        contornoCena = pescaCasuale(contorni, c =>
+          (c.profilo === 'neutro' || !c.profilo) && paeseOk(c) &&
+          !usati.has(c.id) && !rifiutato(c) && ammesso(c) &&
+          (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g)
+        );
+      }
+
+      let contornoPranzo = pescaCasuale(contorni, c =>
         compatibile(c, profiloGiorno) && accompagnaBene(c, primo) &&
-        !usati.has(c.id) && !rifiutato(c) && ammesso(c) &&
+        !usati.has(c.id) && !rifiutato(c) && ammesso(c) && paeseOk(c) &&
         c.id !== (contornoCena && contornoCena.id) &&
         (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g) &&
         (!pranzoFuori || c.trasportabile)
       );
 
-      const colazione = pescaCasuale(colazioni, p =>
-        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) && (p.prep_min || 10) <= 15
+      if (!contornoPranzo) {
+        contornoPranzo = pescaCasuale(contorni, c =>
+          (c.profilo === 'neutro' || !c.profilo) && paeseOk(c) &&
+          !usati.has(c.id) && !rifiutato(c) && ammesso(c) &&
+          c.id !== (contornoCena && contornoCena.id) &&
+          (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g) &&
+          (!pranzoFuori || c.trasportabile)
+        );
+      }
+
+      let colazione = pescaCasuale(colazioni, p =>
+        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) && paeseOkLeggero(p) && (p.prep_min || 10) <= 15
       );
-      const spuntino = pescaCasuale(spuntini, p =>
-        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) && (p.prep_min || 5) <= 10
+      if (!colazione) {
+        // Come per contorno e secondo: ultimo tentativo ignorando il profilo,
+        // ma restando nel paese/generico allargato (compreso mediterraneo_generico).
+        colazione = pescaCasuale(colazioni, p =>
+          (p.profilo === 'neutro' || !p.profilo) && paeseOkLeggero(p) &&
+          !usati.has(p.id) && ammesso(p) && (p.prep_min || 10) <= 15
+        );
+      }
+
+      let spuntino = pescaCasuale(spuntini, p =>
+        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) && paeseOkLeggero(p) && (p.prep_min || 5) <= 10
       );
+      if (!spuntino) {
+        spuntino = pescaCasuale(spuntini, p =>
+          (p.profilo === 'neutro' || !p.profilo) && paeseOkLeggero(p) &&
+          !usati.has(p.id) && ammesso(p) && (p.prep_min || 5) <= 10
+        );
+      }
 
       // ---- 4. Base amidacea a cena ----
       let base = null;
       const cenaHaAmido = secondo.ha_amido || (contornoCena && contornoCena.ha_amido);
       if (!cenaHaAmido) {
-        base = pescaCasuale(piatti.filter(p => p.base_amidacea), b => !usati.has(b.id) && ammesso(b));
+        // Solo dai contorni: 'piatti' mescola tutti gli slot, ed e' cosi'
+        // che una colazione con base_amidacea (es. un muesli) finiva come
+        // contorno di una cena.
+        base = pescaCasuale(
+          contorni.filter(p => p.base_amidacea && paeseOk(p)),
+          b => !usati.has(b.id) && ammesso(b)
+        );
       }
 
-      const spuntino2 = pescaCasuale(spuntini, p =>
-        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) &&
+      let spuntino2 = pescaCasuale(spuntini, p =>
+        compatibile(p, profiloGiorno) && !usati.has(p.id) && ammesso(p) && paeseOkLeggero(p) &&
         p.id !== (spuntino && spuntino.id) && (p.prep_min || 5) <= 10
       );
+      if (!spuntino2) {
+        spuntino2 = pescaCasuale(spuntini, p =>
+          (p.profilo === 'neutro' || !p.profilo) && paeseOkLeggero(p) &&
+          !usati.has(p.id) && ammesso(p) &&
+          p.id !== (spuntino && spuntino.id) && (p.prep_min || 5) <= 10
+        );
+      }
 
       // ---- 5. Registrazione: l'avanzo non consuma il piatto ----
       [primo, contornoPranzo, contornoCena, colazione, spuntino, spuntino2, base]
@@ -598,7 +776,7 @@ async function generaESalva(supabase, userId) {
       week_start: lunediCorrente(),
       generated_at: new Date().toISOString(),
       energy_target_id: target?.id ?? null,
-      corpus_version: 'v8-paesi',
+      corpus_version: CORPUS_VERSION,
     })
     .select('id')
     .single();
@@ -641,4 +819,4 @@ async function generaESalva(supabase, userId) {
   return { plan_id: piano.id, giorni_conformi: Math.floor(migliorPunteggio) };
 }
 
-module.exports = { generaESalva };
+module.exports = { generaESalva, caricaPiatti, gruppoDa, GRUPPI, QUOTE };

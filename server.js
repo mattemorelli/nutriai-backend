@@ -1,6 +1,10 @@
 console.log('[server] avviato', new Date().toISOString());
 const { calcolaESalvaTarget } = require('./fabbisogno');
 const { generaESalva } = require('./genera');
+const { calibra } = require('./calibra');
+const { trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto } = require('./sostituisci');
+const { listaSpesa, dispensa, cambiaDispensa, marchePer, sceltePer, classificaInsegne } = require('./spesa');
+const { votoBarcode } = require('./voto');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -184,7 +188,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
     const { data: righe, error: errItems } = await supabase
       .from('plan_items')
       .select(`
-        id, day_of_week, meal, slot, portion_g, avanzi, bloccato,
+        id, day_of_week, meal, slot, portion_g, avanzi, bloccato, stato,
         kcal, protein_g, sat_fat_g, fibre_g, salt_g,
         dishes ( name, name_en, prep_min, steps, steps_en, health_score )
       `)
@@ -202,6 +206,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
       if (!perGiorno[r.day_of_week]) perGiorno[r.day_of_week] = [];
       perGiorno[r.day_of_week].push({
         plan_item_id: r.id,
+        stato: r.stato,
         pasto: r.meal,
         slot: r.slot,
         piatto: d.name,
@@ -381,7 +386,7 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
         evening_minutes: Number(b.evening_minutes) || 45,
         diet: ['onnivoro','vegetariano','vegano','pescetariano'].includes(b.diet) ? b.diet : 'onnivoro',
         paesi: Array.isArray(b.paesi) ? b.paesi : [],
-        occupation_level: lavoroValido ? b.occupation_level : null,
+        occupation_level: b.occupation_level,
       })
       .eq('id', utenteId);
     if (e1) throw new Error(`profilo: ${e1.message}`);
@@ -503,6 +508,146 @@ app.post('/esito', richiedeAuth, async (req, res) => {
   }
 });
 
+app.post('/sostituisci', richiedeAuth, async (req, res) => {
+  try {
+    const { item_id } = req.body;
+    if (!item_id) return res.status(400).json({ errore: 'item_id mancante' });
+
+    const r = await trovaProposte(supabase, req.utente.id, item_id);
+    res.json(r);
+  } catch (e) {
+    console.error('[sostituisci]', e.message);
+    const codice = e.message === 'Non autorizzato' ? 403 : 500;
+    res.status(codice).json({ errore: e.message });
+  }
+});
+
+app.post('/sostituisci/applica', richiedeAuth, async (req, res) => {
+  try {
+    const { item_id, dish_id, portion_g } = req.body;
+    if (!item_id || !dish_id) {
+      return res.status(400).json({ errore: 'item_id o dish_id mancante' });
+    }
+
+    const r = await applicaSostituzione(
+      supabase, req.utente.id, item_id, dish_id, portion_g
+    );
+    res.json(r);
+  } catch (e) {
+    console.error('[sostituisci/applica]', e.message);
+    const codice = e.message === 'Non autorizzato' ? 403 : 500;
+    res.status(codice).json({ errore: e.message });
+  }
+});
+
+app.post('/sposta', richiedeAuth, async (req, res) => {
+  try {
+    const { item_id, giorno } = req.body;
+    if (!item_id || giorno === undefined) {
+      return res.status(400).json({ errore: 'item_id o giorno mancante' });
+    }
+
+    const r = await spostaGiorno(supabase, req.utente.id, item_id, giorno);
+    res.json(r);
+  } catch (e) {
+    console.error('[sposta]', e.message);
+    const codice = e.message === 'Non autorizzato' ? 403 : 500;
+    res.status(codice).json({ errore: e.message });
+  }
+});
+
+app.post('/salta', richiedeAuth, async (req, res) => {
+  try {
+    const { item_id, annulla } = req.body;
+    if (!item_id) return res.status(400).json({ errore: 'item_id mancante' });
+
+    const r = await saltaPasto(supabase, req.utente.id, item_id, annulla === true);
+    res.json(r);
+  } catch (e) {
+    console.error('[salta]', e.message);
+    const codice = e.message === 'Non autorizzato' ? 403 : 500;
+    res.status(codice).json({ errore: e.message });
+  }
+});
+
+app.get('/spesa', richiedeAuth, async (req, res) => {
+  try {
+    const r = await listaSpesa(supabase, req.utente.id, req.query.plan_id);
+    res.json(r);
+  } catch (e) {
+    console.error('[spesa]', e.message);
+    const codice = e.message === 'Non autorizzato' ? 403 : 500;
+    res.status(codice).json({ errore: e.message });
+  }
+});
+
+app.get('/dispensa', richiedeAuth, async (req, res) => {
+  try {
+    res.json({ voci: await dispensa(supabase, req.utente.id) });
+  } catch (e) {
+    console.error('[dispensa]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+app.post('/dispensa', richiedeAuth, async (req, res) => {
+  try {
+    const { food_id, presente } = req.body;
+    if (!food_id) return res.status(400).json({ errore: 'food_id mancante' });
+    res.json(await cambiaDispensa(supabase, req.utente.id, food_id, presente === true));
+  } catch (e) {
+    console.error('[dispensa]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+app.get('/prodotto/:barcode', richiedeAuth, async (req, res) => {
+  try {
+    const { barcode } = req.params;
+    if (!/^\d{8,14}$/.test(barcode)) {
+      return res.status(400).json({ errore: 'Codice a barre non valido' });
+    }
+    const r = await votoBarcode(supabase, barcode, req.query.paese || 'it');
+    res.json(r);
+  } catch (e) {
+    console.error('[prodotto]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+app.get('/marche/:foodId', richiedeAuth, async (req, res) => {
+  try {
+    const r = await marchePer(
+      supabase,
+      req.params.foodId,
+      req.query.paese || 'italy',
+      Number(req.query.quanti) || 5
+    );
+    res.json(r);
+  } catch (e) {
+    console.error('[marche]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+app.get('/scelte', richiedeAuth, async (req, res) => {
+  try {
+    res.json(await sceltePer(supabase, req.utente.id, req.query.paese || 'italy'));
+  } catch (e) {
+    console.error('[scelte]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+app.get('/insegne', richiedeAuth, async (req, res) => {
+  try {
+    res.json(await classificaInsegne(supabase, req.query.paese || 'italy'));
+  } catch (e) {
+    console.error('[insegne]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
+});
+
 // Blocca o sblocca un piatto: alla prossima generazione resterà dov'è.
 app.post('/blocca', richiedeAuth, async (req, res) => {
   try {
@@ -539,6 +684,40 @@ app.post('/blocca', richiedeAuth, async (req, res) => {
 
     if (error) return res.status(500).json({ errore: error.message });
     res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+app.post('/peso', richiedeAuth, async (req, res) => {
+  try {
+    const kg = Number(req.body && req.body.weight_kg);
+    if (!(kg >= 30 && kg <= 300)) {
+      return res.status(400).json({ errore: 'Peso non valido' });
+    }
+
+    const oggi = new Date().toISOString().slice(0, 10);
+
+    // Una sola pesata al giorno: la seconda sovrascrive la prima.
+    const { error } = await supabase.from('body_measurements').upsert({
+      user_id: req.utente.id,
+      measured_on: oggi,
+      weight_kg: kg,
+      body_fat_pct: req.body.body_fat_pct ? Number(req.body.body_fat_pct) : null,
+      source: 'utente',
+    }, { onConflict: 'user_id,measured_on' });
+
+    if (error) return res.status(500).json({ errore: error.message });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+app.post('/calibra', richiedeAuth, async (req, res) => {
+  try {
+    const esito = await calibra(supabase, req.utente.id);
+    res.json(esito);
   } catch (e) {
     res.status(500).json({ errore: e.message });
   }

@@ -1,0 +1,36 @@
+Ricevi un array JSON di alimenti da un database nutrizionale. Ogni elemento ha:
+- id: identificatore (slug italiano tipo "limone_it" oppure codice numerico USDA)
+- name: il nome così com'è nel database, in italiano o in inglese tecnico USDA
+
+Per ciascuno restituisci un oggetto con questi campi:
+
+- id: lo stesso id ricevuto, invariato
+- name_en: il nome in inglese come lo scriveresti su una lista della spesa.
+  Breve, naturale, senza gergo tecnico. Singolare salvo quando l'alimento si
+  compra sempre al plurale.
+  Esempi: "Tomatoes, red, ripe, raw, year round average" -> "Tomatoes";
+  "limone_it" / "Limone" -> "Lemon";
+  "Oil, olive, salad or cooking" -> "Olive oil";
+  "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw" -> "Chicken breast";
+  "Fiocchi davena per bircher" -> "Rolled oats".
+- unita: come si compra quell'alimento. Uno solo tra:
+  "pezzi"       -> si conta a unità (cipolle, limoni, uova, avocado)
+  "mazzo"       -> erbe fresche e simili (rosmarino, prezzemolo, basilico)
+  "barattolo"   -> conserve e scatolame (fagioli in scatola, pelati, tonno)
+  "confezione"  -> prodotti secchi confezionati (pasta, riso, farina, fiocchi)
+  "peso"        -> tutto il resto, che si compra a peso (carne, pesce, spinaci)
+- peso_pezzo_g: quanto pesa un pezzo o una confezione tipica, in grammi.
+  Obbligatorio quando unita è "pezzi", "mazzo", "barattolo" o "confezione".
+  null quando unita è "peso".
+  Esempi: cipolla media 110, limone 100, uovo 55, avocado 200,
+  mazzo di rosmarino 20, barattolo di fagioli 400, pacco di pasta 500.
+- reparto: uno solo tra "Produce", "Meat & fish", "Dairy & eggs", "Pantry".
+  Produce      -> frutta, verdura, erbe fresche
+  Meat & fish  -> carne, pesce, frutti di mare, salumi
+  Dairy & eggs -> latte, formaggi, yogurt, burro, uova
+  Pantry       -> tutto il resto: cereali, legumi, oli, spezie, conserve,
+                  frutta secca, prodotti confezionati
+
+Rispondi SOLO con l'array JSON, senza testo prima o dopo, senza backtick
+e senza blocchi markdown. Un oggetto per ogni alimento ricevuto, nello
+stesso ordine.
