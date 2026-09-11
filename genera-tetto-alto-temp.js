@@ -562,7 +562,7 @@ async function generaESalva(supabase, userId, seedIniziale) {
   // un gradino che li "non applica", semplicemente non esiste codice che li
   // tocchi in questa funzione.
 
-  const MAX_PASSI = 5000; // per profilo tentato, non condiviso: un profilo povero non deve rubare il budget agli altri
+  const MAX_PASSI = Number(process.env.MAX_PASSI_TEST || 5000);
 
   // Mescola una lista con l'rng col seme, ordinata per peso (famiglia
   // preferita) DOPO il mescolamento: usata per la scelta del profilo, non
@@ -641,86 +641,11 @@ async function generaESalva(supabase, userId, seedIniziale) {
     const colazioni = perSlot('colazione');
     const spuntini  = perSlot('spuntino');
 
-    // ---- F0: controllo di capienza per aritmetica, prima di cercare ----
-    // Il tetto dei passi (C16) ferma la ricerca senza dimostrare
-    // l'impossibilita': se il conto dice che non bastano abbastanza piatti
-    // DISTINTI, non serve cercare per scoprirlo. Granularita' reale della
-    // ricerca: il profiloSettimana governa 5 giorni su 7 (i giorni 3 e 6
-    // possono usare un profiloGiorno diverso, pescato da profiliConSecondo -
-    // per questo il conto e' fatto per profilo, non sul totale del pool, ma
-    // resta un'approssimazione prudente pensata per non creare falsi "non si
-    // puo'": sovrastima la disponibilita' (conta un piatto se esiste ALMENO
-    // un giorno della settimana dove il suo paese sarebbe accettato, non lo
-    // vincola al giorno esatto) e sottostima leggermente la domanda (ignora
-    // la base amidacea, il cui bisogno dipende da scelte non ancora fatte).
-    // Meglio una ricerca in piu' quando non serve, mai un salto sbagliato.
-    const paesiRilevanti = new Set(paesiScelti.length ? paesiScelti : [null]);
-    const genericiPropri = new Set([...paesiRilevanti].map(p => p && GENERICO_DI[p]).filter(Boolean));
-    const famiglieProprie = new Set([...genericiPropri].map(g => FAMIGLIA_DI_GENERICO[g]).filter(Boolean));
-    const paesiAccettati = new Set([...paesiRilevanti, ...genericiPropri]);
-    if (opz.genericoStessaFamiglia) {
-      for (const g of GENERICI) if (famiglieProprie.has(FAMIGLIA_DI_GENERICO[g])) paesiAccettati.add(g);
-    }
-    if (opz.genericoQualunqueFamiglia) {
-      for (const g of GENERICI) paesiAccettati.add(g);
-    }
-    const paeseAmmesso = (p) => !paesiScelti.length || paesiAccettati.has(p.paese);
-
-    function contaDisponibili(lista, profiloSettimana, richiedeEsatto, filtroExtra) {
-      return lista.filter(p =>
-        (richiedeEsatto ? p.profilo === profiloSettimana : (p.profilo === profiloSettimana || p.profilo === 'neutro')) &&
-        paeseAmmesso(p) && !rifiutato(p) && (!filtroExtra || filtroExtra(p))
-      ).length;
-    }
-
-    // Quante cene fresche servono davvero: un giorno senza cottura riusa
-    // l'avanzo del giorno precedente, tranne se e' il giorno 1 (non c'e'
-    // nulla da riusare ancora) - stessa logica dell'avanzo nella ricerca.
-    const secondiFreschiNecessari = giorniCottura.length + (cucinaOggi(1) ? 0 : 1);
-
-    function capienzaSufficiente(profiloSettimana) {
-      const gruppiDelProfilo = gruppiPerProfilo[profiloSettimana] || new Set();
-
-      const nSecondi = contaDisponibili(secondi, profiloSettimana, true);
-      if (nSecondi < secondiFreschiNecessari) {
-        return { ok: false, messaggio: `servono ${secondiFreschiNecessari} secondi distinti, ne ha ${nSecondi}` };
-      }
-      if (!opz.quotaTollerante) {
-        for (const [gruppo, q] of Object.entries(QUOTE)) {
-          if (!gruppiDelProfilo.has(gruppo) || q.min <= 0) continue;
-          const nGruppo = contaDisponibili(secondi, profiloSettimana, true, (p) => p.gruppo === gruppo);
-          if (nGruppo < q.min) {
-            return { ok: false, messaggio: `quota minima gruppo ${gruppo}: servono ${q.min}, ne ha ${nGruppo}` };
-          }
-        }
-      }
-
-      const nPrimi = contaDisponibili(primi, profiloSettimana, false);
-      if (nPrimi < 7) return { ok: false, messaggio: `servono 7 primi distinti, ne ha ${nPrimi}` };
-
-      const nContorni = contaDisponibili(contorni, profiloSettimana, false);
-      if (nContorni < 14) return { ok: false, messaggio: `servono almeno 14 contorni distinti (cena+pranzo), ne ha ${nContorni}` };
-
-      const nColazioni = contaDisponibili(colazioni, profiloSettimana, false);
-      if (nColazioni < 7) return { ok: false, messaggio: `servono 7 colazioni distinte, ne ha ${nColazioni}` };
-
-      const nSpuntini = contaDisponibili(spuntini, profiloSettimana, false);
-      if (nSpuntini < 14) return { ok: false, messaggio: `servono almeno 14 spuntini distinti, ne ha ${nSpuntini}` };
-
-      return { ok: true };
-    }
-
     const diagnosticaProfili = [];
     const profiliDaProvare = pesoOrdinato(profiliConSecondo, pr => pesoFamiglia[famigliaDi[pr]] || 1, rng);
 
     profiliEsterni:
     for (const profiloSettimana of profiliDaProvare) {
-      const capienza = capienzaSufficiente(profiloSettimana);
-      if (!capienza.ok) {
-        diagnosticaProfili.push(`${profiloSettimana}: impossibile per aritmetica - ${capienza.messaggio}`);
-        continue profiliEsterni;
-      }
-
       const passiUsati = { valore: 0 };
 
       const gruppiDelProfilo = gruppiPerProfilo[profiloSettimana] || new Set();
