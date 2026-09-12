@@ -17,7 +17,7 @@ const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 const {
   caricaPiatti, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza,
-  GRADINI, FAMIGLIE_PER_CUCINA,
+  GRADINI, FAMIGLIE_PER_CUCINA, GENERICO_DI,
 } = require('./genera');
 
 const CUCINA_DI_PAESE = {
@@ -76,8 +76,28 @@ function perSlotDa(piatti, soglia) {
     return cacheVietatiPerDieta.get(dieta);
   }
 
+  // Un profilo e' "non applicabile" a un paese quando non e' mai stato
+  // scritto per quel paese: zero piatti (di qualunque punteggio salute,
+  // qualunque dieta) taggati con quel paese o il suo generico designato -
+  // non la famiglia intera, il pool esatto di gradino 0. E' la stessa
+  // distinzione che si fa gia' a mano per la dieta (un vegetariano non ha
+  // bisogno di europeo-brasato, e' fatto di carne) applicata al paese: un
+  // italiano non ha bisogno di europeo-ricco, non l'ha mai avuto, usera' il
+  // suo mediterraneo. Diverso da un buco vero, dove il profilo ESISTE nel
+  // pool proprio del paese ma non basta (es. asiatico-sudest per il
+  // Giappone: qualche piatto in asia_generico c'e', non e' abbastanza).
+  // Calcolata sulla famiglia intera (non filtrata per dieta): l'esistenza di
+  // un piatto non dipende da chi puo' mangiarlo.
+  function profiloApplicabileA(piattiFamiglia, profilo, paesi) {
+    const poolProprio = new Set(paesi.flatMap(p => [p, GENERICO_DI[p]].filter(Boolean)));
+    return piattiFamiglia.some(p =>
+      p.meal_slot === 'secondo' && p.profilo === profilo && poolProprio.has(p.paese)
+    );
+  }
+
   const righeReport = [];
   const impossibili = [];
+  const nonApplicabili = [];
 
   for (const cfg of CONFIG) {
     const piattiFamiglia = await piattiDellaFamiglia(cfg.cucina);
@@ -118,8 +138,14 @@ function perSlotDa(piatti, soglia) {
       }
 
       if (gradinoMinimo === null) {
-        righeReport.push({ combo: cfg.nome, profilo, gradinoMinimo: 'IMPOSSIBILE', dettaglio: ultimoMessaggio });
-        impossibili.push(`${cfg.nome} / ${profilo}: impossibile anche al gradino piu' permissivo - ${ultimoMessaggio}`);
+        const applicabile = profiloApplicabileA(piattiFamiglia, profilo, cfg.paesi);
+        const stato = applicabile ? 'IMPOSSIBILE' : 'NON_APPLICABILE';
+        righeReport.push({ combo: cfg.nome, profilo, gradinoMinimo: stato, dettaglio: ultimoMessaggio });
+        if (applicabile) {
+          impossibili.push(`${cfg.nome} / ${profilo}: impossibile anche al gradino piu' permissivo - ${ultimoMessaggio}`);
+        } else {
+          nonApplicabili.push(`${cfg.nome} / ${profilo}: mai scritto per questo paese (0 piatti nel pool proprio)`);
+        }
       } else {
         righeReport.push({ combo: cfg.nome, profilo, gradinoMinimo, dettaglio: gradinoMinimo === '0' ? null : ultimoMessaggio });
       }
@@ -128,26 +154,35 @@ function perSlotDa(piatti, soglia) {
 
   console.log(`\n=== Passo F0: capienza aritmetica su ${CONFIG.length} combinazioni dieta+paese/i ===\n`);
 
-  const soloProblematiche = righeReport.filter(r => r.gradinoMinimo !== '0');
-  if (!soloProblematiche.length) {
-    console.log('Tutte le combinazioni reggono al gradino 0 (nessun allentamento necessario).');
-  } else {
-    console.log(`${soloProblematiche.length}/${righeReport.length} righe profilo richiedono un allentamento (o sono impossibili):\n`);
-    for (const r of soloProblematiche) {
+  const regge = righeReport.filter(r => r.gradinoMinimo !== 'IMPOSSIBILE' && r.gradinoMinimo !== 'NON_APPLICABILE');
+  const reggeConAllentamento = regge.filter(r => r.gradinoMinimo !== '0');
+  console.log(`Totale righe profilo: ${righeReport.length}`);
+  console.log(`  regge: ${regge.length} (di cui ${reggeConAllentamento.length} solo con un allentamento)`);
+  console.log(`  non applicabile: ${righeReport.filter(r => r.gradinoMinimo === 'NON_APPLICABILE').length}`);
+  console.log(`  buco vero (impossibile, profilo comunque scritto per il paese): ${impossibili.length}\n`);
+
+  if (reggeConAllentamento.length) {
+    console.log(`--- Regge solo con allentamento (${reggeConAllentamento.length}) ---`);
+    for (const r of reggeConAllentamento) {
       console.log(`  ${r.combo} / ${r.profilo}: gradino minimo = ${r.gradinoMinimo}${r.dettaglio ? ` (${r.dettaglio})` : ''}`);
     }
   }
 
+  if (nonApplicabili.length) {
+    console.log(`\n--- NON APPLICABILI: profilo mai scritto per quel paese (${nonApplicabili.length}) ---`);
+    for (const m of nonApplicabili) console.log(`  ${m}`);
+  }
+
   if (impossibili.length) {
-    console.log(`\n--- IMPOSSIBILI anche al gradino piu' permissivo (${impossibili.length}) ---`);
+    console.log(`\n--- BUCHI VERI: profilo scritto per il paese ma non abbastanza (${impossibili.length}) ---`);
     for (const m of impossibili) console.log(`  ${m}`);
   } else {
-    console.log('\nNessuna combinazione risulta impossibile: la scala di allentamento basta sempre a trovare una settimana.');
+    console.log('\nNessun buco vero: dove il profilo esiste per il paese, la scala di allentamento basta.');
   }
 
   require('fs').writeFileSync(
     __dirname + '/passoF0-risultati.json',
-    JSON.stringify({ righeReport, impossibili }, null, 2)
+    JSON.stringify({ righeReport, impossibili, nonApplicabili }, null, 2)
   );
   console.log(`\nDettaglio completo salvato in passoF0-risultati.json (${righeReport.length} righe).`);
 })();
