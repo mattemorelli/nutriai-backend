@@ -15,7 +15,40 @@ const GENERICO_DI = {
   stati_uniti: null, australia: 'mediterraneo_generico',
 };
 
+const GENERICI = ['mediterraneo_generico', 'asia_generico', 'latino_generico', 'centro_nord_generico'];
+// A quale macro-area appartiene ciascun generico: centro_nord_generico e'
+// comunque Europa (i paesi che vi ricadono, Germania e Regno Unito, sono
+// sotto la stessa cucina 'europea' -> famiglia 'mediterranea' di
+// Italia/Francia/Spagna in FAMIGLIE_PER_CUCINA). Un tedesco che finisce nel
+// pool mediterraneo resta in Europa; solo asia_generico e latino_generico
+// sono davvero un'altra macro-area (Fase 3 Passo C bis, C9).
+const FAMIGLIA_DI_GENERICO = {
+  mediterraneo_generico: 'mediterranea',
+  centro_nord_generico: 'mediterranea',
+  asia_generico: 'asiatica',
+  latino_generico: 'latina',
+};
+
 const CORPUS_VERSION = 'v8-paesi-e-vincoli';
+
+// ---- La scala: si sale di un gradino solo dopo aver esaurito onestamente quello precedente ----
+// Ogni gradino eredita gli allentamenti di quelli precedenti (si sale,
+// non si passa da uno all'altro): 3a e 3b restano due gradini distinti
+// (Passo C bis, C9) perche' il danno culturale di un pool generico della
+// STESSA famiglia (3a) e' nullo, quello di un'ALTRA macro-area (3b) no.
+// A livello di modulo (non solo dentro generaESalva) perche' il controllo di
+// capienza fuori linea (F0) deve scandire la STESSA scala della generazione
+// vera, non una sua copia che puo' disallinearsi nel tempo.
+const GRADINI = [
+  { gradino: '0',  soglia: 7,   opz: {} },
+  { gradino: '1',  soglia: 7,   opz: { ripetizione: true } },
+  { gradino: '2',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true } },
+  { gradino: '3a', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true } },
+  { gradino: '3b', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true } },
+  { gradino: '4',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
+  { gradino: '5',  soglia: 6.5, opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
+  { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
+];
 
 // Quanto ogni elemento puo' essere scalato. Le ancore hanno margini stretti,
 // le leve margini ampi. E' questa distinzione che evita le porzioni assurde.
@@ -69,6 +102,16 @@ const QUOTE = {
   legumi:       { min: 1, max: 3 },
   uova:         { min: 0, max: 2 },
   formaggio:    { min: 0, max: 2 },
+};
+
+// Categorie escluse da ciascuna dieta (prima dell'espansione CONTENUTE_IN).
+// Condivisa fra generaESalva (applica il filtro sui piatti caricati) e i
+// controlli di capienza fuori linea (F0), che devono vedere esattamente le
+// stesse esclusioni, non una loro copia.
+const CATEGORIE_DIETA = {
+  vegano:       ['carne_rossa', 'carne_bianca', 'pesce', 'crostacei', 'molluschi', 'uova', 'latticini'],
+  vegetariano:  ['carne_rossa', 'carne_bianca', 'pesce', 'crostacei', 'molluschi'],
+  pescetariano: ['carne_rossa', 'carne_bianca'],
 };
 
 const FAMIGLIE_PER_CUCINA = {
@@ -196,6 +239,38 @@ function limiteEfficace(secondi, profili, minutiDichiarati, minimoRichiesto) {
   return { limite: minutiDichiarati + 60, allargato: true };
 }
 
+// Da un catalogo gia' filtrato per dieta, i profili con secondi utilizzabili
+// e i gruppi proteici che ciascuno copre entro il limite serale effettivo.
+// Estratta da generaESalva perche' il controllo di capienza fuori linea (F0)
+// deve vedere lo stesso catalogo che vedrebbe una generazione vera, non una
+// sua approssimazione con soglie ricalcolate a mano.
+function gruppiPerProfiloDa(piatti, minutiSera = 45) {
+  const profiliConSecondo = [...new Set(
+    piatti.filter(p => p.meal_slot === 'secondo' && p.profilo !== 'neutro').map(p => p.profilo)
+  )];
+
+  const { limite: limiteFeriale, allargato } = limiteEfficace(
+    piatti.filter(p => p.meal_slot === 'secondo' && p.profilo !== 'neutro'),
+    profiliConSecondo,
+    minutiSera,
+    8
+  );
+
+  const gruppiPerProfilo = {};
+  for (const p of piatti.filter(x =>
+    x.meal_slot === 'secondo' && x.profilo !== 'neutro' &&
+    (x.prep_min || 30) <= limiteFeriale &&
+    (x.tecnica || 'semplice') === 'semplice'
+  )) {
+    if (p.gruppo) {
+      if (!gruppiPerProfilo[p.profilo]) gruppiPerProfilo[p.profilo] = new Set();
+      gruppiPerProfilo[p.profilo].add(p.gruppo);
+    }
+  }
+
+  return { profiliConSecondo, limiteFeriale, gruppiPerProfilo, allargato };
+}
+
 // Normalizza una stringa per il confronto fra alias: minuscole, accenti
 // rimossi, spazi e underscore trattati come equivalenti. "Frutta a guscio",
 // "frutta_guscio", "FRUTTA A GUSCIO" devono ridursi tutte alla stessa chiave.
@@ -230,6 +305,30 @@ const CONTENUTE_IN = {
   carne_rossa: ['maiale'],
   latticini: ['lattosio'],
 };
+
+// Food_id esclusi dalla sola dieta (CATEGORIE_DIETA espanso con CONTENUTE_IN),
+// senza i vincoli personali dell'utente (allergie, non graditi): serve sia a
+// generaESalva sia ai controlli di capienza fuori linea (F0), che ragionano
+// per dieta+paese senza un utente reale dietro. Estratta a se' perche' un
+// controllo fuori linea deve interrogare la STESSA fonte di esclusione, non
+// una sua reimplementazione.
+async function foodIdVietatiPerDieta(supabase, dieta) {
+  const codiciDietaEspansi = new Set();
+  for (const codice of (CATEGORIE_DIETA[dieta] || [])) {
+    codiciDietaEspansi.add(codice);
+    for (const contenuta of (CONTENUTE_IN[codice] || [])) codiciDietaEspansi.add(contenuta);
+  }
+
+  const vietati = new Set();
+  for (const codice of codiciDietaEspansi) {
+    const { data: righe } = await supabase
+      .from('categorie_alimenti')
+      .select('food_id')
+      .eq('categoria', codice);
+    for (const r of (righe || [])) vietati.add(r.food_id);
+  }
+  return vietati;
+}
 
 async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   // PostgREST impone un tetto di righe per risposta (di default 1000)
@@ -301,6 +400,78 @@ function accompagnaBene(accompagnamento, piattoBase) {
   return true;
 }
 
+// F0: controllo di capienza per aritmetica, prima di cercare una settimana.
+// Il tetto dei passi (C16) ferma la ricerca senza dimostrare l'impossibilita':
+// se il conto dice che non bastano abbastanza piatti DISTINTI, non serve
+// cercare per scoprirlo. Granularita' reale della ricerca: il profiloSettimana
+// governa 5 giorni su 7 (i giorni 3 e 6 possono usare un profiloGiorno
+// diverso, pescato da profiliConSecondo - per questo il conto e' fatto per
+// profilo, non sul totale del pool), ma resta un'approssimazione prudente
+// pensata per non creare falsi "non si puo'": sovrastima la disponibilita'
+// (conta un piatto se esiste ALMENO un giorno della settimana dove il suo
+// paese sarebbe accettato, non lo vincola al giorno esatto) e sottostima
+// leggermente la domanda (ignora la base amidacea, il cui bisogno dipende da
+// scelte non ancora fatte). Meglio una ricerca in piu' quando non serve, mai
+// un salto sbagliato.
+//
+// Estratta da provaGradino perche' un controllo di capienza fuori linea (F0,
+// su tutte le combinazioni dieta+paese/i) deve chiamare la STESSA funzione
+// che la generazione vera usa, non una sua reimplementazione - lo stesso
+// principio gia' seguito per trovaCategoria.
+function analizzaCapienza(profiloSettimana, catalogo, ctx) {
+  const { primi, secondi, contorni, colazioni, spuntini } = catalogo;
+  const { paesiScelti, opz, rifiutato, secondiFreschiNecessari, gruppiPerProfilo } = ctx;
+
+  const paesiRilevanti = new Set(paesiScelti.length ? paesiScelti : [null]);
+  const genericiPropri = new Set([...paesiRilevanti].map(p => p && GENERICO_DI[p]).filter(Boolean));
+  const famiglieProprie = new Set([...genericiPropri].map(g => FAMIGLIA_DI_GENERICO[g]).filter(Boolean));
+  const paesiAccettati = new Set([...paesiRilevanti, ...genericiPropri]);
+  if (opz.genericoStessaFamiglia) {
+    for (const g of GENERICI) if (famiglieProprie.has(FAMIGLIA_DI_GENERICO[g])) paesiAccettati.add(g);
+  }
+  if (opz.genericoQualunqueFamiglia) {
+    for (const g of GENERICI) paesiAccettati.add(g);
+  }
+  const paeseAmmesso = (p) => !paesiScelti.length || paesiAccettati.has(p.paese);
+
+  function contaDisponibili(lista, richiedeEsatto, filtroExtra) {
+    return lista.filter(p =>
+      (richiedeEsatto ? p.profilo === profiloSettimana : (p.profilo === profiloSettimana || p.profilo === 'neutro')) &&
+      paeseAmmesso(p) && !rifiutato(p) && (!filtroExtra || filtroExtra(p))
+    ).length;
+  }
+
+  const gruppiDelProfilo = gruppiPerProfilo[profiloSettimana] || new Set();
+
+  const nSecondi = contaDisponibili(secondi, true);
+  if (nSecondi < secondiFreschiNecessari) {
+    return { ok: false, messaggio: `servono ${secondiFreschiNecessari} secondi distinti, ne ha ${nSecondi}` };
+  }
+  if (!opz.quotaTollerante) {
+    for (const [gruppo, q] of Object.entries(QUOTE)) {
+      if (!gruppiDelProfilo.has(gruppo) || q.min <= 0) continue;
+      const nGruppo = contaDisponibili(secondi, true, (p) => p.gruppo === gruppo);
+      if (nGruppo < q.min) {
+        return { ok: false, messaggio: `quota minima gruppo ${gruppo}: servono ${q.min}, ne ha ${nGruppo}` };
+      }
+    }
+  }
+
+  const nPrimi = contaDisponibili(primi, false);
+  if (nPrimi < 7) return { ok: false, messaggio: `servono 7 primi distinti, ne ha ${nPrimi}` };
+
+  const nContorni = contaDisponibili(contorni, false);
+  if (nContorni < 14) return { ok: false, messaggio: `servono almeno 14 contorni distinti (cena+pranzo), ne ha ${nContorni}` };
+
+  const nColazioni = contaDisponibili(colazioni, false);
+  if (nColazioni < 7) return { ok: false, messaggio: `servono 7 colazioni distinte, ne ha ${nColazioni}` };
+
+  const nSpuntini = contaDisponibili(spuntini, false);
+  if (nSpuntini < 14) return { ok: false, messaggio: `servono almeno 14 spuntini distinti, ne ha ${nSpuntini}` };
+
+  return { ok: true };
+}
+
 async function generaESalva(supabase, userId, seedIniziale) {
   // Seed esplicito se passato (per rigiocare un fallimento segnalato),
   // altrimenti generato qui - ma sempre salvato col piano, cosi' ogni
@@ -329,19 +500,6 @@ async function generaESalva(supabase, userId, seedIniziale) {
   const minutiSera = (profiloUtente && Number(profiloUtente.evening_minutes)) || 45;
 
   const paesiScelti = (profiloUtente && profiloUtente.paesi) || [];
-  const GENERICI = ['mediterraneo_generico', 'asia_generico', 'latino_generico', 'centro_nord_generico'];
-  // A quale macro-area appartiene ciascun generico: centro_nord_generico e'
-  // comunque Europa (i paesi che vi ricadono, Germania e Regno Unito, sono
-  // sotto la stessa cucina 'europea' -> famiglia 'mediterranea' di
-  // Italia/Francia/Spagna in FAMIGLIE_PER_CUCINA). Un tedesco che finisce nel
-  // pool mediterraneo resta in Europa; solo asia_generico e latino_generico
-  // sono davvero un'altra macro-area (Fase 3 Passo C bis, C9).
-  const FAMIGLIA_DI_GENERICO = {
-    mediterraneo_generico: 'mediterranea',
-    centro_nord_generico: 'mediterranea',
-    asia_generico: 'asiatica',
-    latino_generico: 'latina',
-  };
 
   // Il paese scelto domina, il generico della famiglia lo accompagna,
   // gli altri paesi restano possibili ma rari: e' cosi' che mangia una persona.
@@ -400,25 +558,7 @@ async function generaESalva(supabase, userId, seedIniziale) {
 
   // 4. Le categorie escluse dalla dieta
   const dieta = profiloUtente?.diet || 'onnivoro';
-  const categorieDieta = {
-    vegano:       ['carne_rossa', 'carne_bianca', 'pesce', 'crostacei', 'molluschi', 'uova', 'latticini'],
-    vegetariano:  ['carne_rossa', 'carne_bianca', 'pesce', 'crostacei', 'molluschi'],
-    pescetariano: ['carne_rossa', 'carne_bianca'],
-  };
-
-  const codiciDietaEspansi = new Set();
-  for (const codice of (categorieDieta[dieta] || [])) {
-    codiciDietaEspansi.add(codice);
-    for (const contenuta of (CONTENUTE_IN[codice] || [])) codiciDietaEspansi.add(contenuta);
-  }
-
-  for (const codice of codiciDietaEspansi) {
-    const { data: righe } = await supabase
-      .from('categorie_alimenti')
-      .select('food_id')
-      .eq('categoria', codice);
-    for (const r of (righe || [])) foodIdVietati.add(r.food_id);
-  }
+  for (const fid of await foodIdVietatiPerDieta(supabase, dieta)) foodIdVietati.add(fid);
 
   // 5. Il filtro: un piatto e' ammesso se nessuno dei suoi ingredienti e' vietato
   const ammesso = (p) => {
@@ -504,36 +644,11 @@ async function generaESalva(supabase, userId, seedIniziale) {
     ? Math.max(15, minutiSera - 10)
     : minutiSera;
 
-  const profiliConSecondo = [...new Set(
-    piatti.filter(p => p.meal_slot === 'secondo' && p.profilo !== 'neutro').map(p => p.profilo)
-  )];
+  const { profiliConSecondo, limiteFeriale, gruppiPerProfilo, allargato } = gruppiPerProfiloDa(piatti, minutiCorretti);
   if (!profiliConSecondo.length) throw new Error('Nessun profilo ha secondi utilizzabili');
-
-  const { limite: limiteFeriale, allargato } = limiteEfficace(
-    piatti.filter(p => p.meal_slot === 'secondo' && p.profilo !== 'neutro'),
-    profiliConSecondo,
-    minutiCorretti,
-    8
-  );
 
   if (allargato) {
     console.log(`[genera] limite serale allargato da ${minutiCorretti} a ${limiteFeriale} min: catalogo insufficiente`);
-  }
-
-  const secondiPerProfilo = {};
-  const gruppiPerProfilo = {};
-
-  // Conta tutti i secondi utilizzabili per la soglia dei profili dominanti.
-  for (const p of piatti.filter(x =>
-    x.meal_slot === 'secondo' && x.profilo !== 'neutro' &&
-    (x.prep_min || 30) <= limiteFeriale &&
-    (x.tecnica || 'semplice') === 'semplice'
-  )) {
-    secondiPerProfilo[p.profilo] = (secondiPerProfilo[p.profilo] || 0) + 1;
-    if (p.gruppo) {
-      if (!gruppiPerProfilo[p.profilo]) gruppiPerProfilo[p.profilo] = new Set();
-      gruppiPerProfilo[p.profilo].add(p.gruppo);
-    }
   }
 
   // Fase 3 Passo B: non si prefiltra piu' quali profili sono "abbastanza
@@ -641,74 +756,14 @@ async function generaESalva(supabase, userId, seedIniziale) {
     const colazioni = perSlot('colazione');
     const spuntini  = perSlot('spuntino');
 
-    // ---- F0: controllo di capienza per aritmetica, prima di cercare ----
-    // Il tetto dei passi (C16) ferma la ricerca senza dimostrare
-    // l'impossibilita': se il conto dice che non bastano abbastanza piatti
-    // DISTINTI, non serve cercare per scoprirlo. Granularita' reale della
-    // ricerca: il profiloSettimana governa 5 giorni su 7 (i giorni 3 e 6
-    // possono usare un profiloGiorno diverso, pescato da profiliConSecondo -
-    // per questo il conto e' fatto per profilo, non sul totale del pool, ma
-    // resta un'approssimazione prudente pensata per non creare falsi "non si
-    // puo'": sovrastima la disponibilita' (conta un piatto se esiste ALMENO
-    // un giorno della settimana dove il suo paese sarebbe accettato, non lo
-    // vincola al giorno esatto) e sottostima leggermente la domanda (ignora
-    // la base amidacea, il cui bisogno dipende da scelte non ancora fatte).
-    // Meglio una ricerca in piu' quando non serve, mai un salto sbagliato.
-    const paesiRilevanti = new Set(paesiScelti.length ? paesiScelti : [null]);
-    const genericiPropri = new Set([...paesiRilevanti].map(p => p && GENERICO_DI[p]).filter(Boolean));
-    const famiglieProprie = new Set([...genericiPropri].map(g => FAMIGLIA_DI_GENERICO[g]).filter(Boolean));
-    const paesiAccettati = new Set([...paesiRilevanti, ...genericiPropri]);
-    if (opz.genericoStessaFamiglia) {
-      for (const g of GENERICI) if (famiglieProprie.has(FAMIGLIA_DI_GENERICO[g])) paesiAccettati.add(g);
-    }
-    if (opz.genericoQualunqueFamiglia) {
-      for (const g of GENERICI) paesiAccettati.add(g);
-    }
-    const paeseAmmesso = (p) => !paesiScelti.length || paesiAccettati.has(p.paese);
-
-    function contaDisponibili(lista, profiloSettimana, richiedeEsatto, filtroExtra) {
-      return lista.filter(p =>
-        (richiedeEsatto ? p.profilo === profiloSettimana : (p.profilo === profiloSettimana || p.profilo === 'neutro')) &&
-        paeseAmmesso(p) && !rifiutato(p) && (!filtroExtra || filtroExtra(p))
-      ).length;
-    }
-
     // Quante cene fresche servono davvero: un giorno senza cottura riusa
     // l'avanzo del giorno precedente, tranne se e' il giorno 1 (non c'e'
     // nulla da riusare ancora) - stessa logica dell'avanzo nella ricerca.
     const secondiFreschiNecessari = giorniCottura.length + (cucinaOggi(1) ? 0 : 1);
 
-    function capienzaSufficiente(profiloSettimana) {
-      const gruppiDelProfilo = gruppiPerProfilo[profiloSettimana] || new Set();
-
-      const nSecondi = contaDisponibili(secondi, profiloSettimana, true);
-      if (nSecondi < secondiFreschiNecessari) {
-        return { ok: false, messaggio: `servono ${secondiFreschiNecessari} secondi distinti, ne ha ${nSecondi}` };
-      }
-      if (!opz.quotaTollerante) {
-        for (const [gruppo, q] of Object.entries(QUOTE)) {
-          if (!gruppiDelProfilo.has(gruppo) || q.min <= 0) continue;
-          const nGruppo = contaDisponibili(secondi, profiloSettimana, true, (p) => p.gruppo === gruppo);
-          if (nGruppo < q.min) {
-            return { ok: false, messaggio: `quota minima gruppo ${gruppo}: servono ${q.min}, ne ha ${nGruppo}` };
-          }
-        }
-      }
-
-      const nPrimi = contaDisponibili(primi, profiloSettimana, false);
-      if (nPrimi < 7) return { ok: false, messaggio: `servono 7 primi distinti, ne ha ${nPrimi}` };
-
-      const nContorni = contaDisponibili(contorni, profiloSettimana, false);
-      if (nContorni < 14) return { ok: false, messaggio: `servono almeno 14 contorni distinti (cena+pranzo), ne ha ${nContorni}` };
-
-      const nColazioni = contaDisponibili(colazioni, profiloSettimana, false);
-      if (nColazioni < 7) return { ok: false, messaggio: `servono 7 colazioni distinte, ne ha ${nColazioni}` };
-
-      const nSpuntini = contaDisponibili(spuntini, profiloSettimana, false);
-      if (nSpuntini < 14) return { ok: false, messaggio: `servono almeno 14 spuntini distinti, ne ha ${nSpuntini}` };
-
-      return { ok: true };
-    }
+    const catalogoSlot = { primi, secondi, contorni, colazioni, spuntini };
+    const ctxCapienza = { paesiScelti, opz, rifiutato, secondiFreschiNecessari, gruppiPerProfilo };
+    const capienzaSufficiente = (profiloSettimana) => analizzaCapienza(profiloSettimana, catalogoSlot, ctxCapienza);
 
     const diagnosticaProfili = [];
     const profiliDaProvare = pesoOrdinato(profiliConSecondo, pr => pesoFamiglia[famigliaDi[pr]] || 1, rng);
@@ -1145,22 +1200,6 @@ async function generaESalva(supabase, userId, seedIniziale) {
     return { ok: false, diagnosticaProfili };
   }
 
-  // ---- La scala: si sale di un gradino solo dopo aver esaurito onestamente quello precedente ----
-  // Ogni gradino eredita gli allentamenti di quelli precedenti (si sale,
-  // non si passa da uno all'altro): 3a e 3b restano due gradini distinti
-  // (Passo C bis, C9) perche' il danno culturale di un pool generico della
-  // STESSA famiglia (3a) e' nullo, quello di un'ALTRA macro-area (3b) no.
-  const GRADINI = [
-    { gradino: '0',  soglia: 7,   opz: {} },
-    { gradino: '1',  soglia: 7,   opz: { ripetizione: true } },
-    { gradino: '2',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true } },
-    { gradino: '3a', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true } },
-    { gradino: '3b', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true } },
-    { gradino: '4',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
-    { gradino: '5',  soglia: 6.5, opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
-    { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
-  ];
-
   let esito = null;
   let gradinoRaggiunto = null;
   const diagnosticaCompleta = [];
@@ -1265,4 +1304,8 @@ async function generaESalva(supabase, userId, seedIniziale) {
   return { plan_id: piano.id, giorni_conformi: Math.floor(migliorPunteggio), seed, gradino: gradinoRaggiunto, concessioni };
 }
 
-module.exports = { generaESalva, caricaPiatti, gruppoDa, GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN };
+module.exports = {
+  generaESalva, caricaPiatti, gruppoDa, GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN,
+  CATEGORIE_DIETA, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI,
+  GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA,
+};
