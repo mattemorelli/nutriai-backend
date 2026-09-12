@@ -1170,31 +1170,26 @@ async function generaESalva(supabase, userId, seedIniziale) {
 
         settimana.push({ giorno: g, profilo: st.profiloGiorno, pasti, conforme });
 
-        // F2, seconda regola: un pasto principale (pranzo, cena) deve
-        // coprire proteina_principale, base_amidacea e verdura fra tutti i
-        // suoi piatti insieme. Registrata come concessione (come le altre
-        // qui sotto), non come vincolo duro nella ricerca: imporla in
-        // backtracking richiederebbe scartare un secondo gia' scelto quando
-        // il contorno giusto non si trova, con un impatto sulla capienza
-        // ancora da misurare (F5 controlla poi se i gradini salgono per
-        // colpa di questa regola, e in quel caso va irrigidita o ammorbidita
-        // con cognizione di causa, non a priori).
-        const RUOLI_PASTO_COMPLETO = ['proteina_principale', 'base_amidacea', 'verdura'];
-        function controllaCompletezzaPasto(nomePasto, piattiDelPasto) {
-          const coperti = new Set(piattiDelPasto.flatMap(p => (p && p.ruoli_coperti) || []));
-          const mancanti = RUOLI_PASTO_COMPLETO.filter(r => !coperti.has(r));
-          if (mancanti.length) {
+        // F2, seconda regola (corretta il 2026-09-12: era scritta a livello
+        // di PASTO, ma la giornata ha il pranzo su due soli slot - primo e
+        // contorno - quindi "pasta e verdure" veniva bocciato a torto, non
+        // e' un pasto incompleto, e' la struttura normale del pranzo). La
+        // completezza si misura sulla GIORNATA intera, non sul singolo
+        // pasto: fra tutti i piatti del giorno insieme deve comparire
+        // proteina_principale, base_amidacea e verdura. Registrata come
+        // concessione, non come vincolo duro: imporla in backtracking
+        // scarterebbe scelte gia' fatte altrove nel giorno, impatto sulla
+        // capienza da misurare con F5 prima di irrigidirla.
+        if (!st.bloccatoCompleto) {
+          const RUOLI_GIORNATA_COMPLETA = ['proteina_principale', 'base_amidacea', 'verdura'];
+          const copertiOggi = new Set(pasti.flatMap(p => (p.piatto && p.piatto.ruoli_coperti) || []));
+          const mancantiOggi = RUOLI_GIORNATA_COMPLETA.filter(r => !copertiOggi.has(r));
+          if (mancantiOggi.length) {
             concessioni.push({
-              gradino: null, tipo: 'pasto_incompleto', giorno: g, slot: nomePasto,
-              vincolo: 'ruoli_pasto_principale', prima: RUOLI_PASTO_COMPLETO.join('+'), dopo: `mancano: ${mancanti.join(', ')}`,
+              gradino: null, tipo: 'giornata_incompleta', giorno: g, slot: null,
+              vincolo: 'ruoli_giornata', prima: RUOLI_GIORNATA_COMPLETA.join('+'), dopo: `mancano: ${mancantiOggi.join(', ')}`,
             });
           }
-        }
-        if (!st.bloccatiOggi || !st.bloccatiOggi.some(b => b.slot === 'primo')) {
-          controllaCompletezzaPasto('pranzo', [st.primo, st.contornoPranzo]);
-        }
-        if (!st.secondoEAvanzo) {
-          controllaCompletezzaPasto('cena', [st.secondo, st.contornoCena, st.base]);
         }
 
         // C5: deviazione dalla sequenza proteica pianificata - sempre

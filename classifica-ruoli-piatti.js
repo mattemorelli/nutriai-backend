@@ -36,29 +36,39 @@
 // dominante ne' contare in nessun ruolo - "un caffe' accanto ai savoiardi"
 // non deve mai decidere il ruolo del piatto.
 //
-// RUOLO vs CATEGORIA (da non confondere MAI, in nessun punto del codice):
-// il ruolo descrive cosa fa l'alimento nel piatto (latte di mandorla fa il
-// lavoro del latte, quindi ruolo=latticino), la categoria (categorie_alimenti)
-// descrive cosa contiene per allergie/diete (latte di mandorla NON e' in
-// 'latticini' ne' 'lattosio', e deve restarne fuori). Questo file legge
-// SOLO da categorie_alimenti verso i ruoli (mai il contrario) e non scrive
-// mai categorie_alimenti - se un domani qualcosa derivasse le categorie dai
-// ruoli, un vegano con l'app impostata su "niente latticini" smetterebbe di
-// vedere latte di mandorla escluso da nulla, quando non deve esserlo perche'
-// non era mai stato escluso per allergia - e riaprirebbe esattamente i buchi
-// gia' chiusi con la ricostruzione di categorie_alimenti.
+// RUOLO vs CATEGORIA (da non confondere MAI, in nessun punto del codice, in
+// NESSUNA delle due direzioni - corretto il 2026-09-12 dopo il caso
+// "Savoiardi"): il ruolo descrive cosa fa l'alimento nel piatto, la
+// categoria (categorie_alimenti) descrive cosa contiene per allergie/diete,
+// ed e' VOLUTAMENTE inclusiva (taggare "uova" su un biscotto che ne contiene
+// e' corretto per un'allergia). Le due domande sono diverse e la categoria
+// NON deve mai determinare il ruolo: "Savoiardi" e' taggato 'uova' in
+// categorie_alimenti (giusto, contengono uovo), ma il suo ruolo e'
+// base_amidacea (farina e zucchero), non proteina_principale solo perche'
+// c'e' un uovo nella ricetta. Per questo i ruoli proteina_principale e
+// latticino NON leggono piu' da categorie_alimenti (vedi sotto) - si
+// derivano dal nome esattamente come verdura/frutta/base_amidacea/
+// condimento, con la stessa logica "cosa fa l'alimento", non "cosa contiene
+// che qualcuno deve evitare". Alla prova: "Pasta di curry rosso" e "Kimchi"
+// sono taggati crostacei/pesce (contengono pasta di gamberetti/salsa di
+// pesce, giusto per le allergie) ma il loro ruolo e' condimento/verdura, non
+// proteina_principale - con la derivazione per nome ci arrivano da soli
+// (curry -> condimento, kimchi -> verdura), senza bisogno di un'eccezione.
+// Questo file legge zero campi da categorie_alimenti e non ne scrive mai:
+// la separazione vale in entrambe le direzioni, non solo "mai derivare le
+// categorie dai ruoli" ma anche "mai derivare i ruoli dalle categorie".
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 
 const SOGLIA_SIGNIFICATIVA = 40;
 
-// ---- Livello 1: categorie_alimenti (affidabile dopo la ricostruzione) ----
-// pesce/carne_rossa/carne_bianca/crostacei/molluschi/legumi/uova/soia/maiale
-// (maiale e' contenuto in carne_rossa, non serve elencarlo a parte) -> proteina.
-// latticini (contiene lattosio) -> latticino.
-const CATEGORIE_PROTEINA = new Set(['pesce', 'carne_rossa', 'carne_bianca', 'crostacei', 'molluschi', 'legumi', 'uova', 'soia']);
-const CATEGORIE_LATTICINO = new Set(['latticini']);
+// legumi/soia hanno sia proteina che carboidrati significativi (ha_amido=true
+// su molti piatti a base di legumi nei dati esistenti): l'insieme dei loro
+// food_id serve solo ad ammorbidire il controllo incrociato con ha_amido
+// (sotto), NON a determinare il ruolo - quello resta proteina_principale,
+// derivato dal nome come tutto il resto.
+const RX_LEGUME_O_SOIA = /\bceci\b|fagiol|\bfave\b|lenticchi|lupini|piselli|taccole|edamame|hummus|\btofu\b|tempeh|germogli di soia|semi di soia/i;
 
 // ---- Livello 2: regex sul nome, per tutto cio' che categorie_alimenti non copre ----
 // (verdura, frutta, base_amidacea, condimento - categorie_alimenti e' solo
@@ -77,25 +87,53 @@ const CATEGORIE_LATTICINO = new Set(['latticini']);
 // 'è' e' gia' "non parola" per \b quanto lo spazio stesso.
 const RX_BEVANDA = /\b(caff[eè]|coffee|t[eè] verde|green tea|\btea\b|root beer|acqua (frizzante|tonica)|club soda|tonic water)/i;
 
-const RX_CONDIMENTO = /\b(olio|oil|aceto|vinegar|sriracha|tabasco|ketchup|senape|mustard|salsa|sauce|dressing|chimichurri|gochujang|hoisin|teriyaki|miso|tahini|relish|chutney|marmellata|jam\b|miele|honey|sciroppo|syrup|melassa|molasses|zucchero|sugar|stevia|sale\b|salt,|lievito|leavening|baking (soda|powder)|yeast|amido di mais|cornstarch|estratto di vaniglia|vanilla extract|vaniglia|cacao|cocoa|aglio|garlic|zenzero|ginger root|zenzero fresco|basilico|prezzemolo|parsley|coriandolo|cilantro|menta|mint\b|rosmarino|rosemary|salvia|sage\b|timo|thyme|aneto|dill\b|erba cipollina|chives|maggiorana|marjoram|alloro|bay leaf|cannella|cinnamon|cardamomo|cardamom|chiodi di garofano|cloves|cumino|cumin\b|curcuma|turmeric|curry|noce moscata|nutmeg|origano|oregano|paprika|pepe |pepper,|peperoncino in polvere|chili powder|anice stellato|star anise|semi di (chia|lino|sesamo|girasole|zucca|cumino|finocchio)|seeds?,|capperi|capers|\bolive\b|\bolives\b|rafano|horseradish|vino bianco|vino rosso|wine,|brodo|stock,|broth|pasta di tamarindo|tamarind|latte di cocco|coconut milk|mandorl|almond|nocciol|hazelnut|anacard|cashew|pistacch|pistachio|arachid|peanut|noci\b|noce\b|walnut|macadamia|passata di pomodoro|tomato.*(puree|paste)|concentrato di pomodoro|condimento italiano|italian dressing|pomodori secchi|sun-dried tomato)/i;
+const RX_CONDIMENTO = /\b(olio|oil|aceto|vinegar|sriracha|tabasco|ketchup|senape|mustard|salsa|sauce|dressing|chimichurri|gochujang|hoisin|teriyaki|miso|tahini|relish|chutney|marmellata|jam\b|miele|honey|sciroppo|syrup|melassa|molasses|zucchero|sugar|stevia|sale\b|salt,|lievito|leavening|baking (soda|powder)|yeast|amido di mais|cornstarch|estratto di vaniglia|vanilla extract|vaniglia|cacao|cocoa|cioccolat|chocolate|aglio|garlic|zenzero|ginger root|zenzero fresco|basilico|prezzemolo|parsley|coriandolo|cilantro|menta|mint\b|rosmarino|rosemary|salvia|sage\b|timo|thyme|aneto|dill\b|erba cipollina|chives|maggiorana|marjoram|alloro|bay leaf|cannella|cinnamon|cardamomo|cardamom|chiodi di garofano|cloves|cumino|cumin\b|curcuma|turmeric|curry|noce moscata|nutmeg|origano|oregano|paprika|pepe |pepper,|peperoncino in polvere|chili powder|anice stellato|star anise|semi di (chia|lino|sesamo|girasole|zucca|cumino|finocchio)|seeds?,|capperi|capers|\bolive\b|\bolives\b|rafano|horseradish|vino bianco|vino rosso|wine,|brodo|stock,|broth|pasta di tamarindo|tamarind|latte di cocco|coconut milk|mandorl|almond|nocciol|hazelnut|anacard|cashew|pistacch|pistachio|arachid|peanut|noci\b|noce\b|walnut|macadamia|passata di pomodoro|tomato.*(puree|paste)|concentrato di pomodoro|condimento italiano|italian dressing|pomodori secchi|sun-dried tomato|maionese|\bmayo\b|mayonnaise|pesto|worcestershire|\bburro\b|\bbutter\b|margarina|margarine)/i;
 
 // castagne/chestnut spostate qui da RX_FRUTTA (2026-09-12, campione F1):
 // nutrizionalmente sono amido, non zucchero di frutta (~40g carboidrati/100g,
 // piu' vicine a un cereale che a una mela) - il vecchio ha_amido=true su
 // "Roasted chestnuts" aveva ragione, la prima classificazione no. Savoiardi
-// aggiunto nello stesso giro (biscotto, mancava dal regex).
-const RX_BASE_AMIDACEA = /\b(riso|rice,|pasta|spaghett|penne|farro|spelt|orzo|barley|couscous|cous\b|bulgur|polenta|cornmeal|farina|flour|pane\b|pane,|bread|fette biscottate|savoiardi|biscott|ladyfinger|cracker|patat|potato|quinoa|amaranto|amaranth|grano saraceno|buckwheat|miglio|millet|teff|avena|oat,|oats|tapioca|popcorn|tortilla|carta di riso|rice paper|gallette di riso|rice cakes|platano|plantain|\byuca\b|manioca|cassava|\bbun\b|panino|noodle|udon|soba\b|ramen|vermicelli|castagne|chestnut)/i;
+// aggiunto nello stesso giro (biscotto, mancava dal regex). cornetto/muffin/
+// sfoglia aggiunti insieme alla rimozione di categorie_alimenti dal ruolo
+// (2026-09-12): "Cornetto con uovo formaggio e prosciutto" e "Muffin
+// inglese con formaggio e salsiccia" sono panini/dolci da forno, non un
+// piatto di proteina solo perche' contengono anche uovo/formaggio/salsiccia.
+const RX_BASE_AMIDACEA = /\b(riso|rice,|pasta|spaghett|penne|farro|spelt|orzo|barley|couscous|cous\b|bulgur|polenta|cornmeal|farina|flour|pane\b|pane,|bread|fette biscottate|savoiardi|biscott|ladyfinger|cracker|cornetto|croissant|muffin|sfoglia|puff pastry|patat|potato|quinoa|amaranto|amaranth|grano saraceno|buckwheat|miglio|millet|teff|avena|oat,|oats|tapioca|popcorn|tortilla|carta di riso|rice paper|gallette di riso|rice cakes|platano|plantain|\byuca\b|manioca|cassava|\bbun\b|panino|noodle|udon|soba\b|ramen|vermicelli|castagne|chestnut)/i;
 
 // Latte di mandorla: ruolo latticino (fa il lavoro del latte nel piatto -
 // es. "Cereals with almond milk"), ma NON deve mai toccare categorie_alimenti
 // (resta fuori da 'latticini'/'lattosio', vedi nota RUOLO vs CATEGORIA in
 // testa al file). Controllata PRIMA di RX_CONDIMENTO, che altrimenti la
-// cattura via "mandorl".
+// cattura via "mandorl". Latte/yogurt di soia non hanno bisogno della stessa
+// eccezione: "soia" da sola non e' un termine condimento (lo sono solo i
+// composti - salsa di soia, miso, gochujang, tofu/tempeh restano proteina),
+// quindi arrivano a RX_LATTICINO sotto senza essere intercettati prima.
 const RX_LATTICINO_VEGETALE = /\b(latte di mandorla|almond milk)\b/i;
 
 const RX_FRUTTA = /\b(mela\b|mele\b|apple|banana|arancia|arance|orange|clementine|pompelmo|grapefruit|limone|lime\b|lemon|kiwi|ananas|pineapple|anguria|watermelon|melone|melon|cantaloupe|uva\b|uvetta|grape|raisin|ciliegie|cherr|fragol|strawberr|lampon|raspberr|mirtill|blueberr|cranberr|\bmore\b|blackberr|frutti di bosco|mixed berries|pesc[ah]e|peach|susine|prugn|plum|albicocc|apricot|fichi|\bfico\b|fig,|figs\b|cachi|persimmon|datteri|dates,|melagrana|melograno|pomegranate|guava|papaya|\bmango\b|acai|\bpera\b|pere\b|\bpears?\b|cocco fresco|fresh coconut)/i;
 
-const RX_VERDURA = /\b(pomodor|tomato|zucchin|zucca|squash|pumpkin|melanzan|eggplant|aubergine|peperon|pepper,|jalapeno|padr[oó]n|cipoll|onion|scalogno|shallot|porr[io]|leek|aglio fresco|carota|carrot|sedano|celery|finocchi|fennel|cavol|cabbage|kale|broccol|cavolfiore|cauliflower|bok choy|collard|spinaci|spinach|bietol|chard|lattuga|lettuce|rucola|arugula|radicchio|scarola|escarole|indivia|endive|cicoria|chicory|crescione|watercress|valeriana|asparagi|asparagus|carciof|artichoke|barbabiet|beetroot|beet,|\brapa\b|\brape\b|rape rosse|turnip|ravanell|radish|daikon|topinambur|jerusalem artichoke|funghi|mushroom|\balga\b|alghe|seaweed|kelp|wakame|nori|crauti|sauerkraut|okra|cetriol|cucumber|avocado|mais dolce|mais bianco|sweet corn|corn,|\bolive\b|\bolives\b|pastinaca|parsnip)/i;
+// kimchi aggiunto insieme alla rimozione di categorie_alimenti dal ruolo
+// (2026-09-12): taggato pesce/crostacei per la salsa di pesce/gamberetti
+// che contiene (giusto per le allergie), ma il ruolo e' verdura - e'
+// cavolo fermentato, come i crauti gia' qui sotto.
+const RX_VERDURA = /\b(pomodor|tomato|zucchin|zucca|squash|pumpkin|melanzan|eggplant|aubergine|peperon|pepper,|jalapeno|padr[oó]n|cipoll|onion|scalogno|shallot|porr[io]|leek|aglio fresco|carota|carrot|sedano|celery|finocchi|fennel|cavol|cabbage|kale|broccol|cavolfiore|cauliflower|bok choy|collard|spinaci|spinach|bietol|chard|lattuga|lettuce|rucola|arugula|radicchio|scarola|escarole|indivia|endive|cicoria|chicory|crescione|watercress|valeriana|asparagi|asparagus|carciof|artichoke|barbabiet|beetroot|beet,|\brapa\b|\brape\b|rape rosse|turnip|ravanell|radish|daikon|topinambur|jerusalem artichoke|funghi|mushroom|\balga\b|alghe|seaweed|kelp|wakame|nori|crauti|sauerkraut|\bkimchi\b|okra|cetriol|cucumber|avocado|mais dolce|mais bianco|sweet corn|corn,|\bolive\b|\bolives\b|pastinaca|parsnip)/i;
+
+// ---- Proteina e latticino: DERIVATI DAL NOME, non da categorie_alimenti
+// (vedi nota RUOLO vs CATEGORIA in testa al file). Elenco costruito sui
+// nomi reali dei 247 alimenti oggi taggati con una categoria proteica/
+// allergenica, per verificare che coprano gli alimenti VERI (carne, pesce,
+// legumi, uova) e lascino fuori le salse/composti che li contengono solo
+// come ingrediente minoritario (kimchi, pasta di curry, salsa di pesce,
+// salsa di soia/hoisin/teriyaki, miso, gochujang, maionese, salse BBQ/
+// Buffalo/ranch, cornetto/muffin) - quelli cadono gia' su condimento o
+// base_amidacea sopra, prima di arrivare qui.
+const RX_PROTEINA_PRINCIPALE = /\b(pollo|chicken|tacchino|turkey|anatra|duck|\boca\b|\bgoose\b|coniglio|rabbit|fagiano|pheasant|piccione|pigeon|quaglia|quail|manzo|beef|vitello|veal|agnello|lamb|maiale|pork|\bcapra\b|\bgoat\b|cinghiale|\bboar\b|canguro|kangaroo|bisonte|bison|\bcervo\b|venison|salame|salami|mortadella|salsiccia|sausage|\bbacon\b|pancetta|\bspeck\b|bresaola|prosciutto|ham\b|w[uü]rstel|leberwurst|fegato|liver|\blingua\b|\btongue\b|zampe|trotter|costine|costol|rib\b|ribs\b|stinco|\blonza\b|guancia|cheek\b|\blardo\b|\breni\b|kidney|\bsego\b|tallow|petto di (pollo|tacchino|anatra|manzo)|chicken breast|turkey breast|duck breast|beef brisket|acciughe|anchov|anguilla|\beel\b|aringa|herring|baccal[aà]|\bcod\b|barramundi|branzino|sea bass|\bcarpa\b|\bcarp\b|caviale|caviar|cernia|grouper|\bdentice\b|eglefino|haddock|\bhalibut\b|mahi mahi|merluzzo|nasello|\bhake\b|\borata\b|passera|plaice|\bpersico\b|\bperch\b|pesce (farfalla|gatto|spada)|swordfish|catfish|\bplatessa\b|\bpollock\b|\brombo\b|turbot|salmone|salmon|\bsardine\b|\bsgombro\b|mackerel|sogliola|\bsole\b|\bspigola\b|\bsurimi\b|\btilapia\b|\btonno\b|\btuna\b|\btrota\b|\btrout\b|aragosta|lobster|\bastice\b|gamberetti|\bgambero\b|\bshrimp\b|\bprawn\b|granchio|\bcrab\b|\bscampi\b|calamari|squid|capesante|scallop|\bcozze\b|mussel|\bpolpo\b|octopus|\bseppia\b|cuttlefish|vongole|\bclam\b|\bceci\b|chickpea|fagiol|\bbean\b|\bbeans\b|fagiolini|green bean|\bfave\b|\bfava\b|lenticchi|lentil|\blupini\b|\bpiselli\b|\bpeas\b|\btaccole\b|\bedamame\b|\bhummus\b|\btofu\b|\btempeh\b|germogli di soia|soy sprouts|semi di soia|soybean|\balbume\b|egg white|\btuorlo\b|egg yolk|\buovo\b|\buova\b|\begg\b|\beggs\b)/i;
+
+// Formaggi, latte e derivati che fanno il lavoro del latte/formaggio nel
+// piatto. Burro e margarina restano condimento (funzionano come grasso di
+// cottura, non come "il latticino del pasto") - esclusi qui apposta, gia'
+// in RX_CONDIMENTO sopra.
+const RX_LATTICINO = /\b(asiago|\bbrie\b|caciocavallo|camembert|cheddar|crescenza|emmental|\bfeta\b|fontina|formaggio|cheese\b|gorgonzola|\bgouda\b|gruyere|caprino|goat cheese|mascarpone|\bmonterey\b|mozzarella|parmigiano|parmesan|pecorino|\bprovola\b|provolone|\bqueso\b|ricotta|\brobiola\b|scamorza|stracchino|\btaleggio\b|\blatte\b|\bmilk\b|\bpanna\b|\bcream\b|latticello|buttermilk|\bkefir\b|\byogurt\b|\bgelato\b|ice cream|siero di latte|whey)/i;
 
 // Le due eccezioni concordate per non lasciare "il condimento non e' mai
 // primario" a bocciare due famiglie di piatti frequenti e non ambigue:
@@ -116,10 +154,16 @@ function eccezioneCondimento(nome) {
   return null;
 }
 
+// Ordine deliberato: base_amidacea PRIMA di latticino/proteina, cosi' un
+// prodotto composito da forno ("Cornetto con uovo formaggio e prosciutto",
+// "Muffin inglese con formaggio e salsiccia") resta il pane/dolce che e',
+// non il formaggio o il prosciutto che contiene solo come farcitura.
 function ruoloDaNome(nome) {
   if (RX_LATTICINO_VEGETALE.test(nome)) return 'latticino';
   if (RX_CONDIMENTO.test(nome)) return 'condimento';
   if (RX_BASE_AMIDACEA.test(nome)) return 'base_amidacea';
+  if (RX_LATTICINO.test(nome)) return 'latticino';
+  if (RX_PROTEINA_PRINCIPALE.test(nome)) return 'proteina_principale';
   if (RX_FRUTTA.test(nome)) return 'frutta';
   if (RX_VERDURA.test(nome)) return 'verdura';
   return null;
@@ -127,24 +171,19 @@ function ruoloDaNome(nome) {
 
 async function costruisciMappaRuoli(supabase) {
   const mappa = new Map();
-
-  // legumi/soia hanno sia proteina che carboidrati significativi (da qui
-  // ha_amido=true su molti piatti a base di legumi nei dati esistenti):
-  // tracciati a parte per ammorbidire il controllo incrociato con ha_amido,
-  // senza toccare il ruolo (restano proteina_principale, non un settimo ruolo).
   const foodIdLegumiSoia = new Set();
-  const { data: cat } = await supabase.from('categorie_alimenti').select('food_id, categoria');
-  for (const r of (cat || [])) {
-    if (CATEGORIE_PROTEINA.has(r.categoria)) mappa.set(r.food_id, 'proteina_principale');
-    else if (CATEGORIE_LATTICINO.has(r.categoria) && !mappa.has(r.food_id)) mappa.set(r.food_id, 'latticino');
-    if (r.categoria === 'legumi' || r.categoria === 'soia') foodIdLegumiSoia.add(r.food_id);
-  }
 
+  // Nessuna lettura da categorie_alimenti: il ruolo si deriva SOLO dal nome,
+  // per tutti e sei i ruoli allo stesso modo (vedi nota RUOLO vs CATEGORIA
+  // in testa al file).
   const { data: foods } = await supabase.from('foods').select('id, name, name_it');
   for (const f of foods) {
-    if (mappa.has(f.id)) continue; // categorie_alimenti ha priorita'
-    const ruolo = ruoloDaNome(f.name_it || '') || ruoloDaNome(f.name || '');
+    const nome = f.name_it || f.name || '';
+    const ruolo = ruoloDaNome(nome) || ruoloDaNome(f.name || '');
     if (ruolo) mappa.set(f.id, ruolo);
+    // Serve solo ad ammorbidire il controllo incrociato con ha_amido (i
+    // legumi hanno carboidrati veri), non a determinare il ruolo.
+    if (RX_LEGUME_O_SOIA.test(nome) || RX_LEGUME_O_SOIA.test(f.name || '')) foodIdLegumiSoia.add(f.id);
   }
   const nomeDi = Object.fromEntries(foods.map(f => [f.id, f.name_it || f.name]));
   return { mappa, nomeDi, foodIdLegumiSoia };

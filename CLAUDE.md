@@ -41,18 +41,34 @@ per gli inserimenti in `dish_ingredients`.
    nello stesso paese non va aggiunto.
 9. **ruolo_primario e ruoli_coperti** (Fase 4 F1, 2026-09-12). Ruoli:
    proteina_principale, base_amidacea, verdura, frutta, latticino, condimento.
-   ruolo_primario = ruolo dell'ingrediente col peso maggiore in grammi.
-   ruoli_coperti = ruoli i cui ingredienti superano insieme una soglia
-   adattiva (40g, o il 20% del peso totale del piatto se piu' basso - uno
-   spuntino leggero non deve restare senza ruoli coperti solo per aritmetica).
-   condimento non e' mai ruolo primario: se lo sarebbe, il piatto resta senza
-   ruolo (va segnalato, non inventato) - come un piatto senza profilo non
-   viene usato. Calcolati da classifica-ruoli-piatti.js, che chiama
-   categorie_alimenti per proteine/latticini e un regex sul nome per
-   verdura/frutta/base_amidacea/condimento (categorie_alimenti copre solo
-   proteine/allergeni, non l'intera tassonomia alimentare). Un nuovo piatto
-   scritto a mano deve avere questi due campi valorizzati coerentemente,
-   non lasciati a NULL.
+   ruolo_primario = ruolo dell'ingrediente col peso maggiore in grammi, per
+   OGNI ruolo (anche proteina_principale/latticino). ruoli_coperti usa una
+   metrica diversa per ruolo, dichiarata una volta sola qui (chi la usa - F2
+   compreso - la legge da qui, non la ricalcola): proteina_principale e
+   latticino sui GRAMMI DI PROTEINA reale (protein_100g*grams/100, soglia
+   >=10g o >=25% delle proteine totali del piatto - il peso dell'alimento e'
+   la misura sbagliata per la proteina, un contorno di verdure puo' pesare
+   piu' del pollo pur essendo il pollo l'85% delle proteine); gli altri
+   quattro ruoli sui grammi di ALIMENTO (soglia adattiva 40g, o 20% del peso
+   totale se piu' basso). condimento non e' mai ruolo primario: se lo
+   sarebbe, il piatto resta senza ruolo (va segnalato, non inventato). Le
+   bevande (caffe', te', acqua frizzante/tonica, root beer) non sono un
+   ruolo: escluse a monte, non occupano mai uno slot.
+   **La categoria (categorie_alimenti) NON deve MAI determinare il ruolo, in
+   nessuna delle due direzioni.** La categoria risponde "cosa contiene che
+   puo' far male" ed e' volutamente inclusiva (taggare 'uova' su un biscotto
+   che ne contiene e' corretto per un'allergia); il ruolo risponde "che
+   lavoro fa nel piatto". Sono domande diverse: "Savoiardi" e' 'uova' in
+   categorie_alimenti ma il suo ruolo e' base_amidacea (farina e zucchero),
+   non proteina_principale; "Kimchi" e "Pasta di curry rosso" sono pesce/
+   crostacei (contengono salsa di pesce/gamberetti) ma il loro ruolo e'
+   verdura/condimento. Per questo classifica-ruoli-piatti.js deriva TUTTI e
+   sei i ruoli dal nome dell'alimento (mai da categorie_alimenti) - la
+   stessa regola vale anche al contrario, mai derivare una categoria
+   allergenica dal ruolo di un piatto. Un nuovo piatto scritto a mano deve
+   avere ruolo_primario/ruoli_coperti valorizzati coerentemente con questo
+   principio, non lasciati a NULL e non copiati dalla categoria allergenica
+   dei suoi ingredienti.
 
 ## Obiettivo per paese
 Paesi senza generico di riferimento (Italia, Francia, Grecia, Spagna, Portogallo):
