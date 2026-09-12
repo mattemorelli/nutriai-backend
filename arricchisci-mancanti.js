@@ -14,6 +14,21 @@ const CAMPI = 'code,product_name,brands,categories_tags,labels_tags,ingredients_
 
 const attesa = (ms) => new Promise(r => setTimeout(r, ms));
 
+// PostgREST impone un tetto di righe per risposta (di default 1000)
+// indipendente da .limit(): categorie come formaggio o latte hanno migliaia
+// di prodotti in italy, quindi va paginato con .range().
+async function paginaTutto(costruisciQuery) {
+  const righe = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await costruisciQuery(offset, offset + PAGINA - 1);
+    if (error) throw new Error(error.message);
+    righe.push(...(blocco || []));
+    if (!blocco || blocco.length < PAGINA) break;
+  }
+  return righe;
+}
+
 async function scheda(barcode) {
   try {
     const r = await fetch(
@@ -39,23 +54,25 @@ async function scheda(barcode) {
   for (const p of pesi) pesiDi[p.tipo_prodotto].push(p);
 
   // le marche che contano
-  const { data: tutte } = await supabase
+  const tutte = await paginaTutto((da, a) => supabase
     .from('prodotti').select('marca')
     .eq('paese', 'italy').in('categoria_riconosciuta', CATEGORIE)
-    .not('marca', 'is', null);
+    .not('marca', 'is', null)
+    .range(da, a));
   const conteggio = {};
   for (const r of tutte) conteggio[r.marca] = (conteggio[r.marca] || 0) + 1;
   const marcheVere = new Set(Object.keys(conteggio).filter(m => conteggio[m] >= 5));
 
   // i prodotti da arricchire
-  const { data: daFare } = await supabase
+  const daFare = await paginaTutto((da, a) => supabase
     .from('prodotti')
     .select('barcode, nome, marca, categoria_riconosciuta')
     .eq('paese', 'italy')
     .in('categoria_riconosciuta', CATEGORIE)
-    .is('voto_ambientale', null);
+    .is('voto_ambientale', null)
+    .range(da, a));
 
-  const lista = (daFare || []).filter(p => marcheVere.has(p.marca)).slice(0, 15);
+  const lista = daFare.filter(p => marcheVere.has(p.marca)).slice(0, 15);
   console.log(`Da arricchire: ${lista.length}\n`);
 
   let ok = 0, vuoti = 0, errori = 0;

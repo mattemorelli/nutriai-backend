@@ -29,6 +29,35 @@ function prodottoTag(p = {}) {
 // fra il prodotto peggiore e il migliore della stessa categoria.
 const FATTORE = 5;
 
+// I modificatori spostano il voto dalla base di categoria, ma entro un tetto:
+// senza, categorie vicine per CO2 potrebbero scavalcarsi a vicenda solo per
+// differenze di packaging o etichette, cosa che vanificherebbe la separazione
+// voluta fra categorie a impatto diverso.
+//
+// Il tetto e' differenziato per categoria, non piu' unico: per le carni e i
+// legumi serve stretto (9), l'unico che garantisce matematicamente il vincolo
+// "nessuna carne supera un legume, nessun manzo supera un pollo" dati i gap di
+// base reali (pollame-legumi = 19.98 -> tetto max 9.99, manzo-pollame = 23.88 ->
+// tetto max 11.94: 9 rispetta entrambi con margine). Altrove, dove non c'e'
+// nessun vincolo da rispettare, un tetto piu' largo (20) sfrutta la varianza
+// reale emersa con i dati arricchiti (dev.std 13-24 nello spostamento grezzo),
+// che 9 comprimerebbe inutilmente.
+const CATEGORIE_TETTO_STRETTO = ['agnello', 'maiale', 'manzo', 'pollame', 'legumi'];
+const TETTO_STRETTO = 9;
+const TETTO_LARGO = 20;
+function capPer(categoria) {
+  return CATEGORIE_TETTO_STRETTO.includes(categoria) ? TETTO_STRETTO : TETTO_LARGO;
+}
+
+// Dalla CO2 della categoria al punteggio di base (25-75, non più un fisso 50):
+// stessa scala logaritmica di puntiCarbonio, solo riscalata cosi' che il minimo
+// impatto stia vicino a 75 e il massimo vicino a 25. Le categorie partono quindi
+// gia' ordinate per impronta di carbonio, e i modificatori (capati a ±12) le
+// spostano solo localmente, senza poter scavalcare una categoria molto piu' pulita.
+function baseDaCO2(co2) {
+  return 25 + 0.5 * puntiCarbonio(co2);
+}
+
 function calcolaVoto({ base, pesi, modificatori = [] }) {
   const dettaglio = [];
   let deltaPesato = 0;
@@ -74,19 +103,23 @@ function calcolaVoto({ base, pesi, modificatori = [] }) {
     });
   }
 
-  const spostamento = pesoTotale > 0 ? (deltaPesato / pesoTotale) * FATTORE : 0;
-  const finale = Math.max(0, Math.min(100, 50 + spostamento));
+  const tetto = capPer(base.categoria);
+  const spostamentoGrezzo = pesoTotale > 0 ? (deltaPesato / pesoTotale) * FATTORE : 0;
+  const spostamento = Math.max(-tetto, Math.min(tetto, spostamentoGrezzo));
+  const baseCategoria = baseDaCO2(Number(base.co2_kg_per_kg));
+  const finale = Math.max(0, Math.min(100, baseCategoria + spostamento));
 
   return {
     voto: lettera(finale),
     punteggio: Math.round(finale),
     confidenza: confidenzaVoto,
-    // contesto: quanto pesa la categoria in assoluto, per non far sembrare
-    // "ottimo" un prodotto che resta comunque ad alto impatto
     categoria: base.categoria,
     impatto_categoria: {
       co2_kg_per_kg: Number(base.co2_kg_per_kg),
       punti_assoluti: Math.round(puntiCarbonio(Number(base.co2_kg_per_kg))),
+      // la base di partenza usata per questo voto, prima del ±12 dei modificatori:
+      // sostituisce il vecchio 50 fisso ed e' derivata dalla CO2 della categoria.
+      base_categoria: Math.round(baseCategoria),
       nota: base.nota,
     },
     fonte: base.fonte,
@@ -437,4 +470,90 @@ async function votoBarcode(supabase, barcode, paese = 'it') {
   return risposta;
 }
 
-module.exports = { calcolaVoto, votoAlimento, modificatoriDa, modificatoreUova, categoriaDa, votoBarcode, lettera, puntiCarbonio };
+// --- Motivi per scegliere un prodotto: sempre un confronto con la categoria,
+// mai un'etichetta interna del calcolo. "Molti additivi" non dice nulla a chi
+// è davanti allo scaffale; "12 additivi contro una media di 4" sì. Se non c'è
+// uno scarto verificabile abbastanza grande, meglio nessuna frase che una vaga.
+
+function haImballaggioRiciclabile(packagingTags = []) {
+  const t = (packagingTags || []).join(' ').toLowerCase();
+  return /recycl|riciclabil|carton|glass|verre|vetro|carta\b|cardboard|paper/.test(t);
+}
+
+// Da una frazione (0-1) a una parola, per non scrivere sempre percentuali:
+// intorno a metà si dice "metà", agli estremi "quasi tutti"/"quasi nessuno".
+function fraseFrazione(frac) {
+  const pct = Math.round(frac * 100);
+  if (pct >= 45 && pct <= 55) return 'metà';
+  if (pct >= 90) return 'quasi tutti';
+  if (pct <= 10) return 'quasi nessuno';
+  return `il ${pct}%`;
+}
+
+// `prodotto`: { additivi_n, sale, zuccheri, grassiSaturi, nCertificazioni, packagingRiciclabile }
+// `statistiche`: { n, mediaAdditivi, mediaSale, mediaZuccheri, mediaGrassiSaturi, fracCertificazioni, fracRiciclabile }
+// tutte calcolate sugli altri prodotti della stessa categoria_riconosciuta.
+function motiviConfronto({ prodotto, statistiche }) {
+  const perche = [];
+  const contro = [];
+  if (!statistiche || !statistiche.n) return { perche, contro };
+
+  const fonte = `Confronto con ${statistiche.n} prodotti della categoria`;
+
+  // additivi: unico caso con numeri esatti, perché sono un conteggio, non una stima
+  if (prodotto.additivi_n != null && statistiche.mediaAdditivi != null && statistiche.mediaAdditivi > 0) {
+    const media = statistiche.mediaAdditivi;
+    if (prodotto.additivi_n === 0 && media >= 1) {
+      perche.push({ testo: `Nessun additivo, contro una media di ${media.toFixed(1)} in questa categoria`, fonte });
+    } else if (prodotto.additivi_n < media * 0.5 && media - prodotto.additivi_n >= 1.5) {
+      perche.push({ testo: `Solo ${prodotto.additivi_n} additivi contro una media di ${media.toFixed(1)} in questa categoria`, fonte });
+    } else if (prodotto.additivi_n > media * 1.4 && prodotto.additivi_n - media >= 1.5) {
+      contro.push({ testo: `${prodotto.additivi_n} additivi contro una media di ${media.toFixed(1)} in questa categoria`, fonte });
+    }
+  }
+
+  // nutrienti: solo direzione, non serve il numero per dire "meno sale della media"
+  const NUTRIENTI = [
+    ['sale', 'mediaSale', 'sale'],
+    ['zuccheri', 'mediaZuccheri', 'zuccheri'],
+    ['grassiSaturi', 'mediaGrassiSaturi', 'grassi saturi'],
+  ];
+  for (const [chiave, mediaChiave, nome] of NUTRIENTI) {
+    const valore = prodotto[chiave];
+    const media = statistiche[mediaChiave];
+    if (valore == null || media == null || media <= 0.05) continue;
+    const diff = (valore - media) / media;
+    if (diff <= -0.25) {
+      perche.push({ testo: `Meno ${nome} della media di questa categoria`, fonte });
+    } else if (diff >= 0.3) {
+      contro.push({ testo: `Più ${nome} della media di questa categoria`, fonte });
+    }
+  }
+
+  // certificazioni: presenza rara è un pro, assenza dove è la norma è un contro
+  if (statistiche.fracCertificazioni != null) {
+    const ha = (prodotto.nCertificazioni || 0) > 0;
+    if (ha && statistiche.fracCertificazioni <= 0.4) {
+      perche.push({ testo: `Ha certificazioni dichiarate, raro tra i prodotti simili (le ha ${fraseFrazione(statistiche.fracCertificazioni)})`, fonte });
+    } else if (!ha && statistiche.fracCertificazioni >= 0.4) {
+      contro.push({ testo: `Senza certificazioni, a differenza di ${fraseFrazione(statistiche.fracCertificazioni)} dei prodotti simili`, fonte });
+    }
+  }
+
+  // packaging riciclabile: stessa logica
+  if (statistiche.fracRiciclabile != null) {
+    const ha = !!prodotto.packagingRiciclabile;
+    if (ha && statistiche.fracRiciclabile <= 0.4) {
+      perche.push({ testo: `Packaging riciclabile, raro tra i prodotti simili (lo dichiara ${fraseFrazione(statistiche.fracRiciclabile)})`, fonte });
+    } else if (!ha && statistiche.fracRiciclabile >= 0.5) {
+      contro.push({ testo: `Packaging non dichiarato riciclabile, a differenza di ${fraseFrazione(statistiche.fracRiciclabile)} dei prodotti simili`, fonte });
+    }
+  }
+
+  return { perche, contro };
+}
+
+module.exports = {
+  calcolaVoto, votoAlimento, modificatoriDa, modificatoreUova, categoriaDa, votoBarcode,
+  lettera, puntiCarbonio, baseDaCO2, capPer, motiviConfronto, haImballaggioRiciclabile, fraseFrazione,
+};

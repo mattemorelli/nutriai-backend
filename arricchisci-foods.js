@@ -43,15 +43,30 @@ async function arricchisci(blocco) {
   return JSON.parse(testo);
 }
 
+// PostgREST impone un tetto di righe per risposta (di default 1000)
+// indipendente da .limit(): foods puo' crescere oltre la soglia, quindi va
+// paginato con .range() invece di fidarsi che resti sotto.
+async function paginaTutto(costruisciQuery) {
+  const righe = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await costruisciQuery(offset, offset + PAGINA - 1);
+    if (error) throw new Error(error.message);
+    righe.push(...(blocco || []));
+    if (!blocco || blocco.length < PAGINA) break;
+  }
+  return righe;
+}
+
 async function main() {
   console.log(SOLO_PROVA ? '=== PROVA (non scrive) ===\n' : '=== SCRITTURA ATTIVA ===\n');
 
-  const { data: mancanti, error } = await supabase
+  const mancanti = await paginaTutto((da, a) => supabase
     .from('foods')
     .select('id, name')
     .is('name_en', null)
-    .order('id');
-  if (error) throw new Error(error.message);
+    .order('id')
+    .range(da, a));
 
   console.log(`Da arricchire: ${mancanti.length}\n`);
   let ok = 0, scartati = 0;

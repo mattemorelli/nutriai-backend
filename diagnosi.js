@@ -5,11 +5,27 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY
 );
 
+// PostgREST impone un tetto di righe per risposta (di default 1000)
+// indipendente da .limit(): i "secondo" sono gia' a 800+ e crescono, quindi
+// va paginato con .range() invece di fidarsi che restino sotto la soglia.
+async function paginaTutto(costruisciQuery) {
+  const righe = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await costruisciQuery(offset, offset + PAGINA - 1);
+    if (error) throw new Error(error.message);
+    righe.push(...(blocco || []));
+    if (!blocco || blocco.length < PAGINA) break;
+  }
+  return righe;
+}
+
 (async () => {
-  const { data: piatti } = await supabase
+  const piatti = await paginaTutto((da, a) => supabase
     .from('dishes')
     .select('id, name, meal_slot, profilo, prep_min, tecnica, health_score, contiene_glutine')
-    .eq('meal_slot', 'secondo');
+    .eq('meal_slot', 'secondo')
+    .range(da, a));
 
   const passi = [
     ['tutti i secondi',    p => true],

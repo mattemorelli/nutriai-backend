@@ -36,14 +36,30 @@ async function chiedi(blocco) {
   return JSON.parse(testo);
 }
 
+// PostgREST impone un tetto di righe per risposta (di default 1000)
+// indipendente da .limit(): con --tutti si legge l'intera tabella foods,
+// che puo' crescere oltre la soglia, quindi va paginato con .range().
+async function paginaTutto(costruisciQuery) {
+  const righe = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await costruisciQuery(offset, offset + PAGINA - 1);
+    if (error) throw new Error(error.message);
+    righe.push(...(blocco || []));
+    if (!blocco || blocco.length < PAGINA) break;
+  }
+  return righe;
+}
+
 (async () => {
   console.log(SOLO_PROVA ? '=== PROVA ===\n' : '=== SCRITTURA ATTIVA ===\n');
 
   // --tutti rigenera anche i sinonimi di chi ha già il nome italiano
-  let q = supabase.from('foods').select('id, name, name_en').order('id');
-  if (!TUTTI) q = q.is('name_it', null);
-  const { data: mancanti, error } = await q;
-  if (error) throw new Error(error.message);
+  const mancanti = await paginaTutto((da, a) => {
+    let q = supabase.from('foods').select('id, name, name_en').order('id').range(da, a);
+    if (!TUTTI) q = q.is('name_it', null);
+    return q;
+  });
 
   console.log(`Da elaborare: ${mancanti.length}\n`);
   let ok = 0, scartati = 0;

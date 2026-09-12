@@ -1,4 +1,19 @@
-const { lettera, puntiCarbonio } = require('./voto');
+const { lettera, puntiCarbonio, motiviConfronto, haImballaggioRiciclabile } = require('./voto');
+
+// PostgREST impone un tetto di righe per risposta (di default 1000)
+// indipendente da .limit(): categorie come pane_pasta o formaggio hanno
+// migliaia di prodotti per paese, quindi va paginato con .range().
+async function paginaTutto(costruisciQuery) {
+  const righe = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await costruisciQuery(offset, offset + PAGINA - 1);
+    if (error) throw new Error(error.message);
+    righe.push(...(blocco || []));
+    if (!blocco || blocco.length < PAGINA) break;
+  }
+  return righe;
+}
 
 // Reparti riconosciuti dal nome dell'alimento (italiano e inglese USDA).
 const REPARTI = [
@@ -13,6 +28,18 @@ function repartoDi(nome) {
     if (rx.test(nome || '')) return reparto;
   }
   return 'Other';
+}
+
+// Alimenti da dispensa: quelli che restano buoni per mesi, quindi ha senso
+// chiedere "ce l'hai gia'?" invece di rimetterli in lista ogni settimana.
+// Piu' stretto del reparto "Pantry" sopra, che raggruppa anche pane e
+// tofu per scaffale del supermercato - freschi, non hanno senso qui.
+// Copre: olio, aceto, spezie ed erbe secche, cereali e legumi secchi o in
+// scatola, conserve, farina, sale, zucchero, salse a lunga conservazione.
+const DISPENSA_RX = /\boil\b|olio|vinegar|aceto|\bsalt\b|\bsale\b|\bsugar\b|zucchero|honey|miele|\bflour\b|farina|\brice\b|\briso\b|\bpasta\b|spaghett|penne|farro|spelt|\borzo\b|quinoa|couscous|\bcous\b|bulgur|polenta|\boat|avena|buckwheat|grano saraceno|semolino|lentil|lenticch|\bbean|fagiol|\bceci\b|chickpea|lupini|passata|pelati|canned|scatola|barattolo|spice|spezi|paprika|curcuma|\bcumin\b|\bcurry\b|origano|peperoncino|broth|brodo|\bstock\b|sauce|salsa|senape|mustard|tahini|miso/i;
+
+function eDaDispensa(nome) {
+  return DISPENSA_RX.test(nome || '');
 }
 
 // Trasforma i grammi in qualcosa che ha senso al supermercato.
@@ -83,18 +110,21 @@ function settimanaTipica(grammiProteici) {
 async function listaSpesa(supabase, userId, planId) {
   // il piano più recente se non ne viene chiesto uno preciso
   let id = planId;
+  let weekStart = null;
   if (!id) {
     const { data: p } = await supabase
-      .from('plans').select('id')
+      .from('plans').select('id, week_start')
       .eq('user_id', userId)
       .order('generated_at', { ascending: false })
       .limit(1).maybeSingle();
     if (!p) throw new Error('Nessun piano trovato');
     id = p.id;
+    weekStart = p.week_start || null;
   } else {
     const { data: p } = await supabase
-      .from('plans').select('id, user_id').eq('id', id).single();
+      .from('plans').select('id, user_id, week_start').eq('id', id).single();
     if (!p || p.user_id !== userId) throw new Error('Non autorizzato');
+    weekStart = p.week_start || null;
   }
 
   // le righe del piano che vanno davvero cucinate
@@ -105,7 +135,14 @@ async function listaSpesa(supabase, userId, planId) {
   if (error) throw new Error(error.message);
 
   const attive = (righe || []).filter(r => r.stato !== 'saltato' && !r.avanzi);
-  if (!attive.length) return { plan_id: id, reparti: [] };
+  if (!attive.length) return { plan_id: id, week_start: weekStart, reparti: [] };
+
+  // portion_g è la porzione di UNA persona: chi cucina per la propria
+  // famiglia ha bisogno degli ingredienti per tutti quelli che mangiano,
+  // non solo per sé.
+  const { data: utente } = await supabase
+    .from('users').select('household_size').eq('id', userId).maybeSingle();
+  const numeroPersone = Math.max(1, Number(utente && utente.household_size) || 1);
 
   // ingredienti di tutti i piatti coinvolti
   const dishIds = [...new Set(attive.map(r => r.dish_id))];
@@ -134,7 +171,7 @@ async function listaSpesa(supabase, userId, planId) {
   const totali = {};
   for (const riga of attive) {
     const base = baseDi[riga.dish_id] || 0;
-    const scala = base > 0 ? Number(riga.portion_g || base) / base : 1;
+    const scala = (base > 0 ? Number(riga.portion_g || base) / base : 1) * numeroPersone;
 
     for (const r of (ing || []).filter(x => x.dish_id === riga.dish_id)) {
       const f = r.foods || {};
@@ -191,6 +228,7 @@ async function listaSpesa(supabase, userId, planId) {
       nome: v.nome,
       grammi: g,
       quantita: quantitaLeggibile(v, g),
+      da_dispensa: eDaDispensa(v.nome),
       costo: v.prezzo_kg ? costoReale(v, g) : null,
       costo_debole: v.prezzo_debole || false,
       impatto: v.cat_impatto && impattoDi[v.cat_impatto]
@@ -229,6 +267,7 @@ async function listaSpesa(supabase, userId, planId) {
 
   return {
     plan_id: id,
+    week_start: weekStart,
     reparti,
     totale: (() => {
       const costo = tutte.reduce((s, v) => s + (v.costo || 0), 0);
@@ -262,6 +301,35 @@ async function listaSpesa(supabase, userId, planId) {
   };
 }
 
+// Ingredienti di un piatto, scalati sulla porzione effettiva - stessa
+// matematica di listaSpesa() (grammi base della ricetta -> fattore di
+// scala sulla porzione), ma per un piatto solo, non per l'intera settimana.
+async function ingredientiPiatto(supabase, dishId, portionG) {
+  const { data: ing, error } = await supabase
+    .from('dish_ingredients')
+    .select('food_id, grams, foods (name, name_en, unita, peso_pezzo_g)')
+    .eq('dish_id', dishId);
+  if (error) throw new Error(error.message);
+
+  const righe = ing || [];
+  const baseTotale = righe.reduce((s, r) => s + Number(r.grams || 0), 0);
+  const scala = baseTotale > 0 ? Number(portionG || baseTotale) / baseTotale : 1;
+
+  return righe
+    .slice()
+    .sort((a, b) => Number(b.grams || 0) - Number(a.grams || 0))
+    .map((r) => {
+      const f = r.foods || {};
+      const v = { unita: f.unita || 'peso', pezzo: f.peso_pezzo_g ? Number(f.peso_pezzo_g) : null };
+      const g = Math.round(Number(r.grams || 0) * scala);
+      return {
+        food_id: r.food_id,
+        nome: f.name_en || f.name || r.food_id,
+        quantita: quantitaLeggibile(v, g),
+      };
+    });
+}
+
 async function dispensa(supabase, userId) {
   const { data, error } = await supabase
     .from('pantry_items')
@@ -292,6 +360,41 @@ async function cambiaDispensa(supabase, userId, foodId, presente) {
   return { ok: true, food_id: foodId, presente };
 }
 
+// Le medie/quote della categoria: base per i motivi in motiviConfronto(),
+// calcolate sugli stessi prodotti che poi verranno confrontati fra loro.
+function calcolaStatisticheCategoria(prodotti) {
+  const media = (estrai) => {
+    const vals = prodotti.map(estrai).filter(v => v != null && !isNaN(v));
+    return vals.length ? vals.reduce((a, b) => a + Number(b), 0) / vals.length : null;
+  };
+  const frazione = (test) => {
+    const con = prodotti.filter(p => p != null);
+    if (!con.length) return null;
+    return con.filter(test).length / con.length;
+  };
+  return {
+    n: prodotti.length,
+    mediaAdditivi: media(p => p.additivi_n),
+    mediaSale: media(p => p.voto_salute_json?.dati_grezzi?.salt_100g),
+    mediaZuccheri: media(p => p.voto_salute_json?.dati_grezzi?.sugars_100g),
+    mediaGrassiSaturi: media(p => p.voto_salute_json?.dati_grezzi?.saturated_fat_100g),
+    fracCertificazioni: frazione(p => (p.certificazioni || []).length > 0),
+    fracRiciclabile: frazione(p => haImballaggioRiciclabile(p.packaging_tags)),
+  };
+}
+
+// Dalla riga grezza di 'prodotti' ai campi che motiviConfronto() sa leggere.
+function prodottoPerConfronto(p) {
+  return {
+    additivi_n: p.additivi_n,
+    sale: p.voto_salute_json?.dati_grezzi?.salt_100g ?? null,
+    zuccheri: p.voto_salute_json?.dati_grezzi?.sugars_100g ?? null,
+    grassiSaturi: p.voto_salute_json?.dati_grezzi?.saturated_fat_100g ?? null,
+    nCertificazioni: (p.certificazioni || []).length,
+    packagingRiciclabile: haImballaggioRiciclabile(p.packaging_tags),
+  };
+}
+
 // Per un ingrediente della lista, trova i prodotti migliori in catalogo.
 async function marchePer(supabase, foodId, paese = 'italy', quanti = 5) {
   const { data: alimento } = await supabase
@@ -313,13 +416,19 @@ async function marchePer(supabase, foodId, paese = 'italy', quanti = 5) {
 
   // prendo tutti i prodotti della categoria e filtro qui: su parola intera,
   // che in SQL costerebbe una ricerca testuale completa
-  const { data: tutti } = await supabase
+  const tutti = await paginaTutto((da, a) => supabase
     .from('prodotti')
-    .select('barcode, nome, marca, voto_ambientale, punteggio_ambientale, nutri_score, voto_json')
+    .select(`barcode, nome, marca, voto_ambientale, punteggio_ambientale, voto_stimato,
+             voto_salute, voto_salute_stimato, percentile, nutri_score, voto_json,
+             additivi_n, certificazioni, packaging_tags`)
     .eq('paese', paese)
     .eq('categoria_riconosciuta', alimento.categoria_impatto)
     .order('punteggio_ambientale', { ascending: false, nullsFirst: false })
-    .limit(2000);
+    .range(da, a));
+
+  // Statistiche della categoria: la base per dire "meno sale della media" invece
+  // di ripetere l'etichetta interna del modificatore che ha mosso il voto.
+  const statisticheCategoria = calcolaStatisticheCategoria(tutti || []);
 
   // Le insegne della grande distribuzione non sono marche di prodotto:
   // l'utente vuole sapere quale marca comprare, non in quale supermercato andare.
@@ -362,14 +471,20 @@ async function marchePer(supabase, foodId, paese = 'italy', quanti = 5) {
       nome: p.nome,
       marca: p.marca,
       impatto: p.voto_ambientale,
+      // campi nuovi (vedi CLAUDE.md / voto.js): voto_salute e voto_ambientale
+      // calcolati sul prodotto specifico, non sulla categoria, ciascuno con il
+      // proprio flag "stimato" quando i dati alla fonte non bastavano.
+      voto_ambientale: p.voto_ambientale,
+      punteggio_ambientale: p.punteggio_ambientale != null ? Number(p.punteggio_ambientale) : null,
+      voto_stimato: p.voto_stimato ?? null,
+      voto_salute: p.voto_salute != null ? Number(p.voto_salute) : null,
+      voto_salute_stimato: p.voto_salute_stimato ?? null,
+      percentile: p.percentile != null ? Number(p.percentile) : null,
       nutrizione: p.nutri_score ? p.nutri_score.toUpperCase() : null,
-      perche: (p.voto_json?.marca_bonus ? [p.voto_json.marca_bonus] : [])
-        .concat((p.voto_json?.dettaglio || []).flatMap(d => d.modificatori).filter(m => m.punti > 0))
-        .map(m => ({ testo: m.descrizione, fonte: m.fonte })),
-      contro: (p.voto_json?.dettaglio || [])
-        .flatMap(d => d.modificatori)
-        .filter(m => m.punti < 0)
-        .map(m => ({ testo: m.descrizione, fonte: m.fonte })),
+      ...motiviConfronto({
+        prodotto: prodottoPerConfronto(p),
+        statistiche: statisticheCategoria,
+      }),
     });
   }
 
@@ -385,11 +500,22 @@ async function marchePer(supabase, foodId, paese = 'italy', quanti = 5) {
   // se non c'è niente con voto, mostro comunque cosa esiste
   if (!scelti.length) scelti.push(...tutti_validi.slice(0, quanti));
 
-  // chi ha un voto ambientale davanti a chi non ne ha
+  // Ordine finale: prima chi ha dati reali su entrambi gli assi (non stimati),
+  // poi per punteggio composito (media di ambientale e salute normalizzati
+  // 0-1, così un prodotto forte solo su un asse non scavalca chi è solido
+  // su entrambi). Chi non ha alcun voto va in coda.
+  const punteggioComposito = (p) => {
+    const amb = p.punteggio_ambientale != null ? p.punteggio_ambientale / 100 : null;
+    const sal = p.voto_salute != null ? p.voto_salute / 10 : null;
+    const componenti = [amb, sal].filter(v => v != null);
+    return componenti.length ? componenti.reduce((s, v) => s + v, 0) / componenti.length : -1;
+  };
+  const datiReali = (p) => (p.voto_stimato === false && p.voto_salute_stimato === false) ? 1 : 0;
+
   scelti.sort((a, b) => {
-    const va = a.impatto ? 1 : 0, vb = b.impatto ? 1 : 0;
-    if (va !== vb) return vb - va;
-    return (a.impatto || 'Z').localeCompare(b.impatto || 'Z');
+    const ra = datiReali(a), rb = datiReali(b);
+    if (ra !== rb) return rb - ra;
+    return punteggioComposito(b) - punteggioComposito(a);
   });
 
   return {
@@ -561,4 +687,4 @@ async function classificaInsegne(supabase, paese = 'italy') {
   };
 }
 
-module.exports = { listaSpesa, repartoDi, dispensa, cambiaDispensa, marchePer, sceltePer, classificaInsegne };
+module.exports = { listaSpesa, repartoDi, ingredientiPiatto, dispensa, cambiaDispensa, marchePer, sceltePer, classificaInsegne };

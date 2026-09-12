@@ -3,13 +3,14 @@ const { calcolaESalvaTarget } = require('./fabbisogno');
 const { generaESalva } = require('./genera');
 const { calibra } = require('./calibra');
 const { trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto } = require('./sostituisci');
-const { listaSpesa, dispensa, cambiaDispensa, marchePer, sceltePer, classificaInsegne } = require('./spesa');
+const { listaSpesa, ingredientiPiatto, dispensa, cambiaDispensa, marchePer, sceltePer, classificaInsegne } = require('./spesa');
 const { votoBarcode } = require('./voto');
+const { ritratto, carbonioSettimanale, mappaPaesi } = require('./tu');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
-const { creaRichiedeAuth } = require('./auth-middleware');
+const { creaRichiedeAuth, verificaProprieta } = require('./auth-middleware');
 
 // Il backend deve usare la service_role: con RLS attivo la chiave anon
 // non puo' leggere le tabelle personali (users, plans, ...).
@@ -57,6 +58,21 @@ const LIMITI = {
   fibraMinGiorno: 25,
 };
 
+// PostgREST impone un tetto di righe per risposta (di default 1000)
+// indipendente da .limit(): con piu' di 1000 piatti in tabella le righe oltre
+// la millesima spariscono in silenzio (visto anche in genera.js e tu.js).
+async function paginaTutto(costruisciQuery) {
+  const righe = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await costruisciQuery(offset, offset + PAGINA - 1);
+    if (error) throw new Error(error.message);
+    righe.push(...(blocco || []));
+    if (!blocco || blocco.length < PAGINA) break;
+  }
+  return righe;
+}
+
 async function calcolaPiatto(dishId) {
   const { data: ingredienti, error } = await supabase
     .from('dish_ingredients')
@@ -83,12 +99,11 @@ async function calcolaPiatto(dishId) {
 
 app.get('/dishes', async (req, res) => {
   try {
-    const { data: piatti, error } = await supabase
+    const piatti = await paginaTutto((da, a) => supabase
       .from('dishes')
       .select('id, name, meal_slot')
-      .order('name');
-
-    if (error) throw error;
+      .order('name')
+      .range(da, a));
 
     const risultato = [];
     for (const piatto of piatti) {
@@ -323,7 +338,7 @@ app.get('/', (req, res) => {
 app.get('/profilo', richiedeAuth, async (req, res) => {
   const { data, error } = await supabase
     .from('users')
-    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, household_size, evening_minutes, paesi')
+    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, household_size, evening_minutes, paesi, is_pro')
     .eq('id', req.utente.id)
     .maybeSingle();
 
@@ -336,7 +351,33 @@ app.get('/profilo', richiedeAuth, async (req, res) => {
     data && data.sex && data.birth_year && data.height_cm && data.goal
   );
 
-  res.json({ completo, profilo: data || null });
+  // Fonte unica per lo stato Pro: oggi il flag si alza a mano sul DB
+  // (in attesa degli acquisti veri), ma chi legge da qui non deve cambiare
+  // quando si collega un pagamento reale - cambia solo chi scrive is_pro.
+  res.json({ completo, pro: Boolean(data?.is_pro), profilo: data || null });
+});
+
+// Dati per la schermata "You": ritratto sempre, carbonio e mappa solo Pro
+// (restano null per chi non lo e', cosi' l'app puo' mostrare la sezione
+// comunque, coperta da un invito ad abbonarsi, invece di nasconderla).
+app.get('/tu', richiedeAuth, async (req, res) => {
+  try {
+    const { data: utente, error } = await supabase
+      .from('users').select('is_pro').eq('id', req.utente.id).maybeSingle();
+    if (error) return res.status(500).json({ errore: error.message });
+
+    const isPro = Boolean(utente?.is_pro);
+    const [r, carbonio, mappa] = await Promise.all([
+      ritratto(supabase, req.utente.id, isPro),
+      isPro ? carbonioSettimanale(supabase, req.utente.id) : Promise.resolve(null),
+      isPro ? mappaPaesi(supabase, req.utente.id) : Promise.resolve(null),
+    ]);
+
+    res.json({ pro: isPro, ritratto: r, carbonio, mappa });
+  } catch (e) {
+    console.error('[tu]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
 });
 
 // Salva le risposte, calcola il fabbisogno, genera il primo piano
@@ -405,16 +446,18 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
       );
     }
 
-    // 2. peso
+    // 2. peso - upsert perche' c'e' un vincolo una-misura-al-giorno: se
+    // l'utente ha gia' registrato un peso oggi (es. da Peso.js prima di
+    // finire l'onboarding), lo aggiorna invece di scontrarsi col vincolo.
     const { error: e2 } = await supabase
       .from('body_measurements')
-      .insert({
+      .upsert({
         user_id: utenteId,
         measured_on: oggi,
         weight_kg: Number(b.weight_kg),
         source: 'utente',
         body_fat_pct: b.body_fat_pct || null,
-      });
+      }, { onConflict: 'user_id,measured_on' });
     if (e2) throw new Error(`peso: ${e2.message}`);
 
     // 4. vincoli alimentari (facoltativi)
@@ -453,6 +496,105 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
     console.error('ERRORE /onboarding:', err);
     res.status(500).json({ errore: err.message });
   }
+});
+
+// ---------- SCHERMATA "YOU": modifiche puntuali dopo l'onboarding ----------
+
+const GOAL_VALIDI = ['dimagrimento', 'mantenimento', 'massa'];
+const DIET_VALIDI = ['onnivoro', 'vegetariano', 'vegano', 'pescetariano'];
+
+// A differenza di /onboarding (scrive tutto insieme la prima volta), qui si
+// cambia un campo alla volta: si aggiornano solo le chiavi presenti nel corpo.
+app.post('/profilo', richiedeAuth, async (req, res) => {
+  const b = req.body || {};
+  const aggiornamento = {};
+
+  if ('goal' in b) {
+    if (!GOAL_VALIDI.includes(b.goal)) return res.status(400).json({ errore: 'obiettivo non valido' });
+    aggiornamento.goal = b.goal;
+  }
+  if ('diet' in b) {
+    if (!DIET_VALIDI.includes(b.diet)) return res.status(400).json({ errore: 'dieta non valida' });
+    aggiornamento.diet = b.diet;
+  }
+  if ('cook_days' in b) {
+    if (!Array.isArray(b.cook_days) || !b.cook_days.length
+        || !b.cook_days.every(d => Number.isInteger(d) && d >= 1 && d <= 7)) {
+      return res.status(400).json({ errore: 'giorni di cucina non validi' });
+    }
+    aggiornamento.cook_days = b.cook_days;
+  }
+  if ('evening_minutes' in b) {
+    const m = Number(b.evening_minutes);
+    if (!(m >= 10 && m <= 180)) return res.status(400).json({ errore: 'minuti serali non validi' });
+    aggiornamento.evening_minutes = m;
+  }
+  if ('paesi' in b) {
+    if (!Array.isArray(b.paesi) || !b.paesi.every(p => typeof p === 'string')) {
+      return res.status(400).json({ errore: 'paesi non validi' });
+    }
+    aggiornamento.paesi = b.paesi;
+  }
+  if ('height_cm' in b) {
+    const h = Number(b.height_cm);
+    if (!(h >= 120 && h <= 230)) return res.status(400).json({ errore: 'altezza non valida' });
+    aggiornamento.height_cm = h;
+  }
+  if ('birth_year' in b) {
+    const annoCorrente = new Date().getFullYear();
+    const y = Number(b.birth_year);
+    if (!(y >= annoCorrente - 100 && y <= annoCorrente - 16)) {
+      return res.status(400).json({ errore: 'anno di nascita non valido' });
+    }
+    aggiornamento.birth_year = y;
+  }
+  if ('household_size' in b) {
+    const n = Number(b.household_size);
+    if (!(Number.isInteger(n) && n >= 1 && n <= 12)) return res.status(400).json({ errore: 'numero di persone non valido' });
+    aggiornamento.household_size = n;
+  }
+
+  if (!Object.keys(aggiornamento).length) return res.status(400).json({ errore: 'nessun campo da aggiornare' });
+
+  const { error } = await supabase.from('users').update(aggiornamento).eq('id', req.utente.id);
+  if (error) return res.status(500).json({ errore: error.message });
+  res.json({ ok: true });
+});
+
+// ---------- VINCOLI ALIMENTARI (allergie, cibi esclusi) ----------
+
+app.get('/vincoli', richiedeAuth, async (req, res) => {
+  const { data, error } = await supabase
+    .from('user_constraints')
+    .select('id, kind, subject, severity')
+    .eq('user_id', req.utente.id)
+    .order('declared_at', { ascending: true });
+  if (error) return res.status(500).json({ errore: error.message });
+  res.json(data || []);
+});
+
+app.post('/vincoli', richiedeAuth, async (req, res) => {
+  const { kind, subject, severity } = req.body || {};
+  const testo = String(subject || '').trim().slice(0, 80);
+  if (!testo) return res.status(400).json({ errore: 'manca cosa evitare' });
+  const k = ['allergia', 'non_gradito'].includes(kind) ? kind : 'non_gradito';
+  const s = ['assoluto', 'preferibile'].includes(severity) ? severity : (k === 'allergia' ? 'assoluto' : 'preferibile');
+
+  const { data, error } = await supabase
+    .from('user_constraints')
+    .insert({ user_id: req.utente.id, kind: k, subject: testo, severity: s, declared_at: new Date().toISOString() })
+    .select('id, kind, subject, severity')
+    .single();
+  if (error) return res.status(500).json({ errore: error.message });
+  res.json(data);
+});
+
+app.delete('/vincoli/:id', richiedeAuth, async (req, res) => {
+  const ok = await verificaProprieta(supabase, res, 'user_constraints', req.params.id, req.utente.id);
+  if (!ok) return;
+  const { error } = await supabase.from('user_constraints').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ errore: error.message });
+  res.json({ ok: true });
 });
 
 // Rigenera il piano per chi ha gia' un profilo
@@ -570,6 +712,29 @@ app.post('/salta', richiedeAuth, async (req, res) => {
   }
 });
 
+app.get('/piatto/:planItemId', richiedeAuth, async (req, res) => {
+  try {
+    const { planItemId } = req.params;
+    const { data: item, error: errItem } = await supabase
+      .from('plan_items')
+      .select('id, plan_id, dish_id, portion_g')
+      .eq('id', planItemId)
+      .single();
+    if (errItem || !item) return res.status(404).json({ errore: 'Piatto non trovato' });
+
+    const { data: piano, error: errPiano } = await supabase
+      .from('plans').select('user_id').eq('id', item.plan_id).single();
+    if (errPiano || !piano) return res.status(404).json({ errore: 'Piano non trovato' });
+    if (piano.user_id !== req.utente.id) return res.status(403).json({ errore: 'Non autorizzato' });
+
+    const ingredienti = await ingredientiPiatto(supabase, item.dish_id, item.portion_g);
+    res.json({ ingredienti });
+  } catch (e) {
+    console.error('[piatto]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
+});
+
 app.get('/spesa', richiedeAuth, async (req, res) => {
   try {
     const r = await listaSpesa(supabase, req.utente.id, req.query.plan_id);
@@ -684,6 +849,41 @@ app.post('/blocca', richiedeAuth, async (req, res) => {
 
     if (error) return res.status(500).json({ errore: error.message });
     res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+// Peso attuale e andamento delle ultime settimane, per la carta compatta
+// nella schermata "You" (il flusso di inserimento resta in Peso.js).
+app.get('/peso', richiedeAuth, async (req, res) => {
+  try {
+    const da = new Date(Date.now() - 42 * 86400000).toISOString().slice(0, 10); // 6 settimane
+    const { data, error } = await supabase
+      .from('body_measurements')
+      .select('measured_on, weight_kg')
+      .eq('user_id', req.utente.id)
+      .gte('measured_on', da)
+      .order('measured_on', { ascending: true });
+    if (error) return res.status(500).json({ errore: error.message });
+
+    const misure = data || [];
+    if (!misure.length) return res.json({ attuale: null, trend_kg: null, giorni: 0, storico: [] });
+
+    const attuale = Number(misure[misure.length - 1].weight_kg);
+    const trend_kg = misure.length >= 2
+      ? Math.round((attuale - Number(misure[0].weight_kg)) * 10) / 10
+      : null;
+    const giorni = misure.length >= 2
+      ? Math.round((new Date(misure[misure.length - 1].measured_on) - new Date(misure[0].measured_on)) / 86400000)
+      : 0;
+
+    res.json({
+      attuale,
+      trend_kg,
+      giorni,
+      storico: misure.map(m => ({ data: m.measured_on, kg: Number(m.weight_kg) })),
+    });
   } catch (e) {
     res.status(500).json({ errore: e.message });
   }
