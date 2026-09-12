@@ -109,6 +109,7 @@ function scrivi(riga) {
       .from('prodotti')
       .select('barcode, nome, marca, categoria_riconosciuta, paese')
       .is('voto_ambientale', null)
+      .order('barcode')
       .range(offset, offset + PAGINA - 1);
     if (errFetch) { console.error('Errore lettura prodotti:', errFetch.message); process.exit(1); }
     daFare.push(...blocco);

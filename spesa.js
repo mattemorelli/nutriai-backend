@@ -424,6 +424,7 @@ async function marchePer(supabase, foodId, paese = 'italy', quanti = 5) {
     .eq('paese', paese)
     .eq('categoria_riconosciuta', alimento.categoria_impatto)
     .order('punteggio_ambientale', { ascending: false, nullsFirst: false })
+    .order('barcode')
     .range(da, a));
 
   // Statistiche della categoria: la base per dire "meno sale della media" invece

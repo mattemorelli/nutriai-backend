@@ -22,7 +22,7 @@ const PAROLA_CATEGORIA = [
   let piatti = [];
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await supabase.from('dishes')
-      .select('id, name, name_en, meal_slot, paese').range(offset, offset + 999);
+      .select('id, name, name_en, meal_slot, paese').order('id').range(offset, offset + 999);
     if (error) throw new Error(error.message);
     piatti = piatti.concat(data);
     if (data.length < 1000) break;

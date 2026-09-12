@@ -8,7 +8,7 @@ const C = require('./classificazione-alimenti');
   {
     let da = 0;
     while (true) {
-      const { data, error } = await supabase.from('foods').select('id, name, name_it').range(da, da + 999);
+      const { data, error } = await supabase.from('foods').select('id, name, name_it').order('id').range(da, da + 999);
       if (error) throw error;
       if (!data.length) break;
       foods = foods.concat(data);
@@ -22,7 +22,7 @@ const C = require('./classificazione-alimenti');
   {
     let da = 0;
     while (true) {
-      const { data, error } = await supabase.from('categorie_alimenti').select('food_id, categoria').range(da, da + 999);
+      const { data, error } = await supabase.from('categorie_alimenti').select('food_id, categoria').order('food_id').order('categoria').range(da, da + 999);
       if (error) throw error;
       if (!data.length) break;
       esistenti = esistenti.concat(data);

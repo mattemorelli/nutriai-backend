@@ -55,9 +55,10 @@ async function scheda(barcode) {
 
   // le marche che contano
   const tutte = await paginaTutto((da, a) => supabase
-    .from('prodotti').select('marca')
+    .from('prodotti').select('marca, barcode')
     .eq('paese', 'italy').in('categoria_riconosciuta', CATEGORIE)
     .not('marca', 'is', null)
+    .order('barcode')
     .range(da, a));
   const conteggio = {};
   for (const r of tutte) conteggio[r.marca] = (conteggio[r.marca] || 0) + 1;
@@ -70,6 +71,7 @@ async function scheda(barcode) {
     .eq('paese', 'italy')
     .in('categoria_riconosciuta', CATEGORIE)
     .is('voto_ambientale', null)
+    .order('barcode')
     .range(da, a));
 
   const lista = daFare.filter(p => marcheVere.has(p.marca)).slice(0, 15);

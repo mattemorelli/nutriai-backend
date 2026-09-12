@@ -49,6 +49,7 @@ async function pianiCorrentiPerSettimana(supabase, userId) {
     .from('plans')
     .select('id, week_start, generated_at')
     .eq('user_id', userId)
+    .order('id')
     .range(da, a));
 
   const ultimoPerSettimana = new Map();
@@ -89,8 +90,9 @@ async function paginaTutto(costruisciQuery) {
 async function co2DiPiano(supabase, planId, co2Di) {
   const righe = await paginaTutto((da, a) => supabase
     .from('plan_items')
-    .select('dish_id, portion_g, stato, avanzi')
+    .select('id, dish_id, portion_g, stato, avanzi')
     .eq('plan_id', planId)
+    .order('id')
     .range(da, a));
   const attive = righe.filter(r => r.stato !== 'saltato' && !r.avanzi);
   if (!attive.length) return { totale: 0, perCategoriaKg: {}, grammiProteici: 0 };
@@ -100,6 +102,7 @@ async function co2DiPiano(supabase, planId, co2Di) {
     .from('dish_ingredients')
     .select('dish_id, grams, foods (categoria_impatto)')
     .in('dish_id', dishIds)
+    .order('dish_id').order('food_id')
     .range(da, a));
 
   const baseDi = {};
@@ -163,15 +166,16 @@ async function ritratto(supabase, userId, isPro) {
   const planIds = piani.map(p => p.id);
   const righe = await paginaTutto((da, a) => supabase
     .from('plan_items')
-    .select('plan_id, dish_id, stato, avanzi')
+    .select('id, plan_id, dish_id, stato, avanzi')
     .in('plan_id', planIds)
+    .order('id')
     .range(da, a));
   const attive = righe.filter(r => r.stato !== 'saltato' && !r.avanzi);
   if (!attive.length) return { parti: null, parti2: null };
 
   const dishIds = [...new Set(attive.map(r => r.dish_id))];
   const piatti = await paginaTutto((da, a) => supabase
-    .from('dishes').select('id, paese').in('id', dishIds).range(da, a));
+    .from('dishes').select('id, paese').in('id', dishIds).order('id').range(da, a));
   const paeseDi = {};
   for (const p of piatti || []) paeseDi[p.id] = p.paese;
 
@@ -198,6 +202,7 @@ async function ritratto(supabase, userId, isPro) {
     .select('dish_id, grams, foods (categoria_impatto)')
     .in('dish_id', dishIds)
     .gte('grams', 80)
+    .order('dish_id').order('food_id')
     .range(da, a));
   const piattiPesce = new Set(
     ingPesce
@@ -296,7 +301,7 @@ async function mappaPaesi(supabase, userId) {
   // costruirci davvero delle settimane, e i generici (rete di sicurezza,
   // non una scelta dell'utente) non contano come cucine proprie.
   const SOGLIA_CUCINA = 40;
-  const catalogo = await paginaTutto((da, a) => supabase.from('dishes').select('paese').range(da, a));
+  const catalogo = await paginaTutto((da, a) => supabase.from('dishes').select('id, paese').order('id').range(da, a));
   const conteggioCatalogo = {};
   for (const d of catalogo) conteggioCatalogo[d.paese] = (conteggioCatalogo[d.paese] || 0) + 1;
   const totale = Object.keys(conteggioCatalogo)
@@ -309,13 +314,14 @@ async function mappaPaesi(supabase, userId) {
 
   const righe = await paginaTutto((da, a) => supabase
     .from('plan_items')
-    .select('dish_id, stato, avanzi')
+    .select('id, dish_id, stato, avanzi')
     .in('plan_id', planIds)
+    .order('id')
     .range(da, a));
   const attive = righe.filter(r => r.stato !== 'saltato' && !r.avanzi);
   const dishIds = [...new Set(attive.map(r => r.dish_id))];
   const piatti = await paginaTutto((da, a) => supabase
-    .from('dishes').select('id, paese').in('id', dishIds).range(da, a));
+    .from('dishes').select('id, paese').in('id', dishIds).order('id').range(da, a));
   const paeseDi = {};
   for (const p of piatti || []) paeseDi[p.id] = p.paese;
 

@@ -245,6 +245,7 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
       .gte('health_score', sogliaSalute)
       .not('profilo', 'is', null)
       .in('occasione', ['quotidiano', 'lungo'])
+      .order('id')
       .range(offset, offset + PAGINA - 1);
 
     if (error) throw new Error(error.message);

@@ -25,6 +25,7 @@ async function paginaTutto(costruisciQuery) {
     .from('dishes')
     .select('id, name, meal_slot, profilo, prep_min, tecnica, health_score, contiene_glutine')
     .eq('meal_slot', 'secondo')
+    .order('id')
     .range(da, a));
 
   const passi = [

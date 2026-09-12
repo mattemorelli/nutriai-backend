@@ -24,7 +24,7 @@ function senzaAccenti(s) {
   {
     let da = 0;
     while (true) {
-      const { data, error } = await supabase.from('dish_ingredients').select('dish_id, food_id').range(da, da + 999);
+      const { data, error } = await supabase.from('dish_ingredients').select('dish_id, food_id').order('dish_id').order('food_id').range(da, da + 999);
       if (error) throw error;
       if (!data.length) break;
       usati = usati.concat(data);
@@ -41,7 +41,7 @@ function senzaAccenti(s) {
   {
     let da = 0;
     while (true) {
-      const { data, error } = await supabase.from('foods').select('id, name, name_it').range(da, da + 999);
+      const { data, error } = await supabase.from('foods').select('id, name, name_it').order('id').range(da, da + 999);
       if (error) throw error;
       if (!data.length) break;
       foods = foods.concat(data);
@@ -67,7 +67,7 @@ function senzaAccenti(s) {
   {
     let da = 0;
     while (true) {
-      const { data, error } = await supabase.from('categorie_alimenti').select('food_id, categoria').range(da, da + 999);
+      const { data, error } = await supabase.from('categorie_alimenti').select('food_id, categoria').order('food_id').order('categoria').range(da, da + 999);
       if (error) throw error;
       if (!data.length) break;
       categorie = categorie.concat(data);

@@ -8,6 +8,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await supabase.from('dishes')
       .select('id, name, name_en, meal_slot, famiglia, paese, cucina')
+      .order('id')
       .range(offset, offset + 999);
     if (error) throw new Error(error.message);
     piatti = piatti.concat(data);

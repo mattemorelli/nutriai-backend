@@ -102,7 +102,7 @@ app.get('/dishes', async (req, res) => {
     const piatti = await paginaTutto((da, a) => supabase
       .from('dishes')
       .select('id, name, meal_slot')
-      .order('name')
+      .order('name').order('id')
       .range(da, a));
 
     const risultato = [];

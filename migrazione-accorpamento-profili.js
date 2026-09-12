@@ -33,7 +33,7 @@ async function contaProfili() {
   const PAGINA = 1000;
   for (let offset = 0; ; offset += PAGINA) {
     const { data: blocco, error } = await supabase
-      .from('dishes').select('profilo').range(offset, offset + PAGINA - 1);
+      .from('dishes').select('profilo').order('id').range(offset, offset + PAGINA - 1);
     if (error) throw new Error(error.message);
     for (const r of blocco) conta[r.profilo] = (conta[r.profilo] || 0) + 1;
     if (blocco.length < PAGINA) break;
