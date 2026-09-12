@@ -22,11 +22,15 @@ per gli inserimenti in `dish_ingredients`.
    pesce magro 8.8-9.3, pollame 8.5-9.1, uova 8.0-8.7, carne rossa 7.8-8.4,
    piatti con pane o patate come base 8.0-8.6, dolci mai sopra 7.5.
 3. **prep_min massimo 25** per i piatti quotidiani.
-4. **profilo** deve essere uno dei valori esistenti: neutro, mediterraneo-olio,
-   mediterraneo-erbe, asiatico-soia, asiatico-gochujang, asiatico-lime,
-   asiatico-cocco, latino-lime, latino-chimichurri, latino-messicano,
-   americano-comfort, americano-bbq, europeo-aceto, europeo-burro,
-   europeo-erbe, europeo-brasato, europeo-panna.
+4. **profilo** deve essere uno dei valori esistenti: neutro, mediterraneo,
+   europeo-leggero, europeo-ricco, asiatico-orientale, asiatico-sudest,
+   latino-messicano-ampio, latino-chimichurri, americano.
+   (Accorpati il 2026-09-12 da 16 profili a 8 — misura in
+   misura-accorpamento-profili.js, migrazione in migrazione-accorpamento-profili.js —
+   perché troppo frammentati facevano fallire per aritmetica quasi ogni
+   profilo secondario; vecchia tassonomia: mediterraneo-olio/erbe,
+   europeo-aceto/erbe, europeo-burro/panna/brasato, asiatico-soia/gochujang,
+   asiatico-lime/cocco, latino-lime/messicano.)
 5. **famiglia**: mediterranea, neutra, latina, asiatica, americana.
 6. **steps_en** deve avere 5-6 passaggi che spiegano il *perché*, non solo il cosa.
    Esempio: "sottili, perché dentro un cartoccio niente si mescola".

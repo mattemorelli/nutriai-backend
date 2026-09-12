@@ -26,7 +26,7 @@ module.exports = [
     name: "Uova strapazzate con crescione su pane tostato",
     name_en: "Scrambled eggs with watercress on toast",
     meal_slot: "colazione", prep_min: 8,
-    profilo: "europeo-erbe", ha_amido: true, ha_proteina: true,
+    profilo: "europeo-leggero", ha_amido: true, ha_proteina: true,
     tecnica: "semplice", health_score: 7.8,
     base_amidacea: false, trasportabile: false, salsa_industriale: false,
     contiene_glutine: true, contiene_lattosio: true, contiene_frutta_secca: false,
