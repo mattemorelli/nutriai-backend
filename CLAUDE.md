@@ -8,7 +8,8 @@ per gli inserimenti in `dish_ingredients`.
 ## Struttura
 - `dishes`: id (uuid), name, name_en, meal_slot, prep_min, cucina, paese, profilo,
   famiglia, ha_amido, ha_proteina, tecnica, occasione, health_score,
-  base_amidacea, trasportabile, salsa_industriale, steps (jsonb), steps_en (jsonb)
+  base_amidacea, trasportabile, salsa_industriale, steps (jsonb), steps_en (jsonb),
+  ruolo_primario (text), ruoli_coperti (text[]) — Fase 4 F1, vedi regola 9
 - `dish_ingredients`: dish_id, food_id, grams
 - `foods`: id (text), name, name_it, source, stato, kcal_100g, protein_100g,
   carb_100g, sugar_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g
@@ -38,6 +39,20 @@ per gli inserimenti in `dish_ingredients`.
 7. **Temperature interne**: pollame 74C, maiale 63C, pesce 63C, manzo 52C al sangue.
 8. **Verificare i duplicati** prima di inserire: un piatto con lo stesso nome
    nello stesso paese non va aggiunto.
+9. **ruolo_primario e ruoli_coperti** (Fase 4 F1, 2026-09-12). Ruoli:
+   proteina_principale, base_amidacea, verdura, frutta, latticino, condimento.
+   ruolo_primario = ruolo dell'ingrediente col peso maggiore in grammi.
+   ruoli_coperti = ruoli i cui ingredienti superano insieme una soglia
+   adattiva (40g, o il 20% del peso totale del piatto se piu' basso - uno
+   spuntino leggero non deve restare senza ruoli coperti solo per aritmetica).
+   condimento non e' mai ruolo primario: se lo sarebbe, il piatto resta senza
+   ruolo (va segnalato, non inventato) - come un piatto senza profilo non
+   viene usato. Calcolati da classifica-ruoli-piatti.js, che chiama
+   categorie_alimenti per proteine/latticini e un regex sul nome per
+   verdura/frutta/base_amidacea/condimento (categorie_alimenti copre solo
+   proteine/allergeni, non l'intera tassonomia alimentare). Un nuovo piatto
+   scritto a mano deve avere questi due campi valorizzati coerentemente,
+   non lasciati a NULL.
 
 ## Obiettivo per paese
 Paesi senza generico di riferimento (Italia, Francia, Grecia, Spagna, Portogallo):
