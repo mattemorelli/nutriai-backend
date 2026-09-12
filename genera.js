@@ -335,6 +335,16 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   // indipendente da .limit(): con 1741 piatti nel db va paginato con
   // .range(), altrimenti i piatti inseriti per ultimi (es. centro_nord_generico)
   // restano sempre fuori dal generatore.
+  //
+  // Il filtro per famiglia (bug corretto il 2026-09-12: prima 'famiglie' non
+  // veniva usato affatto, la query caricava sempre l'intero catalogo) NON
+  // esclude mai un piatto 'neutro' in base alla sua famiglia: compatibile()
+  // tratta il profilo 'neutro' come sempre ammesso a prescindere dalla
+  // famiglia, e in dishes 33 piatti neutri hanno famiglia='mediterranea'
+  // invece di 'neutra' - filtrarli via famiglia li farebbe sparire per un
+  // utente che ha scelto un'altra famiglia, mentre oggi sono visibili a tutti.
+  const filtroFamiglia = `profilo.eq.neutro,famiglia.in.(${famiglie.join(',')})`;
+
   const piatti = [];
   const PAGINA = 1000;
   for (let offset = 0; ; offset += PAGINA) {
@@ -344,6 +354,8 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
       .gte('health_score', sogliaSalute)
       .not('profilo', 'is', null)
       .in('occasione', ['quotidiano', 'lungo'])
+      .or(filtroFamiglia)
+      .order('id')
       .range(offset, offset + PAGINA - 1);
 
     if (error) throw new Error(error.message);
