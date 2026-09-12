@@ -368,29 +368,61 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   const ids = piatti.map(p => p.id);
   const valori = {};
 
+  // F4: tag_nutrizionali (fonte_vitamina_c, ferro_vegetale, caroteni) -
+  // caricata una volta, indipendente dai piatti. Vedi genera.js piu' sotto
+  // per le due regole che la usano, e migrazione-tag-nutrizionali.js per le
+  // fonti di ogni riga.
+  const { data: tagRighe, error: eTag } = await supabase.from('tag_nutrizionali').select('food_id, tag');
+  if (eTag) throw new Error(eTag.message);
+  const tagDi = {};
+  for (const r of (tagRighe || [])) (tagDi[r.food_id] ||= new Set()).add(r.tag);
+
   for (let i = 0; i < ids.length; i += 200) {
     const blocco = ids.slice(i, i + 200);
     const { data: righe, error: e2 } = await supabase
       .from('dish_ingredients')
-      .select('dish_id, food_id, grams, foods (name, kcal_100g, protein_100g, sat_fat_100g, fibre_100g, salt_100g)')
+      .select('dish_id, food_id, grams, foods (name, kcal_100g, protein_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g, stato)')
       .in('dish_id', blocco);
     if (e2) throw new Error(e2.message);
 
     for (const r of righe) {
       if (!valori[r.dish_id]) {
-        valori[r.dish_id] = { kcal: 0, protein: 0, satFat: 0, fibre: 0, salt: 0, grams: 0, ingredienti: [] };
+        valori[r.dish_id] = { kcal: 0, protein: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0, ingredienti: [] };
       }
       const v = valori[r.dish_id];
       const f = r.foods || {};
       const k = r.grams / 100;
       v.kcal    += (f.kcal_100g    || 0) * k;
       v.protein += (f.protein_100g || 0) * k;
+      v.fat     += (f.fat_100g     || 0) * k;
       v.satFat  += (f.sat_fat_100g || 0) * k;
       v.fibre   += (f.fibre_100g   || 0) * k;
       v.salt    += (f.salt_100g    || 0) * k;
       v.grams   += r.grams;
-      v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', grams: r.grams });
+      v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', grams: r.grams, stato: f.stato || null });
     }
+  }
+
+  // F4: riassunto nutrizionale del piatto, dai tag sugli ingredienti.
+  // vitaminaCStato = 'crudo' se ALMENO una fonte di vitamina C nel piatto e'
+  // cruda (la vitamina C e' termolabile, un piatto con una fonte cruda e una
+  // cotta conta come cruda - basta che l'ascorbico sia presente in quel
+  // pasto), altrimenti 'cotto' se ce n'e' solo di cotte, altrimenti null.
+  function riassuntoNutrizionale(ingredienti) {
+    let vitaminaCStato = null;
+    let ferroVegetale = false;
+    let caroteni = false;
+    for (const ing of ingredienti) {
+      const tags = tagDi[ing.food_id];
+      if (!tags) continue;
+      if (tags.has('fonte_vitamina_c')) {
+        if (ing.stato === 'crudo') vitaminaCStato = 'crudo';
+        else if (!vitaminaCStato) vitaminaCStato = 'cotto';
+      }
+      if (tags.has('ferro_vegetale')) ferroVegetale = true;
+      if (tags.has('caroteni')) caroteni = true;
+    }
+    return { vitaminaCStato, ferroVegetale, caroteni };
   }
 
   return piatti
@@ -400,6 +432,7 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
       ...valori[p.id],
       gruppo: gruppoDa(valori[p.id].ingredienti),
       principale: ingredientePrincipale(valori[p.id].ingredienti),
+      ...riassuntoNutrizionale(valori[p.id].ingredienti),
     }));
 }
 
@@ -714,17 +747,77 @@ async function generaESalva(supabase, userId, seedIniziale) {
       .map(x => x.v);
   }
 
+  // F4 - due regole, entrambe preferenze (mai un vincolo, nessuna
+  // combinazione e' vietata), terza componente di pesoCandidato sotto.
+  // Fonti verificate (non a memoria) il 2026-09-12, elenco completo dei tag
+  // e delle rispettive fonti in migrazione-tag-nutrizionali.js:
+  //  - vitamina C + ferro vegetale nello stesso pasto: l'acido ascorbico
+  //    riduce Fe3+ a Fe2+ e contrasta gli inibitori - "The role of vitamin C
+  //    in iron absorption", PubMed 2507689. E' il piu' forte e documentato
+  //    dei quattro misurati, da qui il peso maggiore.
+  //  - grassi del pasto (>=5g, soglia dalla fonte stessa, non un tag per
+  //    ingrediente: e' un totale, non una proprieta') + caroteni: senza
+  //    grassi i caroteni liposolubili si assorbono molto meno - "Influence
+  //    of dietary fat on beta-carotene absorption", PubMed 12002680.
+  // Eliminate le altre due misurate: te'/caffe' + ferro (Hurrell, PubMed
+  // 10999016 - effetto reale e forte, ma verificato che nel catalogo
+  // attuale zero piatti hanno insieme una bevanda e una fonte di ferro
+  // vegetale, dichiarata inattiva invece di lasciarla a far finta di
+  // funzionare) e calcio+ferro (il piu' debole e contestato dei quattro,
+  // svanisce negli studi di lungo periodo, avrebbe penalizzato abbinamenti
+  // legittimi come pasta e fagioli col parmigiano - tolta anche dalla
+  // tabella tag_nutrizionali, non solo dal peso).
+  //
+  // La vitamina C e' termolabile (foods.stato): bonus pieno se la fonte nel
+  // piatto e' cruda, dimezzato se cotta. I caroteni sono l'opposto (la
+  // cottura li rende PIU' disponibili) quindi nessuna penalita' li' - non
+  // implementata di proposito, non per dimenticanza.
+  const PESO_VITAMINA_C_FERRO = 6;    // il piu' forte dei due, effetto maggiore in letteratura
+  const PESO_GRASSI_CAROTENI = 3;
+  const GRASSI_MINIMI_PASTO = 5; // grammi, dalla fonte (PubMed 12002680: "circa 3-5g")
+
+  function bonusNutrizionale(p, altriDelPasto) {
+    if (!altriDelPasto.length) return 0;
+    let bonus = 0;
+
+    const pesoVitaminaC = (pFonte) => pFonte.vitaminaCStato === 'crudo' ? PESO_VITAMINA_C_FERRO
+      : pFonte.vitaminaCStato === 'cotto' ? PESO_VITAMINA_C_FERRO / 2 : 0;
+
+    // Vitamina C + ferro vegetale: conta in entrambe le direzioni (p porta
+    // la vitamina C e un compagno il ferro, o viceversa) - a chi tocca
+    // fornire cosa non e' definito a priori, dipende da quale slot si sta
+    // decidendo in quel momento.
+    if (p.ferroVegetale && altriDelPasto.some(c => c.vitaminaCStato)) {
+      bonus += Math.max(...altriDelPasto.filter(c => c.vitaminaCStato).map(pesoVitaminaC));
+    }
+    if (p.vitaminaCStato && altriDelPasto.some(c => c.ferroVegetale)) {
+      bonus += pesoVitaminaC(p);
+    }
+
+    // Grassi del pasto + caroteni: il totale include p stesso, non solo i
+    // compagni - e' una soglia sul pasto intero.
+    const grassiPasto = (p.fat || 0) + altriDelPasto.reduce((s, c) => s + (c.fat || 0), 0);
+    if (grassiPasto >= GRASSI_MINIMI_PASTO) {
+      if (p.caroteni) bonus += PESO_GRASSI_CAROTENI;
+      if (altriDelPasto.some(c => c.caroteni)) bonus += PESO_GRASSI_CAROTENI;
+    }
+
+    return bonus;
+  }
+
   // C6: peso di qualita' di un candidato piatto. Il voto salute domina
   // l'ordine, l'aderenza alle preferenze di cucina (pesoPaese: 25 sul paese
   // scelto, 6 sul generico, 1 altrove) e' un correttivo piu' leggero che
   // conta solo a parita' di voto - per questo e' su scala log2 mentre il
-  // voto e' moltiplicato per 10. Pensata per crescere: le preferenze
-  // nutrizionali di una fase successiva si aggiungono come un altro termine
-  // sommato qui, non come un rimpiazzo.
-  function pesoCandidato(p) {
+  // voto e' moltiplicato per 10. F4 (bonusNutrizionale) e' la terza
+  // componente prevista da questo commento fin dalla progettazione
+  // originale - mai piu' del 10-15% dell'intervallo del voto salute (10-100,
+  // quindi il tetto pratico dei due pesi sopra e' attorno a 9-13,5, coerente
+  // con 6 e 3 scelti sopra).
+  function pesoCandidato(p, altriDelPasto = []) {
     const salute = (p.health_score != null ? p.health_score : 6) * 10;
     const aderenza = Math.log2((pesoPaese(p) || 1) + 1);
-    return salute + aderenza;
+    return salute + aderenza + bonusNutrizionale(p, altriDelPasto);
   }
 
   // Estrazione pesata col seme: pesca senza reimbussolare, ricalcolando i
@@ -756,11 +849,12 @@ async function generaESalva(supabase, userId, seedIniziale) {
   // i duplicati fra livelli sono tolti. Il livello piu' preferito resta
   // primo nella struttura, ma la ricerca puo' comunque scendere ai livelli
   // successivi invece di fermarsi.
-  function concatenaLivelli(livelli, rng) {
+  function concatenaLivelli(livelli, rng, altriDelPasto = []) {
     const visti = new Set();
     const risultato = [];
+    const pesoFn = (p) => pesoCandidato(p, altriDelPasto);
     for (const livello of livelli) {
-      for (const p of mescolaPesata(livello, pesoCandidato, rng)) {
+      for (const p of mescolaPesata(livello, pesoFn, rng)) {
         if (visti.has(p.id)) continue;
         visti.add(p.id);
         risultato.push(p);
@@ -900,6 +994,18 @@ async function generaESalva(supabase, userId, seedIniziale) {
       }
       const principaleLiberoOggi = (gi, p) => !p.principale || !principaliOggi(gi).includes(p.principale);
 
+      // F4: piatti gia' scelti nello stesso pasto (pranzo = primo+contorno,
+      // cena = secondo+contorno+base), qualunque sia l'ordine in cui la
+      // ricerca li ha decisi - la ricerca sceglie prima lo slot con meno
+      // candidati, non sempre nello stesso ordine, quindi va letto da
+      // statoGiorni al momento della scelta, non assunto fisso.
+      function compagniDiPasto(gi, pasto) {
+        const st = statoGiorni[gi];
+        if (pasto === 'pranzo') return [st.primo, st.contornoPranzo].filter(Boolean);
+        if (pasto === 'cena') return [st.secondo, st.contornoCena, st.base].filter(Boolean);
+        return [];
+      }
+
       // Candidati per ciascuno slot, dato lo stato attuale del giorno.
       // paeseOk e limiteOggi sono gia' allargati (gradini 3 e 4) da chi li
       // costruisce in prossimaDecisione, quindi qui i filtri restano
@@ -924,7 +1030,7 @@ async function generaESalva(supabase, userId, seedIniziale) {
         const ripetuto = (opz.ripetizione && ripetizioniSecondo.valore < 1)
           ? secondi.filter(p => p.profilo === profiloGiorno && paeseOk(p) && baseComune(p) && usati.has(p.id))
           : [];
-        return concatenaLivelli([proprioCentra, proprioAltro, generico, ripetuto], rng);
+        return concatenaLivelli([proprioCentra, proprioAltro, generico, ripetuto], rng, compagniDiPasto(gi, 'cena'));
       }
 
       function candidatiPrimo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteOggi) {
@@ -938,7 +1044,7 @@ async function generaESalva(supabase, userId, seedIniziale) {
         const proprio = primi.filter(p => compatibile(p, profiloGiorno) && paeseOk(p) && base(p));
         const generico = paeseGiorno ? primi.filter(p => p.paese === genericoOggi && base(p)) : [];
         const neutro = primi.filter(p => (p.profilo === 'neutro' || !p.profilo || p.paese === 'mediterraneo_generico') && base(p));
-        return concatenaLivelli([proprio, generico, neutro], rng);
+        return concatenaLivelli([proprio, generico, neutro], rng, compagniDiPasto(gi, 'pranzo'));
       }
 
       function candidatiContorno(gi, ruolo, profiloGiorno, paeseGiorno, paeseOk, limiteOggi, piattoAbbinato, altroContorno) {
@@ -954,7 +1060,7 @@ async function generaESalva(supabase, userId, seedIniziale) {
         const proprio = contorni.filter(c => compatibile(c, profiloGiorno) && accompagnaBene(c, piattoAbbinato) && paeseOk(c) && base(c));
         const neutroStretto = contorni.filter(c => (c.profilo === 'neutro' || !c.profilo) && paeseOk(c) && base(c));
         const neutroLargo = contorni.filter(c => (c.profilo === 'neutro' || !c.profilo || c.paese === 'mediterraneo_generico') && accompagnaBene(c, piattoAbbinato) && base(c));
-        return concatenaLivelli([proprio, neutroStretto, neutroLargo], rng);
+        return concatenaLivelli([proprio, neutroStretto, neutroLargo], rng, compagniDiPasto(gi, ruolo));
       }
 
       function candidatiColazione(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
@@ -981,7 +1087,8 @@ async function generaESalva(supabase, userId, seedIniziale) {
       }
 
       function candidatiBase(gi, paeseOk) {
-        return mescolaPesata(contorni.filter(p => p.base_amidacea && paeseOk(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p)), pesoCandidato, rng);
+        const altriDelPasto = compagniDiPasto(gi, 'cena');
+        return mescolaPesata(contorni.filter(p => p.base_amidacea && paeseOk(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p)), (p) => pesoCandidato(p, altriDelPasto), rng);
       }
 
       // Determina la prossima decisione necessaria per il giorno `gi`.
