@@ -350,7 +350,7 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   for (let offset = 0; ; offset += PAGINA) {
     const { data: blocco, error } = await supabase
       .from('dishes')
-      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese')
+      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti')
       .gte('health_score', sogliaSalute)
       .not('profilo', 'is', null)
       .in('occasione', ['quotidiano', 'lungo'])
@@ -405,9 +405,22 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
 
 const compatibile = (piatto, profilo) => piatto.profilo === profilo || piatto.profilo === 'neutro';
 
+// Legge ruoli_coperti cosi' come lo ha scritto F1 (classifica-ruoli-piatti.js)
+// - non ricalcola una soglia qui: la metrica di copertura (grammi di
+// proteina per proteina_principale/latticino, grammi di alimento per gli
+// altri ruoli) vive in un posto solo, quel file.
+const copreRuolo = (piatto, ruolo) => Array.isArray(piatto.ruoli_coperti) && piatto.ruoli_coperti.includes(ruolo);
+
 function accompagnaBene(accompagnamento, piattoBase) {
   if (piattoBase.ha_amido && accompagnamento.ha_amido) return false;
-  if (piattoBase.ha_proteina && accompagnamento.ha_proteina) return false;
+  // F2: due piatti dello stesso pasto non coprono entrambi proteina_principale
+  // (l'intenzione era "non due piatti di proteina", non "stesso ruolo
+  // primario" - un secondo il cui primario e' 'verdura' per peso ma che
+  // copre comunque la proteina resta comunque un piatto proteico agli
+  // effetti di questa regola). Sostituisce il vecchio controllo su
+  // ha_proteina, il flag esistente e piu' largo (conta anche i latticini
+  // leggeri) e non allineato alla soglia misurata in F1.
+  if (copreRuolo(piattoBase, 'proteina_principale') && copreRuolo(accompagnamento, 'proteina_principale')) return false;
   if (accompagnamento.principale && accompagnamento.principale === piattoBase.principale) return false;
   return true;
 }
@@ -873,6 +886,20 @@ async function generaESalva(supabase, userId, seedIniziale) {
         return () => { delete statoGiorni[gi].profiloGiorno; };
       }
 
+      // F3: nessun ingrediente principale ripetuto nella stessa giornata -
+      // non solo fra un piatto e il suo abbinato (accompagnaBene gia' lo
+      // faceva, ma solo per la coppia), tutta la giornata: due spuntini alla
+      // banana in momenti diversi del giorno sono lo stesso problema di un
+      // contorno e una colazione entrambi ai cachi. Letto da statoGiorni al
+      // momento della scelta, non serve uno stato separato da annullare -
+      // riflette sempre esattamente cio' che e' assegnato adesso.
+      function principaliOggi(gi) {
+        const st = statoGiorni[gi];
+        return [st.colazione, st.primo, st.contornoPranzo, st.spuntino, st.secondo, st.contornoCena, st.base, st.spuntino2]
+          .filter(Boolean).map(p => p.principale).filter(Boolean);
+      }
+      const principaleLiberoOggi = (gi, p) => !p.principale || !principaliOggi(gi).includes(p.principale);
+
       // Candidati per ciascuno slot, dato lo stato attuale del giorno.
       // paeseOk e limiteOggi sono gia' allargati (gradini 3 e 4) da chi li
       // costruisce in prossimaDecisione, quindi qui i filtri restano
@@ -883,7 +910,8 @@ async function generaESalva(supabase, userId, seedIniziale) {
         const baseComune = (p) =>
           !rifiutato(p) &&
           (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
-          (!p.salsa_industriale || usoSalse.valore < 1);
+          (!p.salsa_industriale || usoSalse.valore < 1) &&
+          principaleLiberoOggi(gi, p);
 
         const proprio = secondi.filter(p => p.profilo === profiloGiorno && paeseOk(p) && baseComune(p) && !usati.has(p.id));
         const proprioCentra = gruppoRichiesto ? proprio.filter(p => p.gruppo === gruppoRichiesto) : [];
@@ -904,7 +932,8 @@ async function generaESalva(supabase, userId, seedIniziale) {
         const base = (p) =>
           !usati.has(p.id) && !rifiutato(p) &&
           (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
-          (!pranzoFuori || p.trasportabile);
+          (!pranzoFuori || p.trasportabile) &&
+          principaleLiberoOggi(gi, p);
 
         const proprio = primi.filter(p => compatibile(p, profiloGiorno) && paeseOk(p) && base(p));
         const generico = paeseGiorno ? primi.filter(p => p.paese === genericoOggi && base(p)) : [];
@@ -919,7 +948,8 @@ async function generaESalva(supabase, userId, seedIniziale) {
           !usati.has(c.id) && !rifiutato(c) &&
           (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g) &&
           (!altroContorno || c.id !== altroContorno.id) &&
-          trasportabileSeServe(c);
+          trasportabileSeServe(c) &&
+          principaleLiberoOggi(gi, c);
 
         const proprio = contorni.filter(c => compatibile(c, profiloGiorno) && accompagnaBene(c, piattoAbbinato) && paeseOk(c) && base(c));
         const neutroStretto = contorni.filter(c => (c.profilo === 'neutro' || !c.profilo) && paeseOk(c) && base(c));
@@ -928,21 +958,30 @@ async function generaESalva(supabase, userId, seedIniziale) {
       }
 
       function candidatiColazione(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
-        const base = (p) => !usati.has(p.id) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p);
+        const base = (p) => !usati.has(p.id) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
         const proprio = colazioni.filter(p => compatibile(p, profiloGiorno) && base(p));
         const neutro = colazioni.filter(p => (p.profilo === 'neutro' || !p.profilo) && base(p));
         return concatenaLivelli([proprio, neutro], rng);
       }
 
+      // F3, seconda regola: non due spuntini con base amidacea nello stesso
+      // giorno (due spuntini a cracker/gallette, invece di uno a frutta e
+      // uno amidaceo). copreRuolo legge ruoli_coperti gia' calcolato da F1
+      // (classifica-ruoli-piatti.js), non lo ricalcola.
       function candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, altroSpuntino, cappaMinuti) {
-        const base = (p) => !usati.has(p.id) && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) && (!altroSpuntino || p.id !== altroSpuntino.id);
+        const altroEAmidaceo = altroSpuntino && copreRuolo(altroSpuntino, 'base_amidacea');
+        const base = (p) =>
+          !usati.has(p.id) && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
+          (!altroSpuntino || p.id !== altroSpuntino.id) &&
+          (!altroEAmidaceo || !copreRuolo(p, 'base_amidacea')) &&
+          principaleLiberoOggi(gi, p);
         const proprio = spuntini.filter(p => compatibile(p, profiloGiorno) && base(p));
         const neutro = spuntini.filter(p => (p.profilo === 'neutro' || !p.profilo) && base(p));
         return concatenaLivelli([proprio, neutro], rng);
       }
 
-      function candidatiBase(paeseOk) {
-        return mescolaPesata(contorni.filter(p => p.base_amidacea && paeseOk(p) && !usati.has(p.id)), pesoCandidato, rng);
+      function candidatiBase(gi, paeseOk) {
+        return mescolaPesata(contorni.filter(p => p.base_amidacea && paeseOk(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p)), pesoCandidato, rng);
       }
 
       // Determina la prossima decisione necessaria per il giorno `gi`.
@@ -1018,7 +1057,7 @@ async function generaESalva(supabase, userId, seedIniziale) {
         if (st.spuntino2 === undefined) pronti.push(['spuntino2', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino, cappaSpuntino)]);
         if (st.contornoCena !== undefined && st.base === undefined) {
           const cenaHaAmido = st.secondo.ha_amido || (st.contornoCena && st.contornoCena.ha_amido);
-          if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(paeseOk)]);
+          if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(gi, paeseOk)]);
           else st.base = null;
         }
 
@@ -1130,6 +1169,33 @@ async function generaESalva(supabase, userId, seedIniziale) {
           tot.fibre  >= LIMITI.fibraMinGiorno;
 
         settimana.push({ giorno: g, profilo: st.profiloGiorno, pasti, conforme });
+
+        // F2, seconda regola: un pasto principale (pranzo, cena) deve
+        // coprire proteina_principale, base_amidacea e verdura fra tutti i
+        // suoi piatti insieme. Registrata come concessione (come le altre
+        // qui sotto), non come vincolo duro nella ricerca: imporla in
+        // backtracking richiederebbe scartare un secondo gia' scelto quando
+        // il contorno giusto non si trova, con un impatto sulla capienza
+        // ancora da misurare (F5 controlla poi se i gradini salgono per
+        // colpa di questa regola, e in quel caso va irrigidita o ammorbidita
+        // con cognizione di causa, non a priori).
+        const RUOLI_PASTO_COMPLETO = ['proteina_principale', 'base_amidacea', 'verdura'];
+        function controllaCompletezzaPasto(nomePasto, piattiDelPasto) {
+          const coperti = new Set(piattiDelPasto.flatMap(p => (p && p.ruoli_coperti) || []));
+          const mancanti = RUOLI_PASTO_COMPLETO.filter(r => !coperti.has(r));
+          if (mancanti.length) {
+            concessioni.push({
+              gradino: null, tipo: 'pasto_incompleto', giorno: g, slot: nomePasto,
+              vincolo: 'ruoli_pasto_principale', prima: RUOLI_PASTO_COMPLETO.join('+'), dopo: `mancano: ${mancanti.join(', ')}`,
+            });
+          }
+        }
+        if (!st.bloccatiOggi || !st.bloccatiOggi.some(b => b.slot === 'primo')) {
+          controllaCompletezzaPasto('pranzo', [st.primo, st.contornoPranzo]);
+        }
+        if (!st.secondoEAvanzo) {
+          controllaCompletezzaPasto('cena', [st.secondo, st.contornoCena, st.base]);
+        }
 
         // C5: deviazione dalla sequenza proteica pianificata - sempre
         // registrata, a qualunque gradino, perche' non e' un allentamento
