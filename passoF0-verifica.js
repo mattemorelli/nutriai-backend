@@ -104,23 +104,28 @@ function perSlotDa(piatti, soglia) {
     const vietati = await vietatiDellaDieta(cfg.dieta);
     const piatti = piattiFamiglia.filter(p => !(p.ingredienti || []).some(i => vietati.has(i.food_id)));
 
-    const { profiliConSecondo: profiliCatalogo, gruppiPerProfilo } = gruppiPerProfiloDa(piatti, 45);
+    const { gruppiPerProfilo } = gruppiPerProfiloDa(piatti, 45);
 
-    // caricaPiatti (bug noto, non toccato qui: il parametro 'famiglie' non
-    // filtra la query, vedi memoria) restituisce l'intero catalogo, quindi
-    // profiliCatalogo include profili di famiglie culinarie estranee al
-    // paese in esame - per costruzione mai raggiungibili (paeseAmmesso li
-    // esclude sempre). Il generatore vero li scarta gia' da soli tramite
-    // questo stesso controllo di capienza; qui li togliamo prima di
-    // riportarli, per non riempire l'esito F0 di "impossibile" ovvio.
+    // Riga per ogni profilo della FAMIGLIA ATTESA, non solo quelli che
+    // sopravvivono al filtro dieta - altrimenti una dieta che esclude TUTTI
+    // i secondi di un profilo (es. asiatico-sudest per un vegetariano, tutto
+    // a base di pesce) non produce nessuna riga invece di una riga a zero:
+    // e' esattamente la stessa forma del bug della paginazione, un'assenza
+    // silenziosa proprio nel caso peggiore. Calcolato sulla famiglia INTERA
+    // (piattiFamiglia, non filtrata per dieta): l'esistenza di un profilo
+    // non dipende da chi puo' mangiarlo, solo la sua capienza ne dipende.
     const famigliaDiProfilo = {};
-    for (const p of piatti) if (p.profilo !== 'neutro') famigliaDiProfilo[p.profilo] = p.famiglia;
+    for (const p of piattiFamiglia) if (p.profilo !== 'neutro') famigliaDiProfilo[p.profilo] = p.famiglia;
     const famigliaAttesa = FAMIGLIE_PER_CUCINA[cfg.cucina][0];
-    const profiliConSecondo = profiliCatalogo.filter(pr => famigliaDiProfilo[pr] === famigliaAttesa);
+    const profiliAttesi = [...new Set(piattiFamiglia
+      .filter(p => p.meal_slot === 'secondo' && p.profilo !== 'neutro' && famigliaDiProfilo[p.profilo] === famigliaAttesa)
+      .map(p => p.profilo))];
+
+    const profiliConSecondo = profiliAttesi;
 
     if (!profiliConSecondo.length) {
-      righeReport.push({ combo: cfg.nome, profilo: '(nessuno)', gradinoMinimo: 'IMPOSSIBILE', dettaglio: 'nessun profilo ha secondi utilizzabili' });
-      impossibili.push(`${cfg.nome}: nessun profilo ha secondi utilizzabili`);
+      righeReport.push({ combo: cfg.nome, profilo: '(nessuno)', gradinoMinimo: 'IMPOSSIBILE', dettaglio: 'nessun profilo esiste per questa famiglia' });
+      impossibili.push(`${cfg.nome}: nessun profilo esiste per questa famiglia`);
       continue;
     }
 
