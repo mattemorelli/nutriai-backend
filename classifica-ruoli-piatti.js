@@ -36,11 +36,37 @@ const CATEGORIE_LATTICINO = new Set(['latticini']);
 // salse, agrumi da condimento) piu' il resto del registro "spezie/condimenti".
 const RX_CONDIMENTO = /\b(olio|oil|aceto|vinegar|sriracha|tabasco|ketchup|senape|mustard|salsa|sauce|dressing|chimichurri|gochujang|hoisin|teriyaki|miso|tahini|relish|chutney|marmellata|jam\b|miele|honey|sciroppo|syrup|melassa|molasses|zucchero|sugar|stevia|sale\b|salt,|lievito|leavening|baking (soda|powder)|yeast|amido di mais|cornstarch|estratto di vaniglia|vanilla extract|vaniglia|cacao|cocoa|aglio|garlic|zenzero|ginger root|zenzero fresco|basilico|prezzemolo|parsley|coriandolo|cilantro|menta|mint\b|rosmarino|rosemary|salvia|sage\b|timo|thyme|aneto|dill\b|erba cipollina|chives|maggiorana|marjoram|alloro|bay leaf|cannella|cinnamon|cardamomo|cardamom|chiodi di garofano|cloves|cumino|cumin\b|curcuma|turmeric|curry|noce moscata|nutmeg|origano|oregano|paprika|pepe |pepper,|peperoncino in polvere|chili powder|anice stellato|star anise|semi di (chia|lino|sesamo|girasole|zucca|cumino|finocchio)|seeds?,|capperi|capers|olive|olives|rafano|horseradish|vino bianco|vino rosso|wine,|te verde|t[eè] verde|green tea|caff[eè]|coffee|root beer|acqua (frizzante|tonica)|club soda|tonic water|brodo|stock,|broth|pasta di tamarindo|tamarind|latte di cocco|coconut milk|latte di mandorla|almond milk|mandorl|almond|nocciol|hazelnut|anacard|cashew|pistacch|pistachio|arachid|peanut|noci\b|noce\b|walnut|macadamia|passata di pomodoro|tomato.*(puree|paste)|concentrato di pomodoro|condimento italiano|italian dressing|pomodori secchi|sun-dried tomato)/i;
 
-const RX_BASE_AMIDACEA = /\b(riso|rice,|pasta|spaghett|penne|farro|spelt|orzo|barley|couscous|cous\b|polenta|cornmeal|farina|flour|pane\b|pane,|bread|fette biscottate|patat|potato|quinoa|amaranto|amaranth|grano saraceno|buckwheat|miglio|millet|teff|avena|oat,|oats|tapioca|popcorn|tortilla|carta di riso|rice paper|gallette di riso|rice cakes|platano|plantain|\byuca\b|manioca|cassava|\bbun\b|panino|noodle|udon|soba\b|ramen|vermicelli|cracker)/i;
+// castagne/chestnut spostate qui da RX_FRUTTA (2026-09-12, campione F1):
+// nutrizionalmente sono amido, non zucchero di frutta (~40g carboidrati/100g,
+// piu' vicine a un cereale che a una mela) - il vecchio ha_amido=true su
+// "Roasted chestnuts" aveva ragione, la prima classificazione no.
+const RX_BASE_AMIDACEA = /\b(riso|rice,|pasta|spaghett|penne|farro|spelt|orzo|barley|couscous|cous\b|bulgur|polenta|cornmeal|farina|flour|pane\b|pane,|bread|fette biscottate|patat|potato|quinoa|amaranto|amaranth|grano saraceno|buckwheat|miglio|millet|teff|avena|oat,|oats|tapioca|popcorn|tortilla|carta di riso|rice paper|gallette di riso|rice cakes|platano|plantain|\byuca\b|manioca|cassava|\bbun\b|panino|noodle|udon|soba\b|ramen|vermicelli|cracker|castagne|chestnut)/i;
 
-const RX_FRUTTA = /\b(mela\b|mele\b|apple|banana|arancia|arance|orange|clementine|pompelmo|grapefruit|limone|lime\b|lemon|kiwi|ananas|pineapple|anguria|watermelon|melone|melon|cantaloupe|uva\b|uvetta|grape|raisin|ciliegie|cherr|fragol|strawberr|lampon|raspberr|mirtill|blueberr|cranberr|\bmore\b|blackberr|frutti di bosco|mixed berries|pesc[ah]e|peach|susine|prugn|plum|albicocc|apricot|fichi|\bfico\b|fig,|figs\b|cachi|persimmon|datteri|dates,|melagrana|melograno|pomegranate|guava|papaya|\bmango\b|castagne|chestnut|acai|\bpera\b|pere\b|\bpears?\b|cocco fresco|fresh coconut)/i;
+const RX_FRUTTA = /\b(mela\b|mele\b|apple|banana|arancia|arance|orange|clementine|pompelmo|grapefruit|limone|lime\b|lemon|kiwi|ananas|pineapple|anguria|watermelon|melone|melon|cantaloupe|uva\b|uvetta|grape|raisin|ciliegie|cherr|fragol|strawberr|lampon|raspberr|mirtill|blueberr|cranberr|\bmore\b|blackberr|frutti di bosco|mixed berries|pesc[ah]e|peach|susine|prugn|plum|albicocc|apricot|fichi|\bfico\b|fig,|figs\b|cachi|persimmon|datteri|dates,|melagrana|melograno|pomegranate|guava|papaya|\bmango\b|acai|\bpera\b|pere\b|\bpears?\b|cocco fresco|fresh coconut)/i;
 
 const RX_VERDURA = /\b(pomodor|tomato|zucchin|zucca|squash|pumpkin|melanzan|eggplant|aubergine|peperon|pepper,|jalapeno|padr[oó]n|cipoll|onion|scalogno|shallot|porr[io]|leek|aglio fresco|carota|carrot|sedano|celery|finocchi|fennel|cavol|cabbage|kale|broccol|cavolfiore|cauliflower|bok choy|collard|spinaci|spinach|bietol|chard|lattuga|lettuce|rucola|arugula|radicchio|scarola|escarole|indivia|endive|cicoria|chicory|crescione|watercress|valeriana|asparagi|asparagus|carciof|artichoke|barbabiet|beetroot|beet,|\brapa\b|\brape\b|rape rosse|turnip|ravanell|radish|daikon|topinambur|jerusalem artichoke|funghi|mushroom|\balga\b|alghe|seaweed|kelp|wakame|nori|crauti|sauerkraut|okra|cetriol|cucumber|avocado|mais dolce|mais bianco|sweet corn|corn,|\bolive\b|\bolives\b|pastinaca|parsnip)/i;
+
+// Le due eccezioni concordate per non lasciare "il condimento non e' mai
+// primario" a bocciare due famiglie di piatti frequenti e non ambigue:
+// - uno spuntino di sola frutta secca/semi (mandorle, noci, nocciole,
+//   anacardi, pistacchi, arachidi, semi di zucca/girasole - non olive, non
+//   latte di frutta secca) prende proteina_principale: contengono proteine
+//   reali (5-6g per 30g di mandorle/noci) e funzionano nutrizionalmente
+//   come lo spuntino proteico, non come porzione di frutta.
+// - un piatto dove la passata/il concentrato di pomodoro domina prende
+//   verdura: e' pomodoro, solo ridotto in purea, non un condimento aggiunto
+//   a qualcos'altro (es. "Tomato rice").
+const RX_FRUTTA_SECCA_SOLA = /\b(mandorl|almond|nocciol|hazelnut|anacard|cashew|pistacch|pistachio|arachid|peanut|noci\b|noce\b|walnut|macadamia|semi di (chia|lino|sesamo|girasole|zucca|cumino|finocchio)|seeds?,)/i;
+const RX_POMODORO_CONCENTRATO = /\b(passata di pomodoro|tomato.*(puree|paste)|concentrato di pomodoro|pomodori secchi|sun-dried tomato)\b/i;
+
+function eccezioneCondimento(nome) {
+  if (RX_POMODORO_CONCENTRATO.test(nome)) return 'verdura';
+  // "latte di mandorla" non e' frutta secca: e' un liquido diluito con poca
+  // proteina reale (~1g/100ml), non la mandorla intera - l'eccezione vale
+  // solo per il seme/frutto, non per un suo derivato liquido.
+  if (RX_FRUTTA_SECCA_SOLA.test(nome) && !/latte|milk/i.test(nome)) return 'proteina_principale';
+  return null;
+}
 
 function ruoloDaNome(nome) {
   if (RX_CONDIMENTO.test(nome)) return 'condimento';
@@ -145,12 +171,23 @@ async function caricaIngredientiDi(supabase, ids) {
       });
       continue;
     }
+    let ruoloEffettivo = ruoloDominante;
     if (ruoloDominante === 'condimento') {
-      dubbi.push({
-        tipo: 'primario_sarebbe_condimento', piatto: piatto.name_en || piatto.name, id: piatto.id,
-        dettaglio: `ingrediente dominante food_id ${dominante.food_id} (${nomeDi[dominante.food_id] || '?'}, ${dominante.grams}g) e' un condimento`,
-      });
-      continue;
+      const eccezione = eccezioneCondimento(nomeDi[dominante.food_id] || '');
+      if (eccezione) {
+        ruoloEffettivo = eccezione;
+        // Lo spostamento vale anche nel conteggio per ruoli_coperti: il peso
+        // dell'ingrediente dominante segue la sua eccezione, non resta sotto
+        // 'condimento' mentre il ruolo primario dice altro.
+        pesoPerRuolo['condimento'] = (pesoPerRuolo['condimento'] || 0) - (dominante.grams || 0);
+        pesoPerRuolo[eccezione] = (pesoPerRuolo[eccezione] || 0) + (dominante.grams || 0);
+      } else {
+        dubbi.push({
+          tipo: 'primario_sarebbe_condimento', piatto: piatto.name_en || piatto.name, id: piatto.id,
+          dettaglio: `ingrediente dominante food_id ${dominante.food_id} (${nomeDi[dominante.food_id] || '?'}, ${dominante.grams}g) e' un condimento`,
+        });
+        continue;
+      }
     }
 
     // Soglia adattiva: 40g fissi penalizzano gli spuntini leggeri (un
@@ -192,12 +229,12 @@ async function caricaIngredientiDi(supabase, ids) {
       dubbi.push({
         tipo: 'flag_dish_incoerente', piatto: piatto.name_en || piatto.name, id: piatto.id,
         dettaglio: flagSenzaRuolo.join('; '),
-        ruolo_primario_proposto: ruoloDominante, ruoli_coperti_proposti: ruoliCoperti,
+        ruolo_primario_proposto: ruoloEffettivo, ruoli_coperti_proposti: ruoliCoperti,
       });
       continue;
     }
 
-    aggiornamenti.push({ id: piatto.id, ruolo_primario: ruoloDominante, ruoli_coperti: ruoliCoperti });
+    aggiornamenti.push({ id: piatto.id, ruolo_primario: ruoloEffettivo, ruoli_coperti: ruoliCoperti });
   }
 
   console.log(`\nClassificati automaticamente: ${aggiornamenti.length}`);
