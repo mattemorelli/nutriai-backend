@@ -1,8 +1,7 @@
-// Verifica richiesta: dopo aver fatto funzionare il filtro famiglia in
-// caricaPiatti, controllare che sostituisci.js continui a restituire 3
-// proposte, del paese giusto, su una decina di casi reali (paesi e diete
-// diverse). Non allarga nulla di sua iniziativa: se scende sotto 3 lo
-// segnala soltanto, come richiesto.
+// Verifica: dopo aver fatto funzionare il filtro famiglia in caricaPiatti e
+// aver eliminato la mappa cucina->famiglia duplicata in sostituisci.js
+// (ora legge FAMIGLIE_PER_CUCINA da genera.js), controllare che
+// sostituisci.js restituisca 3 proposte del paese giusto su dieci casi reali.
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
@@ -32,6 +31,7 @@ const GENERICO_DI = {
 };
 
 (async () => {
+  let okCount = 0;
   for (const caso of CASI) {
     await supabase.from('users').update({
       diet: caso.diet, paesi: caso.paesi, cook_days: [1, 2, 3, 4, 5, 6, 7],
@@ -48,7 +48,7 @@ const GENERICO_DI = {
       const { data: items } = await supabase
         .from('plan_items').select('id, day_of_week, slot, dish_id')
         .eq('plan_id', planId).eq('slot', 'secondo').order('day_of_week').limit(1);
-      if (!items || !items.length) { console.log(`${caso.nome}: nessuna riga 'secondo' da sostituire (piano senza cena?)`); continue; }
+      if (!items || !items.length) { console.log(`${caso.nome}: nessuna riga 'secondo' da sostituire`); continue; }
 
       const proposta = await trovaProposte(supabase, USER_ID, items[0].id);
       const dishIds = proposta.proposte.map(p => p.dish_id);
@@ -57,20 +57,24 @@ const GENERICO_DI = {
         : { data: [] };
       const dettaglioPer = Object.fromEntries((dettagli || []).map(d => [d.id, d]));
 
-      const paesiAccettati = new Set([...caso.paesi, ...caso.paesi.map(p => GENERICO_DI[p]).filter(Boolean)]);
+      const famigliaAttesa = { europea: 'mediterranea', australiana: 'mediterranea', asiatica: 'asiatica', sud_americana: 'latina', usa: 'americana' }[caso.cucina];
       const righe = proposta.proposte.map(p => {
         const d = dettaglioPer[p.dish_id] || {};
-        const paeseOk = paesiAccettati.has(d.paese);
-        return `${p.nome} [paese=${d.paese}, profilo=${d.profilo}]${paeseOk ? '' : '  <-- PAESE INATTESO'}`;
+        const famigliaOk = d.famiglia === famigliaAttesa;
+        return `${p.nome} [paese=${d.paese}, famiglia=${d.famiglia}]${famigliaOk ? '' : '  <-- FAMIGLIA SBAGLIATA'}`;
       });
 
-      console.log(`\n${caso.nome}: originale="${proposta.originale}", ${proposta.proposte.length} proposte`);
+      const tutteOk = proposta.originale !== null && proposta.proposte.length === 3 &&
+        proposta.proposte.every(p => (dettaglioPer[p.dish_id] || {}).famiglia === famigliaAttesa);
+      if (tutteOk) okCount++;
+
+      console.log(`\n${caso.nome}: originale="${proposta.originale}", ${proposta.proposte.length} proposte ${tutteOk ? 'OK' : 'PROBLEMA'}`);
       for (const riga of righe) console.log('   -', riga);
-      if (proposta.proposte.length < 3) console.log(`   ATTENZIONE: solo ${proposta.proposte.length} proposte, sotto le 3 attese.`);
     } catch (e) {
       console.log(`${caso.nome}: ERRORE - ${e.message}`);
     } finally {
       if (planId) await supabase.from('plans').delete().eq('id', planId);
     }
   }
+  console.log(`\n=== ${okCount}/${CASI.length} casi corretti (3 proposte, famiglia giusta) ===`);
 })();

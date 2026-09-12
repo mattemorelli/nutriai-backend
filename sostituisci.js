@@ -1,4 +1,4 @@
-const { caricaPiatti } = require('./genera');
+const { caricaPiatti, FAMIGLIE_PER_CUCINA } = require('./genera');
 
 // Allarga i vincoli a ogni giro finché non trova tre proposte.
 const GIRI = [
@@ -54,19 +54,14 @@ async function trovaProposte(supabase, userId, itemId) {
 
   const preferenze = (prefRaw && prefRaw.length) ? prefRaw : [{ cucina: 'europea', rank: 1 }];
 
-  const FAMIGLIA_DI_CUCINA = {
-    europea: 'mediterranea',
-    asiatica: 'asiatica',
-    sud_americana: 'latina',
-    usa: 'americana',
-    australiana: 'americana',
-  };
-
+  // Stessa fonte di genera.js (FAMIGLIE_PER_CUCINA, esportata), non una
+  // copia a mano: le due erano andate fuori sincrono in silenzio
+  // (australiana->americana qui, ->mediterranea in genera.js) prima che il
+  // filtro famiglia in caricaPiatti diventasse reale e lo rendesse visibile.
   const famiglie = [...new Set(
     preferenze
       .sort((a, b) => (a.rank || 9) - (b.rank || 9))
-      .map(p => FAMIGLIA_DI_CUCINA[p.cucina])
-      .filter(Boolean)
+      .flatMap(p => FAMIGLIE_PER_CUCINA[p.cucina] || [])
   )];
 
   const piatti = await caricaPiatti(supabase, famiglie.length ? famiglie : ['mediterranea']);
