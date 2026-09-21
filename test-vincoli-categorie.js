@@ -12,10 +12,10 @@ const ATTESO_ALLERGENI = {
   crostacei: 11,
   molluschi: 6,
   frutta_guscio: 14,
-  glutine: 59,
+  glutine: 59, // 60 il 2026-09-13 (+1 per soba_it) poi -1 il 2026-09-16: 168933 (Semola) era un doppione di semola_it, gia' taggato glutine - la deduplica dei food_id ha eliminato 168933 (che non esiste piu' in foods), non una categoria persa per errore
   lattosio: 60,
   pesce: 42,
-  soia: 16,
+  soia: 17, // +1 il 2026-09-16: soia_gialla_cotta_it (blocco 3 F0bis), aggiunta oggi insieme a legumi - mancava del tutto da categorie_alimenti
   uova: 9,
 };
 
