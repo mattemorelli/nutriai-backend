@@ -43,11 +43,26 @@ const GRADINI = [
   { gradino: '0',  soglia: 7,   opz: {} },
   { gradino: '1',  soglia: 7,   opz: { ripetizione: true } },
   { gradino: '2',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true } },
-  { gradino: '3a', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true } },
-  { gradino: '3b', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true } },
-  { gradino: '4',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
-  { gradino: '5',  soglia: 6.5, opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
-  { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
+  // 2b (2026-09-17): il tetto sale/saturi (giornaliero, proporzionale al
+  // fabbisogno, valutato sui valori SCALATI da adattaGiornata) e' un vincolo
+  // vero dal gradino 0: un fallimento fa risalire il backtracking DENTRO la
+  // giornata, come un vicolo cieco qualunque. Fino al gradino 2b compreso
+  // niente lo allenta - si esaurisce onestamente il pool corretto prima di
+  // concedere. tettoTollerante accetta il giorno comunque, registrando la
+  // concessione: stessa famiglia di quotaTollerante (l'aritmetica non torna
+  // esatta col pool attuale), non una concessione culturale come 3a/3b.
+  { gradino: '2b', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true } },
+  { gradino: '3a', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true } },
+  { gradino: '3b', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true } },
+  { gradino: '4',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
+  // 4b (2026-09-20): le preferenze alimentari (kind non_gradito + severity
+  // preferibile) cedono qui, e solo qui. Dopo il tempo allargato perche' un
+  // piatto sgradito pesa piu' di una ricetta lunga; prima della soglia salute
+  // perche' il voto e' la promessa centrale del prodotto. Allergie, intolleranze
+  // e dieta non entrano in questo gradino ne' in nessun altro.
+  { gradino: '4b', soglia: 7, opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true } },
+  { gradino: '5',  soglia: 6.5, opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true } },
+  { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true } },
 ];
 
 // Quanto ogni elemento puo' essere scalato. Le ancore hanno margini stretti,
@@ -93,15 +108,66 @@ function adattaGiornata(pasti, obiettivo) {
   return stato;
 }
 
-const LIMITI = { satMaxGiorno: 29, saleMaxGiorno: 5, fibraMinGiorno: 25 };
+// Limiti proporzionali al fabbisogno (2026-09-17, sostituisce la costante
+// fissa satMaxGiorno=29/saleMaxGiorno=5/fibraMinGiorno=25 - quei 29g erano il
+// 10% dell'energia di una giornata da ~2600 kcal, una raccomandazione OMS
+// resa in grammi per UNA persona media, sbagliata per chiunque altro: a 1800
+// kcal lasciava passare 29g dove il limite vero e' 20, a 2900 tappava a 29
+// dove il limite vero e' 32). Il sale resta assoluto (OMS: sotto 5g/giorno a
+// prescindere da quanto si mangia). La fibra resta un pavimento EFSA (25g
+// minimo adulto, ~14g/1000kcal come adeguatezza) - vedi valutaGiornataScalata
+// per come sale/saturi diventano un vincolo vero e la fibra no.
+function limitiProporzionali(kcal) {
+  return {
+    satMaxGiorno: kcal * 0.10 / 9,
+    saleMaxGiorno: 5,
+    fibraMinGiorno: Math.max(25, kcal * 0.014),
+  };
+}
 
+// Valuta una giornata sui valori SCALATI (adattaGiornata la porta al kcal
+// obiettivo, come fa davvero il salvataggio in plan_items) invece che sulla
+// ricetta base - il buco misurato il 2026-09-17: una giornata validata sui
+// valori base poteva arrivare all'utente fino al doppio su sale/saturi dopo
+// lo scalamento di colazione/base amidacea (fino a 2x/2.2x). tettoOk e'
+// sale<=5 e saturi<=limite proporzionale: un vincolo vero, verificato dal
+// chiamante DURANTE la costruzione della giornata (vedi avanzaFinDove), non
+// solo a posteriori. fibraOk resta un pavimento: mai un vincolo, solo
+// riportato come concessione (vedi il ciclo di ricostruzione della settimana).
+function valutaGiornataScalata(pastiGiorno, obiettivo) {
+  if (!obiettivo || !pastiGiorno.length) return null;
+  const adattati = adattaGiornata(pastiGiorno, obiettivo);
+  let saturi = 0, sale = 0, fibra = 0, kcal = 0;
+  for (const { p, f } of adattati) {
+    saturi += (p.piatto.satFat || 0) * f;
+    sale += (p.piatto.salt || 0) * f;
+    fibra += (p.piatto.fibre || 0) * f;
+    kcal += (p.piatto.kcal || 0) * f;
+  }
+  const lim = limitiProporzionali(kcal || obiettivo);
+  return {
+    saturi, sale, fibra, kcal,
+    satMax: lim.satMaxGiorno, saleMax: lim.saleMaxGiorno, fibraMin: lim.fibraMinGiorno,
+    tettoOk: saturi <= lim.satMaxGiorno && sale <= lim.saleMaxGiorno,
+    fibraOk: fibra >= lim.fibraMinGiorno,
+  };
+}
+
+// Frequenze settimanali dalle Linee Guida CREA 2018 (adulto, 2000 kcal),
+// scalate dalle 15 porzioni proteiche della fonte alle 7 caselle di secondo
+// di Quadrio (fattore 7/12, formaggio escluso perche' senza secondi).
+// Fonte: CREA, "Le giuste porzioni e le frequenze di consumo consigliate"
+// https://sapermangiare.an.crea.gov.it/493/le-giuste-porzioni.html
 const QUOTE = {
-  carne_rossa:  { min: 0, max: 1 },
-  carne_bianca: { min: 1, max: 3 },
-  pesce:        { min: 2, max: 4 },
-  legumi:       { min: 1, max: 3 },
-  uova:         { min: 0, max: 2 },
-  formaggio:    { min: 0, max: 2 },
+  carne_rossa:  { min: 0, max: 1, freq: 0.583, fonte: 'CREA 2018: 1 porzione da 100 g a settimana' },
+  carne_bianca: { min: 1, max: 3, freq: 1.167, fonte: 'CREA 2018: 2 porzioni da 100 g a settimana' },
+  pesce:        { min: 2, max: 4, freq: 1.750, fonte: 'CREA 2018: 2 porzioni da 150 g piu 1 conservata da 50 g' },
+  legumi:       { min: 1, max: 3, freq: 1.750, fonte: 'CREA 2018: 3 porzioni da 150 g a settimana' },
+  uova:         { min: 0, max: 2, freq: 1.750, fonte: 'CREA 2018: 3 uova da 50 g a settimana' },
+  // formaggio: nessun secondo del catalogo ha un latticino come ancora
+  // proteica (misurato 19/09/2026: 0 su 710). Rimettere la quota quando
+  // esisteranno secondi a base di formaggio, non prima: un tetto su un
+  // insieme vuoto non difende niente.
 };
 
 // Categorie escluse da ciascuna dieta (prima dell'espansione CONTENUTE_IN).
@@ -122,6 +188,16 @@ const FAMIGLIE_PER_CUCINA = {
   usa: ['americana'],
 };
 
+// RIPIEGO (Fase 2, 2026-09-16): queste sei regex erano il metodo PRIMARIO
+// per indovinare il gruppo proteico di un piatto dai nomi degli ingredienti.
+// Fragile per costruzione (foods.name mescola inglese USDA e slug italiani,
+// e l'ordine fisso della lista decide chi vince quando un piatto ha piu' di
+// un ingrediente riconosciuto, non chi pesa di piu' - vedi f3-gruppo-
+// proteico.js, gli 8 casi "in disaccordo" accettati il 2026-09-16). Il
+// metodo primario ora e' gruppoDa() sotto, che legge categorie_alimenti
+// sull'ancora proteica (metrica F1). Le regex restano SOLO come ripiego per
+// quando l'ancora non ha nessuna categoria - cosi' nessun piatto che oggi ha
+// un gruppo lo perde.
 const GRUPPI = [
   ['pesce',        /fish|salmon|salmone|cod,|merluzzo|tuna|tonno|trout|trota|sgombro|sardin|acciugh|aringa|branzino|orata|barramundi|halibut|nasello|rombo|sogliola|anguilla|baccal|mahi|astice|granchio|crab|shrimp|gamber|vongol|cozze|seppia|polpo/i],
   ['carne_rossa',  /beef|manzo|brisket|agnello|lamb|canguro|kangaroo|vitell|veal|maiale|pork|lonza|speck|bresaola/i],
@@ -133,12 +209,70 @@ const GRUPPI = [
 
 const rankInPeso = (rank) => Math.round(25 / Math.pow(2, rank - 1));
 
-function gruppoDa(ingredienti) {
+function gruppoDaRegex(ingredienti) {
   const testo = ingredienti.filter(i => i.grams >= 40).map(i => i.nome).join(' | ');
   for (const [gruppo, rx] of GRUPPI) {
     if (rx.test(testo)) return gruppo;
   }
   return null;
+}
+
+// L'ancora proteica di un piatto: la stessa metrica di F1 (regola 9 del
+// CLAUDE.md) - grammi di proteina reale, non grammi di alimento. Soglia
+// >=10g oppure >=25% della proteina totale del piatto, quale delle due e'
+// piu' facile. Il peso dell'alimento e' la misura sbagliata per la
+// proteina: un contorno di verdure puo' pesare piu' del pollo.
+function ancoraProteica(ingredienti) {
+  const conProteina = ingredienti
+    .map(i => ({ ...i, proteina: (i.protein_100g || 0) * i.grams / 100 }))
+    .filter(i => i.proteina > 0)
+    .sort((a, b) => b.proteina - a.proteina);
+  if (!conProteina.length) return null;
+  const totale = conProteina.reduce((s, i) => s + i.proteina, 0);
+  const primo = conProteina[0];
+  if (primo.proteina >= 10 || (totale > 0 && primo.proteina / totale >= 0.25)) return primo;
+  return null;
+}
+
+// Da categoria (categorie_alimenti) a gruppo proteico, sull'ingrediente che
+// l'ancora proteica ha gia' scelto - NON viola la regola 9 del CLAUDE.md
+// ("la categoria non deve mai determinare il ruolo"): qui il ruolo/ancora
+// resta deciso dai grammi di proteina, la categoria dice solo *che cosa e'*
+// l'ingrediente che ha gia' vinto. E' anche cio' che protegge dai casi che
+// la regola 9 cita: il curry rosso e' taggato 'pesce' (contiene salsa di
+// pesce) ma con pochi grammi e quasi nessuna proteina non sara' mai
+// l'ancora. L'ordine e' la precedenza quando l'ancora porta piu' categorie:
+// si nomina il piatto per la proteina piu' "impegnativa" (il pesce prima
+// del latticino, la carne prima del legume) - lo stesso ordine in cui QUOTE
+// ragiona.
+const GRUPPO_DA_CATEGORIA = [
+  ['pesce',        ['pesce', 'crostacei', 'molluschi']],
+  ['carne_rossa',  ['carne_rossa', 'maiale']],
+  ['carne_bianca', ['carne_bianca']],
+  ['uova',         ['uova']],
+  ['legumi',       ['legumi', 'soia']],
+  ['formaggio',    ['latticini']],
+];
+
+// Metodo primario (Fase 2, 2026-09-16): ancora proteica -> categoria
+// dell'ancora -> gruppo. Ripiega sulle regex (gruppoDaRegex) solo quando
+// l'ancora non esiste o non ha nessuna categoria che mappi a un gruppo -
+// misurato su tutto il catalogo prima di attivare (f3-gruppo-proteico.js):
+// 771 d'accordo, 45 recuperati dalla categoria (prima invisibili al
+// generatore), 0 persi, 8 disaccordi accettati (la categoria aveva ragione
+// in tutti e otto - l'ordine fisso delle regex vinceva per posizione in
+// lista, non per peso).
+function gruppoDa(ingredienti, categorieDi) {
+  const ancora = ancoraProteica(ingredienti);
+  if (ancora && categorieDi) {
+    const cat = categorieDi[ancora.food_id];
+    if (cat) {
+      for (const [gruppo, categorie] of GRUPPO_DA_CATEGORIA) {
+        if (categorie.some(x => cat.has(x))) return gruppo;
+      }
+    }
+  }
+  return gruppoDaRegex(ingredienti);
 }
 
 function ingredientePrincipale(ingredienti) {
@@ -211,13 +345,33 @@ function pianoProteico(gruppiDisponibili, rng) {
     if (!gruppiDisponibili.has(gruppo)) continue;
     for (let i = 0; i < q.min; i++) piano.push(gruppo);
   }
-  const riempitivi = Object.entries(QUOTE)
-    .filter(([g]) => gruppiDisponibili.has(g))
-    .flatMap(([g, q]) => Array(Math.max(0, q.max - q.min)).fill(g));
 
-  const extra = mescola(riempitivi, rng);
-  while (piano.length < 7 && extra.length) piano.push(extra.pop());
-  while (piano.length < 7) piano.push(null); // nessun vincolo su questo giorno
+  const liberi = 7 - piano.length;
+  if (liberi > 0) {
+    const residui = mescola(
+      Object.entries(QUOTE)
+        .filter(([g]) => gruppiDisponibili.has(g))
+        .map(([g, q]) => [g, Math.max(0, (q.freq != null ? q.freq : q.max) - q.min)])
+        .filter(([, w]) => w > 0),
+      rng
+    );
+    const somma = residui.reduce((a, [, w]) => a + w, 0);
+    if (somma > 0) {
+      // Campionamento sistematico: i pesi riscalati sommano a `liberi`, quindi
+      // ogni gruppo esce floor o ceil del proprio peso e la media e' esatta.
+      const scala = liberi / somma;
+      const cursore = rng();
+      let acc = 0;
+      for (const [g, w] of residui) {
+        const prima = acc;
+        acc += w * scala;
+        const n = Math.ceil(acc - cursore) - Math.ceil(prima - cursore);
+        for (let i = 0; i < n && piano.length < 7; i++) piano.push(g);
+      }
+    }
+  }
+
+  while (piano.length < 7) piano.push(null);
   return mescola(piano, rng).slice(0, 7);
 }
 
@@ -301,6 +455,14 @@ function trovaCategoria(subject, mappaAlias) {
 // piu' ampia deve escludere anche quella contenuta, anche se un domani un
 // alimento venisse taggato con una sola delle due per una svista - non ci si
 // puo' affidare al doppio tag manuale per sempre.
+// CONTENUTE_IN e GRUPPO_DA_CATEGORIA sono DIVERSE di proposito, non per
+// svista. GRUPPO_DA_CATEGORIA risponde a una domanda nutrizionale: un
+// gambero conta come pesce nel profilo proteico della settimana.
+// CONTENUTE_IN risponde a cosa esclude un vincolo dichiarato: pesce,
+// crostacei, molluschi e soia sono allergeni distinti nel Reg. UE
+// 1169/2011, e l'onboarding li offre come voci separate. Non allinearle.
+// (Verificato il 21/09/2026 con prova-4b.js: con le categorie dichiarate
+// tutte, il gradino 4b scatta e dichiara le concessioni.)
 const CONTENUTE_IN = {
   carne_rossa: ['maiale'],
   latticini: ['lattosio'],
@@ -377,6 +539,15 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   const tagDi = {};
   for (const r of (tagRighe || [])) (tagDi[r.food_id] ||= new Set()).add(r.tag);
 
+  // Fase 2 (2026-09-16): categorie_alimenti caricata una volta sola, stessa
+  // forma di tagDi - food_id -> Set di categorie. Usata da gruppoDa()
+  // sull'ancora proteica, non per determinare il ruolo (vedi la nota sopra
+  // GRUPPO_DA_CATEGORIA).
+  const { data: catRighe, error: eCat } = await supabase.from('categorie_alimenti').select('food_id, categoria');
+  if (eCat) throw new Error(eCat.message);
+  const categorieDi = {};
+  for (const r of (catRighe || [])) (categorieDi[r.food_id] ||= new Set()).add(r.categoria);
+
   for (let i = 0; i < ids.length; i += 200) {
     const blocco = ids.slice(i, i + 200);
     const { data: righe, error: e2 } = await supabase
@@ -399,7 +570,7 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
       v.fibre   += (f.fibre_100g   || 0) * k;
       v.salt    += (f.salt_100g    || 0) * k;
       v.grams   += r.grams;
-      v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', grams: r.grams, stato: f.stato || null });
+      v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', grams: r.grams, stato: f.stato || null, protein_100g: f.protein_100g || 0 });
     }
   }
 
@@ -430,7 +601,7 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
     .map(p => ({
       ...p,
       ...valori[p.id],
-      gruppo: gruppoDa(valori[p.id].ingredienti),
+      gruppo: gruppoDa(valori[p.id].ingredienti, categorieDi),
       principale: ingredientePrincipale(valori[p.id].ingredienti),
       ...riassuntoNutrizionale(valori[p.id].ingredienti),
     }));
@@ -515,6 +686,19 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
     }
   }
 
+  // Solo avviso, mai un fallimento: un gruppo di QUOTE presente nel profilo
+  // ma con zero secondi disponibili e' esattamente la situazione di
+  // 'formaggio' scoperta il 19/09/2026 (misurato 0 su 710) prima di togliere
+  // la quota - se ricapita su un altro gruppo, deve gridare qui, non restare
+  // silenzioso come formaggio e' rimasto per mesi.
+  for (const gruppo of Object.keys(QUOTE)) {
+    if (!gruppiDelProfilo.has(gruppo)) continue;
+    const nGruppo = contaDisponibili(secondi, true, (p) => p.gruppo === gruppo);
+    if (nGruppo === 0) {
+      console.warn(`gruppo ${gruppo} in QUOTE ma 0 secondi disponibili`);
+    }
+  }
+
   const nPrimi = contaDisponibili(primi, false);
   if (nPrimi < 7) return { ok: false, messaggio: `servono 7 primi distinti, ne ha ${nPrimi}` };
 
@@ -530,7 +714,86 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
   return { ok: true };
 }
 
-async function generaESalva(supabase, userId, seedIniziale) {
+// Vincoli dell'utente: UNA sola fonte per generatore e Swap. Prima del
+// 21/09/2026 viveva dentro generaESalva e lo Swap non la vedeva: proponeva
+// piatti col glutine ai celiaci (misurato: 10 su 54 proposte).
+async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
+  // --- Vincoli dell'utente: riferimenti risolti, non piu' testo da indovinare ---
+  // food_id  = un alimento singolo. categoria = un gruppo intero.
+  // Nessuno dei due = vincolo non risolto: non esclude nulla, e lo diciamo.
+
+  const { data: vincoli } = await supabase
+    .from('user_constraints')
+    .select('kind, subject, severity, food_id, categoria')
+    .eq('user_id', userId);
+
+  const foodIdVietati = new Set();    // allergie, intolleranze, dieta: non cedono mai
+  const foodIdSgraditi = new Set();   // preferenze: cedono al gradino 4b, dichiarandolo
+  const categorieDaEspandere = new Set();
+  const categorieSgradite = new Set();
+  const nonRisolti = [];
+
+  // Prudente per costruzione: e' una preferenza solo se lo dice sia kind che
+  // severity. Qualunque altra combinazione, o un campo mancante, resta assoluta.
+  const ePreferenza = (v) => v.kind === 'non_gradito' && v.severity === 'preferibile';
+
+  for (const v of vincoli || []) {
+    const molle = ePreferenza(v);
+    if (v.food_id) { (molle ? foodIdSgraditi : foodIdVietati).add(v.food_id); continue; }
+    if (v.categoria) {
+      const dove = molle ? categorieSgradite : categorieDaEspandere;
+      for (const c of [v.categoria, ...(CONTENUTE_IN[v.categoria] || [])]) dove.add(c);
+      continue;
+    }
+    nonRisolti.push(v.subject || '(vuoto)');
+  }
+
+  const espandi = async (codici, destinazione) => {
+    if (!codici.size) return;
+    const { data: righe } = await supabase
+      .from('categorie_alimenti')
+      .select('food_id')
+      .in('categoria', [...codici]);
+    for (const r of righe || []) destinazione.add(r.food_id);
+  };
+
+  await espandi(categorieDaEspandere, foodIdVietati);
+  await espandi(categorieSgradite, foodIdSgraditi);
+
+  for (const fid of await foodIdVietatiPerDieta(supabase, dieta)) foodIdVietati.add(fid);
+
+  if (nonRisolti.length) {
+    console.warn(
+      `ATTENZIONE: ${nonRisolti.length} vincolo/i non risolto/i, non escludono nulla: ${nonRisolti.join(', ')}`
+    );
+  }
+
+  const senzaNessunoDi = (insieme) => (p) => {
+    const ingredienti = p.ingredienti || p.dish_ingredients || [];
+    for (const i of ingredienti) {
+      const fid = i.food_id || (i.foods && i.foods.id);
+      if (fid && insieme.has(fid)) return false;
+    }
+    return true;
+  };
+
+  const ammesso = senzaNessunoDi(foodIdVietati);   // assoluto
+  const gradito = senzaNessunoDi(foodIdSgraditi);  // preferenza
+
+  console.log(
+    `Vincoli: ${foodIdVietati.size} alimenti vietati, ${foodIdSgraditi.size} sgraditi (dieta: ${dieta}), ${nonRisolti.length} non risolti`
+  );
+
+  return { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito };
+}
+
+async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
+  // Modo prova (2026-09-19): salva=false costruisce la settimana senza
+  // scrivere su plans/plan_items, per misurare senza sporcare il database.
+  // Nessun chiamante esistente passa opzioni, quindi il default (true)
+  // mantiene il comportamento di sempre.
+  const salva = opzioni.salva !== false;
+
   // Seed esplicito se passato (per rigiocare un fallimento segnalato),
   // altrimenti generato qui - ma sempre salvato col piano, cosi' ogni
   // generazione e' rigiocabile a posteriori, non solo quando lo si prevede.
@@ -568,67 +831,9 @@ async function generaESalva(supabase, userId, seedIniziale) {
     return 1;
   };
 
-  // --- Espansione dei vincoli tramite categorie_alimenti ---
-
-  // 1. I vincoli dell'utente
-  const { data: vincoli } = await supabase
-    .from('user_constraints')
-    .select('kind, subject, severity')
-    .eq('user_id', userId);
-
-  // 2. Gli alias delle categorie (codice, nome_it, nome_en, sinonimi gia'
-  // normalizzati), unica fonte di risoluzione: il vincolo di unicita' vive
-  // sul database (alias_categoria.alias e' chiave primaria).
-  const { data: aliasRighe } = await supabase
-    .from('alias_categoria')
-    .select('alias, codice');
-  const mappaAlias = new Map((aliasRighe || []).map(r => [r.alias, r.codice]));
-
-  // 3. Per ogni subject dichiarato, l'insieme dei food_id da escludere
-  const foodIdVietati = new Set();
-
-  for (const v of (vincoli || [])) {
-    const s = (v.subject || '').trim();
-    if (!s) continue;
-
-    // Il subject corrisponde a una categoria (per codice, nome o sinonimo)?
-    const cat = trovaCategoria(s, mappaAlias);
-
-    if (cat) {
-      const codiciDaEscludere = [cat.codice, ...(CONTENUTE_IN[cat.codice] || [])];
-      for (const codice of codiciDaEscludere) {
-        const { data: righe } = await supabase
-          .from('categorie_alimenti')
-          .select('food_id')
-          .eq('categoria', codice);
-        for (const r of (righe || [])) foodIdVietati.add(r.food_id);
-      }
-      continue;
-    }
-
-    // Altrimenti e' un singolo alimento: prendo TUTTE le corrispondenze
-    const { data: cibi } = await supabase
-      .from('foods')
-      .select('id')
-      .or(`name.ilike.%${s}%,name_it.ilike.%${s}%`);
-    for (const c of (cibi || [])) foodIdVietati.add(c.id);
-  }
-
-  // 4. Le categorie escluse dalla dieta
   const dieta = profiloUtente?.diet || 'onnivoro';
-  for (const fid of await foodIdVietatiPerDieta(supabase, dieta)) foodIdVietati.add(fid);
-
-  // 5. Il filtro: un piatto e' ammesso se nessuno dei suoi ingredienti e' vietato
-  const ammesso = (p) => {
-    const ingredienti = p.ingredienti || p.dish_ingredients || [];
-    for (const i of ingredienti) {
-      const fid = i.food_id || (i.foods && i.foods.id);
-      if (fid && foodIdVietati.has(fid)) return false;
-    }
-    return true;
-  };
-
-  console.log(`Vincoli: ${foodIdVietati.size} alimenti esclusi (dieta: ${dieta})`);
+  const { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito } =
+    await caricaVincoli(supabase, userId, dieta);
 
   // Cosa l'utente ha deciso di tenere dalla settimana precedente
   const { data: pianoVecchio } = await supabase
@@ -672,7 +877,26 @@ async function generaESalva(supabase, userId, seedIniziale) {
 
   // La dieta è un vincolo assoluto: si applica una volta sola, a monte,
   // così quote, piano proteico e selezione lavorano già su piatti ammessi.
-  piatti = piatti.filter(ammesso);
+  piatti = piatti.filter(ammesso);        // assoluti: filtrati una volta sola, come prima
+  const piattiConSgraditi = piatti;       // ci si arriva solo al gradino 4b
+  piatti = piatti.filter(gradito);        // il caso normale: preferenze rispettate
+
+  console.log(`Pool: ${piattiConSgraditi.length} dopo i vincoli assoluti, ` +
+              `${piatti.length} dopo le preferenze ` +
+              `(${piattiConSgraditi.length - piatti.length} piatti sgraditi tolti)`);
+
+  // Spostato qui (2026-09-17, prima era letto solo a fine funzione, dopo la
+  // ricerca): il tetto sale/saturi (gradino 2b+) deve valutare i valori
+  // SCALATI durante la costruzione della giornata, quindi serve conoscere il
+  // kcal obiettivo PRIMA che la ricerca inizi, non dopo che ha gia' finito.
+  const { data: target } = await supabase
+    .from('energy_targets')
+    .select('id, kcal')
+    .eq('user_id', userId)
+    .order('computed_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const obiettivo = target?.kcal ?? null;
 
   // Cosa e' successo nelle settimane precedenti
   const { data: esiti } = await supabase
@@ -868,7 +1092,8 @@ async function generaESalva(supabase, userId, seedIniziale) {
   // parte perche' al gradino 5 scende sotto 7 in due passi (6.5 poi 6),
   // sempre dentro lo stesso gradino 5.
   function provaGradino(opz, sogliaSalute) {
-    const perSlot = (slot) => piatti.filter(p => p.meal_slot === slot && (p.health_score == null || p.health_score >= sogliaSalute));
+    const insiemeBase = opz.preferenzeTolleranti ? piattiConSgraditi : piatti;
+    const perSlot = (slot) => insiemeBase.filter(p => p.meal_slot === slot && (p.health_score == null || p.health_score >= sogliaSalute));
     const primi     = perSlot('primo');
     const secondi   = perSlot('secondo');
     const contorni  = perSlot('contorno');
@@ -909,6 +1134,25 @@ async function generaESalva(supabase, userId, seedIniziale) {
       const ripetizioniSecondo = { valore: 0 }; // gradino 1: al massimo una nell'intera settimana
       const statoGiorni = Array.from({ length: 7 }, () => ({}));
       const pila = [];
+
+      // Stessa forma dell'array 'pasti' costruito a fine funzione per il
+      // salvataggio (era duplicato inline li' e nel ciclo di ricostruzione:
+      // estratto una volta sola perche' ora serve anche qui, dentro la
+      // ricerca, per valutare la giornata sui valori scalati appena e'
+      // COMPLETA).
+      function pastiDi(gi) {
+        const st = statoGiorni[gi];
+        return [
+          st.colazione      && { meal: 'colazione', slot: 'colazione', piatto: st.colazione },
+          st.primo          && { meal: 'pranzo',    slot: 'primo',     piatto: st.primo },
+          st.contornoPranzo && { meal: 'pranzo',    slot: 'contorno',  piatto: st.contornoPranzo },
+          st.spuntino       && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino },
+          st.secondo        && { meal: 'cena',      slot: 'secondo',   piatto: st.secondo, avanzi: st.secondoEAvanzo },
+          st.contornoCena   && { meal: 'cena',      slot: 'contorno',  piatto: st.contornoCena },
+          st.base           && { meal: 'cena',      slot: 'contorno',  piatto: st.base },
+          st.spuntino2      && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino2 },
+        ].filter(Boolean);
+      }
 
       function creaFrame(giorno, nomeSlot, candidati, applica) {
         return { giorno, nomeSlot, candidati, indice: 0, applica, annullaCorrente: null };
@@ -1194,12 +1438,33 @@ async function generaESalva(supabase, userId, seedIniziale) {
       // spazio sia stato esplorato per intero (la pila aveva ancora
       // candidati non provati); il secondo dice che la pila si e' svuotata
       // da sola, nessuna alternativa restava da tentare per questo profilo.
+      // Tetto sale/saturi (gradino 2b): appena una giornata e' COMPLETA, si
+      // valuta sui valori SCALATI (valutaGiornataScalata chiama adattaGiornata,
+      // la stessa funzione che scala davvero cio' che l'utente riceve). Se
+      // sfonda e il gradino non e' ancora tollerante, e' un vicolo cieco
+      // come un altro: si torna indietro e si riprova un candidato diverso
+      // per l'ultimo slot deciso di QUESTA giornata (stesso meccanismo di
+      // 'decisione === null', non uno nuovo). Il risultato si salva su
+      // statoGiorni[gi] cosi' il ciclo di ricostruzione dopo non ricalcola.
       function avanzaFinDove(giIniziale) {
         let gi = giIniziale;
         while (gi < 7) {
           if (passiUsati.valore > MAX_PASSI) return { esaurito: true, motivo: 'tetto' };
           const decisione = prossimaDecisione(gi);
-          if (decisione === 'COMPLETO') { gi++; continue; }
+          if (decisione === 'COMPLETO') {
+            const st = statoGiorni[gi];
+            if (!st.bloccatoCompleto && obiettivo) {
+              const val = valutaGiornataScalata(pastiDi(gi), obiettivo);
+              if (val && !val.tettoOk && !opz.tettoTollerante) {
+                const tornaA = indietro();
+                if (tornaA < 0) return { esaurito: true, motivo: 'reale' };
+                gi = tornaA;
+                continue;
+              }
+              st.valutazioneNutrienti = val;
+            }
+            gi++; continue;
+          }
           if (decisione === null) {
             const tornaA = indietro();
             if (tornaA < 0) return { esaurito: true, motivo: 'reale' };
@@ -1250,30 +1515,66 @@ async function generaESalva(supabase, userId, seedIniziale) {
         const g = k + 1;
         const st = statoGiorni[k];
         if (st.bloccatoCompleto) {
+          // Non e' una concessione del generatore (non e' lui a decidere che
+          // sale/saturi/fibra vadano bene qui): e' l'utente che ha bloccato
+          // primo+secondo di questo giorno, quindi ne' avanzaFinDove ne' il
+          // ciclo qui sotto lo hanno mai valutato. Distinta esplicitamente
+          // da 'tetto_sale_saturi' cosi' chi legge il piano non scambia il
+          // silenzio per un tetto rispettato.
+          concessioni.push({
+            gradino: null, tipo: 'nota', giorno: g, slot: null, vincolo: 'giorno_bloccato_dall_utente',
+            prima: null, dopo: 'sale/saturi/fibra non valutati: giornata bloccata dall\'utente',
+          });
           settimana.push({ giorno: g, profilo: st.profiloGiorno ?? profiloSettimana, bloccati: st.bloccatiOggi, conforme: true, pasti: [] });
           continue;
         }
-        const pasti = [
-          st.colazione      && { meal: 'colazione', slot: 'colazione', piatto: st.colazione },
-          st.primo          && { meal: 'pranzo',    slot: 'primo',     piatto: st.primo },
-          st.contornoPranzo && { meal: 'pranzo',    slot: 'contorno',  piatto: st.contornoPranzo },
-          st.spuntino       && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino },
-          st.secondo        && { meal: 'cena',      slot: 'secondo',   piatto: st.secondo, avanzi: st.secondoEAvanzo },
-          st.contornoCena   && { meal: 'cena',      slot: 'contorno',  piatto: st.contornoCena },
-          st.base           && { meal: 'cena',      slot: 'contorno',  piatto: st.base },
-          st.spuntino2      && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino2 },
-        ].filter(Boolean);
+        const pasti = pastiDi(k);
 
-        const tot = pasti.reduce((a, p) => ({
-          satFat: a.satFat + p.piatto.satFat,
-          fibre:  a.fibre  + p.piatto.fibre,
-          salt:   a.salt   + p.piatto.salt,
-        }), { satFat: 0, fibre: 0, salt: 0 });
+        // Riusa la valutazione gia' fatta DURANTE la ricerca (vedi
+        // avanzaFinDove) quando c'e'; la ricalcola solo se manca (giornata
+        // senza obiettivo kcal - nessun utente ha ancora un energy_target,
+        // capita per esempio ai profili appena creati). Le giornate
+        // bloccatoCompleto NON arrivano qui: il 'continue' qualche riga sopra
+        // le intercetta prima, quindi non producono mai una concessione
+        // tetto/fibra (verificato: 2026-09-17). Per tutte le altre, sale e
+        // saturi sono un vincolo vero: se questa giornata e' arrivata fin qui
+        // con tettoOk=false, il gradino corrente ha tettoTollerante=true
+        // (altrimenti avanzaFinDove l'avrebbe scartata, vedi il gate li') - va
+        // registrato come concessione, non come piatto rotto. La fibra non
+        // blocca mai: solo concessione.
+        const val = st.valutazioneNutrienti || valutaGiornataScalata(pasti, obiettivo);
+        const conforme = val ? (val.tettoOk && val.fibraOk) : true;
 
-        const conforme =
-          tot.satFat <= LIMITI.satMaxGiorno &&
-          tot.salt   <= LIMITI.saleMaxGiorno &&
-          tot.fibre  >= LIMITI.fibraMinGiorno;
+        if (val && !val.tettoOk) {
+          concessioni.push({
+            gradino: '2b', tipo: 'allentamento', giorno: g, slot: null, vincolo: 'tetto_sale_saturi',
+            prima: `sale<=${val.saleMax} saturi<=${val.satMax.toFixed(1)}`,
+            dopo: `sale=${val.sale.toFixed(2)} saturi=${val.saturi.toFixed(2)}`,
+          });
+        }
+        if (val && !val.fibraOk) {
+          concessioni.push({
+            gradino: null, tipo: 'pavimento_mancato', giorno: g, slot: null, vincolo: 'fibra_minima',
+            prima: val.fibraMin.toFixed(1), dopo: val.fibra.toFixed(1),
+          });
+        }
+
+        // Gradino 4b: se ci si e' arrivati, la settimana puo' contenere un
+        // alimento sgradito - va dichiarato, non lasciato in silenzio dentro
+        // un piatto altrimenti conforme.
+        if (opz.preferenzeTolleranti) {
+          for (const pasto of pasti) {
+            for (const ing of (pasto.piatto.ingredienti || [])) {
+              if (foodIdSgraditi.has(ing.food_id)) {
+                concessioni.push({
+                  gradino: '4b', tipo: 'allentamento', giorno: g, slot: pasto.slot,
+                  vincolo: 'preferenza_non_gradita', prima: ing.nome, dopo: pasto.piatto.name,
+                  food_id: ing.food_id, dish_id: pasto.piatto.id,
+                });
+              }
+            }
+          }
+        }
 
         settimana.push({ giorno: g, profilo: st.profiloGiorno, pasti, conforme });
 
@@ -1360,6 +1661,8 @@ async function generaESalva(supabase, userId, seedIniziale) {
         const ottenuto = usoGruppi[gruppo] || 0;
         if (ottenuto < q.min) {
           concessioni.push({ gradino: '2', tipo: 'allentamento', giorno: null, slot: null, vincolo: 'quota_minima_gruppo_proteico', prima: q.min, dopo: ottenuto, gruppo });
+        } else if (ottenuto > q.max) {
+          concessioni.push({ gradino: null, tipo: 'sforamento_tetto', giorno: null, slot: null, vincolo: 'quota_massima_gruppo_proteico', prima: q.max, dopo: ottenuto, gruppo });
         }
       }
 
@@ -1374,7 +1677,7 @@ async function generaESalva(supabase, userId, seedIniziale) {
         : 0;
       const punteggio = conformi + completezza * 2 + mediaSalute * 0.5;
 
-      return { ok: true, settimana, punteggio, concessioni, mediaSalute };
+      return { ok: true, settimana, punteggio, concessioni, mediaSalute, usoGruppi };
     }
 
     return { ok: false, diagnosticaProfili };
@@ -1417,75 +1720,76 @@ async function generaESalva(supabase, userId, seedIniziale) {
     );
   }
 
-  const { settimana: migliore, punteggio: migliorPunteggio, concessioni } = esito;
+  const { settimana: migliore, punteggio: migliorPunteggio, concessioni, usoGruppi } = esito;
 
-  const { data: target } = await supabase
-    .from('energy_targets')
-    .select('id, kcal')
-    .eq('user_id', userId)
-    .order('computed_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // target/obiettivo letti all'inizio della funzione, non qui: vedi sopra.
 
-  const obiettivo = target?.kcal ?? null;
+  // 'piano' dichiarata qui (non con const dentro l'if) apposta: deve restare
+  // visibile al return finale anche quando salva=true, e un const dentro il
+  // blocco sarebbe uscito di scope li' (verificato: senza questo, il ramo
+  // salva=true lancia "piano is not defined", non solo quello salva=false).
+  let piano = null;
+  if (salva) {
+    const { data: pianoInserito, error: errPiano } = await supabase
+      .from('plans')
+      .insert({
+        user_id: userId,
+        week_start: lunediCorrente(),
+        generated_at: new Date().toISOString(),
+        energy_target_id: target?.id ?? null,
+        corpus_version: CORPUS_VERSION,
+        seed,
+        gradino_raggiunto: gradinoRaggiunto,
+        concessioni,
+        dieta,
+        paesi: paesiScelti,
+      })
+      .select('id')
+      .single();
+    if (errPiano) throw new Error(`Creazione piano fallita: ${errPiano.message}`);
+    piano = pianoInserito;
 
-  const { data: piano, error: errPiano } = await supabase
-    .from('plans')
-    .insert({
-      user_id: userId,
-      week_start: lunediCorrente(),
-      generated_at: new Date().toISOString(),
-      energy_target_id: target?.id ?? null,
-      corpus_version: CORPUS_VERSION,
-      seed,
-      gradino_raggiunto: gradinoRaggiunto,
-      concessioni,
-      dieta,
-      paesi: paesiScelti,
-    })
-    .select('id')
-    .single();
-  if (errPiano) throw new Error(`Creazione piano fallita: ${errPiano.message}`);
-
-  const righe = [];
-  for (const g of migliore) {
-    if (g.bloccati && g.bloccati.length && !g.pasti.length) {
-      for (const b of g.bloccati) {
-        righe.push({ plan_id: piano.id, ...b, bloccato: true });
+    const righe = [];
+    for (const g of migliore) {
+      if (g.bloccati && g.bloccati.length && !g.pasti.length) {
+        for (const b of g.bloccati) {
+          righe.push({ plan_id: piano.id, ...b, bloccato: true });
+        }
+        continue;
       }
-      continue;
+      const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo) : g.pasti.map(p => ({ p, f: 1 }));
+      for (const x of adattati) {
+        const p = x.p, f = x.f;
+        righe.push({
+          plan_id: piano.id,
+          day_of_week: g.giorno,
+          meal: p.meal,
+          slot: p.slot,
+          dish_id: p.piatto.id,
+          portion_g: Math.round(p.piatto.grams * f),
+          kcal: Math.round(p.piatto.kcal * f),
+          protein_g: Number((p.piatto.protein * f).toFixed(1)),
+          sat_fat_g: Number((p.piatto.satFat * f).toFixed(1)),
+          fibre_g: Number((p.piatto.fibre * f).toFixed(1)),
+          salt_g: Number((p.piatto.salt * f).toFixed(2)),
+          avanzi: Boolean(p.avanzi),
+        });
+      }
     }
-    const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo) : g.pasti.map(p => ({ p, f: 1 }));
-    for (const x of adattati) {
-      const p = x.p, f = x.f;
-      righe.push({
-        plan_id: piano.id,
-        day_of_week: g.giorno,
-        meal: p.meal,
-        slot: p.slot,
-        dish_id: p.piatto.id,
-        portion_g: Math.round(p.piatto.grams * f),
-        kcal: Math.round(p.piatto.kcal * f),
-        protein_g: Number((p.piatto.protein * f).toFixed(1)),
-        sat_fat_g: Number((p.piatto.satFat * f).toFixed(1)),
-        fibre_g: Number((p.piatto.fibre * f).toFixed(1)),
-        salt_g: Number((p.piatto.salt * f).toFixed(2)),
-        avanzi: Boolean(p.avanzi),
-      });
+
+    const { error: errItems } = await supabase.from('plan_items').insert(righe);
+    if (errItems) {
+      await supabase.from('plans').delete().eq('id', piano.id);
+      throw new Error(`Inserimento pasti fallito: ${errItems.message}`);
     }
   }
 
-  const { error: errItems } = await supabase.from('plan_items').insert(righe);
-  if (errItems) {
-    await supabase.from('plans').delete().eq('id', piano.id);
-    throw new Error(`Inserimento pasti fallito: ${errItems.message}`);
-  }
-
-  return { plan_id: piano.id, giorni_conformi: Math.floor(migliorPunteggio), seed, gradino: gradinoRaggiunto, concessioni };
+  return { plan_id: salva ? piano.id : null, giorni_conformi: Math.floor(migliorPunteggio), seed, gradino: gradinoRaggiunto, concessioni, uso_gruppi: { ...usoGruppi } };
 }
 
 module.exports = {
-  generaESalva, caricaPiatti, gruppoDa, GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN,
+  generaESalva, caricaPiatti, gruppoDa, gruppoDaRegex, ancoraProteica, GRUPPO_DA_CATEGORIA,
+  GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN,
   CATEGORIE_DIETA, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI,
-  GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA,
+  GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
 };

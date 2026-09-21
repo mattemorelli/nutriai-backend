@@ -1,4 +1,4 @@
-const { caricaPiatti, FAMIGLIE_PER_CUCINA } = require('./genera');
+const { caricaPiatti, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli } = require('./genera');
 
 // Allarga i vincoli a ogni giro finché non trova tre proposte.
 const GIRI = [
@@ -64,16 +64,18 @@ async function trovaProposte(supabase, userId, itemId) {
       .flatMap(p => FAMIGLIE_PER_CUCINA[p.cucina] || [])
   )];
 
-  const piatti = await caricaPiatti(supabase, famiglie.length ? famiglie : ['mediterranea']);
+  const tutti = await caricaPiatti(supabase, famiglie.length ? famiglie : ['mediterranea']);
+  const { ammesso, gradito } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
+  // Nello Swap non cede niente: ne' le allergie ne' le preferenze.
+  const piatti = tutti.filter((p) => ammesso(p) && gradito(p));
 
-  const originale = piatti.find(p => p.id === item.dish_id);
+  const originale = tutti.find(p => p.id === item.dish_id);
   const slotCercato = originale ? originale.meal_slot : item.slot;
   const tempoBase = originale ? (originale.prep_min || 30) : (profilo?.evening_minutes || 40);
 
   // Il paese della giornata che si sta sostituendo: le proposte restano dentro
   const paeseGiorno = originale ? originale.paese : null;
   const paesiScelti = (profilo && profilo.paesi) || [];
-  const GENERICI = ['mediterraneo_generico', 'asia_generico', 'latino_generico'];
   console.log('paese giornata:', paeseGiorno, '| paesi utente:', paesiScelti, '| famiglie:', famiglie);
 
   const paeseCompatibile = (p, giro) => {
@@ -123,7 +125,15 @@ async function trovaProposte(supabase, userId, itemId) {
 
 // Applica la sostituzione scelta dall'utente, ricalcolando i valori nutrizionali.
 async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portionG) {
-  const { item } = await proposte(supabase, userId, itemId);
+  const { item, profilo } = await proposte(supabase, userId, itemId);
+
+  // Difesa lato server: anche se il client manda un piatto vietato, non passa.
+  const { foodIdVietati } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
+  const { data: ingNuovo } = await supabase
+    .from('dish_ingredients').select('food_id').eq('dish_id', nuovoDishId);
+  if ((ingNuovo || []).some((i) => foodIdVietati.has(i.food_id))) {
+    throw new Error('Piatto non ammesso per le allergie o la dieta dell\'utente');
+  }
 
   // ingredienti del nuovo piatto, per 100 g di ricetta
   const { data: righe, error: e1 } = await supabase
