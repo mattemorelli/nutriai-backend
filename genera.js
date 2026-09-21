@@ -722,10 +722,11 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
   // food_id  = un alimento singolo. categoria = un gruppo intero.
   // Nessuno dei due = vincolo non risolto: non esclude nulla, e lo diciamo.
 
-  const { data: vincoli } = await supabase
+  const { data: vincoli, error: eVincoli } = await supabase
     .from('user_constraints')
     .select('kind, subject, severity, food_id, categoria')
     .eq('user_id', userId);
+  if (eVincoli) throw new Error('lettura user_constraints: ' + eVincoli.message);
 
   const foodIdVietati = new Set();    // allergie, intolleranze, dieta: non cedono mai
   const foodIdSgraditi = new Set();   // preferenze: cedono al gradino 4b, dichiarandolo
@@ -750,10 +751,11 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
 
   const espandi = async (codici, destinazione) => {
     if (!codici.size) return;
-    const { data: righe } = await supabase
+    const { data: righe, error: eRighe } = await supabase
       .from('categorie_alimenti')
       .select('food_id')
       .in('categoria', [...codici]);
+    if (eRighe) throw new Error('lettura categorie_alimenti: ' + eRighe.message);
     for (const r of righe || []) destinazione.add(r.food_id);
   };
 
@@ -836,10 +838,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     await caricaVincoli(supabase, userId, dieta);
 
   // Cosa l'utente ha deciso di tenere dalla settimana precedente
-  const { data: pianoVecchio } = await supabase
+  const { data: pianoVecchio, error: ePiano } = await supabase
     .from('plans').select('id')
     .eq('user_id', userId)
     .order('generated_at', { ascending: false }).limit(1).maybeSingle();
+  if (ePiano) throw new Error('lettura plans: ' + ePiano.message);
 
   const bloccatiPerGiorno = {};
   if (pianoVecchio) {
@@ -889,35 +892,40 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // ricerca): il tetto sale/saturi (gradino 2b+) deve valutare i valori
   // SCALATI durante la costruzione della giornata, quindi serve conoscere il
   // kcal obiettivo PRIMA che la ricerca inizi, non dopo che ha gia' finito.
-  const { data: target } = await supabase
+  const { data: target, error: eTarget } = await supabase
     .from('energy_targets')
     .select('id, kcal')
     .eq('user_id', userId)
     .order('computed_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+  if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
   const obiettivo = target?.kcal ?? null;
 
   // Cosa e' successo nelle settimane precedenti
-  const { data: esiti } = await supabase
+  const { data: esiti, error: eEsiti } = await supabase
     .from('meal_outcomes')
     .select('dish_id, status, skip_reason')
     .eq('user_id', userId)
-    .order('recorded_at', { ascending: false })
+    .order('reported_at', { ascending: false })
     .limit(300);
+  if (eEsiti) throw new Error('lettura meal_outcomes: ' + eEsiti.message);
 
   const saltati = {};
   let skipPerTempo = 0, skipTotali = 0;
 
   for (const e of (esiti || [])) {
-    if (e.status === 'saltato') {
-      saltati[e.dish_id] = (saltati[e.dish_id] || 0) + 1;
-      skipTotali++;
-      if (e.skip_reason === 'tempo') skipPerTempo++;
-    }
+    if (e.status !== 'saltato') continue;
+    // "Ero fuori" non dice niente ne' sul piatto ne' sul tempo: fuori dai conti.
+    if (e.skip_reason === 'fuori_casa') continue;
+    skipTotali++;
+    if (e.skip_reason === 'tempo') skipPerTempo++;
+    // Solo il gusto conta contro il piatto (decisione del 21/09/2026):
+    // tempo, ingredienti, altro non lo tolgono dai piani.
+    if (e.skip_reason === 'gusto') saltati[e.dish_id] = (saltati[e.dish_id] || 0) + 1;
   }
 
-  // Un piatto saltato due volte non si ripropone: e' un no chiaro.
+  // Un piatto non piaciuto due volte non si ripropone: e' un no chiaro.
   const rifiutato = (p) => (saltati[p.id] || 0) >= 2;
 
   // Se piu' della meta' dei salti e' per mancanza di tempo, il limite
@@ -1308,7 +1316,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       }
 
       function candidatiColazione(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
-        const base = (p) => !usati.has(p.id) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
+        const base = (p) => !usati.has(p.id) && !rifiutato(p) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
         const proprio = colazioni.filter(p => compatibile(p, profiloGiorno) && base(p));
         const neutro = colazioni.filter(p => (p.profilo === 'neutro' || !p.profilo) && base(p));
         return concatenaLivelli([proprio, neutro], rng);
@@ -1321,7 +1329,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       function candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, altroSpuntino, cappaMinuti) {
         const altroEAmidaceo = altroSpuntino && copreRuolo(altroSpuntino, 'base_amidacea');
         const base = (p) =>
-          !usati.has(p.id) && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
+          !usati.has(p.id) && !rifiutato(p) && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
           (!altroSpuntino || p.id !== altroSpuntino.id) &&
           (!altroEAmidaceo || !copreRuolo(p, 'base_amidacea')) &&
           principaleLiberoOggi(gi, p);
@@ -1332,7 +1340,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
       function candidatiBase(gi, paeseOk) {
         const altriDelPasto = compagniDiPasto(gi, 'cena');
-        return mescolaPesata(contorni.filter(p => p.base_amidacea && paeseOk(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p)), (p) => pesoCandidato(p, altriDelPasto), rng);
+        return mescolaPesata(contorni.filter(p => p.base_amidacea && paeseOk(p) && !usati.has(p.id) && !rifiutato(p) && principaleLiberoOggi(gi, p)), (p) => pesoCandidato(p, altriDelPasto), rng);
       }
 
       // Determina la prossima decisione necessaria per il giorno `gi`.
@@ -1784,7 +1792,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     }
   }
 
-  return { plan_id: salva ? piano.id : null, giorni_conformi: Math.floor(migliorPunteggio), seed, gradino: gradinoRaggiunto, concessioni, uso_gruppi: { ...usoGruppi } };
+  return {
+    plan_id: salva ? piano.id : null, giorni_conformi: Math.floor(migliorPunteggio), seed,
+    gradino: gradinoRaggiunto, concessioni, uso_gruppi: { ...usoGruppi },
+    dish_ids: esito.settimana.flatMap((g) => g.pasti.map((x) => x.piatto.id)),
+  };
 }
 
 module.exports = {

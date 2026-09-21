@@ -640,11 +640,23 @@ app.post('/esito', richiedeAuth, async (req, res) => {
       status: b.status,
       skip_reason: b.status === 'saltato' ? (b.skip_reason || 'altro') : null,
       liked: b.liked ? Number(b.liked) : null,
-      recorded_at: new Date().toISOString(),
+      reported_at: new Date().toISOString(),
     }, { onConflict: 'plan_item_id' });
 
     if (error) return res.status(500).json({ errore: error.message });
-    res.json({ ok: true });
+
+    let rifiutiGusto = 0;
+    if (b.status === 'saltato' && b.skip_reason === 'gusto') {
+      const { count } = await supabase
+        .from('meal_outcomes')
+        .select('plan_item_id', { count: 'exact', head: true })
+        .eq('user_id', req.utente.id)
+        .eq('dish_id', riga.dish_id)
+        .eq('status', 'saltato')
+        .eq('skip_reason', 'gusto');
+      rifiutiGusto = count || 0;
+    }
+    res.json({ ok: true, rifiuti_gusto: rifiutiGusto });
   } catch (e) {
     res.status(500).json({ errore: e.message });
   }
@@ -820,10 +832,13 @@ app.post('/blocca', richiedeAuth, async (req, res) => {
 
     if (day_of_week) {
       // blocca l'intera giornata
-      const { data: piano } = await supabase
+      const { data: piano, error: ePiano } = await supabase
         .from('plans').select('id')
         .eq('user_id', req.utente.id)
-        .order('generated_at', { ascending: false }).limit(1).single();
+        .order('generated_at', { ascending: false }).limit(1).maybeSingle();
+
+      if (ePiano) return res.status(500).json({ errore: 'lettura plans: ' + ePiano.message });
+      if (!piano) return res.status(404).json({ errore: 'Nessun piano da bloccare' });
 
       const { error } = await supabase
         .from('plan_items')
