@@ -18,19 +18,21 @@ async function proposte(supabase, userId, itemId) {
   if (e1 || !item) throw new Error('Riga del piano non trovata');
 
   // 2. il piano deve appartenere all'utente
-  const { data: piano } = await supabase
+  const { data: piano, error: ePiano } = await supabase
     .from('plans')
     .select('id, user_id')
     .eq('id', item.plan_id)
-    .single();
+    .maybeSingle();
+  if (ePiano) throw new Error('lettura plans: ' + ePiano.message);
   if (!piano || piano.user_id !== userId) throw new Error('Non autorizzato');
 
   // 3. il profilo dell'utente (serve per tempo e dieta)
-  const { data: profilo } = await supabase
+  const { data: profilo, error: eProfilo } = await supabase
     .from('users')
     .select('evening_minutes, diet, paesi')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
+  if (eProfilo) throw new Error('lettura users: ' + eProfilo.message);
 
   // 4. i piatti già usati nella settimana
   const { data: righe } = await supabase

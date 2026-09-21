@@ -11,6 +11,7 @@
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva, caricaVincoli } = require('./genera.js');
+const { trovaProposte } = require('./sostituisci.js');
 
 const USER_ID = process.argv[2];
 if (!USER_ID) { console.error('Uso: node test-errori-lettura.js <USER_ID di test>'); process.exit(1); }
@@ -89,6 +90,7 @@ async function siAspettaNoLancio(etichetta, promessa) {
 
 (async () => {
   const risultati = [];
+  let planId = null;
 
   risultati.push(await siAspettaLancio(
     'user_constraints',
@@ -128,6 +130,33 @@ async function siAspettaNoLancio(etichetta, promessa) {
     generaESalva(clientCon({ plans: VUOTO_SINGOLO }), USER_ID, 5, { salva: false })
   ));
 
+  // trovaProposte (sostituisci.js) ha bisogno di un plan_item vero: piano di
+  // prova, pulito sempre alla fine (anche se una prova sopra fallisce).
+  try {
+    const piano = await generaESalva(supabaseReale, USER_ID, 6, { salva: true });
+    planId = piano.plan_id;
+    const { data: righe } = await supabaseReale
+      .from('plan_items').select('id').eq('plan_id', planId).limit(1);
+    const itemId = righe[0].id;
+
+    risultati.push(await siAspettaLancio(
+      'sostituisci: plans (errore vero)',
+      trovaProposte(clientCon({ plans: ERRORE }), USER_ID, itemId)
+    ));
+
+    risultati.push(await siAspettaLancio(
+      'sostituisci: users (errore vero)',
+      trovaProposte(clientCon({ users: ERRORE }), USER_ID, itemId)
+    ));
+
+    risultati.push(await siAspettaNoLancio(
+      'sostituisci: users (nessuna riga, predefiniti)',
+      trovaProposte(clientCon({ users: VUOTO_SINGOLO }), USER_ID, itemId)
+    ));
+  } catch (e) {
+    risultati.push({ etichetta: 'sostituisci: setup piano di prova', atteso: '-', ottenuto: `ERRORE SETUP: ${e.message}` });
+  }
+
   console.log('tabella / caso              | atteso     | ottenuto');
   console.log('-----------------------------|------------|---------');
   let falliti = 0;
@@ -138,4 +167,12 @@ async function siAspettaNoLancio(etichetta, promessa) {
     console.log(r.etichetta.padEnd(29) + ' | ' + r.atteso.padEnd(10) + ' | ' + r.ottenuto + (ok ? '' : '  <-- FALLITO'));
   }
   console.log(`\n${falliti === 0 ? 'PROVA SUPERATA' : `PROVA FALLITA (${falliti} righe non combaciano)`}`);
+
+  if (planId) {
+    await supabaseReale.from('plan_items').delete().eq('plan_id', planId);
+    await supabaseReale.from('plans').delete().eq('id', planId);
+    const { count } = await supabaseReale
+      .from('plans').select('id', { count: 'exact', head: true }).eq('user_id', USER_ID);
+    console.log(`Pulizia piano di prova: plans residui per l'utente = ${count}`);
+  }
 })();

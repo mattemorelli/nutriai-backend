@@ -623,12 +623,13 @@ app.post('/esito', richiedeAuth, async (req, res) => {
     }
 
     // Verifica che la riga appartenga davvero a questo utente
-    const { data: riga } = await supabase
+    const { data: riga, error: eRiga } = await supabase
       .from('plan_items')
       .select('id, dish_id, plans!inner(user_id)')
       .eq('id', b.plan_item_id)
-      .single();
+      .maybeSingle();
 
+    if (eRiga) return res.status(500).json({ errore: 'lettura plan_items: ' + eRiga.message });
     if (!riga || riga.plans.user_id !== req.utente.id) {
       return res.status(403).json({ errore: 'Non autorizzato' });
     }
@@ -850,11 +851,12 @@ app.post('/blocca', richiedeAuth, async (req, res) => {
       return res.json({ ok: true });
     }
 
-    const { data: riga } = await supabase
+    const { data: riga, error: eRiga } = await supabase
       .from('plan_items')
       .select('id, plans!inner(user_id)')
-      .eq('id', plan_item_id).single();
+      .eq('id', plan_item_id).maybeSingle();
 
+    if (eRiga) return res.status(500).json({ errore: 'lettura plan_items: ' + eRiga.message });
     if (!riga || riga.plans.user_id !== req.utente.id) {
       return res.status(403).json({ errore: 'Non autorizzato' });
     }
