@@ -789,6 +789,41 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
   return { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito };
 }
 
+// Un piatto non piaciuto due volte non si ripropone: e' un no chiaro. Soglia
+// centralizzata qui - genera.js e sostituisci.js la leggono da rifiutato(),
+// nessuno dei due la riscrive a mano.
+const SOGLIA_RIFIUTO = 2;
+
+// Cosa e' successo nelle settimane precedenti - UNA sola fonte per
+// generatore e Swap, stesso principio di caricaVincoli.
+async function caricaEsiti(supabase, userId) {
+  const { data: esiti, error: eEsiti } = await supabase
+    .from('meal_outcomes')
+    .select('dish_id, status, skip_reason')
+    .eq('user_id', userId)
+    .order('reported_at', { ascending: false })
+    .limit(300);
+  if (eEsiti) throw new Error('lettura meal_outcomes: ' + eEsiti.message);
+
+  const saltati = {};
+  let skipPerTempo = 0, skipTotali = 0;
+
+  for (const e of (esiti || [])) {
+    if (e.status !== 'saltato') continue;
+    // "Ero fuori" non dice niente ne' sul piatto ne' sul tempo: fuori dai conti.
+    if (e.skip_reason === 'fuori_casa') continue;
+    skipTotali++;
+    if (e.skip_reason === 'tempo') skipPerTempo++;
+    // Solo il gusto conta contro il piatto (decisione del 21/09/2026):
+    // tempo, ingredienti, altro non lo tolgono dai piani.
+    if (e.skip_reason === 'gusto') saltati[e.dish_id] = (saltati[e.dish_id] || 0) + 1;
+  }
+
+  const rifiutato = (p) => (saltati[p.id] || 0) >= SOGLIA_RIFIUTO;
+
+  return { saltati, skipPerTempo, skipTotali, rifiutato };
+}
+
 async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // Modo prova (2026-09-19): salva=false costruisce la settimana senza
   // scrivere su plans/plan_items, per misurare senza sporcare il database.
@@ -902,31 +937,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
   const obiettivo = target?.kcal ?? null;
 
-  // Cosa e' successo nelle settimane precedenti
-  const { data: esiti, error: eEsiti } = await supabase
-    .from('meal_outcomes')
-    .select('dish_id, status, skip_reason')
-    .eq('user_id', userId)
-    .order('reported_at', { ascending: false })
-    .limit(300);
-  if (eEsiti) throw new Error('lettura meal_outcomes: ' + eEsiti.message);
-
-  const saltati = {};
-  let skipPerTempo = 0, skipTotali = 0;
-
-  for (const e of (esiti || [])) {
-    if (e.status !== 'saltato') continue;
-    // "Ero fuori" non dice niente ne' sul piatto ne' sul tempo: fuori dai conti.
-    if (e.skip_reason === 'fuori_casa') continue;
-    skipTotali++;
-    if (e.skip_reason === 'tempo') skipPerTempo++;
-    // Solo il gusto conta contro il piatto (decisione del 21/09/2026):
-    // tempo, ingredienti, altro non lo tolgono dai piani.
-    if (e.skip_reason === 'gusto') saltati[e.dish_id] = (saltati[e.dish_id] || 0) + 1;
-  }
-
-  // Un piatto non piaciuto due volte non si ripropone: e' un no chiaro.
-  const rifiutato = (p) => (saltati[p.id] || 0) >= 2;
+  const { skipPerTempo, skipTotali, rifiutato } = await caricaEsiti(supabase, userId);
 
   // Se piu' della meta' dei salti e' per mancanza di tempo, il limite
   // dichiarato non regge la vita reale e va stretto di dieci minuti.
@@ -1804,4 +1815,5 @@ module.exports = {
   GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN,
   CATEGORIE_DIETA, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI,
   GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
+  caricaEsiti, SOGLIA_RIFIUTO,
 };

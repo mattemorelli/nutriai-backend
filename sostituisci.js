@@ -1,4 +1,4 @@
-const { caricaPiatti, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli } = require('./genera');
+const { caricaPiatti, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti } = require('./genera');
 
 // Allarga i vincoli a ogni giro finché non trova tre proposte.
 const GIRI = [
@@ -66,8 +66,10 @@ async function trovaProposte(supabase, userId, itemId) {
 
   const tutti = await caricaPiatti(supabase, famiglie.length ? famiglie : ['mediterranea']);
   const { ammesso, gradito } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
-  // Nello Swap non cede niente: ne' le allergie ne' le preferenze.
-  const piatti = tutti.filter((p) => ammesso(p) && gradito(p));
+  const { rifiutato } = await caricaEsiti(supabase, userId);
+  // Nello Swap non cede niente: ne' le allergie ne' le preferenze, ne' un
+  // piatto gia' rifiutato due volte per gusto (stessa regola del generatore).
+  const piatti = tutti.filter((p) => ammesso(p) && gradito(p) && !rifiutato(p));
 
   const originale = tutti.find(p => p.id === item.dish_id);
   const slotCercato = originale ? originale.meal_slot : item.slot;
