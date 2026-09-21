@@ -663,6 +663,65 @@ app.post('/esito', richiedeAuth, async (req, res) => {
   }
 });
 
+// Gli esiti gia' registrati per un piano: l'app li richiama all'apertura
+// cosi' motivo/rifiuti sopravvivono a un riavvio dell'app, non solo alla
+// sessione. rifiuti_gusto per ogni riga e' lo stesso conteggio di /esito
+// (per utente+piatto, non per riga), cosi' l'app puo' popolare lo stato
+// esattamente come farebbe segnaEsito.
+app.get('/esiti', richiedeAuth, async (req, res) => {
+  try {
+    const planId = req.query.plan_id;
+    if (!planId) return res.status(400).json({ errore: 'plan_id mancante' });
+
+    const { data: piano, error: ePiano } = await supabase
+      .from('plans').select('id, user_id').eq('id', planId).maybeSingle();
+    if (ePiano) return res.status(500).json({ errore: 'lettura plans: ' + ePiano.message });
+    if (!piano) return res.status(404).json({ errore: 'Piano non trovato' });
+    if (piano.user_id !== req.utente.id) return res.status(403).json({ errore: 'Non autorizzato' });
+
+    const { data: righe, error: eRighe } = await supabase
+      .from('plan_items').select('id, dish_id').eq('plan_id', planId);
+    if (eRighe) return res.status(500).json({ errore: 'lettura plan_items: ' + eRighe.message });
+
+    const itemIds = (righe || []).map((r) => r.id);
+    const dishIds = [...new Set((righe || []).map((r) => r.dish_id))];
+    const segnaposto = '00000000-0000-0000-0000-000000000000';
+
+    const { data: esitiRighe, error: eEsiti } = await supabase
+      .from('meal_outcomes')
+      .select('plan_item_id, status, skip_reason')
+      .in('plan_item_id', itemIds.length ? itemIds : [segnaposto]);
+    if (eEsiti) return res.status(500).json({ errore: 'lettura meal_outcomes: ' + eEsiti.message });
+
+    const { data: rifiutiRighe, error: eRifiuti } = await supabase
+      .from('meal_outcomes')
+      .select('dish_id')
+      .eq('user_id', req.utente.id)
+      .eq('status', 'saltato')
+      .eq('skip_reason', 'gusto')
+      .in('dish_id', dishIds.length ? dishIds : [segnaposto]);
+    if (eRifiuti) return res.status(500).json({ errore: 'lettura meal_outcomes (rifiuti): ' + eRifiuti.message });
+
+    const rifiutiGustoPerPiatto = {};
+    for (const r of (rifiutiRighe || [])) {
+      rifiutiGustoPerPiatto[r.dish_id] = (rifiutiGustoPerPiatto[r.dish_id] || 0) + 1;
+    }
+    const dishIdDiRiga = {};
+    for (const r of righe) dishIdDiRiga[r.id] = r.dish_id;
+
+    const esiti = (esitiRighe || []).map((e) => ({
+      plan_item_id: e.plan_item_id,
+      status: e.status,
+      skip_reason: e.skip_reason,
+      rifiuti_gusto: rifiutiGustoPerPiatto[dishIdDiRiga[e.plan_item_id]] || 0,
+    }));
+
+    res.json({ ok: true, esiti });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
+});
+
 app.post('/sostituisci', richiedeAuth, async (req, res) => {
   try {
     const { item_id } = req.body;
