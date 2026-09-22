@@ -512,11 +512,20 @@ async function marchePer(supabase, foodId, paese = 'italy', quanti = 5) {
     return componenti.length ? componenti.reduce((s, v) => s + v, 0) / componenti.length : -1;
   };
   const datiReali = (p) => (p.voto_stimato === false && p.voto_salute_stimato === false) ? 1 : 0;
+  // Il punteggio viene prima: "best first" deve voler dire davvero il voto piu'
+  // alto. I dati stimati valgono un po' meno (sconto del 5%) e restano solo il
+  // criterio di spareggio, altrimenti un prodotto mediocre con dati completi
+  // scavalcava uno chiaramente migliore stimato.
+  const punteggioOrdinamento = (p) => {
+    const base = punteggioComposito(p);
+    if (base < 0) return base;
+    return datiReali(p) ? base : base * 0.95;
+  };
 
   scelti.sort((a, b) => {
-    const ra = datiReali(a), rb = datiReali(b);
-    if (ra !== rb) return rb - ra;
-    return punteggioComposito(b) - punteggioComposito(a);
+    const d = punteggioOrdinamento(b) - punteggioOrdinamento(a);
+    if (Math.abs(d) > 0.0001) return d;
+    return datiReali(b) - datiReali(a);
   });
 
   return {
