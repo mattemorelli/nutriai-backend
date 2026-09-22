@@ -21,6 +21,9 @@ const FONTE_VITAMINA_C = [
   'kale_it', '168421',
   'peperone_giallo_it', 'peperone_rosso_it', 'peperone_verde_it', 'peperoni_padron_it',
   'peperoncino_it', '168576', 'peperoncino_jalapeno_it',
+  // aggiunto per il blocco A F0bis (2026-09-13): ananas ~48mg/100g, sopra
+  // la soglia di 24mg, mancava dall'elenco.
+  'ananas_it',
 ];
 
 const FERRO_VEGETALE = [
@@ -36,6 +39,13 @@ const FERRO_VEGETALE = [
   // aggiunti dopo il controllo richiesto (avena, albicocche secche, cacao):
   // latte d'avena escluso, contenuto in ferro non affidabile senza dati di fortificazione.
   'avena_it', 'farina_avena_it', 'albicocche_secche_it', 'cacao_it',
+  // aggiunti per il blocco 3 F0bis (2026-09-12): anacardi ~6.7mg/100g,
+  // soia gialla cotta ~5mg/100g - sopra la soglia, mancavano dall'elenco.
+  'anacardi_it', 'soia_gialla_cotta_it',
+  // aggiunti per il blocco B F0bis (2026-09-13): sorelle cotte di alimenti
+  // gia' in elenco (fagioli_spagna_it come gli altri fagioli cotti,
+  // piselli_spezzati_cotti_it come piselli_spezzati_it gia' presente).
+  'fagioli_spagna_it', 'piselli_spezzati_cotti_it',
 ];
 
 const CAROTENI = [

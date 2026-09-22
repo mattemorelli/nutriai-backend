@@ -116,7 +116,15 @@ const RX_FRUTTA = /\b(mela\b|mele\b|apple|banana|arancia|arance|orange|clementin
 // (2026-09-12): taggato pesce/crostacei per la salsa di pesce/gamberetti
 // che contiene (giusto per le allergie), ma il ruolo e' verdura - e'
 // cavolo fermentato, come i crauti gia' qui sotto.
-const RX_VERDURA = /\b(pomodor|tomato|zucchin|zucca|squash|pumpkin|melanzan|eggplant|aubergine|peperon|pepper,|jalapeno|padr[oó]n|cipoll|onion|scalogno|shallot|porr[io]|leek|aglio fresco|carota|carrot|sedano|celery|finocchi|fennel|cavol|cabbage|kale|broccol|cavolfiore|cauliflower|bok choy|collard|spinaci|spinach|bietol|chard|lattuga|lettuce|rucola|arugula|radicchio|scarola|escarole|indivia|endive|cicoria|chicory|crescione|watercress|valeriana|asparagi|asparagus|carciof|artichoke|barbabiet|beetroot|beet,|\brapa\b|\brape\b|rape rosse|turnip|ravanell|radish|daikon|topinambur|jerusalem artichoke|funghi|mushroom|\balga\b|alghe|seaweed|kelp|wakame|nori|crauti|sauerkraut|\bkimchi\b|okra|cetriol|cucumber|avocado|mais dolce|mais bianco|sweet corn|corn,|\bolive\b|\bolives\b|pastinaca|parsnip)/i;
+// fagiolini/green bean aggiunti qui il 2026-09-13 (prima erano in
+// RX_PROTEINA_PRINCIPALE via lo stem "fagiol"/"bean"): botanicamente sono
+// legumi ma hanno ~2g di proteine/100g, e chi dichiara "niente legumi" non
+// si aspetta di perdere i fagiolini - stessa logica gia' applicata a
+// categorie_alimenti (rimossi da 'legumi' li'). RX_PROTEINA_PRINCIPALE ora
+// esclude esplicitamente "fagiolini"/"green bean" con un lookahead/
+// lookbehind negativo, per non farli ricadere comunque nello stem
+// "fagiol"/"\bbean\b" prima di arrivare qui.
+const RX_VERDURA = /\b(pomodor|tomato|zucchin|zucca|squash|pumpkin|melanzan|eggplant|aubergine|peperon|pepper,|jalapeno|padr[oó]n|cipoll|onion|scalogno|shallot|porr[io]|leek|aglio fresco|carota|carrot|sedano|celery|finocchi|fennel|cavol|cabbage|kale|broccol|cavolfiore|cauliflower|bok choy|collard|spinaci|spinach|bietol|chard|lattuga|lettuce|rucola|arugula|radicchio|scarola|escarole|indivia|endive|cicoria|chicory|crescione|watercress|valeriana|asparagi|asparagus|carciof|artichoke|barbabiet|beetroot|beet,|\brapa\b|\brape\b|rape rosse|turnip|ravanell|radish|daikon|topinambur|jerusalem artichoke|funghi|mushroom|\balga\b|alghe|seaweed|kelp|wakame|nori|crauti|sauerkraut|\bkimchi\b|okra|cetriol|cucumber|avocado|mais dolce|mais bianco|sweet corn|corn,|\bolive\b|\bolives\b|pastinaca|parsnip|fagiolini|green bean)/i;
 
 // ---- Proteina e latticino: DERIVATI DAL NOME, non da categorie_alimenti
 // (vedi nota RUOLO vs CATEGORIA in testa al file). Elenco costruito sui
@@ -127,7 +135,14 @@ const RX_VERDURA = /\b(pomodor|tomato|zucchin|zucca|squash|pumpkin|melanzan|eggp
 // salsa di soia/hoisin/teriyaki, miso, gochujang, maionese, salse BBQ/
 // Buffalo/ranch, cornetto/muffin) - quelli cadono gia' su condimento o
 // base_amidacea sopra, prima di arrivare qui.
-const RX_PROTEINA_PRINCIPALE = /\b(pollo|chicken|tacchino|turkey|anatra|duck|\boca\b|\bgoose\b|coniglio|rabbit|fagiano|pheasant|piccione|pigeon|quaglia|quail|manzo|beef|vitello|veal|agnello|lamb|maiale|pork|\bcapra\b|\bgoat\b|cinghiale|\bboar\b|canguro|kangaroo|bisonte|bison|\bcervo\b|venison|salame|salami|mortadella|salsiccia|sausage|\bbacon\b|pancetta|\bspeck\b|bresaola|prosciutto|ham\b|w[uü]rstel|leberwurst|fegato|liver|\blingua\b|\btongue\b|zampe|trotter|costine|costol|rib\b|ribs\b|stinco|\blonza\b|guancia|cheek\b|\blardo\b|\breni\b|kidney|\bsego\b|tallow|petto di (pollo|tacchino|anatra|manzo)|chicken breast|turkey breast|duck breast|beef brisket|acciughe|anchov|anguilla|\beel\b|aringa|herring|baccal[aà]|\bcod\b|barramundi|branzino|sea bass|\bcarpa\b|\bcarp\b|caviale|caviar|cernia|grouper|\bdentice\b|eglefino|haddock|\bhalibut\b|mahi mahi|merluzzo|nasello|\bhake\b|\borata\b|passera|plaice|\bpersico\b|\bperch\b|pesce (farfalla|gatto|spada)|swordfish|catfish|\bplatessa\b|\bpollock\b|\brombo\b|turbot|salmone|salmon|\bsardine\b|\bsgombro\b|mackerel|sogliola|\bsole\b|\bspigola\b|\bsurimi\b|\btilapia\b|\btonno\b|\btuna\b|\btrota\b|\btrout\b|aragosta|lobster|\bastice\b|gamberetti|\bgambero\b|\bshrimp\b|\bprawn\b|granchio|\bcrab\b|\bscampi\b|calamari|squid|capesante|scallop|\bcozze\b|mussel|\bpolpo\b|octopus|\bseppia\b|cuttlefish|vongole|\bclam\b|\bceci\b|chickpea|fagiol|\bbean\b|\bbeans\b|fagiolini|green bean|\bfave\b|\bfava\b|lenticchi|lentil|\blupini\b|\bpiselli\b|\bpeas\b|\btaccole\b|\bedamame\b|\bhummus\b|\btofu\b|\btempeh\b|germogli di soia|soy sprouts|semi di soia|soybean|\balbume\b|egg white|\btuorlo\b|egg yolk|\buovo\b|\buova\b|\begg\b|\beggs\b)/i;
+// \bsoia\b aggiunto 2026-09-12: "soia gialla cotta" (il legume, non la
+// salsa) non matchava nulla sul nome italiano - il fallback sul nome
+// inglese USDA ("Soybeans, MATURE SEEDS, cooked...") faceva scattare
+// 'seeds?,' di RX_CONDIMENTO per primo, e il piatto finiva silenziosamente
+// nel caso dubbio 'primario_sarebbe_condimento'. "salsa di soia" resta
+// condimento comunque: RX_CONDIMENTO e' controllato prima di questo, in
+// ruoloDaNome().
+const RX_PROTEINA_PRINCIPALE = /\b(pollo|chicken|tacchino|turkey|anatra|duck|\boca\b|\bgoose\b|coniglio|rabbit|fagiano|pheasant|piccione|pigeon|quaglia|quail|manzo|beef|vitello|veal|agnello|lamb|maiale|pork|\bcapra\b|\bgoat\b|cinghiale|\bboar\b|canguro|kangaroo|bisonte|bison|\bcervo\b|venison|salame|salami|mortadella|salsiccia|sausage|\bbacon\b|pancetta|\bspeck\b|bresaola|prosciutto|ham\b|w[uü]rstel|leberwurst|fegato|liver|\blingua\b|\btongue\b|zampe|trotter|costine|costol|rib\b|ribs\b|stinco|\blonza\b|guancia|cheek\b|\blardo\b|\breni\b|kidney|\bsego\b|tallow|petto di (pollo|tacchino|anatra|manzo)|chicken breast|turkey breast|duck breast|beef brisket|acciughe|anchov|anguilla|\beel\b|aringa|herring|baccal[aà]|\bcod\b|barramundi|branzino|sea bass|\bcarpa\b|\bcarp\b|caviale|caviar|cernia|grouper|\bdentice\b|eglefino|haddock|\bhalibut\b|mahi mahi|merluzzo|nasello|\bhake\b|\borata\b|passera|plaice|\bpersico\b|\bperch\b|pesce (farfalla|gatto|spada)|swordfish|catfish|\bplatessa\b|\bpollock\b|\brombo\b|turbot|salmone|salmon|\bsardine\b|\bsgombro\b|mackerel|sogliola|\bsole\b|\bspigola\b|\bsurimi\b|\btilapia\b|\btonno\b|\btuna\b|\btrota\b|\btrout\b|aragosta|lobster|\bastice\b|gamberetti|\bgambero\b|\bshrimp\b|\bprawn\b|granchio|\bcrab\b|\bscampi\b|calamari|squid|capesante|scallop|\bcozze\b|mussel|\bpolpo\b|octopus|\bseppia\b|cuttlefish|vongole|\bclam\b|\bceci\b|chickpea|fagiol(?!ini)|(?<!green )\bbean\b|(?<!green )\bbeans\b|\bfave\b|\bfava\b|lenticchi|lentil|\blupini\b|\bpiselli\b|\bpeas\b|\btaccole\b|\bedamame\b|\bhummus\b|\btofu\b|\btempeh\b|germogli di soia|soy sprouts|semi di soia|soybean|\bsoia\b|\balbume\b|egg white|\btuorlo\b|egg yolk|\buovo\b|\buova\b|\begg\b|\beggs\b)/i;
 
 // Formaggi, latte e derivati che fanno il lavoro del latte/formaggio nel
 // piatto. Burro e margarina restano condimento (funzionano come grasso di
@@ -207,17 +222,29 @@ async function caricaIngredientiDi(supabase, ids) {
   const per = {};
   for (let i = 0; i < ids.length; i += 200) {
     const blocco = ids.slice(i, i + 200);
-    const { data, error } = await supabase
-      .from('dish_ingredients')
-      .select('dish_id, food_id, grams, foods (protein_100g)')
-      .in('dish_id', blocco)
-      .order('dish_id').order('food_id');
-    if (error) throw new Error(error.message);
-    for (const r of data) {
-      (per[r.dish_id] ||= []).push({
-        food_id: r.food_id, grams: r.grams,
-        proteina: ((r.foods && r.foods.protein_100g) || 0) * (r.grams || 0) / 100,
-      });
+    // Un blocco di 200 dish_id puo' avere piu' di 1000 righe di
+    // dish_ingredients (il tetto implicito di PostgREST) - senza .range()
+    // qui le righe oltre la mille venivano scartate in silenzio, lasciando
+    // alcuni piatti di quel blocco con ingredienti parziali o assenti
+    // (trovato 2026-09-12: 6 piatti del blocco 3 F0bis restavano a
+    // ruolo_primario null senza mai comparire fra i casi dubbi, perche'
+    // caricaTuttiIPiatti() li vedeva ma i loro ingredienti sparivano qui).
+    const PAGINA = 1000;
+    for (let offset = 0; ; offset += PAGINA) {
+      const { data, error } = await supabase
+        .from('dish_ingredients')
+        .select('dish_id, food_id, grams, foods (protein_100g)')
+        .in('dish_id', blocco)
+        .order('dish_id').order('food_id')
+        .range(offset, offset + PAGINA - 1);
+      if (error) throw new Error(error.message);
+      for (const r of data) {
+        (per[r.dish_id] ||= []).push({
+          food_id: r.food_id, grams: r.grams,
+          proteina: ((r.foods && r.foods.protein_100g) || 0) * (r.grams || 0) / 100,
+        });
+      }
+      if (data.length < PAGINA) break;
     }
   }
   return per;
