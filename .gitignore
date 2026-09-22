@@ -1,3 +1,10 @@
 node_modules/
 .env
 dati/
+
+.DS_Store
+.expo/
+.fraunces_tmp/
+*.log
+*.jsonl
+dist/

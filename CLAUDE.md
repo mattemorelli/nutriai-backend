@@ -69,6 +69,45 @@ per gli inserimenti in `dish_ingredients`.
    avere ruolo_primario/ruoli_coperti valorizzati coerentemente con questo
    principio, non lasciati a NULL e non copiati dalla categoria allergenica
    dei suoi ingredienti.
+10. **Gruppo proteico** (Fase 3, genera.js, 2026-09-16). Il gruppo di un
+    piatto (pesce, carne_rossa, carne_bianca, uova, legumi, formaggio - usato
+    da QUOTE per il bilanciamento della settimana) si legge da
+    categorie_alimenti sull'ancora proteica, non piu' solo da sei regex sui
+    nomi. **Questo non e' un'eccezione alla regola 9**: il ruolo/ancora resta
+    deciso dai grammi di proteina reale (stessa metrica: >=10g o >=25% della
+    proteina del piatto), e la categoria dice soltanto *che cosa e'*
+    l'ingrediente che l'ancora ha gia' scelto - stessa distinzione "cosa fa"
+    vs "cosa contiene" della regola 9, applicata a un problema diverso (il
+    gruppo per QUOTE, non il ruolo del piatto). Precedenza quando l'ancora
+    porta piu' categorie: pesce (pesce, crostacei, molluschi) > carne_rossa
+    (carne_rossa, maiale) > carne_bianca > uova > legumi (legumi, soia) >
+    formaggio (latticini). Le sei regex restano come ripiego (gruppoDaRegex)
+    per quando l'ancora non ha nessuna categoria - mai lasciare un piatto
+    senza gruppo se la regex lo trovava. **Ogni legume/soia nuovo inserito a
+    mano deve avere una riga 'legumi' (e 'soia' se pertinente) in
+    categorie_alimenti**, altrimenti resta senza gruppo E non viene escluso
+    da nessun vincolo utente che esclude i legumi - e' successo con 5
+    alimenti del blocco F0bis, trovato solo con l'audit di f3-gruppo-
+    proteico.js.
+11. **Mai leggere una tabella via PostgREST (supabase-js `.select()`) per
+    un'analisi senza paginazione E senza un ordinamento unico.** PostgREST
+    tronca silenziosamente a ~1000 righe di default, senza errore: la query
+    torna, sembra valida, ed e' sbagliata. Per una lettura di sola analisi
+    (conteggi, audit, verifiche) usare SQL diretto via `node db.js "..."`
+    (nessun limite implicito) invece di supabase-js. Non e' pedanteria:
+    successo tre volte nella stessa giornata (2026-09-17). 1) l'audit dei
+    doppioni di dishes ha rischiato di mancare righe oltre le prime 1000. 2) un
+    conteggio d'uso di un ingrediente nei piatti, non paginato, avrebbe
+    riportato un numero parziale come se fosse totale. 3) la misura del buco
+    di scalamento su plan_items ha riportato "134 giornate reali" quando
+    l'utente di test condiviso da solo ne aveva 92.876 - la query aveva letto
+    un frammento arbitrario dei primi ~1000 record, quasi tutti rumore di
+    verifiche passate, e il numero e' sembrato plausibile finche' un conteggio
+    diretto via db.js non l'ha smentito.
+12. **Mai cancellare righe da `plans` o `plan_items`** (tranne i piani di prova
+    sull'utente di test): la cascata cancella anche `meal_outcomes`, cioe' la
+    memoria dei piatti rifiutati. Prima di qualunque archiviazione bisogna
+    separare gli esiti dai piani.
 
 ## Obiettivo per paese
 Paesi senza generico di riferimento (Italia, Francia, Grecia, Spagna, Portogallo):
