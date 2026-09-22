@@ -1,0 +1,1317 @@
+{
+  "righeReport": [
+    {
+      "combo": "onnivoro+italia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+italia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "onnivoro+italia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+italia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+italia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+italia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+italia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+italia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+italia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+italia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+italia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+italia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 1"
+    },
+    {
+      "combo": "onnivoro+francia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "onnivoro+francia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "onnivoro+francia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+francia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+francia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+francia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+francia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+francia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+francia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+francia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+francia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+francia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "onnivoro+spagna",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+spagna",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "onnivoro+spagna",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+spagna",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+spagna",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+spagna",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+spagna",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+spagna",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+spagna",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+spagna",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+spagna",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+spagna",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+grecia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+grecia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "onnivoro+grecia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+grecia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+grecia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+grecia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+grecia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+grecia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+grecia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+grecia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+grecia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+grecia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+portogallo",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+portogallo",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "onnivoro+portogallo",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+portogallo",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+portogallo",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+portogallo",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+portogallo",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+portogallo",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+portogallo",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+portogallo",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+portogallo",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+portogallo",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 1"
+    },
+    {
+      "combo": "onnivoro+germania",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+germania",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+germania",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+germania",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+germania",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+germania",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+germania",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+germania",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "3a",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 3"
+    },
+    {
+      "combo": "vegano+germania",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "3a",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 3"
+    },
+    {
+      "combo": "pescetariano+germania",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+germania",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+germania",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+regno_unito",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+regno_unito",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+regno_unito",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+regno_unito",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+regno_unito",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+regno_unito",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+regno_unito",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+regno_unito",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "3a",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 5"
+    },
+    {
+      "combo": "vegano+regno_unito",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "3a",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 5"
+    },
+    {
+      "combo": "pescetariano+regno_unito",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+regno_unito",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 1"
+    },
+    {
+      "combo": "pescetariano+regno_unito",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+giappone",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "onnivoro+giappone",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegetariano+giappone",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "vegetariano+giappone",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegano+giappone",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "vegano+giappone",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "pescetariano+giappone",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "pescetariano+giappone",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "onnivoro+cina",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 12"
+    },
+    {
+      "combo": "onnivoro+cina",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegetariano+cina",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 12"
+    },
+    {
+      "combo": "vegetariano+cina",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegano+cina",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 12"
+    },
+    {
+      "combo": "vegano+cina",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "pescetariano+cina",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 12"
+    },
+    {
+      "combo": "pescetariano+cina",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "onnivoro+thailandia",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "onnivoro+thailandia",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegetariano+thailandia",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "vegetariano+thailandia",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegano+thailandia",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "vegano+thailandia",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "pescetariano+thailandia",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "pescetariano+thailandia",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "onnivoro+corea",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 11"
+    },
+    {
+      "combo": "onnivoro+corea",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegetariano+corea",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 11"
+    },
+    {
+      "combo": "vegetariano+corea",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegano+corea",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 11"
+    },
+    {
+      "combo": "vegano+corea",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "pescetariano+corea",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 11"
+    },
+    {
+      "combo": "pescetariano+corea",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "onnivoro+vietnam",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "onnivoro+vietnam",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegetariano+vietnam",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "vegetariano+vietnam",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "vegano+vietnam",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "vegano+vietnam",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "pescetariano+vietnam",
+      "profilo": "asiatico-orientale",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 10"
+    },
+    {
+      "combo": "pescetariano+vietnam",
+      "profilo": "asiatico-sudest",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 6"
+    },
+    {
+      "combo": "onnivoro+messico",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 5"
+    },
+    {
+      "combo": "onnivoro+messico",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+messico",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "vegetariano+messico",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+messico",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 1"
+    },
+    {
+      "combo": "vegano+messico",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+messico",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "pescetariano+messico",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+argentina",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "onnivoro+argentina",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "vegetariano+argentina",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "vegetariano+argentina",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "vegano+argentina",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 1"
+    },
+    {
+      "combo": "vegano+argentina",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 1"
+    },
+    {
+      "combo": "pescetariano+argentina",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "pescetariano+argentina",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "onnivoro+brasile",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "onnivoro+brasile",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+brasile",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "vegetariano+brasile",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+brasile",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 1"
+    },
+    {
+      "combo": "vegano+brasile",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+brasile",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "pescetariano+brasile",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+ande",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "onnivoro+ande",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+ande",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "vegetariano+ande",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+ande",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 1"
+    },
+    {
+      "combo": "vegano+ande",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+ande",
+      "profilo": "latino-messicano-ampio",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 4"
+    },
+    {
+      "combo": "pescetariano+ande",
+      "profilo": "latino-chimichurri",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+stati_uniti",
+      "profilo": "americano",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 spuntini distinti, ne ha 4"
+    },
+    {
+      "combo": "vegetariano+stati_uniti",
+      "profilo": "americano",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 spuntini distinti, ne ha 4"
+    },
+    {
+      "combo": "vegano+stati_uniti",
+      "profilo": "americano",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 contorni distinti (cena+pranzo), ne ha 11"
+    },
+    {
+      "combo": "pescetariano+stati_uniti",
+      "profilo": "americano",
+      "gradinoMinimo": "3b",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono almeno 14 spuntini distinti, ne ha 4"
+    },
+    {
+      "combo": "onnivoro+australia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "onnivoro+australia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "onnivoro+australia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo carne_bianca: servono 1, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+australia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+australia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+australia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+australia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+australia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+australia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+australia",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+australia",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "pescetariano+australia",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+Germania+RegnoUnito",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "pescetariano+Germania+RegnoUnito",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 1"
+    },
+    {
+      "combo": "pescetariano+Germania+RegnoUnito",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "2",
+      "stato": "regge_allentamento",
+      "dettaglio": "quota minima gruppo pesce: servono 2, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+Portogallo+Germania",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegetariano+Portogallo+Germania",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegetariano+Portogallo+Germania",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "0",
+      "stato": "regge_0",
+      "dettaglio": null
+    },
+    {
+      "combo": "vegano+RegnoUnito+StatiUniti",
+      "profilo": "europeo-ricco",
+      "gradinoMinimo": "NON_APPLICABILE",
+      "stato": "non_applicabile",
+      "dettaglio": "servono 7 secondi distinti, ne ha 0"
+    },
+    {
+      "combo": "vegano+RegnoUnito+StatiUniti",
+      "profilo": "mediterraneo",
+      "gradinoMinimo": "3a",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 6"
+    },
+    {
+      "combo": "vegano+RegnoUnito+StatiUniti",
+      "profilo": "europeo-leggero",
+      "gradinoMinimo": "3a",
+      "stato": "regge_allentamento",
+      "dettaglio": "servono 7 colazioni distinte, ne ha 6"
+    }
+  ],
+  "impossibili": [],
+  "nonApplicabili": [
+    "onnivoro+italia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+italia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+italia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+italia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+spagna / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+spagna / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+spagna / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+spagna / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+grecia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+grecia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+grecia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+grecia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+portogallo / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+portogallo / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+portogallo / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+portogallo / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+germania / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+germania / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+germania / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+germania / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+regno_unito / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+regno_unito / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+regno_unito / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+regno_unito / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+messico / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+messico / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+messico / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+messico / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+brasile / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+brasile / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+brasile / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+brasile / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+ande / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+ande / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+ande / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+ande / latino-chimichurri: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "onnivoro+australia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+australia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+australia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+australia / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "pescetariano+Germania+RegnoUnito / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegetariano+Portogallo+Germania / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)",
+    "vegano+RegnoUnito+StatiUniti / europeo-ricco: mai scritto per questo paese (0 piatti nel pool proprio)"
+  ]
+}

@@ -8,6 +8,8 @@ const supabase = createClient(
 );
 
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+const { assertUtenteDiTest } = require('./test-users');
+assertUtenteDiTest(USER_ID);
 
 // Stessa mappa paese->cucina di PAESI_PER_CUCINA in Onboarding.js: il primo
 // giro di generazioni aveva lasciato user_cuisine_preferences fermo su

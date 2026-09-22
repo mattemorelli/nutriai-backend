@@ -8,6 +8,8 @@ const supabase = createClient(
 );
 
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+const { assertUtenteDiTest } = require('./test-users');
+assertUtenteDiTest(USER_ID);
 
 (async () => {
   const t0 = Date.now();

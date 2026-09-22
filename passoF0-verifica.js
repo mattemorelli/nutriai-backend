@@ -124,7 +124,7 @@ function perSlotDa(piatti, soglia) {
     const profiliConSecondo = profiliAttesi;
 
     if (!profiliConSecondo.length) {
-      righeReport.push({ combo: cfg.nome, profilo: '(nessuno)', gradinoMinimo: 'IMPOSSIBILE', dettaglio: 'nessun profilo esiste per questa famiglia' });
+      righeReport.push({ combo: cfg.nome, profilo: '(nessuno)', gradinoMinimo: 'IMPOSSIBILE', stato: 'buco_vero', dettaglio: 'nessun profilo esiste per questa famiglia' });
       impossibili.push(`${cfg.nome}: nessun profilo esiste per questa famiglia`);
       continue;
     }
@@ -134,6 +134,19 @@ function perSlotDa(piatti, soglia) {
       let ultimoMessaggio = null;
 
       for (const passo of GRADINI) {
+        // 2b (2026-09-19): NON testabile qui, non per svista. analizzaCapienza
+        // ragiona su conteggi (secondi distinti, quote gruppo, ecc.), mai su
+        // kcal/sale/saturi - e F0 non ha mai un target kcal dietro (ragiona
+        // per dieta+paese, "senza un utente reale dietro", vedi sopra
+        // foodIdVietatiPerDieta). opz.tettoTollerante non e' letto da
+        // analizzaCapienza: se non saltassimo 2b qui, il suo esito
+        // sarebbe SEMPRE identico a quello del gradino 2 (stesso
+        // quotaTollerante, l'unica opzione che analizzaCapienza guarda),
+        // e potrebbe uscire come "il gradino minimo e' 2b" per puro caso
+        // di posizione in lista - una riga che dice di aver testato il
+        // tetto senza averlo mai potuto fare. Il tetto va verificato con
+        // una generazione vera (misura-gradino-2b.js), non qui.
+        if (passo.gradino === '2b') continue;
         const catalogo = perSlotDa(piatti, passo.soglia);
         const esito = analizzaCapienza(profilo, catalogo, {
           paesiScelti: cfg.paesi, opz: passo.opz, rifiutato, secondiFreschiNecessari, gruppiPerProfilo,
@@ -145,29 +158,39 @@ function perSlotDa(piatti, soglia) {
       if (gradinoMinimo === null) {
         const applicabile = profiloApplicabileA(piattiFamiglia, profilo, cfg.paesi);
         const stato = applicabile ? 'IMPOSSIBILE' : 'NON_APPLICABILE';
-        righeReport.push({ combo: cfg.nome, profilo, gradinoMinimo: stato, dettaglio: ultimoMessaggio });
+        righeReport.push({ combo: cfg.nome, profilo, gradinoMinimo: stato, stato: applicabile ? 'buco_vero' : 'non_applicabile', dettaglio: ultimoMessaggio });
         if (applicabile) {
           impossibili.push(`${cfg.nome} / ${profilo}: impossibile anche al gradino piu' permissivo - ${ultimoMessaggio}`);
         } else {
           nonApplicabili.push(`${cfg.nome} / ${profilo}: mai scritto per questo paese (0 piatti nel pool proprio)`);
         }
       } else {
-        righeReport.push({ combo: cfg.nome, profilo, gradinoMinimo, dettaglio: gradinoMinimo === '0' ? null : ultimoMessaggio });
+        // QUATTRO stati, non tre (corretto 2026-09-13 su richiesta esplicita):
+        // "regge" da solo nascondeva casi come centro_nord_generico, che
+        // raggiunge SEMPRE e solo un gradino allentato (mai 0) e quindi si
+        // presentava come "sano" in un conteggio unico con chi regge quasi
+        // sempre a 0. regge_0 e regge_allentamento sono ora due stati
+        // separati e paritetici nel riepilogo, non un conteggio annidato.
+        const stato = gradinoMinimo === '0' ? 'regge_0' : 'regge_allentamento';
+        righeReport.push({ combo: cfg.nome, profilo, gradinoMinimo, stato, dettaglio: gradinoMinimo === '0' ? null : ultimoMessaggio });
       }
     }
   }
 
-  console.log(`\n=== Passo F0: capienza aritmetica su ${CONFIG.length} combinazioni dieta+paese/i ===\n`);
+  console.log(`\n=== Passo F0: capienza aritmetica su ${CONFIG.length} combinazioni dieta+paese/i ===`);
+  console.log('(gradino 2b escluso da questa scansione: e\' il tetto sale/saturi, dipende da un target kcal che F0 non ha - vedi il commento nel codice. Va verificato con una generazione vera, non con la sola capienza aritmetica.)\n');
 
-  const regge = righeReport.filter(r => r.gradinoMinimo !== 'IMPOSSIBILE' && r.gradinoMinimo !== 'NON_APPLICABILE');
-  const reggeConAllentamento = regge.filter(r => r.gradinoMinimo !== '0');
+  const reggeGradino0 = righeReport.filter(r => r.stato === 'regge_0');
+  const reggeConAllentamento = righeReport.filter(r => r.stato === 'regge_allentamento');
+  const nonApplicabiliRighe = righeReport.filter(r => r.stato === 'non_applicabile');
   console.log(`Totale righe profilo: ${righeReport.length}`);
-  console.log(`  regge: ${regge.length} (di cui ${reggeConAllentamento.length} solo con un allentamento)`);
-  console.log(`  non applicabile: ${righeReport.filter(r => r.gradinoMinimo === 'NON_APPLICABILE').length}`);
+  console.log(`  regge a gradino 0:        ${reggeGradino0.length}`);
+  console.log(`  regge solo con allentamento: ${reggeConAllentamento.length}`);
+  console.log(`  non applicabile:          ${nonApplicabiliRighe.length}`);
   console.log(`  buco vero (impossibile, profilo comunque scritto per il paese): ${impossibili.length}\n`);
 
   if (reggeConAllentamento.length) {
-    console.log(`--- Regge solo con allentamento (${reggeConAllentamento.length}) ---`);
+    console.log(`--- REGGE SOLO CON ALLENTAMENTO: mai a gradino 0, il gradino minimo e' indicato per riga (${reggeConAllentamento.length}) ---`);
     for (const r of reggeConAllentamento) {
       console.log(`  ${r.combo} / ${r.profilo}: gradino minimo = ${r.gradinoMinimo}${r.dettaglio ? ` (${r.dettaglio})` : ''}`);
     }

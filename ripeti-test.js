@@ -4,6 +4,8 @@ const { generaESalva } = require('./genera');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+const { assertUtenteDiTest } = require('./test-users');
+assertUtenteDiTest(USER_ID);
 const CUCINA_DI = { australia: 'australiana', messico: 'sud_americana', argentina: 'sud_americana' };
 const PAESI = ['australia', 'messico', 'argentina'];
 const RIPETIZIONI = 10;

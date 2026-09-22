@@ -8,6 +8,8 @@ const supabase = createClient(
 );
 
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+const { assertUtenteDiTest } = require('./test-users');
+assertUtenteDiTest(USER_ID);
 
 // Batch B: mappare dove fallisce davvero (dieta x paese), e prendere altre
 // settimane riuscite per l'analisi di coerenza.

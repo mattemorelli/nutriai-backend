@@ -66,6 +66,8 @@ async function ammessoPerTutti(piatti, vietati) {
   // --- test: e se togliessi i piatti senza ingredienti dalla selezione? ---
   console.log('\n=== Test: generazione vegetariano+Francia CON i piatti rotti esclusi a monte ===');
   const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+  const { assertUtenteDiTest } = require('./test-users');
+  assertUtenteDiTest(USER_ID);
   await supabase.from('users').update({
     diet: 'vegetariano', paesi: [PAESE], cook_days: [1,2,3,4,5,6,7],
     lunch_away: false, evening_minutes: 45, household_size: 2,

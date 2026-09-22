@@ -4,6 +4,8 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 const { generaESalva } = require('./genera');
 
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+const { assertUtenteDiTest } = require('./test-users');
+assertUtenteDiTest(USER_ID);
 
 // Stessa sequenza esatta di Fase 1 / Fase 2 bis Passo 2a.
 const CUCINA_DI = {
