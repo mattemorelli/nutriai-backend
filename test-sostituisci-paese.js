@@ -9,6 +9,8 @@ const { generaESalva } = require('./genera');
 const { trovaProposte } = require('./sostituisci');
 
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+const { assertUtenteDiTest } = require('./test-users');
+assertUtenteDiTest(USER_ID);
 
 const CASI = [
   { nome: 'onnivoro+italia',        diet: 'onnivoro',    paesi: ['italia'],       cucina: 'europea' },

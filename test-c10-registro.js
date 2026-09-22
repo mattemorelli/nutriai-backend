@@ -3,6 +3,8 @@ const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 const { generaESalva } = require('./genera');
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+const { assertUtenteDiTest } = require('./test-users');
+assertUtenteDiTest(USER_ID);
 
 (async () => {
   await supabase.from('users').update({

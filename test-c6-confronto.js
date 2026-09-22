@@ -6,6 +6,8 @@ const MODULO = process.argv[2] === 'prima' ? './genera-uniforme-temp' : './gener
 const { generaESalva } = require(MODULO);
 
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';
+const { assertUtenteDiTest } = require('./test-users');
+assertUtenteDiTest(USER_ID);
 const N = 50;
 
 (async () => {
