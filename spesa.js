@@ -296,6 +296,7 @@ async function listaSpesa(supabase, userId, planId) {
         costo_min: Math.round(costo * 0.88),
         costo_max: Math.round(costo * 1.12),
         costo_giorno: Math.round((costo / 7) * 10) / 10,
+        peggiori,
       };
     })(),
   };
