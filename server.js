@@ -17,15 +17,21 @@ const { creaRichiedeAuth, verificaProprieta } = require('./auth-middleware');
 const CHIAVE = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 const supabase = createClient(process.env.SUPABASE_URL, CHIAVE);
 
-// Avviso all'avvio se stiamo girando con la chiave sbagliata
-try {
-  const payload = JSON.parse(Buffer.from(CHIAVE.split('.')[1], 'base64').toString());
-  if (payload.role !== 'service_role') {
-    console.warn(`\n[ATTENZIONE] Il backend sta usando una chiave con ruolo "${payload.role}".`);
-    console.warn('Serve la service_role, altrimenti le tabelle protette da RLS daranno "permission denied".\n');
-  }
-} catch {
-  console.warn('\n[ATTENZIONE] Impossibile leggere il ruolo della chiave Supabase.\n');
+// Avviso all'avvio se stiamo girando con la chiave sbagliata. Le chiavi
+// Supabase sono passate dal vecchio formato JWT (eyJ..., a tre parti) al
+// nuovo sb_secret_/sb_publishable_ (ruotate il 2026-09-25) - qui si
+// riconosce solo il FORMATO, mai il contenuto: la chiave non va mai
+// stampata, nemmeno parziale.
+if (CHIAVE.startsWith('sb_secret_')) {
+  // chiave segreta nel formato nuovo: va bene, nessun avviso
+} else if (CHIAVE.startsWith('sb_publishable_')) {
+  console.warn('\n[ATTENZIONE] Il backend sta usando una chiave pubblica (sb_publishable_...).');
+  console.warn('Non potra\' leggere le tabelle protette da RLS: serve la chiave segreta (sb_secret_...).\n');
+} else if (CHIAVE.startsWith('eyJ')) {
+  console.warn('\n[ATTENZIONE] Il backend sta usando una chiave nel vecchio formato JWT.');
+  console.warn('Quel formato e\' dismesso: va sostituita con la nuova chiave segreta (sb_secret_...).\n');
+} else {
+  console.warn('\n[ATTENZIONE] Formato della chiave Supabase non riconosciuto.\n');
 }
 
 const app = express();
@@ -57,6 +63,35 @@ const LIMITI = {
   saleMaxGiorno: 5,
   fibraMinGiorno: 25,
 };
+
+// Il "perche'" di un vincolo, non il "quanto rigido" (quello e' severity,
+// un asse diverso): allergia/intolleranza sono dati sanitari e richiedono
+// il consenso esplicito prima di essere salvati; non_gradito/preferenza sono
+// gusto, passano sempre. kind e' NOT NULL solo per le scritture nuove (vedi
+// POST /vincoli e /onboarding); una riga vecchia con kind NULL viene trattata
+// come sanitaria per prudenza - se non sappiamo perche' e' esclusa, meglio
+// presumere il caso piu' delicato.
+const KIND_VALIDI = ['allergia', 'intolleranza', 'non_gradito', 'preferenza'];
+const eSanitario = (kind) => kind == null || kind === 'allergia' || kind === 'intolleranza';
+const TIPO_CONSENSO = 'dati_sanitari';
+
+async function ultimoConsenso(userId) {
+  const { data, error } = await supabase
+    .from('consensi')
+    .select('stato, versione_testo, lingua, registrato_at')
+    .eq('user_id', userId)
+    .eq('tipo', TIPO_CONSENSO)
+    .order('registrato_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error('lettura consensi: ' + error.message);
+  return data || null;
+}
+
+async function consensoAttivo(userId) {
+  const ultimo = await ultimoConsenso(userId);
+  return ultimo?.stato === 'accettato';
+}
 
 // PostgREST impone un tetto di righe per risposta (di default 1000)
 // indipendente da .limit(): con piu' di 1000 piatti in tabella le righe oltre
@@ -408,6 +443,29 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
   if (b.cuisines.some(c => !CUCINE_VALIDE.includes(c)))
     return res.status(400).json({ errore: 'Cucina non riconosciuta' });
 
+  // I vincoli, se ci sono, si validano PRIMA di scrivere qualunque cosa:
+  // kind obbligatorio, e se anche uno solo e' sanitario senza consenso,
+  // l'intero onboarding si ferma qui - non parte nessuna scrittura.
+  if (Array.isArray(b.constraints) && b.constraints.length) {
+    const dichiarati = b.constraints.filter(c => c && c.subject);
+    if (dichiarati.some(c => !KIND_VALIDI.includes(c.kind))) {
+      return res.status(400).json({ errore: 'kind_mancante' });
+    }
+    const bloccati = dichiarati.filter(c => eSanitario(c.kind));
+    if (bloccati.length) {
+      try {
+        if (!(await consensoAttivo(utenteId))) {
+          return res.status(403).json({
+            errore: 'consenso_mancante',
+            vincoli_bloccati: bloccati.map(c => c.subject),
+          });
+        }
+      } catch (e) {
+        return res.status(500).json({ errore: e.message });
+      }
+    }
+  }
+
   const oggi = new Date().toISOString().slice(0, 10);
 
   try {
@@ -467,7 +525,7 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
         .slice(0, 40)
         .map(c => ({
           user_id: utenteId,
-          kind: c.kind || 'non_gradito',
+          kind: c.kind, // gia' validato sopra: sempre uno dei KIND_VALIDI
           subject: String(c.subject).trim().slice(0, 80),
           severity: c.severity || 'preferibile',
           declared_at: new Date().toISOString(),
@@ -577,12 +635,23 @@ app.post('/vincoli', richiedeAuth, async (req, res) => {
   const { kind, subject, severity } = req.body || {};
   const testo = String(subject || '').trim().slice(0, 80);
   if (!testo) return res.status(400).json({ errore: 'manca cosa evitare' });
-  const k = ['allergia', 'non_gradito'].includes(kind) ? kind : 'non_gradito';
-  const s = ['assoluto', 'preferibile'].includes(severity) ? severity : (k === 'allergia' ? 'assoluto' : 'preferibile');
+  if (!KIND_VALIDI.includes(kind)) return res.status(400).json({ errore: 'kind_mancante' });
+
+  if (eSanitario(kind)) {
+    try {
+      if (!(await consensoAttivo(req.utente.id))) {
+        return res.status(403).json({ errore: 'consenso_mancante' });
+      }
+    } catch (e) {
+      return res.status(500).json({ errore: e.message });
+    }
+  }
+
+  const s = ['assoluto', 'preferibile'].includes(severity) ? severity : (eSanitario(kind) ? 'assoluto' : 'preferibile');
 
   const { data, error } = await supabase
     .from('user_constraints')
-    .insert({ user_id: req.utente.id, kind: k, subject: testo, severity: s, declared_at: new Date().toISOString() })
+    .insert({ user_id: req.utente.id, kind, subject: testo, severity: s, declared_at: new Date().toISOString() })
     .select('id, kind, subject, severity')
     .single();
   if (error) return res.status(500).json({ errore: error.message });
@@ -595,6 +664,76 @@ app.delete('/vincoli/:id', richiedeAuth, async (req, res) => {
   const { error } = await supabase.from('user_constraints').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ errore: error.message });
   res.json({ ok: true });
+});
+
+// ---------- CONSENSO AI DATI SANITARI ----------
+
+app.get('/consenso', richiedeAuth, async (req, res) => {
+  try {
+    const ultimo = await ultimoConsenso(req.utente.id);
+    res.json(ultimo
+      ? { stato: ultimo.stato, versione_testo: ultimo.versione_testo, lingua: ultimo.lingua, registrato_at: ultimo.registrato_at }
+      : { stato: null, versione_testo: null, lingua: null, registrato_at: null });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+app.post('/consenso', richiedeAuth, async (req, res) => {
+  try {
+    const { versione_testo, lingua } = req.body || {};
+    const testo = String(versione_testo || '').trim();
+    if (!testo) return res.status(400).json({ errore: 'versione_testo mancante' });
+    if (!['it', 'en'].includes(lingua)) return res.status(400).json({ errore: 'lingua non valida' });
+
+    const { error } = await supabase.from('consensi').insert({
+      user_id: req.utente.id,
+      tipo: TIPO_CONSENSO,
+      versione_testo: testo,
+      lingua,
+      stato: 'accettato',
+    });
+    if (error) return res.status(500).json({ errore: error.message });
+
+    const ultimo = await ultimoConsenso(req.utente.id);
+    res.json({ stato: ultimo.stato, versione_testo: ultimo.versione_testo, lingua: ultimo.lingua, registrato_at: ultimo.registrato_at });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+// Revoca: una riga 'revocato' (mai un update), poi toglie dal piano i
+// vincoli che avevano bisogno di quel consenso - allergia/intolleranza e le
+// righe vecchie senza kind (stesso criterio prudente di eSanitario sopra).
+// I non_gradito/preferenza restano.
+app.post('/consenso/revoca', richiedeAuth, async (req, res) => {
+  try {
+    const precedente = await ultimoConsenso(req.utente.id);
+    if (!precedente) {
+      return res.status(400).json({ errore: 'nessun_consenso_da_revocare' });
+    }
+
+    const { error: eIns } = await supabase.from('consensi').insert({
+      user_id: req.utente.id,
+      tipo: TIPO_CONSENSO,
+      versione_testo: precedente.versione_testo,
+      lingua: precedente.lingua,
+      stato: 'revocato',
+    });
+    if (eIns) return res.status(500).json({ errore: eIns.message });
+
+    const { data: cancellati, error: eDel } = await supabase
+      .from('user_constraints')
+      .delete()
+      .eq('user_id', req.utente.id)
+      .or('kind.eq.allergia,kind.eq.intolleranza,kind.is.null')
+      .select('id');
+    if (eDel) return res.status(500).json({ errore: eDel.message });
+
+    res.json({ revocato: true, vincoli_cancellati: (cancellati || []).length });
+  } catch (e) {
+    res.status(500).json({ errore: e.message });
+  }
 });
 
 // Rigenera il piano per chi ha gia' un profilo
