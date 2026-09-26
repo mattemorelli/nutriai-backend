@@ -93,6 +93,30 @@ async function consensoAttivo(userId) {
   return ultimo?.stato === 'accettato';
 }
 
+// pasti_casa: {"1":{"pranzo":bool,"cena":bool}, ..., "7":{...}} - esattamente
+// i sette giorni, nient'altro. Deriva anche i due campi vecchi (cook_days,
+// lunch_away) cosi' un client che non guarda ancora pasti_casa continua a
+// vedere un profilo coerente. Ritorna null se la forma non e' valida.
+function derivaPastiCasa(valore) {
+  if (!valore || typeof valore !== 'object' || Array.isArray(valore)) return null;
+  const chiavi = Object.keys(valore);
+  if (chiavi.length !== 7 || !['1','2','3','4','5','6','7'].every(g => chiavi.includes(g))) return null;
+
+  const cookDays = [];
+  let lunchAway = false;
+  for (const g of ['1','2','3','4','5','6','7']) {
+    const giorno = valore[g];
+    if (!giorno || typeof giorno !== 'object' ||
+        typeof giorno.pranzo !== 'boolean' || typeof giorno.cena !== 'boolean') {
+      return null;
+    }
+    if (giorno.cena) cookDays.push(Number(g));
+    if (!giorno.pranzo) lunchAway = true;
+  }
+
+  return { pasti_casa: valore, cook_days: cookDays, lunch_away: lunchAway };
+}
+
 // PostgREST impone un tetto di righe per risposta (di default 1000)
 // indipendente da .limit(): con piu' di 1000 piatti in tabella le righe oltre
 // la millesima spariscono in silenzio (visto anche in genera.js e tu.js).
@@ -373,7 +397,7 @@ app.get('/', (req, res) => {
 app.get('/profilo', richiedeAuth, async (req, res) => {
   const { data, error } = await supabase
     .from('users')
-    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, household_size, evening_minutes, paesi, is_pro')
+    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, pasti_casa, household_size, evening_minutes, paesi, is_pro')
     .eq('id', req.utente.id)
     .maybeSingle();
 
@@ -443,6 +467,15 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
   if (b.cuisines.some(c => !CUCINE_VALIDE.includes(c)))
     return res.status(400).json({ errore: 'Cucina non riconosciuta' });
 
+  // pasti_casa, se arriva, sostituisce cook_days/lunch_away derivandoli -
+  // validato PRIMA di scrivere qualunque cosa, stesso principio dei vincoli
+  // sotto.
+  let pastiCasaDerivati = null;
+  if ('pasti_casa' in b) {
+    pastiCasaDerivati = derivaPastiCasa(b.pasti_casa);
+    if (!pastiCasaDerivati) return res.status(400).json({ errore: 'pasti_casa_non_valido' });
+  }
+
   // I vincoli, se ci sono, si validano PRIMA di scrivere qualunque cosa:
   // kind obbligatorio, e se anche uno solo e' sanitario senza consenso,
   // l'intero onboarding si ferma qui - non parte nessuna scrittura.
@@ -479,8 +512,10 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
         city: b.city || null,
         region_zone: b.region_zone || null,
         goal: b.goal,
-        cook_days: Array.isArray(b.cook_days) && b.cook_days.length ? b.cook_days : [1,2,3,4,5,6,7],
-        lunch_away: Boolean(b.lunch_away),
+        pasti_casa: pastiCasaDerivati ? pastiCasaDerivati.pasti_casa : null,
+        cook_days: pastiCasaDerivati ? pastiCasaDerivati.cook_days
+          : (Array.isArray(b.cook_days) && b.cook_days.length ? b.cook_days : [1,2,3,4,5,6,7]),
+        lunch_away: pastiCasaDerivati ? pastiCasaDerivati.lunch_away : Boolean(b.lunch_away),
         household_size: Number(b.household_size) || 1,
         evening_minutes: Number(b.evening_minutes) || 45,
         diet: ['onnivoro','vegetariano','vegano','pescetariano'].includes(b.diet) ? b.diet : 'onnivoro',
@@ -610,6 +645,15 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
     const n = Number(b.household_size);
     if (!(Number.isInteger(n) && n >= 1 && n <= 12)) return res.status(400).json({ errore: 'numero di persone non valido' });
     aggiornamento.household_size = n;
+  }
+  // Se arriva, sostituisce cook_days/lunch_away (anche quelli passati sopra
+  // nella stessa richiesta): e' la fonte piu' precisa, ha sempre l'ultima parola.
+  if ('pasti_casa' in b) {
+    const derivati = derivaPastiCasa(b.pasti_casa);
+    if (!derivati) return res.status(400).json({ errore: 'pasti_casa_non_valido' });
+    aggiornamento.pasti_casa = derivati.pasti_casa;
+    aggiornamento.cook_days = derivati.cook_days;
+    aggiornamento.lunch_away = derivati.lunch_away;
   }
 
   if (!Object.keys(aggiornamento).length) return res.status(400).json({ errore: 'nessun campo da aggiornare' });

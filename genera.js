@@ -847,14 +847,22 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
   const { data: profiloUtente } = await supabase
     .from('users')
-    .select('cook_days, lunch_away, evening_minutes, household_size, diet, paesi')
+    .select('cook_days, lunch_away, pasti_casa, evening_minutes, household_size, diet, paesi')
     .eq('id', userId)
     .maybeSingle();
 
   const giorniCottura = (profiloUtente && Array.isArray(profiloUtente.cook_days) && profiloUtente.cook_days.length)
     ? profiloUtente.cook_days
     : [1, 2, 3, 4, 5, 6, 7];
-  const pranzoFuori = Boolean(profiloUtente && profiloUtente.lunch_away);
+  // pasti_casa (se valorizzato) sa giorno per giorno dove si pranza; NULL
+  // (utenti da prima della griglia, o chi non l'ha mai compilata) resta sul
+  // vecchio comportamento: lunch_away vale per tutta la settimana o per
+  // nessun giorno, non c'e' via di mezzo.
+  const pastiCasa = profiloUtente && profiloUtente.pasti_casa;
+  const lunchAwayGlobale = Boolean(profiloUtente && profiloUtente.lunch_away);
+  const pranzoFuoriIl = (g) => pastiCasa
+    ? (pastiCasa[String(g)] && pastiCasa[String(g)].pranzo === false)
+    : lunchAwayGlobale;
   const minutiSera = (profiloUtente && Number(profiloUtente.evening_minutes)) || 45;
 
   const paesiScelti = (profiloUtente && profiloUtente.paesi) || [];
@@ -1301,7 +1309,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         const base = (p) =>
           !usati.has(p.id) && !rifiutato(p) &&
           (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
-          (!pranzoFuori || p.trasportabile) &&
+          (!pranzoFuoriIl(g) || p.trasportabile) &&
           principaleLiberoOggi(gi, p);
 
         const proprio = primi.filter(p => compatibile(p, profiloGiorno) && paeseOk(p) && base(p));
@@ -1312,7 +1320,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
       function candidatiContorno(gi, ruolo, profiloGiorno, paeseGiorno, paeseOk, limiteOggi, piattoAbbinato, altroContorno) {
         const g = gi + 1;
-        const trasportabileSeServe = ruolo === 'pranzo' ? (c) => (!pranzoFuori || c.trasportabile) : () => true;
+        const trasportabileSeServe = ruolo === 'pranzo' ? (c) => (!pranzoFuoriIl(g) || c.trasportabile) : () => true;
         const base = (c) =>
           !usati.has(c.id) && !rifiutato(c) &&
           (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g) &&
