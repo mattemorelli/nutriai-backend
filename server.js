@@ -654,6 +654,12 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
     aggiornamento.pasti_casa = derivati.pasti_casa;
     aggiornamento.cook_days = derivati.cook_days;
     aggiornamento.lunch_away = derivati.lunch_away;
+  } else if ('cook_days' in b || 'lunch_away' in b) {
+    // cook_days/lunch_away sono derivati dalla griglia: modificarli a mano
+    // senza toccare pasti_casa la renderebbe una bugia. Si torna al vecchio
+    // comportamento (pasti_casa NULL), non a una griglia incoerente con
+    // quello che l'utente ha appena impostato altrove.
+    aggiornamento.pasti_casa = null;
   }
 
   if (!Object.keys(aggiornamento).length) return res.status(400).json({ errore: 'nessun campo da aggiornare' });
