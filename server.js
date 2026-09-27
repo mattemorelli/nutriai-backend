@@ -10,12 +10,24 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
+const { Pool } = require('pg');
 const { creaRichiedeAuth, verificaProprieta } = require('./auth-middleware');
 
 // Il backend deve usare la service_role: con RLS attivo la chiave anon
 // non puo' leggere le tabelle personali (users, plans, ...).
 const CHIAVE = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 const supabase = createClient(process.env.SUPABASE_URL, CHIAVE);
+
+// Connessione diretta, SOLO per i pochi conteggi dove PostgREST non va bene
+// (regola 11 del CLAUDE.md: tronca silenziosamente a ~1000 righe, e un
+// count(*) via supabase-js ci passerebbe comunque in mezzo). Un pool aperto
+// all'avvio, non una connessione per richiesta.
+const pgPool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+async function contaPianiUtente(userId) {
+  const { rows } = await pgPool.query('select count(*)::int as n from plans where user_id = $1', [userId]);
+  return rows[0].n;
+}
 
 // Avviso all'avvio se stiamo girando con la chiave sbagliata. Le chiavi
 // Supabase sono passate dal vecchio formato JWT (eyJ..., a tre parti) al
@@ -115,6 +127,26 @@ function derivaPastiCasa(valore) {
   }
 
   return { pasti_casa: valore, cook_days: cookDays, lunch_away: lunchAway };
+}
+
+// "Questo utente e' Pro?" - un solo punto che lo decide, letto da ogni rotta
+// che deve bloccare i non paganti: niente copie della stessa select sparse
+// nel file. Quando arriveranno gli acquisti veri (RevenueCat o altro) cambia
+// solo CHI scrive users.is_pro - questa funzione e le rotte sotto restano
+// identiche.
+async function isPro(userId) {
+  const { data, error } = await supabase
+    .from('users').select('is_pro').eq('id', userId).maybeSingle();
+  if (error) throw new Error('lettura users (is_pro): ' + error.message);
+  return Boolean(data?.is_pro);
+}
+
+// Stesso schema di 'consenso_mancante': 403, codice stabile in snake_case
+// che l'app riconosce, dettaglio che dice COSA ha bloccato (l'app lo usa per
+// scegliere quale schermata di upgrade mostrare).
+const ERRORE_SERVE_PRO = 'serve_pro';
+function rispondiServePro(res, dettaglio) {
+  return res.status(403).json({ errore: ERRORE_SERVE_PRO, dettaglio });
 }
 
 // PostgREST impone un tetto di righe per risposta (di default 1000)
@@ -252,12 +284,29 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
 
     const { data: piano, error: errPiano } = await supabase
       .from('plans')
-      .select('id, user_id, week_start, generated_at, corpus_version')
+      .select('id, user_id, week_start, generated_at, corpus_version, giorno_gratis')
       .eq('id', planId)
       .single();
 
+    // 1. Proprieta': invariato.
     if (errPiano || !piano) return res.status(404).json({ errore: 'Piano non trovato' });
     if (piano.user_id !== req.utente.id) return res.status(403).json({ errore: 'Non autorizzato' });
+
+    const pro = await isPro(req.utente.id);
+
+    // 2. Non Pro e non e' il piano corrente (quello che /piano-corrente
+    // restituirebbe): niente storico per chi non paga.
+    if (!pro) {
+      const { data: corrente, error: errCorrente } = await supabase
+        .from('plans')
+        .select('id')
+        .eq('user_id', req.utente.id)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (errCorrente) return res.status(500).json({ errore: 'lettura plans: ' + errCorrente.message });
+      if (!corrente || corrente.id !== piano.id) return rispondiServePro(res, 'storico');
+    }
 
     const { data: righe, error: errItems } = await supabase
       .from('plan_items')
@@ -320,14 +369,31 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
       .limit(1)
       .maybeSingle();
 
+    // 3. Non Pro e il piano ha gia' un giorno gratis assegnato: filtra sia
+    // "dati" che "giorni" (oggi duplicati - devono restare identici anche
+    // filtrati). NULL (piano generato prima di questa colonna) = nessun
+    // limite, resta aperto come oggi. Per un Pro questi campi extra non
+    // compaiono affatto nella risposta, non solo a zero.
+    let giorniRisposta = giorni;
+    let campiExtra = {};
+    if (!pro && piano.giorno_gratis != null) {
+      const totaliPrima = giorni.length;
+      giorniRisposta = giorni.filter((g) => g.giorno === piano.giorno_gratis);
+      campiExtra = {
+        giorno_gratis: piano.giorno_gratis,
+        giorni_bloccati: totaliPrima - giorniRisposta.length,
+      };
+    }
+
     res.json({
       plan_id: piano.id,
       week_start: piano.week_start,
       generated_at: piano.generated_at,
       corpus_version: piano.corpus_version,
-      dati: giorni,
-      giorni,
+      dati: giorniRisposta,
+      giorni: giorniRisposta,
       obiettivi: obiettivi || null,
+      ...campiExtra,
     });
   } catch (e) {
     res.status(500).json({ errore: e.message });
@@ -581,10 +647,35 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
     // 6. fabbisogno energetico
     const target = await calcolaESalvaTarget(supabase, utenteId);
 
-    // 7. primo piano
-    const piano = await generaESalva(supabase, utenteId);
+    // 7. primo piano - salta se questo dispositivo ha gia' usato il suo
+    // giorno gratis su un altro account (impedisce di rifare l'onboarding
+    // con un'altra email dallo stesso telefono solo per riaverlo). Il campo
+    // e' facoltativo: se manca (versioni dell'app che non lo mandano ancora)
+    // il comportamento resta esattamente quello di oggi, sempre genera.
+    let piano = null;
+    let giornoGratisGiaUsato = false;
+    if (typeof b.impronta_dispositivo === 'string' && b.impronta_dispositivo.trim()) {
+      const impronta = b.impronta_dispositivo.trim();
+      const { data: dispositivoEsistente, error: eDisp } = await supabase
+        .from('dispositivi').select('user_id').eq('impronta', impronta).maybeSingle();
+      if (eDisp) throw new Error('lettura dispositivi: ' + eDisp.message);
 
-    res.json({ ok: true, kcal: target.kcal, ...piano });
+      if (dispositivoEsistente && dispositivoEsistente.user_id !== utenteId) {
+        giornoGratisGiaUsato = true;
+      } else {
+        const { error: eInsDisp } = await supabase
+          .from('dispositivi')
+          .upsert({ impronta, user_id: utenteId }, { onConflict: 'impronta', ignoreDuplicates: true });
+        if (eInsDisp) throw new Error('scrittura dispositivi: ' + eInsDisp.message);
+      }
+    }
+    if (!giornoGratisGiaUsato) {
+      piano = await generaESalva(supabase, utenteId);
+    }
+
+    res.json(giornoGratisGiaUsato
+      ? { ok: true, kcal: target.kcal, piano: null, giorno_gratis_gia_usato: true }
+      : { ok: true, kcal: target.kcal, ...piano });
   } catch (err) {
     console.error('ERRORE /onboarding:', err);
     res.status(500).json({ errore: err.message });
@@ -789,6 +880,10 @@ app.post('/consenso/revoca', richiedeAuth, async (req, res) => {
 // Rigenera il piano per chi ha gia' un profilo
 app.post('/genera-piano', richiedeAuth, async (req, res) => {
   try {
+    if (!(await isPro(req.utente.id))) {
+      const nPiani = await contaPianiUtente(req.utente.id);
+      if (nPiani > 0) return rispondiServePro(res, 'rigenerazione');
+    }
     const piano = await generaESalva(supabase, req.utente.id);
     res.json({ ok: true, ...piano });
   } catch (err) {
@@ -998,7 +1093,24 @@ app.get('/piatto/:planItemId', richiedeAuth, async (req, res) => {
 
 app.get('/spesa', richiedeAuth, async (req, res) => {
   try {
-    const r = await listaSpesa(supabase, req.utente.id, req.query.plan_id);
+    const pro = await isPro(req.utente.id);
+
+    // Il giorno gratis e' una proprieta' del piano (scritto al momento
+    // della generazione), non dell'utente: va letto dal piano che
+    // listaSpesa userebbe - quello indicato in query, o il piu' recente
+    // dell'utente se non specificato. Se il plan_id non e' suo, giornoSolo
+    // resta null: listaSpesa stessa rifiuta con 'Non autorizzato' piu' sotto.
+    let giornoSolo = null;
+    if (!pro) {
+      const { data: piano, error: errPiano } = req.query.plan_id
+        ? await supabase.from('plans').select('id, user_id, giorno_gratis').eq('id', req.query.plan_id).maybeSingle()
+        : await supabase.from('plans').select('id, user_id, giorno_gratis')
+            .eq('user_id', req.utente.id).order('generated_at', { ascending: false }).limit(1).maybeSingle();
+      if (errPiano) throw new Error('lettura plans: ' + errPiano.message);
+      if (piano && piano.user_id === req.utente.id) giornoSolo = piano.giorno_gratis;
+    }
+
+    const r = await listaSpesa(supabase, req.utente.id, req.query.plan_id, giornoSolo);
     res.json(r);
   } catch (e) {
     console.error('[spesa]', e.message);
@@ -1067,7 +1179,24 @@ app.get('/scelte', richiedeAuth, async (req, res) => {
 
 app.get('/insegne', richiedeAuth, async (req, res) => {
   try {
-    res.json(await classificaInsegne(supabase, req.query.paese || 'italy'));
+    const r = await classificaInsegne(supabase, req.query.paese || 'italy');
+
+    // Per i Pro la risposta resta esattamente questa, senza toccarla. Per i
+    // non Pro: solo le prime 2 di 'valutate' (gia' ordinate), ridotte ai
+    // soli campi che servono a farsi un'idea (niente assi/motivi/criteri,
+    // che sono il dettaglio che vale l'abbonamento); 'insufficienti' sparisce
+    // del tutto; insegne_bloccate conta tutto il resto.
+    if (!(await isPro(req.utente.id))) {
+      const primeDue = r.valutate.slice(0, 2)
+        .map(({ posizione, nome, voto, lettera, copertura }) => ({ posizione, nome, voto, lettera, copertura }));
+      return res.json({
+        valutate: primeDue,
+        insufficienti: [],
+        insegne_bloccate: (r.valutate.length - primeDue.length) + r.insufficienti.length,
+      });
+    }
+
+    res.json(r);
   } catch (e) {
     console.error('[insegne]', e.message);
     res.status(500).json({ errore: e.message });
@@ -1077,6 +1206,8 @@ app.get('/insegne', richiedeAuth, async (req, res) => {
 // Blocca o sblocca un piatto: alla prossima generazione resterà dov'è.
 app.post('/blocca', richiedeAuth, async (req, res) => {
   try {
+    if (!(await isPro(req.utente.id))) return rispondiServePro(res, 'piatto_tenuto');
+
     const { plan_item_id, bloccato, day_of_week } = req.body || {};
 
     if (day_of_week) {

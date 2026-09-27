@@ -293,6 +293,20 @@ function lunediCorrente() {
   return lun.toISOString().slice(0, 10);
 }
 
+// Stessa regola di lunediCorrente() sopra (stesso new Date(), stesso
+// getDay()), ma restituisce il numero del giorno invece della data del
+// lunedi': 1 = lunedi' ... 7 = domenica. Usa l'ora del SERVER (UTC su
+// Render), non il fuso dell'utente - e' una scelta consapevole, non un bug:
+// l'app non deve mai ricalcolare "oggi" per conto suo, deve sempre aprire
+// sul giorno che le dice il server con plans.giorno_gratis, qualunque esso
+// sia. Un utente al fuso opposto vedra' il cambio di giorno gratis a
+// un'ora diversa da mezzanotte locale: accettato, non un difetto da
+// correggere qui.
+function giornoSettimanaCorrente() {
+  const giorno = new Date().getDay();
+  return giorno === 0 ? 7 : giorno;
+}
+
 // Un generatore pseudocasuale CON SEME, non Math.random diretto: la stessa
 // generazione (stesso profilo, stesso seed) deve produrre sempre lo stesso
 // piano, cosi' un fallimento intermittente si puo' rigiocare invece di
@@ -1762,6 +1776,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       .insert({
         user_id: userId,
         week_start: lunediCorrente(),
+        giorno_gratis: giornoSettimanaCorrente(),
         generated_at: new Date().toISOString(),
         energy_target_id: target?.id ?? null,
         corpus_version: CORPUS_VERSION,
@@ -1823,5 +1838,5 @@ module.exports = {
   GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN,
   CATEGORIE_DIETA, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI,
   GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
-  caricaEsiti, SOGLIA_RIFIUTO,
+  caricaEsiti, SOGLIA_RIFIUTO, giornoSettimanaCorrente,
 };

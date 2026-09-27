@@ -107,7 +107,20 @@ function settimanaTipica(grammiProteici) {
   return co2;
 }
 
-async function listaSpesa(supabase, userId, planId) {
+// giornoSolo: null per i Pro (nessun cambiamento). Per i non Pro, il numero
+// del giorno gratis (1..7): la lista mostrata in 'reparti' si restringe a
+// quel giorno solo. 'totale' invece resta SEMPRE della settimana intera, in
+// ogni suo campo (lo legge anche la carta Impact, dove CO2 e costo stanno
+// fianco a fianco ed entrambi sono settimanali - un costo di un giorno solo
+// sotto quell'etichetta sarebbe un numero sbagliato, non solo diverso). I
+// numeri del solo giorno, quando servono (la riga in cima alla lista della
+// spesa), stanno in un oggetto separato 'filtrato', assente per i Pro: chi
+// legge la risposta non deve indovinare a cosa si riferisce un numero.
+// Per questo la funzione calcola l'aggregato due volte (sommaPerAlimento/
+// costruisciReparti, fattorizzate sotto): una sulla settimana intera
+// sempre, una sul giorno solo quando serve - invece di un solo calcolo con
+// un if infilato dentro la logica di raggruppamento.
+async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
   // il piano più recente se non ne viene chiesto uno preciso
   let id = planId;
   let weekStart = null;
@@ -130,7 +143,7 @@ async function listaSpesa(supabase, userId, planId) {
   // le righe del piano che vanno davvero cucinate
   const { data: righe, error } = await supabase
     .from('plan_items')
-    .select('dish_id, portion_g, stato, avanzi')
+    .select('dish_id, portion_g, stato, avanzi, day_of_week')
     .eq('plan_id', id);
   if (error) throw new Error(error.message);
 
@@ -144,7 +157,8 @@ async function listaSpesa(supabase, userId, planId) {
     .from('users').select('household_size').eq('id', userId).maybeSingle();
   const numeroPersone = Math.max(1, Number(utente && utente.household_size) || 1);
 
-  // ingredienti di tutti i piatti coinvolti
+  // ingredienti di tutti i piatti coinvolti (sempre l'intera settimana:
+  // servono anche per il calcolo "settimana intera" che non si filtra mai)
   const dishIds = [...new Set(attive.map(r => r.dish_id))];
   const { data: ing } = await supabase
     .from('dish_ingredients')
@@ -167,32 +181,36 @@ async function listaSpesa(supabase, userId, planId) {
     baseDi[r.dish_id] = (baseDi[r.dish_id] || 0) + Number(r.grams || 0);
   }
 
-  // somma per alimento
-  const totali = {};
-  for (const riga of attive) {
-    const base = baseDi[riga.dish_id] || 0;
-    const scala = (base > 0 ? Number(riga.portion_g || base) / base : 1) * numeroPersone;
+  // somma per alimento, dato un sottoinsieme di righe attive (tutta la
+  // settimana, o solo il giorno gratis)
+  function sommaPerAlimento(righeAttive) {
+    const totali = {};
+    for (const riga of righeAttive) {
+      const base = baseDi[riga.dish_id] || 0;
+      const scala = (base > 0 ? Number(riga.portion_g || base) / base : 1) * numeroPersone;
 
-    for (const r of (ing || []).filter(x => x.dish_id === riga.dish_id)) {
-      const f = r.foods || {};
-      if (!totali[r.food_id]) {
-        totali[r.food_id] = {
-          food_id: r.food_id,
-          nome: f.name_en || f.name || r.food_id,
-          unita: f.unita || 'peso',
-          pezzo: f.peso_pezzo_g ? Number(f.peso_pezzo_g) : null,
-          reparto: f.reparto || null,
-          green: f.green_score || null,
-          cat_impatto: f.categoria_impatto || null,
-          prezzo_kg: f.prezzo_kg ? Number(f.prezzo_kg) : null,
-          prezzo_debole: f.prezzo_fonte === 'stima_debole',
-          grammi: 0,
-          per: new Set(),
-        };
+      for (const r of (ing || []).filter(x => x.dish_id === riga.dish_id)) {
+        const f = r.foods || {};
+        if (!totali[r.food_id]) {
+          totali[r.food_id] = {
+            food_id: r.food_id,
+            nome: f.name_en || f.name || r.food_id,
+            unita: f.unita || 'peso',
+            pezzo: f.peso_pezzo_g ? Number(f.peso_pezzo_g) : null,
+            reparto: f.reparto || null,
+            green: f.green_score || null,
+            cat_impatto: f.categoria_impatto || null,
+            prezzo_kg: f.prezzo_kg ? Number(f.prezzo_kg) : null,
+            prezzo_debole: f.prezzo_fonte === 'stima_debole',
+            grammi: 0,
+            per: new Set(),
+          };
+        }
+        totali[r.food_id].grammi += Number(r.grams || 0) * scala;
+        if (nomiPiatto[riga.dish_id]) totali[r.food_id].per.add(nomiPiatto[riga.dish_id]);
       }
-      totali[r.food_id].grammi += Number(r.grams || 0) * scala;
-      if (nomiPiatto[riga.dish_id]) totali[r.food_id].per.add(nomiPiatto[riga.dish_id]);
     }
+    return totali;
   }
 
   // Cosa l'utente ha già in casa: non entra nella lista.
@@ -216,45 +234,59 @@ async function listaSpesa(supabase, userId, planId) {
     };
   }
 
-  // raggruppa per reparto
-  const perReparto = {};
-  for (const v of Object.values(totali)) {
-    if (posseduti.has(v.food_id)) continue;
+  // raggruppa per reparto, dati i totali per alimento di sommaPerAlimento()
+  function costruisciReparti(totali) {
+    const perReparto = {};
+    for (const v of Object.values(totali)) {
+      if (posseduti.has(v.food_id)) continue;
 
-    const rep = v.reparto || repartoDi(v.nome);
-    const g = Math.round(v.grammi);
-    (perReparto[rep] ||= []).push({
-      food_id: v.food_id,
-      nome: v.nome,
-      grammi: g,
-      quantita: quantitaLeggibile(v, g),
-      da_dispensa: eDaDispensa(v.nome),
-      costo: v.prezzo_kg ? costoReale(v, g) : null,
-      costo_debole: v.prezzo_debole || false,
-      impatto: v.cat_impatto && impattoDi[v.cat_impatto]
-        ? {
-            voto: impattoDi[v.cat_impatto].voto,
-            co2_kg: Math.round(impattoDi[v.cat_impatto].co2 * (g / 1000) * 100) / 100,
-            categoria: v.cat_impatto,
-          }
-        : null,
-      per: [...v.per].slice(0, 3),
-      altri: Math.max(0, v.per.size - 3),
-    });
+      const rep = v.reparto || repartoDi(v.nome);
+      const g = Math.round(v.grammi);
+      (perReparto[rep] ||= []).push({
+        food_id: v.food_id,
+        nome: v.nome,
+        grammi: g,
+        quantita: quantitaLeggibile(v, g),
+        da_dispensa: eDaDispensa(v.nome),
+        costo: v.prezzo_kg ? costoReale(v, g) : null,
+        costo_debole: v.prezzo_debole || false,
+        impatto: v.cat_impatto && impattoDi[v.cat_impatto]
+          ? {
+              voto: impattoDi[v.cat_impatto].voto,
+              co2_kg: Math.round(impattoDi[v.cat_impatto].co2 * (g / 1000) * 100) / 100,
+              categoria: v.cat_impatto,
+            }
+          : null,
+        per: [...v.per].slice(0, 3),
+        altri: Math.max(0, v.per.size - 3),
+      });
+    }
+
+    const ordine = ['Produce', 'Meat & fish', 'Dairy & eggs', 'Pantry', 'Other'];
+    const reparti = ordine
+      .filter(r => perReparto[r])
+      .map(r => ({
+        reparto: r,
+        voci: perReparto[r].sort((a, b) => b.grammi - a.grammi),
+      }));
+
+    return { reparti, tutte: reparti.flatMap(r => r.voci) };
   }
 
-  const ordine = ['Produce', 'Meat & fish', 'Dairy & eggs', 'Pantry', 'Other'];
-  const reparti = ordine
-    .filter(r => perReparto[r])
-    .map(r => ({
-      reparto: r,
-      voci: perReparto[r].sort((a, b) => b.grammi - a.grammi),
-    }));
+  // Settimana intera: SEMPRE calcolata, e' la fonte dei numeri d'impatto
+  // (mai filtrati) e, quando non c'e' un giorno solo da isolare, anche la
+  // fonte di reparti/costo mostrati (comportamento di oggi, invariato).
+  const { reparti: repartiSettimana, tutte: tutteSettimana } =
+    costruisciReparti(sommaPerAlimento(attive));
 
-  // tutte le voci in un unico elenco, per i totali della spesa
-  const tutte = reparti.flatMap(r => r.voci);
-  const co2Totale = tutte.reduce((s, v) => s + (v.impatto?.co2_kg || 0), 0);
-  const peggiori = tutte
+  const filtraGiorno = giornoSolo != null;
+  const { reparti: repartiVisti, tutte: tutteViste } = filtraGiorno
+    ? costruisciReparti(sommaPerAlimento(attive.filter(r => r.day_of_week === giornoSolo)))
+    : { reparti: repartiSettimana, tutte: tutteSettimana };
+
+  // Impatto: SEMPRE sulla settimana intera, non su quella filtrata.
+  const co2Totale = tutteSettimana.reduce((s, v) => s + (v.impatto?.co2_kg || 0), 0);
+  const peggiori = tutteSettimana
     .filter(v => v.impatto)
     .sort((a, b) => b.impatto.co2_kg - a.impatto.co2_kg)
     .slice(0, 3)
@@ -268,18 +300,23 @@ async function listaSpesa(supabase, userId, planId) {
   return {
     plan_id: id,
     week_start: weekStart,
-    reparti,
+    reparti: repartiVisti,
+    // 'totale' e' SEMPRE la settimana intera, senza eccezioni: lo legge
+    // anche la carta Impact (CO2 + costo fianco a fianco, entrambi
+    // settimanali), quindi non puo' avere un campo filtrato sul giorno in
+    // mezzo agli altri - il lettore non avrebbe modo di saperlo senza
+    // indovinare. Il giorno filtrato, quando c'e', e' un oggetto a parte.
     totale: (() => {
-      const costo = tutte.reduce((s, v) => s + (v.costo || 0), 0);
+      const costo = tutteSettimana.reduce((s, v) => s + (v.costo || 0), 0);
 
       // grammi delle fonti proteiche, per costruire il confronto a parità di pasti
       const PROTEICHE = ['manzo','agnello','maiale','pollame','pesce_selvatico',
                          'pesce_allevato','gamberi','uova','formaggio','legumi','tofu'];
-      const grammiProt = tutte
+      const grammiProt = tutteSettimana
         .filter(v => PROTEICHE.includes(v.impatto?.categoria))
         .reduce((s, v) => s + v.grammi, 0);
 
-      const co2Tipica = settimanaTipica(grammiProt) + (co2Totale - tutte
+      const co2Tipica = settimanaTipica(grammiProt) + (co2Totale - tutteSettimana
         .filter(v => PROTEICHE.includes(v.impatto?.categoria))
         .reduce((s, v) => s + (v.impatto?.co2_kg || 0), 0));
 
@@ -288,7 +325,7 @@ async function listaSpesa(supabase, userId, planId) {
         : 0;
 
       return {
-        voci: tutte.length,
+        voci: tutteSettimana.length,
         co2_kg: Math.round(co2Totale * 10) / 10,
         co2_tipica_kg: Math.round(co2Tipica * 10) / 10,
         differenza_perc: diff,
@@ -299,6 +336,20 @@ async function listaSpesa(supabase, userId, planId) {
         peggiori,
       };
     })(),
+    // Solo per chi vede un giorno solo (non Pro con giorno_gratis
+    // impostato): la spesa che vedrebbe davvero al supermercato per quel
+    // che ha davanti in 'reparti' sopra - non compare affatto per un Pro.
+    ...(filtraGiorno ? {
+      filtrato: (() => {
+        const costoGiorno = tutteViste.reduce((s, v) => s + (v.costo || 0), 0);
+        return {
+          voci: tutteViste.length,
+          costo_min: Math.round(costoGiorno * 0.88),
+          costo_max: Math.round(costoGiorno * 1.12),
+          voci_bloccate: tutteSettimana.length - tutteViste.length,
+        };
+      })(),
+    } : {}),
   };
 }
 
