@@ -464,6 +464,79 @@ function trovaCategoria(subject, mappaAlias) {
   return codice ? { codice } : null;
 }
 
+// "Lenticchie cotte" -> "lenticchie": lo stesso alimento crudo, cotto o
+// secco resta lo stesso alimento agli occhi di chi lo vuole evitare.
+function radiceAlimento(s) {
+  const n = normalizza(s);
+  return n.replace(/[aeio]$/, '').replace(/[aeio]$/, '');
+}
+function baseAlimento(s) {
+  return normalizza(s)
+    .replace(/\b(cotti|cotte|cotto|cotta|crudi|crude|crudo|cruda|secchi|secche|secco|secca|in scatola|surgelati|surgelate)\b/g, '')
+    .replace(/[,\s]+/g, ' ')
+    .trim();
+}
+
+// Risolve un subject dichiarato da un utente (allergia, non_gradito, ...) a
+// un riferimento concreto - uno o piu' food_id, oppure una categoria intera -
+// con la STESSA logica di migra-vincoli.js: prima il nome esatto o
+// singolare/plurale/sottostringa nel catalogo alimenti (allargato alle
+// varianti crudo/cotto/secco dello stesso alimento), poi la categoria via
+// alias_categoria. Estratta qui perche' va chiamata SUBITO quando un
+// vincolo si scrive (server.js), non solo dal migra-vincoli.js lanciato a
+// mano - cosi' un vincolo nuovo esclude gia' qualcosa dal primo piano
+// generato, senza aspettare un passaggio manuale.
+function risolviSubject(subject, { mappaAlias, foods }) {
+  const s = (subject || '').trim();
+  if (!s) return { tipo: 'irrisolto' };
+
+  const nomeDi = (f) => f.name_it || f.name;
+
+  let trovati = (foods || []).filter(
+    (f) => normalizza(f.name_it) === normalizza(s) || normalizza(f.name) === normalizza(s)
+  );
+
+  if (!trovati.length) {
+    const r = radiceAlimento(s);
+    if (r.length >= 4) {
+      trovati = (foods || []).filter(
+        (f) => radiceAlimento(f.name_it).startsWith(r) || radiceAlimento(f.name).startsWith(r)
+      );
+    }
+  }
+
+  if (!trovati.length) {
+    trovati = (foods || []).filter(
+      (f) => normalizza(f.name_it).includes(normalizza(s)) || normalizza(f.name).includes(normalizza(s))
+    );
+  }
+
+  if (trovati.length) {
+    const basi = new Set(trovati.map((f) => baseAlimento(nomeDi(f))));
+    const allargato = (foods || []).filter((f) => basi.has(baseAlimento(nomeDi(f))));
+    return { tipo: 'alimenti', foodIds: allargato.map((f) => f.id) };
+  }
+
+  const cat = trovaCategoria(s, mappaAlias);
+  if (cat) return { tipo: 'categoria', codice: cat.codice };
+
+  return { tipo: 'irrisolto' };
+}
+
+// Le due tabelle di cui risolviSubject ha bisogno, in un solo giro - le
+// chiama chi scrive vincoli nuovi (server.js), non chi li legge soltanto
+// (caricaVincoli sopra continua a leggere food_id/categoria gia' scritti).
+async function caricaCatalogoPerRisoluzione(supabase) {
+  const [{ data: aliasRighe, error: eAlias }, { data: foods, error: eFoods }] = await Promise.all([
+    supabase.from('alias_categoria').select('alias, codice'),
+    supabase.from('foods').select('id, name, name_it'),
+  ]);
+  if (eAlias) throw new Error('lettura alias_categoria: ' + eAlias.message);
+  if (eFoods) throw new Error('lettura foods: ' + eFoods.message);
+  const mappaAlias = new Map((aliasRighe || []).map((r) => [r.alias, r.codice]));
+  return { mappaAlias, foods: foods || [] };
+}
+
 // Alcune categorie ne contengono altre: il maiale e' comunque carne rossa,
 // il lattosio e' comunque presente nei latticini. Chi esclude la categoria
 // piu' ampia deve escludere anche quella contenuta, anche se un domani un
@@ -1839,4 +1912,5 @@ module.exports = {
   CATEGORIE_DIETA, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI,
   GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
   caricaEsiti, SOGLIA_RIFIUTO, giornoSettimanaCorrente,
+  risolviSubject, caricaCatalogoPerRisoluzione,
 };

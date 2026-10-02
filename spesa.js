@@ -213,12 +213,20 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
     return totali;
   }
 
-  // Cosa l'utente ha già in casa: non entra nella lista.
-  const { data: inCasa } = await supabase
-    .from('pantry_items')
-    .select('food_id')
-    .eq('user_id', userId);
-  const posseduti = new Set((inCasa || []).map(r => r.food_id));
+  // Cosa l'utente ha già in casa: non entra nella lista. Due fonti diverse,
+  // stesso Set - pantry_items e' per sempre (ogni settimana futura),
+  // scorte_settimana vale solo per QUESTO piano (legata a plan_id, sparisce
+  // da sola quando il piano cambia). Da qui in poi il resto della funzione
+  // non sa e non deve sapere quale delle due un food_id viene: e' lo stesso
+  // motivo per cui non entra nella lista, non importa per quanto tempo.
+  const [{ data: inCasa }, { data: inCasaSettimana }] = await Promise.all([
+    supabase.from('pantry_items').select('food_id').eq('user_id', userId),
+    supabase.from('scorte_settimana').select('food_id').eq('user_id', userId).eq('plan_id', id),
+  ]);
+  const posseduti = new Set([
+    ...(inCasa || []).map(r => r.food_id),
+    ...(inCasaSettimana || []).map(r => r.food_id),
+  ]);
 
   // Impatto assoluto per categoria: serve a dire quali voci pesano di più.
   const { data: categorie } = await supabase
@@ -410,6 +418,27 @@ async function cambiaDispensa(supabase, userId, foodId, presente) {
     if (error) throw new Error(error.message);
   }
   return { ok: true, food_id: foodId, presente };
+}
+
+// La versione "solo questa settimana" di cambiaDispensa: stesso pattern
+// upsert/delete (delete e' quello che rende possibile l'Undo), ma legata a
+// un plan_id invece che per sempre.
+async function nascondiPerSettimana(supabase, userId, planId, foodId, nascosto) {
+  if (nascosto) {
+    const { error } = await supabase
+      .from('scorte_settimana')
+      .upsert({ user_id: userId, plan_id: planId, food_id: foodId }, { onConflict: 'user_id,plan_id,food_id' });
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase
+      .from('scorte_settimana')
+      .delete()
+      .eq('user_id', userId)
+      .eq('plan_id', planId)
+      .eq('food_id', foodId);
+    if (error) throw new Error(error.message);
+  }
+  return { ok: true, food_id: foodId, plan_id: planId, nascosto };
 }
 
 // Le medie/quote della categoria: base per i motivi in motiviConfronto(),
@@ -687,6 +716,16 @@ async function classificaInsegne(supabase, paese = 'italy') {
     .select('marca_id, criterio, punti, motivazione, fonte, anno_dato, criteri_voto(nome, asse)')
     .in('marca_id', voti.map(v => v.id));
 
+  // La fascia di prezzo vive su marche (mai su voti_marche, che e' la vista
+  // del voto): un'informazione passeggera, letta qui e basta - non entra in
+  // nessuna somma/ordinamento del voto qui sotto.
+  const { data: fasce } = await supabase
+    .from('marche')
+    .select('id, fascia_prezzo, fascia_indice, fascia_metodo, fascia_nota, fascia_fonte, fascia_anno')
+    .in('id', voti.map(v => v.id));
+  const fasciaDi = {};
+  for (const f of fasce || []) fasciaDi[f.id] = f;
+
     // I criteri hanno pesi diversi: quelli sul cibo contano di più
   const { data: criteri } = await supabase
     .from('criteri_voto').select('codice, peso');
@@ -722,23 +761,41 @@ async function classificaInsegne(supabase, paese = 'italy') {
     ];
   };
 
-  const componi = (v, i) => ({
-    posizione: i + 1,
-    nome: v.nome,
-    voto: v.complessivo != null ? Number(v.complessivo) : null,
-    lettera: v.lettera,
-    assi: v.valutabile ? {
-      ambiente: Number(v.ambiente),
-      umano: Number(v.umano),
-      trasparenza: Number(v.trasparenza),
-    } : null,
-    copertura: {
-      valutati: Number(v.criteri_valutati),
-      totali: Number(v.criteri_possibili),
-    },
-       motivi: treMotivi(perMarca[v.id]),
-    criteri: (perMarca[v.id] || []).sort((a, b) => b.pesato - a.pesato),
-  });
+  const componi = (v, i) => {
+    const f = fasciaDi[v.id];
+    const fasciaPrezzo = f?.fascia_prezzo ?? null;
+
+    return {
+      posizione: i + 1,
+      nome: v.nome,
+      voto: v.complessivo != null ? Number(v.complessivo) : null,
+      lettera: v.lettera,
+      assi: v.valutabile ? {
+        ambiente: Number(v.ambiente),
+        umano: Number(v.umano),
+        trasparenza: Number(v.trasparenza),
+      } : null,
+      copertura: {
+        valutati: Number(v.criteri_valutati),
+        totali: Number(v.criteri_possibili),
+      },
+      motivi: treMotivi(perMarca[v.id]),
+      criteri: (perMarca[v.id] || []).sort((a, b) => b.pesato - a.pesato),
+      // Fascia di prezzo (1-3, € a €€€): mai un fattore del voto qui sopra,
+      // solo un'informazione in piu'. fascia_dettaglio c'e' solo quando la
+      // fascia e' nota - niente indice/metodo/nota/fonte/anno a vuoto.
+      fascia_prezzo: fasciaPrezzo,
+      ...(fasciaPrezzo != null ? {
+        fascia_dettaglio: {
+          indice: Number(f.fascia_indice),
+          metodo: f.fascia_metodo,
+          nota: f.fascia_nota,
+          fonte: f.fascia_fonte,
+          anno: f.fascia_anno,
+        },
+      } : {}),
+    };
+  };
 
   return {
     valutate: voti.filter(v => v.valutabile).map(componi),
@@ -749,4 +806,4 @@ async function classificaInsegne(supabase, paese = 'italy') {
   };
 }
 
-module.exports = { listaSpesa, repartoDi, ingredientiPiatto, dispensa, cambiaDispensa, marchePer, sceltePer, classificaInsegne };
+module.exports = { listaSpesa, repartoDi, ingredientiPiatto, dispensa, cambiaDispensa, nascondiPerSettimana, marchePer, sceltePer, classificaInsegne };

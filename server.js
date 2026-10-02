@@ -1,16 +1,16 @@
 console.log('[server] avviato', new Date().toISOString());
 const { calcolaESalvaTarget } = require('./fabbisogno');
-const { generaESalva } = require('./genera');
+const { generaESalva, risolviSubject, caricaCatalogoPerRisoluzione } = require('./genera');
 const { calibra } = require('./calibra');
 const { trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto } = require('./sostituisci');
-const { listaSpesa, ingredientiPiatto, dispensa, cambiaDispensa, marchePer, sceltePer, classificaInsegne } = require('./spesa');
+const { listaSpesa, ingredientiPiatto, dispensa, cambiaDispensa, nascondiPerSettimana, marchePer, sceltePer, classificaInsegne } = require('./spesa');
 const { votoBarcode } = require('./voto');
 const { ritratto, carbonioSettimanale, mappaPaesi } = require('./tu');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
-const { Pool } = require('pg');
+const crypto = require('crypto');
 const { creaRichiedeAuth, verificaProprieta } = require('./auth-middleware');
 
 // Il backend deve usare la service_role: con RLS attivo la chiave anon
@@ -18,15 +18,20 @@ const { creaRichiedeAuth, verificaProprieta } = require('./auth-middleware');
 const CHIAVE = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 const supabase = createClient(process.env.SUPABASE_URL, CHIAVE);
 
-// Connessione diretta, SOLO per i pochi conteggi dove PostgREST non va bene
-// (regola 11 del CLAUDE.md: tronca silenziosamente a ~1000 righe, e un
-// count(*) via supabase-js ci passerebbe comunque in mezzo). Un pool aperto
-// all'avvio, non una connessione per richiesta.
-const pgPool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-async function contaPianiUtente(userId) {
-  const { rows } = await pgPool.query('select count(*)::int as n from plans where user_id = $1', [userId]);
-  return rows[0].n;
+// Serve solo per sapere SE esiste almeno un piano, non quanti sono: un
+// limit(1) via PostgREST non soffre del troncamento a 1000 righe della
+// regola 11 (quella riguarda i conteggi su insiemi grandi) e passa dallo
+// stesso canale PostgREST di isPro() piu' sotto, provatamente raggiungibile
+// - a differenza della connessione Postgres diretta che questa funzione
+// usava prima (pgPool su porta 5432), andata in ETIMEDOUT il 2026-10-01:
+// /genera-piano rispondeva 500 con un corpo vuoto invece del 403 serve_pro
+// atteso, e un utente free vedeva "Could not build the week" invece
+// dell'avviso.
+async function haPianoEsistente(userId) {
+  const { data, error } = await supabase
+    .from('plans').select('id').eq('user_id', userId).limit(1).maybeSingle();
+  if (error) throw new Error('lettura plans: ' + error.message);
+  return Boolean(data);
 }
 
 // Avviso all'avvio se stiamo girando con la chiave sbagliata. Le chiavi
@@ -86,6 +91,36 @@ const LIMITI = {
 const KIND_VALIDI = ['allergia', 'intolleranza', 'non_gradito', 'preferenza'];
 const eSanitario = (kind) => kind == null || kind === 'allergia' || kind === 'intolleranza';
 const TIPO_CONSENSO = 'dati_sanitari';
+
+// Risolve subito i vincoli dichiarati (bollini con un codice preciso, o
+// testo libero di "+altro") a food_id/categoria, con la stessa logica del
+// migra-vincoli.js lanciato a mano - cosi' il piano generato in fondo a
+// /onboarding vede gia' tutto, senza aspettare un passaggio manuale. Una
+// dichiarazione che matcha piu' alimenti (es. "funghi") diventa piu' righe,
+// una per alimento, come fa gia' migra-vincoli.js.
+async function risolviERighe(dichiarati, utenteId, supabase) {
+  const catalogo = await caricaCatalogoPerRisoluzione(supabase);
+  const oraDichiarato = new Date().toISOString();
+  const righe = [];
+  for (const c of dichiarati) {
+    const base = {
+      user_id: utenteId,
+      kind: c.kind,
+      subject: String(c.subject).trim().slice(0, 80),
+      severity: c.severity || 'preferibile',
+      declared_at: oraDichiarato,
+    };
+    const risolto = risolviSubject(base.subject, catalogo);
+    if (risolto.tipo === 'alimenti' && risolto.foodIds.length) {
+      for (const foodId of risolto.foodIds) righe.push({ ...base, food_id: foodId, categoria: null });
+    } else if (risolto.tipo === 'categoria') {
+      righe.push({ ...base, food_id: null, categoria: risolto.codice });
+    } else {
+      righe.push({ ...base, food_id: null, categoria: null });
+    }
+  }
+  return righe;
+}
 
 async function ultimoConsenso(userId) {
   const { data, error } = await supabase
@@ -621,16 +656,9 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
 
     // 4. vincoli alimentari (facoltativi)
     if (Array.isArray(b.constraints) && b.constraints.length) {
-      const righe = b.constraints
-        .filter(c => c && c.subject)
-        .slice(0, 40)
-        .map(c => ({
-          user_id: utenteId,
-          kind: c.kind, // gia' validato sopra: sempre uno dei KIND_VALIDI
-          subject: String(c.subject).trim().slice(0, 80),
-          severity: c.severity || 'preferibile',
-          declared_at: new Date().toISOString(),
-        }));
+      const dichiarati = b.constraints.filter(c => c && c.subject).slice(0, 40);
+      // gia' validato sopra: kind sempre uno dei KIND_VALIDI
+      const righe = await risolviERighe(dichiarati, utenteId, supabase);
       if (righe.length) {
         const { error: e4 } = await supabase.from('user_constraints').insert(righe);
         if (e4) throw new Error(`vincoli: ${e4.message}`);
@@ -655,7 +683,11 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
     let piano = null;
     let giornoGratisGiaUsato = false;
     if (typeof b.impronta_dispositivo === 'string' && b.impronta_dispositivo.trim()) {
-      const impronta = b.impronta_dispositivo.trim();
+      // Mai l'identificatore del telefono in chiaro nel database: solo il
+      // suo hash. Lo stesso telefono produce sempre lo stesso hash, quindi
+      // il confronto funziona identico - cambia solo cosa resta scritto su
+      // dispositivi.impronta se qualcuno leggesse la tabella.
+      const impronta = crypto.createHash('sha256').update(b.impronta_dispositivo.trim()).digest('hex');
       const { data: dispositivoEsistente, error: eDisp } = await supabase
         .from('dispositivi').select('user_id').eq('impronta', impronta).maybeSingle();
       if (eDisp) throw new Error('lettura dispositivi: ' + eDisp.message);
@@ -790,11 +822,14 @@ app.post('/vincoli', richiedeAuth, async (req, res) => {
 
   const s = ['assoluto', 'preferibile'].includes(severity) ? severity : (eSanitario(kind) ? 'assoluto' : 'preferibile');
 
+  // Un subject puo' risolvere a piu' alimenti (es. "olive" -> 2 righe): il
+  // client riceve l'elenco completo, non una riga sola, e lo sa gestire
+  // (vedi aggiungiVincolo in Profilo.js).
+  const righe = await risolviERighe([{ kind, subject: testo, severity: s }], req.utente.id, supabase);
   const { data, error } = await supabase
     .from('user_constraints')
-    .insert({ user_id: req.utente.id, kind, subject: testo, severity: s, declared_at: new Date().toISOString() })
-    .select('id, kind, subject, severity')
-    .single();
+    .insert(righe)
+    .select('id, kind, subject, severity');
   if (error) return res.status(500).json({ errore: error.message });
   res.json(data);
 });
@@ -881,8 +916,7 @@ app.post('/consenso/revoca', richiedeAuth, async (req, res) => {
 app.post('/genera-piano', richiedeAuth, async (req, res) => {
   try {
     if (!(await isPro(req.utente.id))) {
-      const nPiani = await contaPianiUtente(req.utente.id);
-      if (nPiani > 0) return rispondiServePro(res, 'rigenerazione');
+      if (await haPianoEsistente(req.utente.id)) return rispondiServePro(res, 'rigenerazione');
     }
     const piano = await generaESalva(supabase, req.utente.id);
     res.json({ ok: true, ...piano });
@@ -1114,8 +1148,12 @@ app.get('/spesa', richiedeAuth, async (req, res) => {
     res.json(r);
   } catch (e) {
     console.error('[spesa]', e.message);
-    const codice = e.message === 'Non autorizzato' ? 403 : 500;
-    res.status(codice).json({ errore: e.message });
+    // "Nessun piano trovato" non e' un errore di rete: l'app deve poter
+    // distinguerlo (schermata vuota) da un vero problema di connessione
+    // (messaggio d'errore) invece di mostrare lo stesso 500 per entrambi.
+    const codice = e.message === 'Non autorizzato' ? 403 : e.message === 'Nessun piano trovato' ? 404 : 500;
+    const corpo = e.message === 'Nessun piano trovato' ? { errore: 'nessun_piano' } : { errore: e.message };
+    res.status(codice).json(corpo);
   }
 });
 
@@ -1135,6 +1173,27 @@ app.post('/dispensa', richiedeAuth, async (req, res) => {
     res.json(await cambiaDispensa(supabase, req.utente.id, food_id, presente === true));
   } catch (e) {
     console.error('[dispensa]', e.message);
+    res.status(500).json({ errore: e.message });
+  }
+});
+
+// Versione "solo questa settimana" di /dispensa: un food_id fuori dalla
+// lista solo per il piano indicato. plan_id lo manda il client (lo ha gia',
+// viene dalla stessa GET /spesa) - qui si verifica solo che il piano sia
+// davvero suo, stesso controllo di proprieta' usato altrove.
+app.post('/spesa/nascondi', richiedeAuth, async (req, res) => {
+  try {
+    const { food_id, plan_id, nascosto } = req.body || {};
+    if (!food_id || !plan_id) return res.status(400).json({ errore: 'food_id o plan_id mancante' });
+
+    const { data: piano, error: errPiano } = await supabase
+      .from('plans').select('user_id').eq('id', plan_id).maybeSingle();
+    if (errPiano) return res.status(500).json({ errore: 'lettura plans: ' + errPiano.message });
+    if (!piano || piano.user_id !== req.utente.id) return res.status(403).json({ errore: 'Non autorizzato' });
+
+    res.json(await nascondiPerSettimana(supabase, req.utente.id, plan_id, food_id, nascosto === true));
+  } catch (e) {
+    console.error('[spesa/nascondi]', e.message);
     res.status(500).json({ errore: e.message });
   }
 });
@@ -1177,22 +1236,72 @@ app.get('/scelte', richiedeAuth, async (req, res) => {
   }
 });
 
+// Hash deterministico di una stringa in un intero a 32 bit non negativo -
+// non deve essere crittograficamente robusto, deve solo distribuire bene e
+// dare sempre lo stesso numero per lo stesso testo (sha256 troncato, non un
+// hash scritto a mano: la qualita' della distribuzione qui conta, altrimenti
+// certi user_id finirebbero sempre sulle stesse posizioni).
+function hashStabile(testo) {
+  return crypto.createHash('sha256').update(testo).digest().readUInt32BE(0);
+}
+
+// QUALI DUE INSEGNE RESTANO APERTE per un utente non Pro - decisione
+// commerciale, non tecnica, quindi va spiegata qui e non lasciata
+// indovinare fra sei mesi. Mai la prima posizione: aprirla regalerebbe la
+// risposta ("qual e' la migliore") e toglierebbe ogni motivo di pagare. Mai
+// l'ultima: e' scontata ("comunque la peggiore"), non incuriosisce. Le due
+// aperte non devono essere adiacenti, altrimenti sembrano un unico blocco
+// invece di un assaggio sparso su tutta la classifica. Devono restare LE
+// STESSE per la stessa persona ad ogni ricarica - un utente che vede due
+// insegne diverse ogni volta pensa a un difetto, non a un limite dichiarato
+// - quindi la scelta e' una funzione pura dell'user_id (mai Math.random,
+// mai l'ora): stesso utente, stesso numero di insegne valutate, sempre le
+// stesse due posizioni.
+function posizioniAperte(userId, totale) {
+  const candidate = [];
+  for (let p = 2; p <= totale - 1; p++) candidate.push(p); // esclude prima e ultima
+
+  if (candidate.length === 0) return [];
+  const prima = candidate[hashStabile(`${userId}:1`) % candidate.length];
+
+  const nonAdiacenti = candidate.filter((p) => Math.abs(p - prima) >= 2);
+  if (nonAdiacenti.length === 0) return [prima];
+  const seconda = nonAdiacenti[hashStabile(`${userId}:2`) % nonAdiacenti.length];
+
+  return [prima, seconda].sort((a, b) => a - b);
+}
+
 app.get('/insegne', richiedeAuth, async (req, res) => {
   try {
     const r = await classificaInsegne(supabase, req.query.paese || 'italy');
 
     // Per i Pro la risposta resta esattamente questa, senza toccarla. Per i
-    // non Pro: solo le prime 2 di 'valutate' (gia' ordinate), ridotte ai
-    // soli campi che servono a farsi un'idea (niente assi/motivi/criteri,
-    // che sono il dettaglio che vale l'abbonamento); 'insufficienti' sparisce
-    // del tutto; insegne_bloccate conta tutto il resto.
+    // non Pro: si vedono TUTTE le insegne, nello stesso ordine - solo il
+    // dettaglio sparisce da tutte tranne due, scelte da posizioniAperte().
+    // Su una bloccata sparisce anche 'nome', non solo voto/lettera/assi/
+    // motivi/criteri: lasciarlo leggibile direbbe comunque chi e' al primo
+    // posto - la cosa che vendiamo - e nasconderlo solo nell'app non
+    // basterebbe, un curl con lo stesso token lo leggerebbe lo stesso.
+    // "Sparisce" vuol dire il campo non c'e' proprio nell'oggetto, non che
+    // vale null o stringa vuota - la differenza conta per chi consuma
+    // questa risposta. fascia_prezzo/fascia_dettaglio fanno eccezione e
+    // restano anche sulle bloccate: e' un'informazione sul prezzo, non sul
+    // voto, non c'entra con quello che il Pro sblocca.
     if (!(await isPro(req.utente.id))) {
-      const primeDue = r.valutate.slice(0, 2)
-        .map(({ posizione, nome, voto, lettera, copertura }) => ({ posizione, nome, voto, lettera, copertura }));
+      const aperte = new Set(posizioniAperte(req.utente.id, r.valutate.length));
+      const valutate = r.valutate.map((v) => {
+        if (aperte.has(v.posizione)) return { ...v, bloccata: false };
+        const { posizione, copertura, fascia_prezzo, fascia_dettaglio } = v;
+        return {
+          posizione, copertura, bloccata: true,
+          fascia_prezzo: fascia_prezzo ?? null,
+          ...(fascia_dettaglio ? { fascia_dettaglio } : {}),
+        };
+      });
       return res.json({
-        valutate: primeDue,
+        valutate,
         insufficienti: [],
-        insegne_bloccate: (r.valutate.length - primeDue.length) + r.insufficienti.length,
+        insegne_bloccate: valutate.filter((v) => v.bloccata).length,
       });
     }
 
