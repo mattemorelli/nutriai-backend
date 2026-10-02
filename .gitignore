@@ -10,3 +10,6 @@ prove/
 *.jsonl
 dist/
 snapshot-prima-formula-co2.json
+
+# mockup di lavoro, non codice
+Claude outputs/
