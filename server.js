@@ -413,10 +413,24 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
     let campiExtra = {};
     if (!pro && piano.giorno_gratis != null) {
       const totaliPrima = giorni.length;
+      // Anteprima dei giorni bloccati per "Already built for you": il voto
+      // medio del giorno (stessa formula di transformDay in lib/nutrition.js,
+      // media di health_score sui piatti che ne hanno uno) e il numero di
+      // piatti - MAI il nome di un piatto, quello resta solo dietro Pro.
+      const anteprimaBloccati = giorni
+        .filter((g) => g.giorno !== piano.giorno_gratis)
+        .map((g) => {
+          const conVoto = g.pasti.filter((p) => p.health_score != null);
+          const voto = conVoto.length
+            ? conVoto.reduce((s, p) => s + Number(p.health_score), 0) / conVoto.length
+            : null;
+          return { day: g.giorno, voto: voto != null ? Math.round(voto * 10) / 10 : null, piatti: g.pasti.length };
+        });
       giorniRisposta = giorni.filter((g) => g.giorno === piano.giorno_gratis);
       campiExtra = {
         giorno_gratis: piano.giorno_gratis,
         giorni_bloccati: totaliPrima - giorniRisposta.length,
+        anteprima_bloccati: anteprimaBloccati,
       };
     }
 
