@@ -674,8 +674,8 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
     }
 
     res.json(giornoGratisGiaUsato
-      ? { ok: true, kcal: target.kcal, piano: null, giorno_gratis_gia_usato: true }
-      : { ok: true, kcal: target.kcal, ...piano });
+      ? { ok: true, kcal: target.kcal, tdee: target.tdee_predetto, piano: null, giorno_gratis_gia_usato: true }
+      : { ok: true, kcal: target.kcal, tdee: target.tdee_predetto, ...piano });
   } catch (err) {
     console.error('ERRORE /onboarding:', err);
     res.status(500).json({ errore: err.message });
