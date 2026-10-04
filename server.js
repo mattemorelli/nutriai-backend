@@ -380,7 +380,10 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
     for (const r of righe) {
       const d = r.dishes || {};
       const vals = await valoriPiatto(r.dish_id);
-      const fattoreScala = vals.grams > 0 ? (Number(r.portion_g) || 0) / vals.grams : 0;
+      // null (non 0) quando il piatto non ha ingredienti calcolabili - un
+      // dish_ingredients vuoto per quel dish_id. 0.0 g finto per "dato
+      // mancante" sarebbe indistinguibile da un valore vero basso.
+      const fattoreScala = vals.grams > 0 ? (Number(r.portion_g) || 0) / vals.grams : null;
 
       if (!perGiorno[r.day_of_week]) perGiorno[r.day_of_week] = [];
       perGiorno[r.day_of_week].push({
@@ -401,9 +404,9 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
         fibra_g: Number(r.fibre_g) || 0,
         sale_g: Number(r.salt_g) || 0,
         // Calcolati al volo (vedi sopra), non letti da plan_items.
-        carboidrati_g: Number((vals.carb * fattoreScala).toFixed(1)),
-        zuccheri_g: Number((vals.sugar * fattoreScala).toFixed(1)),
-        grassi_g: Number((vals.fat * fattoreScala).toFixed(1)),
+        carboidrati_g: fattoreScala != null ? Number((vals.carb * fattoreScala).toFixed(1)) : null,
+        zuccheri_g: fattoreScala != null ? Number((vals.sugar * fattoreScala).toFixed(1)) : null,
+        grassi_g: fattoreScala != null ? Number((vals.fat * fattoreScala).toFixed(1)) : null,
         health_score: d.health_score,
         avanzi: r.avanzi,
         bloccato: r.bloccato,
