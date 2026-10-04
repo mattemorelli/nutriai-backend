@@ -202,21 +202,27 @@ async function paginaTutto(costruisciQuery) {
 async function calcolaPiatto(dishId) {
   const { data: ingredienti, error } = await supabase
     .from('dish_ingredients')
-    .select('grams, foods (id, name, kcal_100g, protein_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g)')
+    .select('grams, foods (id, name, kcal_100g, protein_100g, carb_100g, sugar_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g)')
     .eq('dish_id', dishId);
 
   if (error) throw error;
 
-  const tot = { kcal: 0, protein: 0, fat: 0, satFat: 0, fibre: 0, salt: 0 };
+  // grams: peso totale della ricetta base (dish_ingredients), non scalato -
+  // serve a risalire al fattore di scala di un plan_item (portion_g/grams),
+  // lo stesso che genera.js/sostituisci.js applicano gia' a protein_g ecc.
+  const tot = { kcal: 0, protein: 0, carb: 0, sugar: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0 };
   for (const riga of ingredienti) {
     const f = riga.foods;
     const fattore = riga.grams / 100;
     tot.kcal    += (f.kcal_100g    || 0) * fattore;
     tot.protein += (f.protein_100g || 0) * fattore;
+    tot.carb    += (f.carb_100g    || 0) * fattore;
+    tot.sugar   += (f.sugar_100g   || 0) * fattore;
     tot.fat     += (f.fat_100g     || 0) * fattore;
     tot.satFat  += (f.sat_fat_100g || 0) * fattore;
     tot.fibre   += (f.fibre_100g   || 0) * fattore;
     tot.salt    += (f.salt_100g    || 0) * fattore;
+    tot.grams   += riga.grams;
   }
   return tot;
 }
@@ -346,7 +352,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
     const { data: righe, error: errItems } = await supabase
       .from('plan_items')
       .select(`
-        id, day_of_week, meal, slot, portion_g, avanzi, bloccato, stato,
+        id, day_of_week, meal, slot, dish_id, portion_g, avanzi, bloccato, stato,
         kcal, protein_g, sat_fat_g, fibre_g, salt_g,
         dishes ( name, name_en, prep_min, steps, steps_en, health_score )
       `)
@@ -358,9 +364,24 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
     const ordinePasto = { colazione: 1, pranzo: 2, spuntino: 3, cena: 4 };
     const ordineSlot = { colazione: 1, primo: 2, secondo: 3, contorno: 4, spuntino: 5, dolce: 6 };
 
+    // carboidrati_g/zuccheri_g/grassi_g non sono (ancora) colonne di
+    // plan_items: si calcolano al volo da dish_ingredients x foods, con lo
+    // stesso fattore di scala (portion_g/grams della ricetta base) che
+    // genera.js/sostituisci.js usano gia' per protein_g, sat_fat_g, ecc. Una
+    // cache per dish_id evita di ricalcolare lo stesso piatto piu' volte -
+    // gli avanzi ricompaiono spesso nella stessa settimana.
+    const cachePiatti = new Map();
+    async function valoriPiatto(dishId) {
+      if (!cachePiatti.has(dishId)) cachePiatti.set(dishId, await calcolaPiatto(dishId));
+      return cachePiatti.get(dishId);
+    }
+
     const perGiorno = {};
     for (const r of righe) {
       const d = r.dishes || {};
+      const vals = await valoriPiatto(r.dish_id);
+      const fattoreScala = vals.grams > 0 ? (Number(r.portion_g) || 0) / vals.grams : 0;
+
       if (!perGiorno[r.day_of_week]) perGiorno[r.day_of_week] = [];
       perGiorno[r.day_of_week].push({
         plan_item_id: r.id,
@@ -379,6 +400,10 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
         saturi_g: Number(r.sat_fat_g) || 0,
         fibra_g: Number(r.fibre_g) || 0,
         sale_g: Number(r.salt_g) || 0,
+        // Calcolati al volo (vedi sopra), non letti da plan_items.
+        carboidrati_g: Number((vals.carb * fattoreScala).toFixed(1)),
+        zuccheri_g: Number((vals.sugar * fattoreScala).toFixed(1)),
+        grassi_g: Number((vals.fat * fattoreScala).toFixed(1)),
         health_score: d.health_score,
         avanzi: r.avanzi,
         bloccato: r.bloccato,
