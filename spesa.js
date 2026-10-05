@@ -42,47 +42,66 @@ function eDaDispensa(nome) {
   return DISPENSA_RX.test(nome || '');
 }
 
-// Trasforma i grammi in qualcosa che ha senso al supermercato.
+// "circa" arrotondato: a 50 g sotto il chilo, a 0,5 kg sopra - mai un
+// grammo esatto, e' sempre una stima di cosa finirai per comprare.
+function circa(g) {
+  if (g < 1000) {
+    const r = Math.max(50, Math.round(g / 50) * 50);
+    return `about ${r} g`;
+  }
+  const kg = Math.round(g / 500) * 0.5;
+  const testo = kg % 1 === 0 ? kg.toFixed(0) : kg.toFixed(1);
+  return `about ${testo} kg`;
+}
+
+// La taglia di una confezione/barattolo, cosi' com'e' scritta sull'etichetta
+// (non "circa": e' la taglia reale del prodotto, non una stima).
+function taglia(pezzo) {
+  if (pezzo < 1000) return `${pezzo} g`;
+  const kg = pezzo / 1000;
+  return `${kg % 1 === 0 ? kg.toFixed(0) : kg.toFixed(1)} kg`;
+}
+
+// Trasforma i grammi in cosa comprare davvero al supermercato: un numero
+// grande (quantita', es. "6", "2 packs", "1 bunch") e, quando aggiunge
+// qualcosa, una nota piccola sotto (quantita_nota, es. "about 1 kg",
+// "250 g each") - mai un peso esatto in grammi, mai una stringa unica (li'
+// dentro l'app non saprebbe dove tagliarla fra numero e nota).
 function quantitaLeggibile(v, g) {
-  if (g < 15 && v.unita !== 'pezzi') return 'a pinch';
+  if (g < 15 && v.unita !== 'pezzi') return { quantita: 'a pinch', quantita_nota: '' };
 
   if (v.unita === 'pezzi' && v.pezzo) {
     const n = Math.max(1, Math.round(g / v.pezzo));
-    return n === 1 ? '1' : `${n}`;
+    return { quantita: `${n}`, quantita_nota: circa(n * v.pezzo) };
   }
-  if (v.unita === 'mazzo') return '1 bunch';
+  if (v.unita === 'mazzo') {
+    const n = v.pezzo ? Math.max(1, Math.round(g / v.pezzo)) : 1;
+    return {
+      quantita: n === 1 ? '1 bunch' : `${n} bunches`,
+      quantita_nota: v.pezzo ? circa(n * v.pezzo) : '',
+    };
+  }
   if (v.unita === 'barattolo' && v.pezzo) {
     const n = Math.max(1, Math.ceil(g / v.pezzo));
-    return n === 1 ? '1 can' : `${n} cans`;
+    const t = taglia(v.pezzo);
+    return {
+      quantita: n === 1 ? '1 can' : `${n} cans`,
+      quantita_nota: n === 1 ? t : `${t} each`,
+    };
   }
   if (v.unita === 'confezione' && v.pezzo) {
     // Al supermercato compri la confezione intera, non i grammi che ti servono.
     const n = Math.max(1, Math.ceil(g / v.pezzo));
-    const taglia = v.pezzo >= 1000
-      ? `${(v.pezzo / 1000).toFixed(1)} kg`
-      : `${v.pezzo} g`;
-    return n === 1 ? `1 × ${taglia}` : `${n} × ${taglia}`;
+    const t = taglia(v.pezzo);
+    return {
+      quantita: n === 1 ? '1 pack' : `${n} packs`,
+      quantita_nota: n === 1 ? t : `${t} each`,
+    };
   }
-  if (g >= 1000) return `${(g / 1000).toFixed(1)} kg`;
-  return `${g} g`;
+  // Ripiego (nessuna unita' dichiarata): mai grammi esatti, sempre arrotondato.
+  return { quantita: circa(g), quantita_nota: '' };
 }
 
-// Quanto paghi davvero: la confezione intera, non i grammi che userai.
-function costoReale(v, g) {
-  let grammiPagati = g;
-
-  if (v.unita === 'confezione' && v.pezzo) {
-    grammiPagati = Math.max(1, Math.ceil(g / v.pezzo)) * v.pezzo;
-  } else if (v.unita === 'barattolo' && v.pezzo) {
-    grammiPagati = Math.max(1, Math.ceil(g / v.pezzo)) * v.pezzo;
-  } else if (v.unita === 'pezzi' && v.pezzo) {
-    grammiPagati = Math.max(1, Math.round(g / v.pezzo)) * v.pezzo;
-  } else if (v.unita === 'mazzo' && v.pezzo) {
-    grammiPagati = v.pezzo;
-  }
-
-  return Math.round(v.prezzo_kg * (grammiPagati / 1000) * 100) / 100;
-}
 
 // Quanto peserebbe la stessa settimana con una dieta onnivora media italiana.
 // Stessa struttura di pasti, stesse quantità, ma i gruppi proteici sostituiti
@@ -162,7 +181,7 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
   const dishIds = [...new Set(attive.map(r => r.dish_id))];
   const { data: ing } = await supabase
     .from('dish_ingredients')
-    .select('dish_id, food_id, grams, foods (name, name_en, name_it, unita, peso_pezzo_g, reparto, green_score, categoria_impatto, prezzo_kg, prezzo_fonte)')
+    .select('dish_id, food_id, grams, foods (name, name_en, name_it, unita, peso_pezzo_g, reparto, green_score, categoria_impatto)')
     .in('dish_id', dishIds);
 
   // nomi dei piatti, per sapere dove finisce ogni ingrediente
@@ -200,8 +219,6 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
             reparto: f.reparto || null,
             green: f.green_score || null,
             cat_impatto: f.categoria_impatto || null,
-            prezzo_kg: f.prezzo_kg ? Number(f.prezzo_kg) : null,
-            prezzo_debole: f.prezzo_fonte === 'stima_debole',
             grammi: 0,
             per: new Set(),
           };
@@ -250,14 +267,14 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
 
       const rep = v.reparto || repartoDi(v.nome);
       const g = Math.round(v.grammi);
+      const { quantita, quantita_nota } = quantitaLeggibile(v, g);
       (perReparto[rep] ||= []).push({
         food_id: v.food_id,
         nome: v.nome,
         grammi: g,
-        quantita: quantitaLeggibile(v, g),
+        quantita,
+        quantita_nota,
         da_dispensa: eDaDispensa(v.nome),
-        costo: v.prezzo_kg ? costoReale(v, g) : null,
-        costo_debole: v.prezzo_debole || false,
         impatto: v.cat_impatto && impattoDi[v.cat_impatto]
           ? {
               voto: impattoDi[v.cat_impatto].voto,
@@ -315,8 +332,6 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
     // mezzo agli altri - il lettore non avrebbe modo di saperlo senza
     // indovinare. Il giorno filtrato, quando c'e', e' un oggetto a parte.
     totale: (() => {
-      const costo = tutteSettimana.reduce((s, v) => s + (v.costo || 0), 0);
-
       // grammi delle fonti proteiche, per costruire il confronto a parità di pasti
       const PROTEICHE = ['manzo','agnello','maiale','pollame','pesce_selvatico',
                          'pesce_allevato','gamberi','uova','formaggio','legumi','tofu'];
@@ -337,26 +352,17 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
         co2_kg: Math.round(co2Totale * 10) / 10,
         co2_tipica_kg: Math.round(co2Tipica * 10) / 10,
         differenza_perc: diff,
-        // I prezzi variano molto fra insegne: si mostra una forbice, non un numero secco
-        costo_min: Math.round(costo * 0.88),
-        costo_max: Math.round(costo * 1.12),
-        costo_giorno: Math.round((costo / 7) * 10) / 10,
         peggiori,
       };
     })(),
     // Solo per chi vede un giorno solo (non Pro con giorno_gratis
-    // impostato): la spesa che vedrebbe davvero al supermercato per quel
-    // che ha davanti in 'reparti' sopra - non compare affatto per un Pro.
+    // impostato): quante voci di 'reparti' sopra appartengono solo a quel
+    // giorno - non compare affatto per un Pro.
     ...(filtraGiorno ? {
-      filtrato: (() => {
-        const costoGiorno = tutteViste.reduce((s, v) => s + (v.costo || 0), 0);
-        return {
-          voci: tutteViste.length,
-          costo_min: Math.round(costoGiorno * 0.88),
-          costo_max: Math.round(costoGiorno * 1.12),
-          voci_bloccate: tutteSettimana.length - tutteViste.length,
-        };
-      })(),
+      filtrato: {
+        voci: tutteViste.length,
+        voci_bloccate: tutteSettimana.length - tutteViste.length,
+      },
     } : {}),
   };
 }
@@ -382,10 +388,14 @@ async function ingredientiPiatto(supabase, dishId, portionG) {
       const f = r.foods || {};
       const v = { unita: f.unita || 'peso', pezzo: f.peso_pezzo_g ? Number(f.peso_pezzo_g) : null };
       const g = Math.round(Number(r.grams || 0) * scala);
+      // Qui serve una riga sola (la schermata del piatto non ha la coppia
+      // numero-grande/nota-piccola della lista della spesa): le due parti
+      // di quantitaLeggibile si ricompongono in una stringa.
+      const { quantita, quantita_nota } = quantitaLeggibile(v, g);
       return {
         food_id: r.food_id,
         nome: f.name_en || f.name || r.food_id,
-        quantita: quantitaLeggibile(v, g),
+        quantita: quantita_nota ? `${quantita} · ${quantita_nota}` : quantita,
       };
     });
 }
