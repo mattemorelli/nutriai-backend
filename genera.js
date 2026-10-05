@@ -134,6 +134,14 @@ function limitiProporzionali(kcal) {
 // chiamante DURANTE la costruzione della giornata (vedi avanzaFinDove), non
 // solo a posteriori. fibraOk resta un pavimento: mai un vincolo, solo
 // riportato come concessione (vedi il ciclo di ricostruzione della settimana).
+// kcalOk (aggiunto insieme ai piatti bloccati, 2026-10-05): adattaGiornata
+// scala le PORZIONI entro i limiti di LIMITI_SCALA, ma se la combinazione
+// scelta per la giornata e' intrinsecamente leggera (o pesante) anche al
+// massimo (o minimo) di quei limiti non ha modo di colmare il resto - senza
+// questo controllo quella giornata veniva accettata comunque, scoperto
+// misurando le giornate con un piatto bloccato (un piatto fisso toglie un
+// grado di liberta' alla ricerca, rendendo il caso piu' frequente, ma puo'
+// capitare a qualunque giornata).
 function valutaGiornataScalata(pastiGiorno, obiettivo) {
   if (!obiettivo || !pastiGiorno.length) return null;
   const adattati = adattaGiornata(pastiGiorno, obiettivo);
@@ -150,6 +158,7 @@ function valutaGiornataScalata(pastiGiorno, obiettivo) {
     satMax: lim.satMaxGiorno, saleMax: lim.saleMaxGiorno, fibraMin: lim.fibraMinGiorno,
     tettoOk: saturi <= lim.satMaxGiorno && sale <= lim.saleMaxGiorno,
     fibraOk: fibra >= lim.fibraMinGiorno,
+    kcalOk: Math.abs(kcal - obiettivo) <= obiettivo * 0.05,
   };
 }
 
@@ -591,43 +600,16 @@ async function foodIdVietatiPerDieta(supabase, dieta) {
   return vietati;
 }
 
-async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
-  // PostgREST impone un tetto di righe per risposta (di default 1000)
-  // indipendente da .limit(): con 1741 piatti nel db va paginato con
-  // .range(), altrimenti i piatti inseriti per ultimi (es. centro_nord_generico)
-  // restano sempre fuori dal generatore.
-  //
-  // Il filtro per famiglia (bug corretto il 2026-09-12: prima 'famiglie' non
-  // veniva usato affatto, la query caricava sempre l'intero catalogo) NON
-  // esclude mai un piatto 'neutro' in base alla sua famiglia: compatibile()
-  // tratta il profilo 'neutro' come sempre ammesso a prescindere dalla
-  // famiglia, e in dishes 33 piatti neutri hanno famiglia='mediterranea'
-  // invece di 'neutra' - filtrarli via famiglia li farebbe sparire per un
-  // utente che ha scelto un'altra famiglia, mentre oggi sono visibili a tutti.
-  const filtroFamiglia = `profilo.eq.neutro,famiglia.in.(${famiglie.join(',')})`;
-
-  const piatti = [];
-  const PAGINA = 1000;
-  for (let offset = 0; ; offset += PAGINA) {
-    const { data: blocco, error } = await supabase
-      .from('dishes')
-      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti')
-      .gte('health_score', sogliaSalute)
-      .not('profilo', 'is', null)
-      .in('occasione', ['quotidiano', 'lungo'])
-      .or(filtroFamiglia)
-      .order('id')
-      .range(offset, offset + PAGINA - 1);
-
-    if (error) throw new Error(error.message);
-    piatti.push(...blocco);
-    if (blocco.length < PAGINA) break;
-  }
-
-  if (!piatti?.length) throw new Error('Nessun piatto etichettato per le cucine scelte');
-
-  const ids = piatti.map(p => p.id);
-  const valori = {};
+// Dalle righe grezze di 'dishes' ai piatti pronti per il generatore: carica
+// tag_nutrizionali e categorie_alimenti (indipendenti dai piatti), poi gli
+// ingredienti di OGNI piatto a blocchi di 200 id (il tetto di PostgREST),
+// e calcola kcal/protein/gruppo/principale/riassunto nutrizionale per
+// ciascuno. Condivisa da caricaPiatti (il pool filtrato per la ricerca) e
+// caricaPiattiPerId (un piatto bloccato specifico, a prescindere da
+// famiglia/soglia salute/occasione - l'utente l'ha gia' approvato bloccandolo).
+async function arricchisciPiatti(supabase, piattiGrezzi) {
+  if (!piattiGrezzi.length) return [];
+  const ids = piattiGrezzi.map(p => p.id);
 
   // F4: tag_nutrizionali (fonte_vitamina_c, ferro_vegetale, caroteni) -
   // caricata una volta, indipendente dai piatti. Vedi genera.js piu' sotto
@@ -647,6 +629,7 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   const categorieDi = {};
   for (const r of (catRighe || [])) (categorieDi[r.food_id] ||= new Set()).add(r.categoria);
 
+  const valori = {};
   for (let i = 0; i < ids.length; i += 200) {
     const blocco = ids.slice(i, i + 200);
     const { data: righe, error: e2 } = await supabase
@@ -695,7 +678,7 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
     return { vitaminaCStato, ferroVegetale, caroteni };
   }
 
-  return piatti
+  return piattiGrezzi
     .filter(p => valori[p.id])
     .map(p => ({
       ...p,
@@ -704,6 +687,57 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
       principale: ingredientePrincipale(valori[p.id].ingredienti),
       ...riassuntoNutrizionale(valori[p.id].ingredienti),
     }));
+}
+
+async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
+  // PostgREST impone un tetto di righe per risposta (di default 1000)
+  // indipendente da .limit(): con 1741 piatti nel db va paginato con
+  // .range(), altrimenti i piatti inseriti per ultimi (es. centro_nord_generico)
+  // restano sempre fuori dal generatore.
+  //
+  // Il filtro per famiglia (bug corretto il 2026-09-12: prima 'famiglie' non
+  // veniva usato affatto, la query caricava sempre l'intero catalogo) NON
+  // esclude mai un piatto 'neutro' in base alla sua famiglia: compatibile()
+  // tratta il profilo 'neutro' come sempre ammesso a prescindere dalla
+  // famiglia, e in dishes 33 piatti neutri hanno famiglia='mediterranea'
+  // invece di 'neutra' - filtrarli via famiglia li farebbe sparire per un
+  // utente che ha scelto un'altra famiglia, mentre oggi sono visibili a tutti.
+  const filtroFamiglia = `profilo.eq.neutro,famiglia.in.(${famiglie.join(',')})`;
+
+  const piatti = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await supabase
+      .from('dishes')
+      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti')
+      .gte('health_score', sogliaSalute)
+      .not('profilo', 'is', null)
+      .in('occasione', ['quotidiano', 'lungo'])
+      .or(filtroFamiglia)
+      .order('id')
+      .range(offset, offset + PAGINA - 1);
+
+    if (error) throw new Error(error.message);
+    piatti.push(...blocco);
+    if (blocco.length < PAGINA) break;
+  }
+
+  if (!piatti?.length) throw new Error('Nessun piatto etichettato per le cucine scelte');
+  return arricchisciPiatti(supabase, piatti);
+}
+
+// Un piatto bloccato specifico, indipendentemente da famiglia/soglia
+// salute/occasione (vedi la regola dei piatti bloccati in generaESalva: un
+// piatto bloccato resta qualunque sia la combinazione - solo l'incompatibilita'
+// con dieta/allergie puo' farlo scartare, mai questi filtri di catalogo).
+async function caricaPiattiPerId(supabase, ids) {
+  if (!ids.length) return [];
+  const { data: piatti, error } = await supabase
+    .from('dishes')
+    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti')
+    .in('id', ids);
+  if (error) throw new Error(error.message);
+  return arricchisciPiatti(supabase, piatti || []);
 }
 
 const compatibile = (piatto, profilo) => piatto.profilo === profilo || piatto.profilo === 'neutro';
@@ -991,17 +1025,43 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     .order('generated_at', { ascending: false }).limit(1).maybeSingle();
   if (ePiano) throw new Error('lettura plans: ' + ePiano.message);
 
+  // Un piatto bloccato resta esattamente nel suo giorno, pasto e slot,
+  // qualunque sia la combinazione (anche una sola cena bloccata, o un solo
+  // contorno): il resto della giornata si costruisce intorno a lui con le
+  // regole normali (vedi il pre-assegnamento dentro provaGradino, piu' sotto).
+  // Risolto qui una volta sola (non per gradino/profilo, che si ripetono)
+  // sul catalogo pieno - un piatto bloccato non deve sparire solo perche'
+  // la sua famiglia/soglia salute/occasione non e' quella di questo
+  // tentativo, l'utente l'ha gia' approvato bloccandolo. Scartato SOLO se
+  // non e' piu' ammesso da dieta/allergie (es. aggiunte nel frattempo):
+  // in quel caso non entra nel piano ed e' segnalato nella risposta.
   const bloccatiPerGiorno = {};
+  const piattiBloccatiScartati = [];
   if (pianoVecchio && mantieniBloccati) {
     const { data: righeBloccate } = await supabase
       .from('plan_items')
-      .select('day_of_week, meal, slot, dish_id, portion_g, kcal, protein_g, sat_fat_g, fibre_g, salt_g')
+      .select('day_of_week, meal, slot, dish_id')
       .eq('plan_id', pianoVecchio.id)
       .eq('bloccato', true);
 
-    for (const r of (righeBloccate || [])) {
-      if (!bloccatiPerGiorno[r.day_of_week]) bloccatiPerGiorno[r.day_of_week] = [];
-      bloccatiPerGiorno[r.day_of_week].push(r);
+    if (righeBloccate?.length) {
+      const idsBloccati = [...new Set(righeBloccate.map(r => r.dish_id))];
+      const piattiRisolti = await caricaPiattiPerId(supabase, idsBloccati);
+      const piattoDi = {};
+      for (const p of piattiRisolti) piattoDi[p.id] = p;
+
+      for (const r of righeBloccate) {
+        const piatto = piattoDi[r.dish_id];
+        if (!piatto || !ammesso(piatto)) {
+          piattiBloccatiScartati.push({
+            dish_id: r.dish_id, day_of_week: r.day_of_week, meal: r.meal, slot: r.slot,
+            name: piatto?.name_en || piatto?.name || null,
+          });
+          continue;
+        }
+        if (!bloccatiPerGiorno[r.day_of_week]) bloccatiPerGiorno[r.day_of_week] = [];
+        bloccatiPerGiorno[r.day_of_week].push({ meal: r.meal, slot: r.slot, piatto });
+      }
     }
   }
 
@@ -1264,6 +1324,33 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       const usoSalse = { valore: 0 };
       const ripetizioniSecondo = { valore: 0 }; // gradino 1: al massimo una nell'intera settimana
       const statoGiorni = Array.from({ length: 7 }, () => ({}));
+
+      // Pre-assegna i piatti bloccati, una volta per tentativo (usati/
+      // usoGruppi sono per-tentativo, azzerati qui sopra): MAI dentro la
+      // pila di backtracking, quindi mai annullati da un "torna indietro" -
+      // e' un vincolo dato da prima che la ricerca cominci, non una scelta
+      // della ricerca. Il resto della giornata (vedi prossimaDecisione piu'
+      // sotto) si decide intorno a questi con le regole normali: stesso
+      // principaleLiberoOggi, stesso paese/profilo del giorno (preso dal
+      // bloccato stesso, non dalla rotazione), stessa ricerca per i soli
+      // slot ancora liberi.
+      for (const [giornoStr, lista] of Object.entries(bloccatiPerGiorno)) {
+        const gi = Number(giornoStr) - 1;
+        const st = statoGiorni[gi];
+        st.bloccatiOggi = lista;
+        for (const b of lista) {
+          if (b.meal === 'cena' && b.slot === 'secondo') { assegnaSecondoScelto(gi, b.piatto); continue; }
+          usati.add(b.piatto.id);
+          if (b.meal === 'colazione') st.colazione = b.piatto;
+          else if (b.meal === 'pranzo' && b.slot === 'primo') st.primo = b.piatto;
+          else if (b.meal === 'pranzo' && b.slot === 'contorno') st.contornoPranzo = b.piatto;
+          else if (b.meal === 'spuntino') { if (st.spuntino === undefined) st.spuntino = b.piatto; else st.spuntino2 = b.piatto; }
+          else if (b.meal === 'cena' && b.slot === 'contorno') {
+            if (b.piatto.base_amidacea) st.base = b.piatto; else st.contornoCena = b.piatto;
+          }
+        }
+      }
+
       const pila = [];
 
       // Stessa forma dell'array 'pasti' costruito a fine funzione per il
@@ -1273,15 +1360,20 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // COMPLETA).
       function pastiDi(gi) {
         const st = statoGiorni[gi];
+        // Quali id sono quelli dei piatti bloccati di oggi: serve a
+        // rimettere bloccato=true sulla riga giusta al salvataggio, senza
+        // dover portare il flag dentro ogni singolo campo di statoGiorni.
+        const idsBloccati = new Set((st.bloccatiOggi || []).map(b => b.piatto.id));
+        const conFlag = (x) => x && { ...x, bloccato: idsBloccati.has(x.piatto.id) };
         return [
-          st.colazione      && { meal: 'colazione', slot: 'colazione', piatto: st.colazione },
-          st.primo          && { meal: 'pranzo',    slot: 'primo',     piatto: st.primo },
-          st.contornoPranzo && { meal: 'pranzo',    slot: 'contorno',  piatto: st.contornoPranzo },
-          st.spuntino       && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino },
-          st.secondo        && { meal: 'cena',      slot: 'secondo',   piatto: st.secondo, avanzi: st.secondoEAvanzo },
-          st.contornoCena   && { meal: 'cena',      slot: 'contorno',  piatto: st.contornoCena },
-          st.base           && { meal: 'cena',      slot: 'contorno',  piatto: st.base },
-          st.spuntino2      && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino2 },
+          conFlag(st.colazione      && { meal: 'colazione', slot: 'colazione', piatto: st.colazione }),
+          conFlag(st.primo          && { meal: 'pranzo',    slot: 'primo',     piatto: st.primo }),
+          conFlag(st.contornoPranzo && { meal: 'pranzo',    slot: 'contorno',  piatto: st.contornoPranzo }),
+          conFlag(st.spuntino       && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino }),
+          conFlag(st.secondo        && { meal: 'cena',      slot: 'secondo',   piatto: st.secondo, avanzi: st.secondoEAvanzo }),
+          conFlag(st.contornoCena   && { meal: 'cena',      slot: 'contorno',  piatto: st.contornoCena }),
+          conFlag(st.base           && { meal: 'cena',      slot: 'contorno',  piatto: st.base }),
+          conFlag(st.spuntino2      && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino2 }),
         ].filter(Boolean);
       }
 
@@ -1474,12 +1566,14 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         const g = gi + 1;
         const st = statoGiorni[gi];
 
-        if (st.bloccatoCompleto === undefined) {
-          const bloccatiOggi = bloccatiPerGiorno[g] || [];
-          st.bloccatoCompleto = bloccatiOggi.some(b => b.slot === 'secondo') && bloccatiOggi.some(b => b.slot === 'primo');
-          st.bloccatiOggi = bloccatiOggi;
+        // Un giorno con un piatto bloccato segue il profilo e il paese di
+        // QUEL piatto (coerenza degli abbinamenti), non la rotazione
+        // settimanale - mai una ricerca per decidere il profiloGiorno:
+        // il piatto bloccato l'ha gia' deciso lui.
+        if (st.profiloGiorno === undefined && st.bloccatiOggi?.length) {
+          const daiBloccati = st.bloccatiOggi.map(b => b.piatto.profilo).find(p => p && p !== 'neutro');
+          if (daiBloccati) st.profiloGiorno = daiBloccati;
         }
-        if (st.bloccatoCompleto) return 'COMPLETO';
 
         if ((g === 3 || g === 6) && st.profiloGiorno === undefined) {
           const candidati = pesoOrdinato(profiliConSecondo, pr => pesoFamiglia[famigliaDi[pr]] || 1, rng);
@@ -1489,7 +1583,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         if (st.profiloGiorno === undefined) st.profiloGiorno = profiloSettimana;
 
         const profiloGiorno = st.profiloGiorno;
-        const paeseGiorno = paesiScelti.length ? paesiScelti[(g - 1) % paesiScelti.length] : null;
+        const paeseDaBloccati = st.bloccatiOggi?.length ? st.bloccatiOggi.map(b => b.piatto.paese).find(Boolean) : null;
+        const paeseGiorno = paeseDaBloccati || (paesiScelti.length ? paesiScelti[(g - 1) % paesiScelti.length] : null);
         const genericoOggi = paeseGiorno ? GENERICO_DI[paeseGiorno] : null;
         // Gradino 3a: oltre al proprio generico, si accetta il pool generico
         // di un'altra macro-area SOLO se e' la stessa famiglia culinaria del
@@ -1584,9 +1679,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           const decisione = prossimaDecisione(gi);
           if (decisione === 'COMPLETO') {
             const st = statoGiorni[gi];
-            if (!st.bloccatoCompleto && obiettivo) {
+            if (obiettivo) {
               const val = valutaGiornataScalata(pastiDi(gi), obiettivo);
-              if (val && !val.tettoOk && !opz.tettoTollerante) {
+              if (val && (!val.tettoOk || !val.kcalOk) && !opz.tettoTollerante) {
                 const tornaA = indietro();
                 if (tornaA < 0) return { esaurito: true, motivo: 'reale' };
                 gi = tornaA;
@@ -1645,42 +1740,33 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       for (let k = 0; k < 7; k++) {
         const g = k + 1;
         const st = statoGiorni[k];
-        if (st.bloccatoCompleto) {
-          // Non e' una concessione del generatore (non e' lui a decidere che
-          // sale/saturi/fibra vadano bene qui): e' l'utente che ha bloccato
-          // primo+secondo di questo giorno, quindi ne' avanzaFinDove ne' il
-          // ciclo qui sotto lo hanno mai valutato. Distinta esplicitamente
-          // da 'tetto_sale_saturi' cosi' chi legge il piano non scambia il
-          // silenzio per un tetto rispettato.
-          concessioni.push({
-            gradino: null, tipo: 'nota', giorno: g, slot: null, vincolo: 'giorno_bloccato_dall_utente',
-            prima: null, dopo: 'sale/saturi/fibra non valutati: giornata bloccata dall\'utente',
-          });
-          settimana.push({ giorno: g, profilo: st.profiloGiorno ?? profiloSettimana, bloccati: st.bloccatiOggi, conforme: true, pasti: [] });
-          continue;
-        }
         const pasti = pastiDi(k);
 
         // Riusa la valutazione gia' fatta DURANTE la ricerca (vedi
         // avanzaFinDove) quando c'e'; la ricalcola solo se manca (giornata
         // senza obiettivo kcal - nessun utente ha ancora un energy_target,
-        // capita per esempio ai profili appena creati). Le giornate
-        // bloccatoCompleto NON arrivano qui: il 'continue' qualche riga sopra
-        // le intercetta prima, quindi non producono mai una concessione
-        // tetto/fibra (verificato: 2026-09-17). Per tutte le altre, sale e
-        // saturi sono un vincolo vero: se questa giornata e' arrivata fin qui
+        // capita per esempio ai profili appena creati). Una giornata con
+        // piatti bloccati arriva qui come ogni altra (vedi il pre-assegnamento
+        // in provaGradino): sale e saturi restano un vincolo vero anche per
+        // lei, valutato sugli stessi valori scalati. Se e' arrivata fin qui
         // con tettoOk=false, il gradino corrente ha tettoTollerante=true
         // (altrimenti avanzaFinDove l'avrebbe scartata, vedi il gate li') - va
         // registrato come concessione, non come piatto rotto. La fibra non
         // blocca mai: solo concessione.
         const val = st.valutazioneNutrienti || valutaGiornataScalata(pasti, obiettivo);
-        const conforme = val ? (val.tettoOk && val.fibraOk) : true;
+        const conforme = val ? (val.tettoOk && val.fibraOk && val.kcalOk) : true;
 
         if (val && !val.tettoOk) {
           concessioni.push({
             gradino: '2b', tipo: 'allentamento', giorno: g, slot: null, vincolo: 'tetto_sale_saturi',
             prima: `sale<=${val.saleMax} saturi<=${val.satMax.toFixed(1)}`,
             dopo: `sale=${val.sale.toFixed(2)} saturi=${val.saturi.toFixed(2)}`,
+          });
+        }
+        if (val && !val.kcalOk) {
+          concessioni.push({
+            gradino: '2b', tipo: 'allentamento', giorno: g, slot: null, vincolo: 'kcal_fabbisogno',
+            prima: `${obiettivo} ±5%`, dopo: Math.round(val.kcal),
           });
         }
         if (val && !val.fibraOk) {
@@ -1719,7 +1805,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         // concessione, non come vincolo duro: imporla in backtracking
         // scarterebbe scelte gia' fatte altrove nel giorno, impatto sulla
         // capienza da misurare con F5 prima di irrigidirla.
-        if (!st.bloccatoCompleto) {
+        {
           const RUOLI_GIORNATA_COMPLETA = ['proteina_principale', 'base_amidacea', 'verdura'];
           const copertiOggi = new Set(pasti.flatMap(p => (p.piatto && p.piatto.ruoli_coperti) || []));
           const mancantiOggi = RUOLI_GIORNATA_COMPLETA.filter(r => !copertiOggi.has(r));
@@ -1883,12 +1969,10 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
     const righe = [];
     for (const g of migliore) {
-      if (g.bloccati && g.bloccati.length && !g.pasti.length) {
-        for (const b of g.bloccati) {
-          righe.push({ plan_id: piano.id, ...b, bloccato: true });
-        }
-        continue;
-      }
+      // Ogni giornata, bloccata o no, passa per la stessa adattaGiornata:
+      // le porzioni dei piatti bloccati possono essere riscalate come
+      // quelle di chiunque altro, solo il piatto stesso resta fisso (vedi
+      // il pre-assegnamento in provaGradino, piu' sopra).
       const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo) : g.pasti.map(p => ({ p, f: 1 }));
       for (const x of adattati) {
         const p = x.p, f = x.f;
@@ -1905,6 +1989,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           fibre_g: Number((p.piatto.fibre * f).toFixed(1)),
           salt_g: Number((p.piatto.salt * f).toFixed(2)),
           avanzi: Boolean(p.avanzi),
+          bloccato: Boolean(p.bloccato),
         });
       }
     }
@@ -1920,11 +2005,15 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     plan_id: salva ? piano.id : null, giorni_conformi: Math.floor(migliorPunteggio), seed,
     gradino: gradinoRaggiunto, concessioni, uso_gruppi: { ...usoGruppi },
     dish_ids: esito.settimana.flatMap((g) => g.pasti.map((x) => x.piatto.id)),
+    // Piatti bloccati che non sono entrati nel piano perche' non piu'
+    // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
+    // li mostra come "N locked dish(es) no longer fit your profile".
+    piatti_bloccati_scartati: piattiBloccatiScartati,
   };
 }
 
 module.exports = {
-  generaESalva, caricaPiatti, gruppoDa, gruppoDaRegex, ancoraProteica, GRUPPO_DA_CATEGORIA,
+  generaESalva, caricaPiatti, caricaPiattiPerId, gruppoDa, gruppoDaRegex, ancoraProteica, GRUPPO_DA_CATEGORIA,
   GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN,
   CATEGORIE_DIETA, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI,
   GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
