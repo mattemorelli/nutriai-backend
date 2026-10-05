@@ -540,7 +540,7 @@ app.get('/', (req, res) => {
 app.get('/profilo', richiedeAuth, async (req, res) => {
   const { data, error } = await supabase
     .from('users')
-    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, pasti_casa, household_size, evening_minutes, paesi, is_pro')
+    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, pasti_casa, household_size, evening_minutes, paesi, is_pro, avatar_path, display_name')
     .eq('id', req.utente.id)
     .maybeSingle();
 
@@ -825,6 +825,21 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
     // comportamento (pasti_casa NULL), non a una griglia incoerente con
     // quello che l'utente ha appena impostato altrove.
     aggiornamento.pasti_casa = null;
+  }
+
+  if ('display_name' in b) {
+    const nome = typeof b.display_name === 'string' ? b.display_name.trim().slice(0, 60) : '';
+    if (!nome) return res.status(400).json({ errore: 'nome non valido' });
+    aggiornamento.display_name = nome;
+  }
+  // avatar_path lo scrive l'app stessa dopo l'upload su Supabase Storage
+  // (bucket 'avatars', file <user_id>.jpg - RLS impedisce di scrivere il
+  // percorso di qualcun altro); null per togliere la foto.
+  if ('avatar_path' in b) {
+    if (b.avatar_path !== null && typeof b.avatar_path !== 'string') {
+      return res.status(400).json({ errore: 'avatar_path non valido' });
+    }
+    aggiornamento.avatar_path = b.avatar_path;
   }
 
   if (!Object.keys(aggiornamento).length) return res.status(400).json({ errore: 'nessun campo da aggiornare' });

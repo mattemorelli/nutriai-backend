@@ -263,7 +263,11 @@ async function ritratto(supabase, userId, isPro) {
 
 async function carbonioSettimanale(supabase, userId) {
   const piani = (await pianiCorrentiPerSettimana(supabase, userId)).slice(0, 6);
-  if (piani.length < 2) return null;
+  // Una sola settimana basta per il grafico (e' la soglia che la sezione
+  // You usa per mostrarlo, vedi lib/sogliaDati.js nell'app): "mossa" (il
+  // confronto con la settimana precedente) resta null finche' non ce ne
+  // sono almeno due, non e' un requisito per la carta in se'.
+  if (piani.length < 1) return null;
 
   const { data: categorie } = await supabase.from('impatto_categorie').select('categoria, co2_kg_per_kg');
   const co2Di = {};
@@ -280,16 +284,18 @@ async function carbonioSettimanale(supabase, userId) {
   const media = Math.round((settimane.reduce((s, w) => s + w.kg, 0) / settimane.length) * 10) / 10;
 
   const corrente = conCo2[conCo2.length - 1];
-  const precedente = conCo2[conCo2.length - 2];
+  const precedente = conCo2.length >= 2 ? conCo2[conCo2.length - 2] : null;
   let mossa = null;
-  let peggiorDelta = 0;
-  let peggiorCat = null;
-  for (const cat of PROTEICHE) {
-    const delta = (corrente.perCategoriaKg[cat] || 0) - (precedente.perCategoriaKg[cat] || 0);
-    if (delta < peggiorDelta) { peggiorDelta = delta; peggiorCat = cat; }
-  }
-  if (peggiorCat) {
-    mossa = { testo: `Less ${NOME_CATEGORIA[peggiorCat]}`, delta_kg: Math.round(peggiorDelta * 10) / 10 };
+  if (precedente) {
+    let peggiorDelta = 0;
+    let peggiorCat = null;
+    for (const cat of PROTEICHE) {
+      const delta = (corrente.perCategoriaKg[cat] || 0) - (precedente.perCategoriaKg[cat] || 0);
+      if (delta < peggiorDelta) { peggiorDelta = delta; peggiorCat = cat; }
+    }
+    if (peggiorCat) {
+      mossa = { testo: `Less ${NOME_CATEGORIA[peggiorCat]}`, delta_kg: Math.round(peggiorDelta * 10) / 10 };
+    }
   }
 
   return { settimane, media, mossa };
