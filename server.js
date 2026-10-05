@@ -34,6 +34,19 @@ async function haPianoEsistente(userId) {
   return Boolean(data);
 }
 
+// "AAAA-MM-GG" di oggi in ora LOCALE, mai da toISOString() (che converte in
+// UTC): un peso registrato tra mezzanotte e l'alba italiana finirebbe
+// datato al giorno prima - stesso bug, stessa correzione di lunediCorrente
+// in genera.js. Usata per measured_on, sia il primo peso dell'onboarding
+// sia ogni upsert di POST /peso.
+function oggiLocale() {
+  const d = new Date();
+  const anno = d.getFullYear();
+  const mese = String(d.getMonth() + 1).padStart(2, '0');
+  const giorno = String(d.getDate()).padStart(2, '0');
+  return `${anno}-${mese}-${giorno}`;
+}
+
 // Avviso all'avvio se stiamo girando con la chiave sbagliata. Le chiavi
 // Supabase sono passate dal vecchio formato JWT (eyJ..., a tre parti) al
 // nuovo sb_secret_/sb_publishable_ (ruotate il 2026-09-25) - qui si
@@ -642,7 +655,7 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
     }
   }
 
-  const oggi = new Date().toISOString().slice(0, 10);
+  const oggi = oggiLocale();
 
   try {
     // 1. profilo
@@ -1490,7 +1503,7 @@ app.post('/peso', richiedeAuth, async (req, res) => {
       return res.status(400).json({ errore: 'Peso non valido' });
     }
 
-    const oggi = new Date().toISOString().slice(0, 10);
+    const oggi = oggiLocale();
 
     // Una sola pesata al giorno: la seconda sovrascrive la prima.
     const { error } = await supabase.from('body_measurements').upsert({
