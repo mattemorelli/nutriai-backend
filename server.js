@@ -540,7 +540,7 @@ app.get('/', (req, res) => {
 app.get('/profilo', richiedeAuth, async (req, res) => {
   const { data, error } = await supabase
     .from('users')
-    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, pasti_casa, household_size, evening_minutes, paesi, is_pro, avatar_path, display_name')
+    .select('sex, birth_year, height_cm, city, region_zone, goal, cook_days, lunch_away, pasti_casa, household_size, evening_minutes, paesi, is_pro, avatar_path, display_name, calendario_regola')
     .eq('id', req.utente.id)
     .maybeSingle();
 
@@ -840,6 +840,34 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
       return res.status(400).json({ errore: 'avatar_path non valido' });
     }
     aggiornamento.avatar_path = b.avatar_path;
+  }
+
+  // La regola "ogni settimana, stessi orari" del foglio calendario (vedi
+  // app, FoglioCalendario/sincronizzaRegola): null la disattiva del tutto.
+  // Sul Supabase (non solo sul telefono) perche' deve sopravvivere a un
+  // cambio di telefono o a una reinstallazione.
+  if ('calendario_regola' in b) {
+    const regola = b.calendario_regola;
+    if (regola !== null) {
+      if (typeof regola !== 'object' || Array.isArray(regola)) {
+        return res.status(400).json({ errore: 'calendario_regola non valida' });
+      }
+      const orario = (v) => typeof v === 'string' && /^\d{2}:\d{2}$/.test(v);
+      const giorni = (v) => Array.isArray(v) && v.length > 0 && v.every((g) => Number.isInteger(g) && g >= 1 && g <= 7);
+      for (const meal of ['cena', 'pranzo']) {
+        const m = regola[meal];
+        if (m != null && (typeof m !== 'object' || !giorni(m.giorni) || !orario(m.pronto))) {
+          return res.status(400).json({ errore: `calendario_regola.${meal} non valido` });
+        }
+      }
+      if (regola.spesa != null) {
+        const sp = regola.spesa;
+        if (typeof sp !== 'object' || !Number.isInteger(sp.giorno) || sp.giorno < 1 || sp.giorno > 7 || !orario(sp.ora)) {
+          return res.status(400).json({ errore: 'calendario_regola.spesa non valido' });
+        }
+      }
+    }
+    aggiornamento.calendario_regola = regola;
   }
 
   if (!Object.keys(aggiornamento).length) return res.status(400).json({ errore: 'nessun campo da aggiornare' });
