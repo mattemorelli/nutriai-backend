@@ -284,13 +284,25 @@ function ingredientePrincipale(ingredienti) {
   return utili.sort((a, b) => b.grams - a.grams)[0].nome.toLowerCase().slice(0, 22);
 }
 
+// AAAA-MM-GG dai getter LOCALI (getFullYear/getMonth/getDate), mai da
+// toISOString(): quella converte in UTC, mentre getDay() qui sopra legge
+// gia' in locale - mescolare i due dentro la stessa funzione sposta il
+// lunedi' di una settimana intera per chi genera un piano tra mezzanotte e
+// l'alba, ora locale (es. le 00:30 di lunedi' sono ancora domenica sera in
+// UTC: getDay() vede lunedi', toISOString() formatta domenica). Bug trovato
+// il 2026-10-05: il piano mostrato in Week era quello della settimana
+// scorsa, non perche' l'app lo sceglieva male ma perche' aveva gia' un
+// week_start sbagliato scritto nel database.
 function lunediCorrente() {
   const oggi = new Date();
   const giorno = oggi.getDay();
   const scarto = giorno === 0 ? -6 : 1 - giorno;
   const lun = new Date(oggi);
   lun.setDate(oggi.getDate() + scarto);
-  return lun.toISOString().slice(0, 10);
+  const anno = lun.getFullYear();
+  const mese = String(lun.getMonth() + 1).padStart(2, '0');
+  const giornoMese = String(lun.getDate()).padStart(2, '0');
+  return `${anno}-${mese}-${giornoMese}`;
 }
 
 // Stessa regola di lunediCorrente() sopra (stesso new Date(), stesso
@@ -917,6 +929,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // Nessun chiamante esistente passa opzioni, quindi il default (true)
   // mantiene il comportamento di sempre.
   const salva = opzioni.salva !== false;
+  // Nessun chiamante esistente passa questa opzione (stesso principio di
+  // "salva" sopra): di default si tengono i piatti bloccati della
+  // settimana precedente, come oggi. Il foglio "nuova settimana" (You)
+  // passa false quando l'utente spegne "Keep the dishes you locked".
+  const mantieniBloccati = opzioni.mantieniBloccati !== false;
 
   // Seed esplicito se passato (per rigiocare un fallimento segnalato),
   // altrimenti generato qui - ma sempre salvato col piano, cosi' ogni
@@ -975,7 +992,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   if (ePiano) throw new Error('lettura plans: ' + ePiano.message);
 
   const bloccatiPerGiorno = {};
-  if (pianoVecchio) {
+  if (pianoVecchio && mantieniBloccati) {
     const { data: righeBloccate } = await supabase
       .from('plan_items')
       .select('day_of_week, meal, slot, dish_id, portion_g, kcal, protein_g, sat_fat_g, fibre_g, salt_g')

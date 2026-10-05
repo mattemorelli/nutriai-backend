@@ -975,7 +975,11 @@ app.post('/genera-piano', richiedeAuth, async (req, res) => {
     if (!(await isPro(req.utente.id))) {
       if (await haPianoEsistente(req.utente.id)) return rispondiServePro(res, 'rigenerazione');
     }
-    const piano = await generaESalva(supabase, req.utente.id);
+    // mantieni_bloccati: facoltativo, true se assente (comportamento di
+    // sempre). Il foglio "nuova settimana" lo manda false quando l'utente
+    // spegne "Keep the dishes you locked".
+    const mantieniBloccati = req.body?.mantieni_bloccati !== false;
+    const piano = await generaESalva(supabase, req.utente.id, undefined, { mantieniBloccati });
     res.json({ ok: true, ...piano });
   } catch (err) {
     console.error('ERRORE /genera-piano:', err);
