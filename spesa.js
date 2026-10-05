@@ -1,4 +1,6 @@
 const { lettera, puntiCarbonio, motiviConfronto, haImballaggioRiciclabile } = require('./voto');
+const { vociInStagione } = require('./stagionalita');
+const { trovaProposte } = require('./sostituisci');
 
 // PostgREST impone un tetto di righe per risposta (di default 1000)
 // indipendente da .limit(): categorie come pane_pasta o formaggio hanno
@@ -102,6 +104,61 @@ function quantitaLeggibile(v, g) {
   return { quantita: circa(g), quantita_nota: '' };
 }
 
+const GIORNI_NOME = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+// Quanto finisci davvero per comprare (non quanto serve in ricetta): la
+// confezione, il pezzo, il mazzo intero - stessa matematica di
+// quantitaLeggibile() sopra, qui usata per scoprire quanto resta
+// inutilizzato invece che per scriverlo in lista. Il ripiego (nessuna
+// unita' dichiarata) non ha sprechi per definizione: senza un'unita' compri
+// esattamente il peso che serve.
+function grammiComprati(v, g) {
+  if (v.unita === 'pezzi' && v.pezzo) return Math.max(1, Math.round(g / v.pezzo)) * v.pezzo;
+  if (v.unita === 'mazzo' && v.pezzo) return Math.max(1, Math.round(g / v.pezzo)) * v.pezzo;
+  if (v.unita === 'barattolo' && v.pezzo) return Math.max(1, Math.ceil(g / v.pezzo)) * v.pezzo;
+  if (v.unita === 'confezione' && v.pezzo) return Math.max(1, Math.ceil(g / v.pezzo)) * v.pezzo;
+  return g;
+}
+
+// "NOTHING THROWN AWAY": per ogni voce con un'unita' dichiarata, quanto di
+// quello che compri finisce davvero nei piatti della settimana. Soglie
+// dichiarate: scarto >= 60% "about half left over", >= 25% "some left
+// over" (ambra in entrambi i casi), altrimenti e' considerata usata per
+// intero - "finished on <giorno>" solo se finisce in un piatto solo un
+// giorno solo (altrimenti "used in N dishes"). Il ripiego (nessuna unita')
+// ritorna null: niente da raccontare, compri il peso esatto.
+function spreco(v, g, giorni) {
+  const comprato = grammiComprati(v, g);
+  if (comprato <= g) return null;
+  const scarto = (comprato - g) / comprato;
+  if (scarto >= 0.6) return { stato: 'avanza', testo: 'about half left over' };
+  if (scarto >= 0.25) return { stato: 'avanza', testo: 'some left over' };
+  if (v.per.size === 1 && giorni.size === 1) {
+    const [unico] = giorni;
+    return { stato: 'finito', testo: `finished on ${GIORNI_NOME[unico - 1]}` };
+  }
+  return { stato: 'usato', testo: v.per.size === 1 ? 'used in 1 dish' : `used in ${v.per.size} dishes` };
+}
+
+// Quanta CO2 pesa un piatto candidato (una proposta di scambio), scalata
+// sulla sua porzione - stessa logica di sommaPerAlimento()/costruisciReparti
+// qui sotto, ma per un piatto preso da solo invece che per l'intera
+// settimana (serve a confrontare "quanto pesa il piatto nuovo" prima di
+// proporlo come scambio).
+async function co2DiPiattoCandidato(supabase, impattoDi, dishId, portionG, numeroPersone) {
+  const { data: ingC } = await supabase
+    .from('dish_ingredients')
+    .select('grams, foods (categoria_impatto)')
+    .eq('dish_id', dishId);
+  const baseC = (ingC || []).reduce((s, r) => s + Number(r.grams || 0), 0);
+  const scala = (baseC > 0 ? portionG / baseC : 1) * numeroPersone;
+  let co2 = 0;
+  for (const r of (ingC || [])) {
+    const cat = r.foods && r.foods.categoria_impatto;
+    if (cat && impattoDi[cat]) co2 += impattoDi[cat].co2 * (Number(r.grams || 0) * scala / 1000);
+  }
+  return co2;
+}
 
 // Quanto peserebbe la stessa settimana con una dieta onnivora media italiana.
 // Stessa struttura di pasti, stesse quantità, ma i gruppi proteici sostituiti
@@ -162,7 +219,7 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
   // le righe del piano che vanno davvero cucinate
   const { data: righe, error } = await supabase
     .from('plan_items')
-    .select('dish_id, portion_g, stato, avanzi, day_of_week')
+    .select('id, dish_id, portion_g, stato, avanzi, day_of_week, bloccato')
     .eq('plan_id', id);
   if (error) throw new Error(error.message);
 
@@ -173,7 +230,7 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
   // famiglia ha bisogno degli ingredienti per tutti quelli che mangiano,
   // non solo per sé.
   const { data: utente } = await supabase
-    .from('users').select('household_size').eq('id', userId).maybeSingle();
+    .from('users').select('household_size, region_zone').eq('id', userId).maybeSingle();
   const numeroPersone = Math.max(1, Number(utente && utente.household_size) || 1);
 
   // ingredienti di tutti i piatti coinvolti (sempre l'intera settimana:
@@ -221,10 +278,12 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
             cat_impatto: f.categoria_impatto || null,
             grammi: 0,
             per: new Set(),
+            giorni: new Set(),
           };
         }
         totali[r.food_id].grammi += Number(r.grams || 0) * scala;
         if (nomiPiatto[riga.dish_id]) totali[r.food_id].per.add(nomiPiatto[riga.dish_id]);
+        if (riga.day_of_week != null) totali[r.food_id].giorni.add(riga.day_of_week);
       }
     }
     return totali;
@@ -284,6 +343,7 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
           : null,
         per: [...v.per].slice(0, 3),
         altri: Math.max(0, v.per.size - 3),
+        spreco: spreco(v, g, v.giorni),
       });
     }
 
@@ -322,6 +382,72 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
       quota: co2Totale > 0 ? Math.round((v.impatto.co2_kg / co2Totale) * 100) : 0,
     }));
 
+  // "NOTHING THROWN AWAY": fino a 3 voci, priorita' a chi avanza.
+  const sprechi = tutteSettimana
+    .filter(v => v.spreco)
+    .sort((a, b) => (a.spreco.stato === 'avanza' ? 0 : 1) - (b.spreco.stato === 'avanza' ? 0 : 1))
+    .slice(0, 3)
+    .map(v => ({
+      nome: v.nome,
+      quantita: v.quantita,
+      quantita_nota: v.quantita_nota,
+      stato: v.spreco.stato,
+      testo: v.spreco.testo,
+    }));
+
+  // "IN SEASON IN <MONTH>": mese corrente, zona dal profilo (se assente,
+  // centro Italia dichiarato - vedi stagionalita.js).
+  const stagione = vociInStagione(tutteSettimana, new Date().getMonth() + 1, utente && utente.region_zone);
+
+  // "WHAT WEIGHS MOST ON YOUR LIST": un solo scambio proposto, il piatto
+  // che pesa di piu' sulla CO2 della settimana (mai un piatto bloccato: non
+  // ha senso proporre di cambiare un pasto che l'utente ha fissato),
+  // confrontato con le alternative di sostituisci.js (stesso slot, stessi
+  // vincoli di dieta/allergie/preferenze dell'utente). Se non trova
+  // un'alternativa piu' leggera, niente scambio: la carta non appare (si
+  // applica la stessa regola dei dati insufficienti delle altre carte).
+  let scambio = null;
+  {
+    const candidabili = attive.filter(r => !r.bloccato);
+    let peggioreRiga = null, peggioreCo2 = 0;
+    for (const r of candidabili) {
+      const base = baseDi[r.dish_id] || 0;
+      const scala = (base > 0 ? Number(r.portion_g || base) / base : 1) * numeroPersone;
+      let co2 = 0;
+      for (const ri of (ing || []).filter(x => x.dish_id === r.dish_id)) {
+        const cat = ri.foods && ri.foods.categoria_impatto;
+        if (cat && impattoDi[cat]) co2 += impattoDi[cat].co2 * (Number(ri.grams || 0) * scala / 1000);
+      }
+      if (co2 > peggioreCo2) { peggioreCo2 = co2; peggioreRiga = r; }
+    }
+    if (peggioreRiga && peggioreCo2 > 0) {
+      try {
+        const risposta = await trovaProposte(supabase, userId, peggioreRiga.id);
+        let migliore = null, migliorCo2 = peggioreCo2;
+        for (const p of (risposta && risposta.proposte) || []) {
+          const co2p = await co2DiPiattoCandidato(supabase, impattoDi, p.dish_id, p.portion_g, numeroPersone);
+          if (co2p < migliorCo2) { migliorCo2 = co2p; migliore = { ...p, co2_kg: co2p }; }
+        }
+        if (migliore) {
+          const nuovoTotale = co2Totale - peggioreCo2 + migliore.co2_kg;
+          const guadagno = co2Totale > 0 ? Math.round((1 - nuovoTotale / co2Totale) * 100) : 0;
+          if (guadagno > 0) {
+            scambio = {
+              item_id: peggioreRiga.id,
+              piatto: (risposta && risposta.originale) || nomiPiatto[peggioreRiga.dish_id] || null,
+              proposta: { dish_id: migliore.dish_id, nome: migliore.nome, portion_g: migliore.portion_g },
+              guadagno_perc: guadagno,
+            };
+          }
+        }
+      } catch (e) {
+        // trovaProposte puo' legittimamente non trovare nulla (profilo
+        // incompleto, nessun piatto ammesso): niente scambio, non un errore
+        // della lista della spesa.
+      }
+    }
+  }
+
   return {
     plan_id: id,
     week_start: weekStart,
@@ -353,6 +479,9 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
         co2_tipica_kg: Math.round(co2Tipica * 10) / 10,
         differenza_perc: diff,
         peggiori,
+        stagione,
+        sprechi,
+        scambio,
       };
     })(),
     // Solo per chi vede un giorno solo (non Pro con giorno_gratis
