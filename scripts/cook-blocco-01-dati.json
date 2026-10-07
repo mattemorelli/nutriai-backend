@@ -108,17 +108,19 @@
       "nome": "Pasta con fave e pecorino",
       "nome_en": "Pasta with broad beans and pecorino",
       "meal_slot": "primo",
-      "note": [
-        "Le fave secche vanno ammollate in acqua per una notte prima di cuocerle: questo passo non è coperto dal timer di Cook, avviene prima di iniziare la ricetta."
-      ],
+      "note": [],
+      "prep_anticipo": {
+        "it": "La sera prima: metti le fave secche in ammollo in abbondante acqua fredda.",
+        "en": "The night before: soak the dried broad beans in plenty of cold water.",
+        "ore": 12
+      },
       "passi": [
-        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per le fave, già ammollate in acqua per una notte.", "testo_en": "Put a pot of water on the heat for the broad beans, already soaked overnight.", "durata_min": 8, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
-        { "ordine": 2, "azione": "bollire", "testo_it": "Scola le fave ammollate e lessale 40 minuti, finché morbide, poi scolale tenendo da parte un po' della loro acqua.", "testo_en": "Drain the soaked beans and boil for 40 minutes, until soft, then drain keeping back some of their water.", "durata_min": 40, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "fave_secche_it", "quota": 1.0 }] },
-        { "ordine": 3, "azione": "scaldare", "testo_it": "Metti sul fuoco un'altra pentola d'acqua per la pasta.", "testo_en": "Put another pot of water on the heat for the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
-        { "ordine": 4, "azione": "bollire", "testo_it": "Cuoci la pasta: segui i tempi della confezione meno un minuto.", "testo_en": "Cook the pasta: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
-        { "ordine": 5, "azione": "saltare", "testo_it": "Scola la pasta, uniscila alle fave con l'olio e un mestolo della loro acqua, mescola un minuto a fuoco medio.", "testo_en": "Drain the pasta, combine it with the beans and the oil and a ladle of their water, stir for one minute over medium heat.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
-        { "ordine": 6, "azione": "condire", "testo_it": "Completa con il pecorino grattugiato.", "testo_en": "Finish with the grated pecorino.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "pecorino_it", "quota": 1.0 }] },
-        { "ordine": 7, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua: servirà sia per le fave, già ammollate in acqua per una notte, sia per la pasta.", "testo_en": "Put a pot of water on the heat: it will be used for both the broad beans, already soaked overnight, and the pasta.", "durata_min": 8, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "bollire", "testo_it": "Scola le fave ammollate e lessale nell'acqua bollente 40 minuti, finché morbide, poi scolale tenendo l'acqua sul fuoco e un po' da parte.", "testo_en": "Drain the soaked beans and boil them in the water for 40 minutes, until soft, then drain, keeping the water on the heat and some aside.", "durata_min": 40, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "fave_secche_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "bollire", "testo_it": "Nella stessa pentola, cuoci la pasta: segui i tempi della confezione meno un minuto.", "testo_en": "In the same pot, cook the pasta: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "saltare", "testo_it": "Scola la pasta, uniscila alle fave con l'olio e un mestolo della loro acqua, mescola un minuto a fuoco medio.", "testo_en": "Drain the pasta, combine it with the beans and the oil and a ladle of their water, stir for one minute over medium heat.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "condire", "testo_it": "Completa con il pecorino grattugiato.", "testo_en": "Finish with the grated pecorino.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "pecorino_it", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
       ]
     },
     {
@@ -141,7 +143,9 @@
       "nome": "Pasta con germogli di soia",
       "nome_en": "Pasta with soy sprouts",
       "meal_slot": "primo",
-      "note": [],
+      "note": [
+        "Marcato paese='italia' nel catalogo ma non sembra cucina italiana (pasta con germogli di soia e salsa di soia): segnalato per chi decide i piatti da proporre, non corretto qui."
+      ],
       "passi": [
         { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per la pasta.", "testo_en": "Put a pot of water on the heat for the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
         { "ordine": 2, "azione": "saltare", "testo_it": "Mentre l'acqua arriva a bollore, scalda l'olio in padella e salta i germogli di soia 3 minuti a fuoco alto.", "testo_en": "While the water comes to the boil, heat the oil in a pan and pan-toss the soy sprouts for 3 minutes over high heat.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "germogli_soia_it", "quota": 1.0 }] },
@@ -204,12 +208,11 @@
         "I vecchi passaggi dicevano 'unisci con olio e aglio', ma l'aglio non è tra gli ingredienti tracciati di questo piatto. Non scritto nei nuovi passaggi."
       ],
       "passi": [
-        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per le lenticchie.", "testo_en": "Put a pot of water on the heat for the lentils.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
-        { "ordine": 2, "azione": "bollire", "testo_it": "Cuoci le lenticchie rosse 12 minuti, finché morbide, poi scolale.", "testo_en": "Cook the red lentils for 12 minutes, until soft, then drain.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "lenticchie_rosse_it", "quota": 1.0 }] },
-        { "ordine": 3, "azione": "scaldare", "testo_it": "Metti sul fuoco un'altra pentola d'acqua per la pasta.", "testo_en": "Put another pot of water on the heat for the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
-        { "ordine": 4, "azione": "bollire", "testo_it": "Cuoci la pasta: segui i tempi della confezione meno un minuto.", "testo_en": "Cook the pasta: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
-        { "ordine": 5, "azione": "saltare", "testo_it": "Scola la pasta, uniscila alle lenticchie con l'olio e mescola un minuto a fuoco medio.", "testo_en": "Drain the pasta, combine it with the lentils and the oil and stir for one minute over medium heat.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
-        { "ordine": 6, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua: servirà sia per le lenticchie sia per la pasta.", "testo_en": "Put a pot of water on the heat: it will be used for both the lentils and the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "bollire", "testo_it": "Cuoci le lenticchie rosse nell'acqua bollente salata 12 minuti, finché morbide, poi scolale tenendo l'acqua sul fuoco.", "testo_en": "Cook the red lentils in the salted boiling water for 12 minutes, until soft, then drain, keeping the water on the heat.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "lenticchie_rosse_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "bollire", "testo_it": "Nella stessa pentola, cuoci la pasta: segui i tempi della confezione meno un minuto.", "testo_en": "In the same pot, cook the pasta: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "saltare", "testo_it": "Scola la pasta, uniscila alle lenticchie con l'olio e mescola un minuto a fuoco medio.", "testo_en": "Drain the pasta, combine it with the lentils and the oil and stir for one minute over medium heat.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
       ]
     },
     {
@@ -218,6 +221,11 @@
       "nome_en": "Salt cod with potatoes",
       "meal_slot": "secondo",
       "note": [],
+      "prep_anticipo": {
+        "it": "Da 24 a 48 ore prima: metti il baccalà in ammollo in acqua fredda in frigorifero, cambiando l'acqua ogni 8 ore, finché perde il sale in eccesso.",
+        "en": "24 to 48 hours before: soak the salt cod in cold water in the fridge, changing the water every 8 hours, until the excess salt is gone.",
+        "ore": 24
+      },
       "passi": [
         { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per le patate.", "testo_en": "Put a pot of water on the heat for the potatoes.", "durata_min": 8, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
         { "ordine": 2, "azione": "asciugare", "testo_it": "Mentre l'acqua arriva a bollore, asciuga il baccalà e taglialo a pezzi grandi.", "testo_en": "While the water comes to the boil, pat the salt cod dry and cut it into large pieces.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "baccala_it", "quota": 1.0 }] },

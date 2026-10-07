@@ -21,6 +21,12 @@ const MAX_CARATTERI = 210; // ~200 con un piccolo margine
 const RX_UNITA_VIETATE = /\b\d+([.,]\d+)?\s*(ml|millilitri|l|litri?|kg|chil[oi]|g|grammi)\b/i;
 const RX_ULTIMI_MINUTI = /\b(ultim[oi]\s+\d+\s+minut\w*|last\s+\d+\s+minutes?)\b/i;
 
+// Ingredienti che richiedono una preparazione in anticipo (ammollo,
+// dissalare...) - devono avere una riga in ricetta.prep_anticipo.
+const FOOD_IDS_RICHIEDONO_ANTICIPO = new Set([
+  'ceci_secchi_it', 'fave_secche_it', 'piselli_secchi_it', 'fagioli_secchi_it', 'baccala_it',
+]);
+
 // ---- linea del tempo reale: i passi in_parallelo si assorbono dentro
 // l'attesa aperta piu' recente, finche' c'e' capienza; l'eccedenza (se
 // durano di piu' dell'attesa che dovrebbe contenerli) si somma al totale
@@ -95,6 +101,7 @@ function calcolaTimeline(passi, avvisi, etichetta) {
     let primoInfornare = null;
     let primoScaldaAcqua = null;
     let primoBollire = null;
+    const passiScaldaAcqua = [];
 
     for (const p of ricetta.passi) {
       nPassi++;
@@ -107,8 +114,9 @@ function calcolaTimeline(passi, avvisi, etichetta) {
       if (p.azione === 'preriscaldare' && primoPreriscaldare == null) primoPreriscaldare = p.ordine;
       if (p.azione === 'infornare' && primoInfornare == null) primoInfornare = p.ordine;
       if (p.azione === 'bollire' && primoBollire == null) primoBollire = p.ordine;
-      if (p.azione === 'scaldare' && primoScaldaAcqua == null && /\bacqua\b/i.test(p.testo_it || '')) {
-        primoScaldaAcqua = p.ordine;
+      if (p.azione === 'scaldare' && /\bacqua\b/i.test(p.testo_it || '')) {
+        if (primoScaldaAcqua == null) primoScaldaAcqua = p.ordine;
+        passiScaldaAcqua.push(p);
       }
 
       // 2. testo IT/EN presenti e non vuoti
@@ -204,11 +212,38 @@ function calcolaTimeline(passi, avvisi, etichetta) {
       }
     }
 
-    // 13. tempo totale sulla linea del tempo reale (i passi in_parallelo si
-    // assorbono nell'attesa che li contiene, non si sommano due volte)
+    // 13. pentole in parallelo: ogni "scaldare acqua" oltre il primo deve
+    // stare fra i primi due passi (messa sul fuoco subito insieme alle
+    // altre) oppure essere in_parallelo (fatta mentre un'altra attesa gia'
+    // aperta e' in corso) - mai una seconda pentola accesa solo dopo che
+    // la prima cottura e' finita.
+    for (const p of passiScaldaAcqua) {
+      if (p.ordine > 2 && !p.in_parallelo) {
+        avvisi.push(
+          `${etichetta} passo ${p.ordine}: "scaldare" l'acqua non e' fra i primi due passi e non e' in_parallelo - rischia di essere una seconda pentola accesa dopo la prima cottura invece che all'inizio`
+        );
+      }
+    }
+
+    // 14. preparazioni in anticipo: legumi secchi/baccala' richiedono una
+    // riga ricetta.prep_anticipo (va in ricetta_info, non in ricetta_passi)
+    const serveAnticipo = [...reali].some(f => FOOD_IDS_RICHIEDONO_ANTICIPO.has(f));
+    if (serveAnticipo && !ricetta.prep_anticipo) {
+      errori.push(`${etichetta}: ha un ingrediente che richiede ammollo/dissalatura (${[...reali].filter(f => FOOD_IDS_RICHIEDONO_ANTICIPO.has(f)).join(', ')}) ma non ha prep_anticipo`);
+    }
+    if (ricetta.prep_anticipo) {
+      const pa = ricetta.prep_anticipo;
+      if (!pa.it || !pa.en || !(pa.ore > 0)) {
+        errori.push(`${etichetta}: prep_anticipo presente ma incompleto (serve it, en, ore > 0)`);
+      }
+    }
+
+    // 15. tempo totale sulla linea del tempo reale (i passi in_parallelo si
+    // assorbono nell'attesa che li contiene, non si sommano due volte) -
+    // le preparazioni in anticipo (prep_anticipo) non entrano qui.
     const totale = calcolaTimeline(ricetta.passi, avvisi, etichetta);
 
-    console.log(`${etichetta}: ${nPassi} passi, ${reali.size} ingredienti reali, ${ricetta.note.length} note | tempo totale reale ${totale} min`);
+    console.log(`${etichetta}: ${nPassi} passi, ${reali.size} ingredienti reali, ${ricetta.note.length} note${ricetta.prep_anticipo ? ', ' + ricetta.prep_anticipo.ore + 'h anticipo' : ''} | tempo totale reale ${totale} min`);
   }
 
   console.log('\n=== Esito ===');

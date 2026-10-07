@@ -58,7 +58,11 @@ function tempoTotaleReale(passi) {
 
     md += `## ${r.nome}\n\n`;
     md += `*${r.nome_en}* — ${r.meal_slot} — id \`${r.dish_id}\`\n\n`;
-    md += `**Tempo totale reale: ${totale} min**\n\n`;
+    md += `**Tempo totale reale: ${totale} min**` + (r.prep_anticipo ? ` — richiede preparazione in anticipo (${r.prep_anticipo.ore}h prima)` : '') + '\n\n';
+
+    if (r.prep_anticipo) {
+      md += `**Da fare in anticipo:** ${r.prep_anticipo.it} *(${r.prep_anticipo.en})*\n\n`;
+    }
 
     if (r.note.length) {
       md += '**Note:**\n';
