@@ -8,6 +8,7 @@ const TEST_USERS = {
   alto: { id: '0fb76f4f-f237-44dc-9ffe-98bebde312ab', email: 'test-alto@nutriai-test.invalid', nota: 'fabbisogno alto, ~2900 kcal, onnivoro, italia (184cm/2007/mantenimento)' },
   vegano: { id: 'ee544d17-2a31-4b9a-a7db-ea8a3d3953f2', email: 'test-vegano@nutriai-test.invalid', nota: 'dieta vegana, italia' },
   pescetarianoGlutine: { id: '2a332989-514e-44f1-8b5c-0eb297c8b269', email: 'test-pescetariano-glutine@nutriai-test.invalid', nota: 'pescetariano + vincolo glutine, italia' },
+  vegetarianoGlutineLattosio: { id: '5a408a85-7725-48e7-8ab9-58ddf3e41c66', email: 'test-vegetariano-glutine-lattosio@nutriai-test.invalid', nota: 'vegetariano + vincolo glutine + vincolo lattosio, italia (aggiunto 2026-10-08 per verifica mercati)' },
 };
 
 const ID_VALIDI = new Set(Object.values(TEST_USERS).map(u => u.id).filter(Boolean));

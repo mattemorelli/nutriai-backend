@@ -1,0 +1,44 @@
+[
+ {
+  "id": "759d8f87-e0f8-4ed1-8ac5-eba765226014",
+  "name": "Tempeh alle erbe in padella",
+  "name_en": "Pan-fried tempeh with herbs",
+  "meal_slot": "secondo"
+ },
+ {
+  "id": "b2a00001-0000-0000-0000-000000000010",
+  "name": "Tempeh con peperoni",
+  "name_en": "Tempeh with Peppers",
+  "meal_slot": "secondo"
+ },
+ {
+  "id": "2d83ecf8-642e-4b34-a46f-c2004822aef5",
+  "name": "Tempeh e verdure al forno",
+  "name_en": "Baked tempeh with vegetables",
+  "meal_slot": "secondo"
+ },
+ {
+  "id": "29902941-37b1-4ad2-8eac-e2e6e371fb74",
+  "name": "Tofu all'aceto di mele con erba cipollina e mela",
+  "name_en": "Cider-glazed tofu with chives and apple",
+  "meal_slot": "secondo"
+ },
+ {
+  "id": "ec92462d-146c-4589-8e86-9e99171acd44",
+  "name": "Tofu alle erbe con pomodori",
+  "name_en": "Herb tofu with tomatoes",
+  "meal_slot": "secondo"
+ },
+ {
+  "id": "03876a15-3217-4c85-9faa-c87d08fce0f1",
+  "name": "Tofu saltato con broccoli",
+  "name_en": "Pan-fried tofu with broccoli",
+  "meal_slot": "secondo"
+ },
+ {
+  "id": "b2a00001-0000-0000-0000-000000000009",
+  "name": "Tofu saltato con verdure",
+  "name_en": "Pan-tossed Tofu with Vegetables",
+  "meal_slot": "secondo"
+ }
+]

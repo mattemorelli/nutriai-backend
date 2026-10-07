@@ -31,6 +31,15 @@ const FAMIGLIA_DI_GENERICO = {
 
 const CORPUS_VERSION = 'v8-paesi-e-vincoli';
 
+// Lancio Italia (2026-10-08): il mercato attivo e' un cancello assoluto,
+// non un gusto - a differenza di paesi/user_cuisine_preferences, che
+// restano un peso morbido dentro il pool gia' filtrato per mercato. Un solo
+// punto da cambiare quando si aprira' un altro mercato (o si passera' a
+// leggerlo per utente/regione invece che come costante globale).
+// Vedi nutriai/audit/solo-italiano.md per l'analisi che ha portato a
+// dishes.mercati e la lista dei piatti qualificati per 'it'.
+const MERCATO_ATTIVO = 'it';
+
 // ---- La scala: si sale di un gradino solo dopo aver esaurito onestamente quello precedente ----
 // Ogni gradino eredita gli allentamenti di quelli precedenti (si sale,
 // non si passa da uno all'altro): 3a e 3b restano due gradini distinti
@@ -709,7 +718,12 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   for (let offset = 0; ; offset += PAGINA) {
     const { data: blocco, error } = await supabase
       .from('dishes')
-      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti')
+      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati')
+      // Cancello di mercato (vedi MERCATO_ATTIVO sopra): va PRIMA del filtro
+      // famiglia/neutro perche' deve valere anche per chi e' 'neutro' - un
+      // piatto 'neutro' fuori mercato non deve comparire solo perche' il
+      // bypass famiglia lo farebbe passare comunque.
+      .contains('mercati', [MERCATO_ATTIVO])
       .gte('health_score', sogliaSalute)
       .not('profilo', 'is', null)
       .in('occasione', ['quotidiano', 'lungo'])
@@ -730,11 +744,18 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
 // salute/occasione (vedi la regola dei piatti bloccati in generaESalva: un
 // piatto bloccato resta qualunque sia la combinazione - solo l'incompatibilita'
 // con dieta/allergie puo' farlo scartare, mai questi filtri di catalogo).
+// ECCEZIONE dal 2026-10-08: il mercato (MERCATO_ATTIVO) non e' un filtro di
+// catalogo come gli altri, e' un cancello assoluto - un piatto bloccato
+// prima del lancio-solo-Italia che oggi risulta fuori mercato deve
+// sbloccarsi da solo, non restare in piano. Chi chiama questa funzione
+// (bloccatiPerGiorno in generaESalva) tratta gia' un id non risolto come
+// "scartato", quindi non serve altro codice: basta non farlo tornare qui.
 async function caricaPiattiPerId(supabase, ids) {
   if (!ids.length) return [];
   const { data: piatti, error } = await supabase
     .from('dishes')
-    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti')
+    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati')
+    .contains('mercati', [MERCATO_ATTIVO])
     .in('id', ids);
   if (error) throw new Error(error.message);
   return arricchisciPiatti(supabase, piatti || []);
@@ -2018,5 +2039,5 @@ module.exports = {
   CATEGORIE_DIETA, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI,
   GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
   caricaEsiti, SOGLIA_RIFIUTO, giornoSettimanaCorrente,
-  risolviSubject, caricaCatalogoPerRisoluzione,
+  risolviSubject, caricaCatalogoPerRisoluzione, MERCATO_ATTIVO,
 };

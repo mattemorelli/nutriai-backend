@@ -27,6 +27,14 @@ const PROFILI = [
     kcal: 2200, height_cm: null, birth_year: null, goal: 'mantenimento',
     glutine: true,
   },
+  {
+    // Aggiunto 2026-10-08 per la verifica del filtro mercati (solo-italiano.md):
+    // mancava un profilo vegetariano + senza glutine + senza lattosio.
+    chiave: 'vegetarianoGlutineLattosio', email: 'test-vegetariano-glutine-lattosio@nutriai-test.invalid',
+    diet: 'vegetariano', paesi: ['italia'], evening_minutes: 45,
+    kcal: 2200, height_cm: null, birth_year: null, goal: 'mantenimento',
+    glutine: true, lattosio: true,
+  },
 ];
 
 (async () => {
@@ -59,11 +67,17 @@ const PROFILI = [
       .upsert({ user_id: utente.id, cucina: 'europea', rank: 1 }, { onConflict: 'user_id,cucina' });
     if (eCucina) console.log(`  (cucina) ${eCucina.message}`);
 
-    if (p.glutine) {
+    if (p.glutine || p.lattosio) {
       await supabase.from('user_constraints').delete().eq('user_id', utente.id);
-      const { error: eGlu } = await supabase.from('user_constraints')
-        .insert([{ user_id: utente.id, kind: 'allergia', subject: 'glutine', severity: 'assoluto' }]);
-      if (eGlu) console.log(`  (glutine) ${eGlu.message}`);
+      const righe = [];
+      // categoria (non solo subject) e' quello che caricaVincoli espande
+      // davvero in food_id da escludere - con solo "subject" la riga finiva
+      // tra i vincoli "non risolti" e non escludeva nulla (bug corretto qui
+      // il 2026-10-08, verificando il filtro mercati).
+      if (p.glutine) righe.push({ user_id: utente.id, kind: 'allergia', subject: 'glutine', categoria: 'glutine', severity: 'assoluto' });
+      if (p.lattosio) righe.push({ user_id: utente.id, kind: 'intolleranza', subject: 'lattosio', categoria: 'lattosio', severity: 'assoluto' });
+      const { error: eVinc } = await supabase.from('user_constraints').insert(righe);
+      if (eVinc) console.log(`  (vincoli) ${eVinc.message}`);
     }
 
     const { error: eEnergy } = await supabase.from('energy_targets').insert([{
