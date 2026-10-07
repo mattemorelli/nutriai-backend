@@ -3,8 +3,10 @@
 // database solo per confrontare le quote dichiarate con gli ingredienti
 // veri del piatto, non scrive nulla.
 require('dotenv').config();
+const path = require('path');
 const { Client } = require('pg');
-const dati = require('./cook-prova-dati.json');
+const file = process.argv[2] || './cook-prova-dati.json';
+const dati = require(path.resolve(__dirname, file));
 
 const AZIONI_CHIUSE = new Set(dati.azioni_cook.map(a => a.codice));
 const FUOCO_VALIDI = new Set(['basso', 'medio', 'alto']);

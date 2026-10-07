@@ -1,11 +1,14 @@
-// Inserisce le ricette di scripts/cook-prova-dati.json in ricetta_passi.
-// Uso: node scripts/inserisci-ricette-cook.js
+// Inserisce le ricette di un file dati (default cook-prova-dati.json, o
+// passato come argomento) in ricetta_passi.
+// Uso: node scripts/inserisci-ricette-cook.js [file.json]
 // Non cancella mai righe esistenti: se un dish_id ha gia' dei passi, si
 // ferma e lo segnala, cosi' lo stesso script serve anche per i blocchi
 // successivi del gruppo A senza rischiare doppioni.
 require('dotenv').config();
+const path = require('path');
 const { Client } = require('pg');
-const dati = require('./cook-prova-dati.json');
+const file = process.argv[2] || './cook-prova-dati.json';
+const dati = require(path.resolve(__dirname, file));
 
 (async () => {
   const client = new Client({ connectionString: process.env.DATABASE_URL });
