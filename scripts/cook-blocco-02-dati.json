@@ -1,0 +1,348 @@
+{
+  "azioni_cook": [
+    { "codice": "cuocere", "nome_it": "Cuocere", "nome_en": "Cook" },
+    { "codice": "aggiungere", "nome_it": "Aggiungere", "nome_en": "Add" },
+    { "codice": "soffriggere", "nome_it": "Soffriggere", "nome_en": "Sauté aromatics" },
+    { "codice": "servire", "nome_it": "Servire", "nome_en": "Serve" },
+    { "codice": "condire", "nome_it": "Condire", "nome_en": "Season" },
+    { "codice": "tagliare", "nome_it": "Tagliare", "nome_en": "Cut" },
+    { "codice": "bollire", "nome_it": "Bollire", "nome_en": "Boil" },
+    { "codice": "infornare", "nome_it": "Infornare", "nome_en": "Bake" },
+    { "codice": "disporre", "nome_it": "Disporre", "nome_en": "Arrange" },
+    { "codice": "stufare", "nome_it": "Stufare", "nome_en": "Braise" },
+    { "codice": "versare", "nome_it": "Versare", "nome_en": "Pour" },
+    { "codice": "tostare", "nome_it": "Tostare", "nome_en": "Toast" },
+    { "codice": "mescolare", "nome_it": "Mescolare", "nome_en": "Stir/Whisk together" },
+    { "codice": "grigliare", "nome_it": "Grigliare", "nome_en": "Grill" },
+    { "codice": "frullare", "nome_it": "Frullare", "nome_en": "Blend" },
+    { "codice": "scaldare", "nome_it": "Scaldare", "nome_en": "Heat (oil/water)" },
+    { "codice": "marinare", "nome_it": "Marinare", "nome_en": "Marinate" },
+    { "codice": "scolare", "nome_it": "Scolare", "nome_en": "Drain" },
+    { "codice": "farcire", "nome_it": "Farcire", "nome_en": "Stuff/fill" },
+    { "codice": "schiacciare", "nome_it": "Schiacciare", "nome_en": "Crush" },
+    { "codice": "formare", "nome_it": "Formare", "nome_en": "Shape" },
+    { "codice": "pulire", "nome_it": "Pulire", "nome_en": "Clean/trim" },
+    { "codice": "coprire", "nome_it": "Coprire", "nome_en": "Cover" },
+    { "codice": "sbattere", "nome_it": "Sbattere", "nome_en": "Whisk/beat (eggs)" },
+    { "codice": "lavare", "nome_it": "Lavare", "nome_en": "Wash/Rinse" },
+    { "codice": "rompere", "nome_it": "Rompere", "nome_en": "Crack/Break" },
+    { "codice": "sbucciare", "nome_it": "Sbucciare", "nome_en": "Peel" },
+    { "codice": "spegnere", "nome_it": "Spegnere", "nome_en": "Turn off heat" },
+    { "codice": "arrostire", "nome_it": "Arrostire", "nome_en": "Roast" },
+    { "codice": "asciugare", "nome_it": "Asciugare", "nome_en": "Pat dry" },
+    { "codice": "preriscaldare", "nome_it": "Preriscaldare", "nome_en": "Preheat (oven)" },
+    { "codice": "saltare", "nome_it": "Saltare", "nome_en": "Pan-toss (vegetables/pasta)" },
+    { "codice": "rosolare", "nome_it": "Rosolare", "nome_en": "Brown/sear (meat/fish)" },
+    { "codice": "battere", "nome_it": "Battere", "nome_en": "Pound (meat slices)" },
+    { "codice": "altro", "nome_it": "Altro", "nome_en": "Other" }
+  ],
+  "ricette": [
+    {
+      "dish_id": "eb83768a-b432-4e0b-a924-cb68c857d1ac",
+      "nome": "Caponata leggera", "nome_en": "Light caponata", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia le melanzane a cubetti e salale.", "testo_en": "Dice the eggplant and salt it.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "melanzana_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "altro", "testo_it": "Lasciale spurgare 15 minuti, poi asciugale bene.", "testo_en": "Let them drain for 15 minutes, then pat dry.", "durata_min": 15, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 3, "azione": "rosolare", "testo_it": "Scalda l'olio e rosola le melanzane 8 minuti finché dorate, poi mettile da parte.", "testo_en": "Heat the oil and brown the eggplant for 8 minutes until golden, then set aside.", "durata_min": 8, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "soffriggere", "testo_it": "Nella stessa padella, cuoci la cipolla e la carota 8 minuti.", "testo_en": "In the same pan, cook the onion and carrot for 8 minutes.", "durata_min": 8, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170000", "quota": 1.0 }, { "food_id": "170393", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "aggiungere", "testo_it": "Aggiungi il pomodoro e cuoci 5 minuti, poi rimetti le melanzane.", "testo_en": "Add the tomato and cook for 5 minutes, then return the eggplant.", "durata_min": 5, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170457", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "aggiungere", "testo_it": "Aggiungi l'aceto e lo zucchero e fai sobbollire 2 minuti: l'equilibrio agrodolce è tutto il piatto.", "testo_en": "Add the vinegar and sugar and let it bubble for 2 minutes: the sweet-sour balance is the whole dish.", "durata_min": 2, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "aceto_vino_it", "quota": 1.0 }, { "food_id": "zucchero_it", "quota": 1.0 }] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Servi a temperatura ambiente, mai calda: le serve un'ora per assestarsi.", "testo_en": "Serve at room temperature, never hot: it needs an hour to settle.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "290dd7e9-353e-4a51-b9de-03d03c9cb299",
+      "nome": "Carote al limone e prezzemolo", "nome_en": "Carrots with lemon and basil", "meal_slot": "contorno",
+      "note": ["Il nome dice 'prezzemolo' ma l'ingrediente vero (anche nei vecchi passaggi inglesi, 'tear the basil in') è il basilico: ho usato il basilico, segnalo la discrepanza nel nome."],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia le carote a rondelle di mezzo centimetro.", "testo_en": "Cut the carrots into half-centimetre rounds.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170393", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "cuocere", "testo_it": "Cuocile nell'olio a fuoco medio 12 minuti con un goccio d'acqua, coperte.", "testo_en": "Cook them in the oil over medium heat for 12 minutes with a splash of water, covered.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "cuocere", "testo_it": "Scopri e lascia evaporare il liquido, così si smaltano invece di lessare.", "testo_en": "Uncover and let the liquid evaporate, so they glaze rather than boil.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "aggiungere", "testo_it": "Aggiungi l'aglio per un minuto, poi spremi il limone fuori dal fuoco.", "testo_en": "Add the garlic for one minute, then squeeze the lemon over off the heat.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "169230", "quota": 1.0 }, { "food_id": "limone_it", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "condire", "testo_it": "Regola di sale e sfoglia il basilico prima di servire.", "testo_en": "Season with salt and tear the basil in before serving.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "basilico_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "3b9de306-bf43-4412-8c2a-99252ad9125f",
+      "nome": "Cipolle al forno", "nome_en": "Baked onions", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "preriscaldare", "testo_it": "Accendi il forno a 190°C, statico.", "testo_en": "Turn the oven on to 190°C, conventional.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 190, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre il forno scalda, taglia le cipolle a metà nel verso della radice, così reggono la cottura.", "testo_en": "While the oven heats, halve the onions through the root so they hold together.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170000", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "condire", "testo_it": "Disponile con il taglio verso l'alto, condisci, versa l'olio e l'aceto sopra.", "testo_en": "Lay them cut side up, season, and drizzle with the oil and vinegar.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "aceto_vino_it", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "infornare", "testo_it": "Inforna 30 minuti, finché morbide fino al centro e caramellate ai bordi.", "testo_en": "Bake for 30 minutes, until soft all the way through and caramelised at the edges.", "durata_min": 30, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 190, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "servire", "testo_it": "Sono pronte quando un coltello non trova resistenza al centro. Servi tiepide.", "testo_en": "They are done when a knife meets no resistance at the centre. Serve warm.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "a8000001-0000-0000-0000-000000000012",
+      "nome": "Insalata di cetrioli alla coreana", "nome_en": "Korean-style cucumber salad", "meal_slot": "contorno",
+      "note": ["Marcato paese='italia' ma è una ricetta coreana: segnalato come piatto non italiano."],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia i cetrioli a fette sottili.", "testo_en": "Slice the cucumbers thinly.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "cetrioli_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "condire", "testo_it": "Condisci con l'aceto, l'olio di sesamo e un pizzico di gochujang.", "testo_en": "Season with the vinegar, sesame oil and a pinch of gochujang.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "aceto_vino_it", "quota": 1.0 }, { "food_id": "olio_sesamo_it", "quota": 1.0 }, { "food_id": "gochujang_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "a9488b47-aeb1-4985-a084-fb4eb8247c14",
+      "nome": "Insalata di finocchi", "nome_en": "Fennel salad", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Affetta i finocchi sottilissimi, idealmente con una mandolina.", "testo_en": "Slice the fennel as thinly as you can, ideally on a mandoline.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "finocchi_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "marinare", "testo_it": "Mettili in acqua fredda 5 minuti: è quello che li rende croccanti invece che afflosciati.", "testo_en": "Drop them into cold water for 5 minutes: this is what makes them crisp rather than limp.", "durata_min": 5, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 3, "azione": "asciugare", "testo_it": "Scolali e asciugali bene con un canovaccio.", "testo_en": "Drain and dry them thoroughly on a cloth.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "condire", "testo_it": "Condisci con l'olio, il succo di limone, sale e abbondante pepe appena prima di servire.", "testo_en": "Dress with the oil, lemon juice, salt and plenty of pepper just before serving.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "limone_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "33713408-da18-409f-a88a-af40a256efba",
+      "nome": "Melanzane a funghetto", "nome_en": "Eggplant a funghetto", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia le melanzane a cubetti da due centimetri e salale.", "testo_en": "Dice the eggplant into 2cm cubes and salt it.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "melanzana_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "altro", "testo_it": "Lasciale spurgare 15 minuti, poi asciugale bene: è quello che impedisce loro di bere tutto l'olio.", "testo_en": "Let it drain for 15 minutes, then pat dry: this is what stops it drinking all the oil.", "durata_min": 15, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 3, "azione": "rosolare", "testo_it": "Scalda l'olio a fuoco medio-alto e falle rosolare 8 minuti, girando, finché morbide e dorate.", "testo_en": "Heat the oil over medium-high heat and brown them for 8 minutes, turning, until soft and golden.", "durata_min": 8, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "aggiungere", "testo_it": "Aggiungi l'aglio e i pomodorini tagliati a metà e cuoci 5 minuti.", "testo_en": "Add the garlic and the halved tomatoes and cook for 5 minutes.", "durata_min": 5, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "169230", "quota": 1.0 }, { "food_id": "170457", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "condire", "testo_it": "Regola di sale e sfoglia il basilico fuori dal fuoco.", "testo_en": "Season with salt and tear the basil in off the heat.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "basilico_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "ab000001-0000-0000-0000-000000000004",
+      "nome": "Musaengchae (insalata di daikon piccante)", "nome_en": "Musaengchae (spicy daikon salad)", "meal_slot": "contorno",
+      "note": [
+        "Marcato paese='italia' ma è una ricetta coreana: segnalato come piatto non italiano.",
+        "I vecchi passaggi citavano anche il cipollotto, ma non è tra gli ingredienti tracciati di questo piatto. Non aggiunto."
+      ],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia il daikon a listarelle sottili.", "testo_en": "Cut the daikon into thin matchsticks.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "daikon_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "condire", "testo_it": "Condisci con il gochujang e l'aceto.", "testo_en": "Season with the gochujang and vinegar.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "gochujang_it", "quota": 1.0 }, { "food_id": "aceto_vino_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "09624782-535f-445a-836c-a34338a2b427",
+      "nome": "Pasta integrale", "nome_en": "Wholemeal pasta", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua abbondante e salala bene.", "testo_en": "Put a generous pot of water on the heat and salt it well.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "bollire", "testo_it": "Cuoci la pasta integrale: segui i tempi della confezione meno un minuto, assaggiando spesso perché passa in fretta dalla tenuta allo scotto.", "testo_en": "Cook the wholemeal pasta: follow the pack time minus one minute, tasting often as it goes from firm to mushy quickly.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "pasta_integrale_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "scolare", "testo_it": "Tieni da parte un mestolo di acqua di cottura e scola.", "testo_en": "Keep a ladle of cooking water aside and drain.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "servire", "testo_it": "Condisci subito con il resto del piatto, allungando con l'acqua tenuta da parte se serve.", "testo_en": "Dress at once with the rest of the dish, loosening with the reserved water if needed.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "baa6fe68-63d7-471a-8d68-a50c78c2adc3",
+      "nome": "Patate al rosmarino", "nome_en": "Rosemary potatoes", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "preriscaldare", "testo_it": "Accendi il forno a 210°C, statico, e metti dentro anche la teglia: una teglia già calda fa partire subito la doratura.", "testo_en": "Turn the oven on to 210°C, conventional, with the tray inside: a hot tray starts browning right away.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 210, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre il forno scalda, taglia le patate a cubi, sciacquale finché l'acqua è limpida e asciugale bene.", "testo_en": "While the oven heats, cut the potatoes into cubes, rinse until the water runs clear and dry them thoroughly.", "durata_min": 4, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170028", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "condire", "testo_it": "Condisci con l'olio, il sale e gli spicchi d'aglio interi.", "testo_en": "Toss with the oil, salt and the whole garlic cloves.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "169230", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "infornare", "testo_it": "Versa sulla teglia calda e inforna 20 minuti, girando una volta.", "testo_en": "Tip onto the hot tray and roast for 20 minutes, turning once.", "durata_min": 20, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 210, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "infornare", "testo_it": "Aggiungi il rosmarino e inforna altri 5 minuti: più a lungo brucia e diventa amaro.", "testo_en": "Add the rosemary and roast 5 minutes more: any longer and it burns and turns bitter.", "durata_min": 5, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 210, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "rosmarino_it", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "servire", "testo_it": "Servi calde.", "testo_en": "Serve hot.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "ff6d9cd1-4649-4f6b-9a8d-98174c1d69ef",
+      "nome": "Peperoni in padella", "nome_en": "Pan-cooked peppers", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia i peperoni a falde larghe e affetta la cipolla.", "testo_en": "Cut the peppers into wide strips and slice the onion.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "peperone_giallo_it", "quota": 1.0 }, { "food_id": "170000", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "soffriggere", "testo_it": "Scalda l'olio a fuoco medio e cuoci la cipolla 6 minuti finché morbida.", "testo_en": "Heat the oil over medium heat and cook the onion for 6 minutes until soft.", "durata_min": 6, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "saltare", "testo_it": "Aggiungi i peperoni e cuoci 15 minuti, finché completamente cedevoli: crudi sanno di acerbo, cotti diventano dolci.", "testo_en": "Add the peppers and cook for 15 minutes, until completely slumped: raw they taste sharp, cooked down they turn sweet.", "durata_min": 15, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "condire", "testo_it": "Regola di sale e finisci con uno spruzzo di aceto fuori dal fuoco.", "testo_en": "Season with salt and finish with a splash of vinegar off the heat.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "aceto_vino_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "e47bf4f2-ef8d-41f2-b22f-85096a8ad5ed",
+      "nome": "Pomodori al forno", "nome_en": "Baked tomatoes", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "preriscaldare", "testo_it": "Accendi il forno a 180°C, statico: una temperatura moderata è quello che li concentra senza bruciare i bordi.", "testo_en": "Turn the oven on to 180°C, conventional: a moderate heat is what concentrates them without burning the edges.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 180, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre il forno scalda, taglia i pomodori a metà e disponili con il taglio verso l'alto in una teglia.", "testo_en": "While the oven heats, halve the tomatoes and lay them cut side up in a dish.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170457", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "condire", "testo_it": "Cospargi con l'aglio tritato e il timo, condisci generosamente e versa l'olio sopra.", "testo_en": "Scatter the chopped garlic and thyme over, season generously and drizzle with the oil.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "169230", "quota": 1.0 }, { "food_id": "timo_it", "quota": 1.0 }, { "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "infornare", "testo_it": "Inforna 25 minuti.", "testo_en": "Bake for 25 minutes.", "durata_min": 25, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 180, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "servire", "testo_it": "Servi tiepidi o a temperatura ambiente, versando sopra il fondo di cottura.", "testo_en": "Serve warm or at room temperature, spooning the juices over.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "b94fa855-31e7-4fc2-b2eb-36565484417b",
+      "nome": "Radicchio alla griglia", "nome_en": "Griddled radicchio", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia il radicchio a spicchi nel verso della radice, così le foglie reggono insieme.", "testo_en": "Cut the radicchio into wedges through the root so the leaves hold together.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "radicchio_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "condire", "testo_it": "Spennella con l'olio e condisci.", "testo_en": "Brush with the oil and season.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "scaldare", "testo_it": "Scalda una bistecchiera a fuoco medio-alto finché molto calda.", "testo_en": "Heat a griddle pan over medium-high heat until very hot.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "grigliare", "testo_it": "Griglia 4 minuti per lato, finché i tagli sono segnati e il cuore si ammorbidisce.", "testo_en": "Grill for 4 minutes per side, until the cut faces are charred and the core softens.", "durata_min": 8, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "condire", "testo_it": "Versa l'aceto sopra mentre è ancora caldo: la dolcezza taglia l'amaro delle foglie.", "testo_en": "Drizzle the vinegar over while still hot: the sweetness cuts the bitterness of the leaves.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "aceto_vino_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "2aaba05e-e850-41f3-a9ab-c1c2fb959ad4",
+      "nome": "Spinaci al limone", "nome_en": "Spinach with lemon", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "soffriggere", "testo_it": "Scalda l'olio a fuoco medio e cuoci l'aglio trenta secondi, senza farlo colorire.", "testo_en": "Heat the oil over medium heat and cook the garlic for thirty seconds, without letting it colour.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "169230", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "saltare", "testo_it": "Aggiungi gli spinaci a manciate, lasciando appassire ogni manciata prima di aggiungere la successiva.", "testo_en": "Add the spinach in handfuls, letting each one wilt before adding the next.", "durata_min": 4, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "spinaci_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "scolare", "testo_it": "Versa via l'acqua che si raccoglie in padella, altrimenti il piatto diventa brodoso.", "testo_en": "Tip off the water that collects in the pan, or the dish turns soupy.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "condire", "testo_it": "Regola di sale e spremi il limone fuori dal fuoco.", "testo_en": "Season with salt and squeeze the lemon over off the heat.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "limone_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "4d8e9437-84b1-4022-8b7e-9820ed3a95c9",
+      "nome": "Verza stufata", "nome_en": "Braised savoy cabbage", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Togli il torsolo duro e taglia le foglie a striscioline.", "testo_en": "Remove the tough core and shred the leaves into ribbons.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "cavolo_verza_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "soffriggere", "testo_it": "Scalda l'olio a fuoco medio e cuoci la cipolla affettata 6 minuti.", "testo_en": "Heat the oil over medium heat and cook the sliced onion for 6 minutes.", "durata_min": 6, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "170000", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "aggiungere", "testo_it": "Aggiungi la verza con un goccio d'acqua e un buon pizzico di sale.", "testo_en": "Add the cabbage with a splash of water and a good pinch of salt.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "stufare", "testo_it": "Copri e cuoci 15 minuti a fuoco basso, mescolando due volte.", "testo_en": "Cover and cook for 15 minutes over low heat, stirring twice.", "durata_min": 15, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "basso", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "stufare", "testo_it": "Scopri e fai evaporare l'acqua in eccesso per altri 3 minuti, regolando di nuovo di sale.", "testo_en": "Uncover and let the excess water evaporate for 3 minutes more, seasoning again.", "durata_min": 3, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "d60d204e-35a1-4d24-98d5-fd3c18cf9dcd",
+      "nome": "Zucchine trifolate", "nome_en": "Zucchini trifolate", "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia le zucchine a rondelle di mezzo centimetro.", "testo_en": "Cut the zucchini into half-centimetre rounds.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "169291", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "soffriggere", "testo_it": "Scalda l'olio a fuoco vivo con uno spicchio d'aglio intero finché profuma, poi toglilo.", "testo_en": "Heat the oil over high heat with a whole garlic clove until it perfumes, then remove it.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "169230", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "saltare", "testo_it": "Disponi le zucchine in un solo strato e lasciale tre minuti senza toccarle.", "testo_en": "Arrange the zucchini in a single layer and leave them for 3 minutes without stirring.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "saltare", "testo_it": "Falle saltare altri 4 minuti: il calore alto e la pazienza sono quello che le rosola invece di stufarle.", "testo_en": "Pan-toss for 4 minutes more: high heat and patience is what browns them instead of steaming them.", "durata_min": 4, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "condire", "testo_it": "Regola di sale, sfoglia il basilico e servi.", "testo_en": "Season with salt, tear the basil in and serve.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "basilico_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "b4000002-0000-0000-0000-000000000010",
+      "nome": "Baked mac and cheese (versione più leggera)", "nome_en": "Baked mac and cheese (lighter version)", "meal_slot": "primo", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "preriscaldare", "testo_it": "Accendi il forno a 220°C, ventilato.", "testo_en": "Turn the oven on to 220°C, fan.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 220, "forno_modalita": "ventilato", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "scaldare", "testo_it": "Mentre il forno scalda, metti sul fuoco una pentola d'acqua per la pasta.", "testo_en": "While the oven heats, put a pot of water on the heat for the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 3, "azione": "bollire", "testo_it": "Cuoci la pasta integrale: segui i tempi della confezione meno un minuto.", "testo_en": "Cook the whole wheat pasta: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "pasta_integrale_it", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "scaldare", "testo_it": "Scalda il latte in un pentolino a fuoco basso, senza farlo bollire.", "testo_en": "Heat the milk in a small pot over low heat, without letting it boil.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "basso", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "latte_ps_it", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "aggiungere", "testo_it": "Togli dal fuoco e sciogli dentro due terzi del cheddar grattugiato, mescolando finché liscio.", "testo_en": "Remove from the heat and melt in two thirds of the grated cheddar, stirring until smooth.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "sharp_cheddar_us", "quota": 0.667 }] },
+        { "ordine": 6, "azione": "aggiungere", "testo_it": "Scola la pasta e uniscila alla salsa al formaggio in una teglia da forno.", "testo_en": "Drain the pasta and combine it with the cheese sauce in a baking dish.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 7, "azione": "infornare", "testo_it": "Cospargi con il cheddar rimasto e inforna 10 minuti, finché gratinato in superficie.", "testo_en": "Scatter the remaining cheddar over and bake for 10 minutes, until gratinated on top.", "durata_min": 10, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 220, "forno_modalita": "ventilato", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "sharp_cheddar_us", "quota": 0.333 }] },
+        { "ordine": 8, "azione": "servire", "testo_it": "Servi subito, ben caldo.", "testo_en": "Serve at once, piping hot.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "aa000001-0000-0000-0000-000000000004",
+      "nome": "Bibimbap con manzo e verdure", "nome_en": "Bibimbap with beef and vegetables", "meal_slot": "primo",
+      "note": [
+        "Marcato paese='italia' ma è una ricetta coreana: segnalato come piatto non italiano.",
+        "Nessun olio è tra gli ingredienti tracciati di questo piatto (serve comunque per saltare carne e verdure): ho scritto la cottura con una padella antiaderente, senza inventare una quota d'olio."
+      ],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per il riso.", "testo_en": "Put a pot of water on the heat for the rice.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "bollire", "testo_it": "Cuoci il riso nell'acqua bollente, scolandolo quando è tenero.", "testo_en": "Cook the rice in the boiling water, draining it once tender.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "168877", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "tagliare", "testo_it": "Nel frattempo taglia la carota a listarelle e il bok choy a pezzi.", "testo_en": "Meanwhile cut the carrot into matchsticks and the bok choy into pieces.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170393", "quota": 1.0 }, { "food_id": "bok_choy_it", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "saltare", "testo_it": "Scalda una padella antiaderente a fuoco alto e salta la carota e il bok choy 4 minuti.", "testo_en": "Heat a nonstick pan over high heat and pan-toss the carrot and bok choy for 4 minutes.", "durata_min": 4, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "rosolare", "testo_it": "Nella stessa padella, rosola il manzo a listarelle sottili 3 minuti, finché ben colorito.", "testo_en": "In the same pan, brown the thinly sliced beef for 3 minutes, until well coloured.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "manzo_magro_arg_it", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "cuocere", "testo_it": "In un'altra padella, cuoci un uovo all'occhio di bue, con il tuorlo ancora morbido.", "testo_en": "In another pan, fry an egg sunny-side up, with the yolk still soft.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "uovo_grande_it", "quota": 1.0 }] },
+        { "ordine": 7, "azione": "disporre", "testo_it": "Componi la ciotola con il riso, le verdure, il manzo e l'uovo sopra.", "testo_en": "Compose the bowl with the rice, the vegetables, the beef and the egg on top.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 8, "azione": "condire", "testo_it": "Completa con il gochujang.", "testo_en": "Finish with the gochujang.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "gochujang_it", "quota": 1.0 }] },
+        { "ordine": 9, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "b9000003-0000-0000-0000-000000000006",
+      "nome": "Maultaschen vegetariani (ravioli tedeschi con spinaci)", "nome_en": "Vegetarian Maultaschen (German ravioli with spinach)", "meal_slot": "primo",
+      "note": [
+        "Marcato paese='italia' ma è una ricetta tedesca: segnalato come piatto non italiano.",
+        "I vecchi passaggi citavano il prezzemolo nel ripieno, ma non è tra gli ingredienti tracciati di questo piatto. Non aggiunto."
+      ],
+      "passi": [
+        { "ordine": 1, "azione": "mescolare", "testo_it": "Trita gli spinaci e mescolali con la ricotta per il ripieno.", "testo_en": "Chop the spinach and mix it with the ricotta for the filling.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "spinaci_it", "quota": 1.0 }, { "food_id": "ricotta_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua: servirà più tardi per cuocerli.", "testo_en": "Put a pot of water on the heat: it will be used later to cook them.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 3, "azione": "mescolare", "testo_it": "Nel frattempo impasta la farina con l'uovo fino a ottenere un panetto liscio.", "testo_en": "Meanwhile knead the flour with the egg until you get a smooth dough.", "durata_min": 4, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "farina_00_it", "quota": 1.0 }, { "food_id": "uovo_grande_it", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "altro", "testo_it": "Lascia riposare l'impasto coperto 10 minuti a temperatura ambiente.", "testo_en": "Let the dough rest, covered, for 10 minutes at room temperature.", "durata_min": 10, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "formare", "testo_it": "Stendi la pasta sottile, ricava dei dischi, farcisci ciascuno con un po' di ripieno e richiudili bene.", "testo_en": "Roll the dough thin, cut out rounds, fill each with a little filling and seal them well.", "durata_min": 8, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 6, "azione": "bollire", "testo_it": "Cuocili nell'acqua bollente salata finché vengono a galla, circa 5 minuti.", "testo_en": "Cook them in the salted boiling water until they float, about 5 minutes.", "durata_min": 5, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Scolali con delicatezza e servi subito, così non si attaccano.", "testo_en": "Drain them gently and serve at once, so they don't stick together.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "a2000001-0000-0000-0000-000000000011",
+      "nome": "Noodle con funghi e gochujang", "nome_en": "Noodles with mushrooms and gochujang", "meal_slot": "primo",
+      "note": ["Marcato paese='italia' ma è una ricetta coreana: segnalato come piatto non italiano."],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per i noodle.", "testo_en": "Put a pot of water on the heat for the noodles.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "saltare", "testo_it": "Mentre l'acqua arriva a bollore, scalda l'olio in padella e salta i funghi affettati 6 minuti a fuoco alto.", "testo_en": "While the water comes to the boil, heat the oil in a pan and pan-toss the sliced mushrooms for 6 minutes over high heat.", "durata_min": 6, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "funghi_champignon_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "bollire", "testo_it": "Cuoci i noodle: segui i tempi della confezione meno un minuto.", "testo_en": "Cook the noodles: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "noodle_grano_it", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "aggiungere", "testo_it": "Scola i noodle e uniscili ai funghi con il gochujang, mescolando bene.", "testo_en": "Drain the noodles and combine them with the mushrooms and the gochujang, stirring well.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "gochujang_it", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "aa000001-0000-0000-0000-000000000008",
+      "nome": "Pad Thai vegetariano con tofu", "nome_en": "Vegetarian Pad Thai with tofu", "meal_slot": "primo",
+      "note": [
+        "Marcato paese='italia' ma è una ricetta thailandese: segnalato come piatto non italiano.",
+        "Nessun olio è tra gli ingredienti tracciati di questo piatto: ho scritto la cottura del tofu con una padella antiaderente, senza inventare una quota d'olio."
+      ],
+      "passi": [
+        { "ordine": 1, "azione": "marinare", "testo_it": "Metti gli spaghetti di riso in ammollo in acqua calda finché morbidi, circa 10 minuti.", "testo_en": "Soak the rice noodles in hot water until soft, about 10 minutes.", "durata_min": 10, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Nel frattempo taglia il tofu a cubetti.", "testo_en": "Meanwhile cut the tofu into cubes.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "tofu_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "saltare", "testo_it": "Scalda una padella antiaderente a fuoco alto e salta il tofu 4 minuti, finché dorato.", "testo_en": "Heat a nonstick pan over high heat and pan-toss the tofu for 4 minutes, until golden.", "durata_min": 4, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "scolare", "testo_it": "Scola gli spaghetti di riso.", "testo_en": "Drain the rice noodles.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "spaghetti_riso_it", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "saltare", "testo_it": "Aggiungili al tofu con la pasta di tamarindo e la salsa di soia e salta 2 minuti.", "testo_en": "Add them to the tofu with the tamarind paste and soy sauce and pan-toss for 2 minutes.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "tamarindo_it", "quota": 1.0 }, { "food_id": "salsa_soia_it", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "condire", "testo_it": "Completa con le arachidi tritate e una spremuta di lime.", "testo_en": "Finish with the chopped peanuts and a squeeze of lime.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "arachidi_crude_it", "quota": 1.0 }, { "food_id": "lime_sudam_it", "quota": 1.0 }] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "f1000001-0000-0000-0000-000000000006",
+      "nome": "Pasta con melanzane e peperoni", "nome_en": "Pasta with eggplant and peppers", "meal_slot": "primo", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per la pasta.", "testo_en": "Put a pot of water on the heat for the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre l'acqua arriva a bollore, taglia le melanzane e i peperoni a cubetti.", "testo_en": "While the water comes to the boil, dice the eggplant and peppers.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "melanzana_it", "quota": 1.0 }, { "food_id": "peperone_giallo_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "saltare", "testo_it": "Scalda l'olio in padella e saltali 5 minuti a fuoco alto.", "testo_en": "Heat the oil in a pan and pan-toss them for 5 minutes over high heat.", "durata_min": 5, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "aggiungere", "testo_it": "Aggiungi un mestolo d'acqua e cuoci 10 minuti, finché morbidi.", "testo_en": "Add a ladle of water and cook for 10 minutes, until soft.", "durata_min": 10, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "bollire", "testo_it": "Nella pentola d'acqua già pronta, cuoci la pasta: segui i tempi della confezione meno un minuto.", "testo_en": "In the pot of water already prepared, cook the pasta: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "saltare", "testo_it": "Scola la pasta e uniscila al condimento, mescolando un minuto.", "testo_en": "Drain the pasta and stir it into the sauce for one minute.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "e1111111-0000-0000-0000-000000000003",
+      "nome": "Pasta con melanzane e pomodoro", "nome_en": "Pasta with eggplant and tomato", "meal_slot": "primo", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per la pasta.", "testo_en": "Put a pot of water on the heat for the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre l'acqua arriva a bollore, taglia le melanzane a cubetti.", "testo_en": "While the water comes to the boil, dice the eggplant.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "melanzana_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "saltare", "testo_it": "Scalda l'olio in padella e saltale 5 minuti a fuoco alto, finché dorate.", "testo_en": "Heat the oil in a pan and pan-toss it for 5 minutes over high heat, until golden.", "durata_min": 5, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "aggiungere", "testo_it": "Aggiungi il pomodoro a pezzi e cuoci 10 minuti.", "testo_en": "Add the chopped tomato and cook for 10 minutes.", "durata_min": 10, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170457", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "bollire", "testo_it": "Nella pentola d'acqua già pronta, cuoci la pasta: segui i tempi della confezione meno un minuto.", "testo_en": "In the pot of water already prepared, cook the pasta: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "saltare", "testo_it": "Scola la pasta e uniscila al condimento, mescolando un minuto.", "testo_en": "Drain the pasta and stir it into the sauce for one minute.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "a1900001-0000-0000-0000-000000000009",
+      "nome": "Pasta con polpo e pomodoro", "nome_en": "Pasta with octopus and tomato", "meal_slot": "primo", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per il polpo.", "testo_en": "Put a pot of water on the heat for the octopus.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "bollire", "testo_it": "Cuoci il polpo nell'acqua bollente 30 minuti, finché tenero, poi scolalo tenendo l'acqua sul fuoco e taglialo a pezzi.", "testo_en": "Cook the octopus in the boiling water for 30 minutes, until tender, then drain, keeping the water on the heat, and cut it into pieces.", "durata_min": 30, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "polpo_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "soffriggere", "testo_it": "Scalda l'olio in padella e scalda il pomodoro a pezzi 5 minuti.", "testo_en": "Heat the oil in a pan and warm the chopped tomato for 5 minutes.", "durata_min": 5, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "170457", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "aggiungere", "testo_it": "Aggiungi il polpo e scaldalo nel sugo 2 minuti.", "testo_en": "Add the octopus and warm it through in the sauce for 2 minutes.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "bollire", "testo_it": "Nella stessa pentola d'acqua, cuoci la pasta: segui i tempi della confezione meno un minuto.", "testo_en": "In the same pot of water, cook the pasta: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "saltare", "testo_it": "Scola la pasta e uniscila al condimento, mescolando un minuto.", "testo_en": "Drain the pasta and stir it into the sauce for one minute.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "c1000001-0000-0000-0000-000000000011",
+      "nome": "Pasta con scampi", "nome_en": "Pasta with scampi", "meal_slot": "primo", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per la pasta.", "testo_en": "Put a pot of water on the heat for the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "soffriggere", "testo_it": "Mentre l'acqua arriva a bollore, scalda l'olio in padella con l'aglio un minuto.", "testo_en": "While the water comes to the boil, heat the oil in a pan with the garlic for one minute.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "169230", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "saltare", "testo_it": "Aggiungi gli scampi e saltali 3 minuti, finché rosa e opachi.", "testo_en": "Add the scampi and pan-toss for 3 minutes, until pink and opaque.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "scampi_it", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "bollire", "testo_it": "Cuoci la pasta nell'acqua bollente: segui i tempi della confezione meno un minuto.", "testo_en": "Cook the pasta in the boiling water: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "saltare", "testo_it": "Scola la pasta tenendo un mestolo della sua acqua, uniscila agli scampi e manteca un minuto.", "testo_en": "Drain the pasta keeping a ladle of its water, combine it with the scampi and toss for one minute.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 6, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "a1900001-0000-0000-0000-000000000006",
+      "nome": "Pasta con seppie", "nome_en": "Pasta with cuttlefish", "meal_slot": "primo", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per la pasta.", "testo_en": "Put a pot of water on the heat for the pasta.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre l'acqua arriva a bollore, taglia le seppie ad anelli.", "testo_en": "While the water comes to the boil, slice the cuttlefish into rings.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "seppie_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "soffriggere", "testo_it": "Scalda l'olio in padella con l'aglio un minuto.", "testo_en": "Heat the oil in a pan with the garlic for one minute.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "169230", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "saltare", "testo_it": "Aggiungi le seppie e saltale 3 minuti.", "testo_en": "Add the cuttlefish and pan-toss for 3 minutes.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "bollire", "testo_it": "Cuoci la pasta nell'acqua bollente: segui i tempi della confezione meno un minuto.", "testo_en": "Cook the pasta in the boiling water: follow the pack time minus one minute.", "durata_min": 9, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": true, "ingredienti": [{ "food_id": "169736", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "saltare", "testo_it": "Scola la pasta tenendo un mestolo della sua acqua, uniscila alle seppie e manteca un minuto.", "testo_en": "Drain the pasta keeping a ladle of its water, combine it with the cuttlefish and toss for one minute.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    }
+  ]
+}
