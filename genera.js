@@ -826,9 +826,16 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
 
   const gruppiDelProfilo = gruppiPerProfilo[profiloSettimana] || new Set();
 
+  // Dal gradino 1 in su (opz.ripetizione) candidatiSecondo ammette una
+  // ripetizione nell'intera settimana: con N giorni di cottura bastano
+  // N-1 secondi distinti, non N. Prima questo controllo lo ignorava e
+  // scartava per aritmetica profili che la ricerca vera avrebbe potuto
+  // completare (misurato 2026-10-08: "europeo-leggero", 6 distinti, sempre
+  // scartato anche ai gradini con ripetizione attiva).
   const nSecondi = contaDisponibili(secondi, true);
-  if (nSecondi < secondiFreschiNecessari) {
-    return { ok: false, messaggio: `servono ${secondiFreschiNecessari} secondi distinti, ne ha ${nSecondi}` };
+  const sogliaSecondi = secondiFreschiNecessari - (opz.ripetizione ? 1 : 0);
+  if (nSecondi < sogliaSecondi) {
+    return { ok: false, messaggio: `servono ${sogliaSecondi} secondi distinti, ne ha ${nSecondi}` };
   }
   if (!opz.quotaTollerante) {
     for (const [gruppo, q] of Object.entries(QUOTE)) {
@@ -1344,6 +1351,14 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       const usoGruppi = {};
       const usoSalse = { valore: 0 };
       const ripetizioniSecondo = { valore: 0 }; // gradino 1: al massimo una nell'intera settimana
+      // Stessa regola del secondo (gradino 1: al massimo una ripetizione a
+      // settimana), con in piu' il vincolo che non capiti mai due giorni di
+      // fila: un contorno con l'amido non deve sentirsi "lo stesso pranzo di
+      // ieri". giornoBaseDi ricorda in quale giorno un piatto e' stato usato
+      // la prima volta in questo slot, cosi' candidatiBase puo' verificare
+      // la distanza prima di riproporlo.
+      const ripetizioniBase = { valore: 0 };
+      const giornoBaseDi = new Map();
       const statoGiorni = Array.from({ length: 7 }, () => ({}));
 
       // Pre-assegna i piatti bloccati, una volta per tentativo (usati/
@@ -1463,6 +1478,30 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           if (piatto.gruppo) usoGruppi[piatto.gruppo]--;
         };
       }
+      // Stesso schema di assegnaSecondoScelto: una ripetizione non tocca
+      // 'usati' (e' gia' dentro) e si annulla senza rimuoverlo. giornoBaseDi
+      // tiene la prima apparizione per il controllo di distanza in
+      // candidatiBase; su una ripetizione non si aggiorna (conta sempre
+      // dalla prima volta, non dall'ultima).
+      function assegnaBaseScelto(gi, piatto) {
+        const eRipetizione = usati.has(piatto.id);
+        statoGiorni[gi].base = piatto;
+        if (!eRipetizione) {
+          usati.add(piatto.id);
+          giornoBaseDi.set(piatto.id, gi);
+        } else {
+          ripetizioniBase.valore++;
+        }
+        return () => {
+          delete statoGiorni[gi].base;
+          if (!eRipetizione) {
+            usati.delete(piatto.id);
+            giornoBaseDi.delete(piatto.id);
+          } else {
+            ripetizioniBase.valore--;
+          }
+        };
+      }
       function assegnaProfiloGiorno(gi, profilo) {
         statoGiorni[gi].profiloGiorno = profilo;
         return () => { delete statoGiorni[gi].profiloGiorno; };
@@ -1576,7 +1615,17 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
       function candidatiBase(gi, paeseOk) {
         const altriDelPasto = compagniDiPasto(gi, 'cena');
-        return mescolaPesata(contorni.filter(p => p.base_amidacea && paeseOk(p) && !usati.has(p.id) && !rifiutato(p) && principaleLiberoOggi(gi, p)), (p) => pesoCandidato(p, altriDelPasto), rng);
+        const base = (p) => p.base_amidacea && paeseOk(p) && !rifiutato(p) && principaleLiberoOggi(gi, p);
+        const fresco = contorni.filter(p => base(p) && !usati.has(p.id));
+        // Stessa ripetizione del secondo (gradino 1, al massimo una a
+        // settimana), ma mai a meno di due giorni di distanza dalla prima
+        // volta: un contorno con l'amido ripetuto il giorno dopo si
+        // sentirebbe "lo stesso pasto di ieri" in un modo che un secondo
+        // ripetuto a distanza non da'.
+        const ripetuto = (opz.ripetizione && ripetizioniBase.valore < 1)
+          ? contorni.filter(p => base(p) && usati.has(p.id) && giornoBaseDi.has(p.id) && Math.abs(giornoBaseDi.get(p.id) - gi) >= 2)
+          : [];
+        return concatenaLivelli([fresco, ripetuto], rng, altriDelPasto);
       }
 
       // Determina la prossima decisione necessaria per il giorno `gi`.
@@ -1675,7 +1724,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           colazione: (p) => assegnaSlot(gi, 'colazione', p),
           spuntino: (p) => assegnaSlot(gi, 'spuntino', p),
           spuntino2: (p) => assegnaSlot(gi, 'spuntino2', p),
-          base: (p) => assegnaSlot(gi, 'base', p),
+          base: (p) => assegnaBaseScelto(gi, p),
         };
         return creaFrame(g, scelto.nomeSlot, scelto.candidati, applicaPerSlot[scelto.nomeSlot]);
       }
