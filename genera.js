@@ -92,24 +92,46 @@ const LIMITI_SCALA = {
 // (misurato: 13% delle righe primo/secondo/contorno sopra 500g, fino a
 // 1038g). Il tetto vince sempre sul rapporto: le kcal che non ci stanno in
 // un piatto devono andare altrove (un altro piatto, piu' spuntino), mai
-// gonfiare oltre il tetto. Frutta secca: 40g e' lo spuntino stesso (non un
-// ingrediente fra altri), uso contiene_frutta_secca - gia' verificato
-// allineato agli ingredienti reali da verifica-flag-allergeni.js.
+// gonfiare oltre il tetto. Valori di riferimento per ~2000 kcal/giorno.
 const TETTO_GRAMMI = {
   primo: 450, secondo: 350, contorno: 350, pane: 120, patate: 350, colazione: 350, spuntino: 250,
   spuntino_frutta_secca: 40,
 };
 
-function limitiDi(p) {
+// I tetti sono calibrati su un fabbisogno di ~2000 kcal: un profilo a 3533
+// kcal (vedi la verifica del 2026-10-09: giornate crollate a 1781-2032 kcal,
+// ben sotto obiettivo, perche' ogni piatto satura un tetto pensato per
+// un'altra persona) ha bisogno di porzioni piu' grandi per arrivarci, un
+// profilo a 1590 kcal di porzioni piu' piccole. Scala come la radice quasi
+// quadrata del rapporto kcal (esponente 0.7, non 1: le porzioni non devono
+// crescere alla stessa velocita' delle kcal, altrimenti un fabbisogno
+// doppio tornerebbe a porzioni-chilo - 0.7 e' lo stesso tipo di scala
+// sub-lineare con cui le porzioni reali crescono con il fabbisogno). Tetti
+// min 0.7x (verso i 1200 kcal, il minimo clinico) e max 1.8x (sopra i
+// ~4600 kcal, oltre il range di questi profili).
+function fattoreTetto(obiettivo) {
+  if (!obiettivo) return 1;
+  return Math.max(0.7, Math.min(1.8, Math.pow(obiettivo / 2000, 0.7)));
+}
+
+function limitiDi(p, obiettivo) {
   const ratio = p.piatto.base_amidacea ? LIMITI_SCALA.base : (LIMITI_SCALA[p.slot] || [0.9, 1.2]);
   const tipo = tipoAmidoDiAccompagnamento(p.piatto);
-  const tettoGrammi = tipo === 'pane' ? TETTO_GRAMMI.pane
+  const fattore = fattoreTetto(obiettivo);
+  const tettoGrammi = (tipo === 'pane' ? TETTO_GRAMMI.pane
     : tipo === 'patate' ? TETTO_GRAMMI.patate
-    : (p.slot === 'spuntino' && p.piatto.contiene_frutta_secca) ? TETTO_GRAMMI.spuntino_frutta_secca
-    : (TETTO_GRAMMI[p.slot] || TETTO_GRAMMI.contorno);
+    : (TETTO_GRAMMI[p.slot] || TETTO_GRAMMI.contorno)) * fattore;
   const grammiBase = p.piatto.grams || 0;
   if (!grammiBase) return ratio;
-  const maxEffettivo = Math.min(ratio[1], tettoGrammi / grammiBase);
+  let maxEffettivo = Math.min(ratio[1], tettoGrammi / grammiBase);
+  // Frutta secca: il tetto vale sull'INGREDIENTE frutta a guscio/arachidi,
+  // non sul piatto intero (problema 3 trovato alla verifica: "Mela e
+  // mandorle" finiva a 40g totali, quando il problema erano solo le
+  // mandorle - la mela puo' restare quanto serve).
+  if (p.piatto.grammiFruttaSecca > 0) {
+    const maxRatioNoce = (TETTO_GRAMMI.spuntino_frutta_secca * fattore) / p.piatto.grammiFruttaSecca;
+    maxEffettivo = Math.min(maxEffettivo, maxRatioNoce);
+  }
   // Se la ricetta base e' gia' piu' pesante del tetto anche al minimo
   // normale del rapporto (piatti a verdura abbondante, bassa densita'
   // calorica: 672g di "Lenticchie e spinaci" restano 605g anche a 0.9x), il
@@ -125,7 +147,7 @@ function limitiDi(p) {
 // Distribuisce il residuo calorico proporzionalmente allo spazio di manovra
 // di ciascun elemento, invece di moltiplicare tutto per lo stesso fattore.
 function adattaGiornata(pasti, obiettivo) {
-  const stato = pasti.map(p => ({ p, f: 1, lim: limitiDi(p) }));
+  const stato = pasti.map(p => ({ p, f: 1, lim: limitiDi(p, obiettivo) }));
   const totale = () => stato.reduce((s, x) => s + (x.p.piatto.kcal || 0) * x.f, 0);
 
   for (let i = 0; i < 15; i++) {
@@ -209,7 +231,7 @@ function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine) {
     satMax: lim.satMaxGiorno, saleMax: lim.saleMaxGiorno, fibraMin: lim.fibraMinGiorno, proteinMin,
     tettoOk: saturi <= lim.satMaxGiorno && sale <= lim.saleMaxGiorno,
     fibraOk: fibra >= lim.fibraMinGiorno,
-    kcalOk: Math.abs(kcal - obiettivo) <= obiettivo * 0.05,
+    kcalOk: Math.abs(kcal - obiettivo) <= obiettivo * 0.10,
     proteinOk: proteinMin == null || proteine >= proteinMin,
   };
 }
@@ -714,7 +736,7 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
     const blocco = ids.slice(i, i + 200);
     const { data: righe, error: e2 } = await supabase
       .from('dish_ingredients')
-      .select('dish_id, food_id, grams, foods (name, kcal_100g, protein_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g, stato)')
+      .select('dish_id, food_id, grams, foods (name, kcal_100g, protein_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g, stato, categoria_impatto)')
       .in('dish_id', blocco);
     if (e2) throw new Error(e2.message);
 
@@ -732,7 +754,7 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
       v.fibre   += (f.fibre_100g   || 0) * k;
       v.salt    += (f.salt_100g    || 0) * k;
       v.grams   += r.grams;
-      v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', grams: r.grams, stato: f.stato || null, protein_100g: f.protein_100g || 0 });
+      v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', grams: r.grams, stato: f.stato || null, protein_100g: f.protein_100g || 0, categoria_impatto: f.categoria_impatto || null });
     }
   }
 
@@ -770,6 +792,20 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
     return ingredienti.some(i => (categorieDi[i.food_id] || new Set()).has('amido'));
   }
 
+  // Grammi (ricetta base) di frutta a guscio/arachidi nel piatto - serve al
+  // tetto grammi (problema D) per limitare l'INGREDIENTE, non il piatto
+  // intero: "Mela e mandorle" non deve diventare un piatto da 40g solo
+  // perche' contiene mandorle, va capato sulle mandorle (vedi limitiDi).
+  // categoria_impatto='frutta_secca' (non categorie_alimenti 'frutta_guscio'/
+  // 'arachidi': quelle sono allergeniche e giustamente inclusive, taggano
+  // anche il latte di mandorla - 200g di bevanda non sono 200g di mandorle.
+  // Qui serve l'alimento vero e proprio, non chi ne contiene traccia).
+  function grammiFruttaSeccaDi(ingredienti) {
+    return ingredienti
+      .filter(i => i.categoria_impatto === 'frutta_secca')
+      .reduce((s, i) => s + i.grams, 0);
+  }
+
   return piattiGrezzi
     .filter(p => valori[p.id])
     .map(p => ({
@@ -778,6 +814,7 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
       gruppo: gruppoDa(valori[p.id].ingredienti, categorieDi),
       principale: ingredientePrincipale(valori[p.id].ingredienti),
       amidoReale: amidoDaIngredienti(valori[p.id].ingredienti),
+      grammiFruttaSecca: grammiFruttaSeccaDi(valori[p.id].ingredienti),
       ...riassuntoNutrizionale(valori[p.id].ingredienti),
     }));
 }
@@ -890,6 +927,17 @@ function tipoAccompagnamentoDaSecondo(secondo) {
   if (morbido || RE_SECONDO_UMIDO.test(testo)) return 'pane';
   if (RE_SECONDO_ARROSTO.test(testo)) return 'patate';
   return 'patate';
+}
+
+// Un piatto "senza glutine" e' una sostituzione pensata per chi il glutine
+// non lo puo' mangiare: a chi non ha quel vincolo non porta nessun
+// vantaggio reale (problema 4 dell'audit, 2026-10-09 - "Pane senza
+// glutine" proposto anche a chi non e' celiaco). Non esclude i piatti
+// naturalmente senza glutine (riso, patate...), solo quelli che lo
+// dichiarano nel nome come caratteristica apposita.
+const RE_SOSTITUTO_SENZA_GLUTINE = /senza glutine/i;
+function sostitutoSenzaGlutineNonRichiesto(piatto, haVincoloGlutine) {
+  return RE_SOSTITUTO_SENZA_GLUTINE.test(piatto.name || '') && !haVincoloGlutine;
 }
 
 function accompagnaBene(accompagnamento, piattoBase) {
@@ -1086,7 +1134,14 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
     `Vincoli: ${foodIdVietati.size} alimenti vietati, ${foodIdSgraditi.size} sgraditi (dieta: ${dieta}), ${nonRisolti.length} non risolti`
   );
 
-  return { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito };
+  // Categorie assolute escluse (vincoli dell'utente, non la dieta): serve a
+  // chi deve sapere SE l'utente esclude il glutine, non solo quali food_id
+  // sono vietati - es. "Pane senza glutine" non va proposto a chi il
+  // glutine lo mangia normalmente (problema 4 dell'audit, 2026-10-09): una
+  // sostituzione speciale per chi ne ha bisogno, non un'alternativa neutra.
+  const categorieVietate = categorieDaEspandere;
+
+  return { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito, categorieVietate };
 }
 
 // Un piatto non piaciuto due volte non si ripropone: e' un no chiaro. Soglia
@@ -1182,8 +1237,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   };
 
   const dieta = profiloUtente?.diet || 'onnivoro';
-  const { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito } =
+  const { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito, categorieVietate } =
     await caricaVincoli(supabase, userId, dieta);
+  const haVincoloGlutine = categorieVietate.has('glutine');
 
   // Cosa l'utente ha deciso di tenere dalla settimana precedente
   const { data: pianoVecchio, error: ePiano } = await supabase
@@ -1255,6 +1311,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // La dieta è un vincolo assoluto: si applica una volta sola, a monte,
   // così quote, piano proteico e selezione lavorano già su piatti ammessi.
   piatti = piatti.filter(ammesso);        // assoluti: filtrati una volta sola, come prima
+  piatti = piatti.filter(p => !sostitutoSenzaGlutineNonRichiesto(p, haVincoloGlutine));
   const piattiConSgraditi = piatti;       // ci si arriva solo al gradino 4b
   piatti = piatti.filter(gradito);        // il caso normale: preferenze rispettate
 
@@ -1557,11 +1614,13 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           conFlag(st.colazione      && { meal: 'colazione', slot: 'colazione', piatto: st.colazione }),
           conFlag(st.primo          && { meal: 'pranzo',    slot: 'primo',     piatto: st.primo }),
           conFlag(st.contornoPranzo && { meal: 'pranzo',    slot: 'contorno',  piatto: st.contornoPranzo }),
+          conFlag(st.basePranzo     && { meal: 'pranzo',    slot: 'contorno',  piatto: st.basePranzo }),
           conFlag(st.spuntino       && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino }),
           conFlag(st.secondo        && { meal: 'cena',      slot: 'secondo',   piatto: st.secondo, avanzi: st.secondoEAvanzo }),
           conFlag(st.contornoCena   && { meal: 'cena',      slot: 'contorno',  piatto: st.contornoCena }),
           conFlag(st.base           && { meal: 'cena',      slot: 'contorno',  piatto: st.base }),
           conFlag(st.spuntino2      && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino2 }),
+          conFlag(st.spuntino3      && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino3 }),
         ].filter(Boolean);
       }
 
@@ -1668,19 +1727,19 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // riflette sempre esattamente cio' che e' assegnato adesso.
       function principaliOggi(gi) {
         const st = statoGiorni[gi];
-        return [st.colazione, st.primo, st.contornoPranzo, st.spuntino, st.secondo, st.contornoCena, st.base, st.spuntino2]
+        return [st.colazione, st.primo, st.contornoPranzo, st.basePranzo, st.spuntino, st.secondo, st.contornoCena, st.base, st.spuntino2, st.spuntino3]
           .filter(Boolean).map(p => p.principale).filter(Boolean);
       }
       const principaleLiberoOggi = (gi, p) => !p.principale || !principaliOggi(gi).includes(p.principale);
 
-      // F4: piatti gia' scelti nello stesso pasto (pranzo = primo+contorno,
-      // cena = secondo+contorno+base), qualunque sia l'ordine in cui la
-      // ricerca li ha decisi - la ricerca sceglie prima lo slot con meno
-      // candidati, non sempre nello stesso ordine, quindi va letto da
-      // statoGiorni al momento della scelta, non assunto fisso.
+      // F4: piatti gia' scelti nello stesso pasto (pranzo = primo+contorno
+      // [+pane d'emergenza], cena = secondo+contorno+base), qualunque sia
+      // l'ordine in cui la ricerca li ha decisi - la ricerca sceglie prima
+      // lo slot con meno candidati, non sempre nello stesso ordine, quindi
+      // va letto da statoGiorni al momento della scelta, non assunto fisso.
       function compagniDiPasto(gi, pasto) {
         const st = statoGiorni[gi];
-        if (pasto === 'pranzo') return [st.primo, st.contornoPranzo].filter(Boolean);
+        if (pasto === 'pranzo') return [st.primo, st.contornoPranzo, st.basePranzo].filter(Boolean);
         if (pasto === 'cena') return [st.secondo, st.contornoCena, st.base].filter(Boolean);
         return [];
       }
@@ -1729,19 +1788,19 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       function candidatiContorno(gi, ruolo, profiloGiorno, paeseGiorno, paeseOk, limiteOggi, piattoAbbinato, altroContorno) {
         const g = gi + 1;
         const trasportabileSeServe = ruolo === 'pranzo' ? (c) => (!pranzoFuoriIl(g) || c.trasportabile) : () => true;
-        // A cena, un contorno di pasta/riso/farro/orzo/couscous scondito non e'
-        // cucina italiana di casa (problema A, 2026-10-09) - non solo come
-        // "base" di riempimento (candidatiBase, che gia' li esclude), ma anche
-        // come normale contorno scelto qui: l'unico amido ammesso a cena e'
-        // pane o patate, mai un primo travestito da contorno.
-        const nonCerealeSconditoSeCena = (c) =>
-          ruolo !== 'cena' || !c.base_amidacea || tipoAmidoDiAccompagnamento(c) != null;
+        // Un contorno di pasta/riso/farro/orzo/couscous scondito non e'
+        // cucina italiana di casa (problema A, poi problema 5 trovato alla
+        // verifica: tornava a PRANZO - "Farro con pastinaca" + contorno
+        // "Pasta integrale" - perche' la prima correzione escludeva questi
+        // piatti solo a cena). Vale sempre, pranzo e cena: l'unico amido
+        // ammesso come contorno e' pane o patate, mai un primo travestito.
+        const nonCerealeScondito = (c) => !c.base_amidacea || tipoAmidoDiAccompagnamento(c) != null;
         const base = (c) =>
           !usati.has(c.id) && !rifiutato(c) &&
           (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g) &&
           (!altroContorno || c.id !== altroContorno.id) &&
           trasportabileSeServe(c) &&
-          nonCerealeSconditoSeCena(c) &&
+          nonCerealeScondito(c) &&
           principaleLiberoOggi(gi, c);
 
         const proprio = contorni.filter(c => compatibile(c, profiloGiorno) && accompagnaBene(c, piattoAbbinato) && paeseOk(c) && base(c));
@@ -1786,6 +1845,65 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           ? contorni.filter(p => base(p) && usati.has(p.id) && giornoBaseDi.has(p.id) && Math.abs(giornoBaseDi.get(p.id) - gi) >= 2)
           : [];
         return concatenaLivelli([fresco, ripetuto], rng, altriDelPasto);
+      }
+
+      // Aumenti di emergenza (problema 1/2 della verifica, 2026-10-09): se a
+      // fine giornata le kcal restano sotto obiettivo perche' ogni piatto e'
+      // gia' al suo tetto in grammi, non c'e' piu' spazio per gonfiare un
+      // piatto esistente - va aggiunta capacita' nuova. Nell'ordine chiesto:
+      // pane anche a pranzo, un terzo spuntino, una colazione piu' ricca.
+      // Chiamati SOLO da avanzaFinDove quando serve (non sono decisioni
+      // sempre presenti come le altre), ma con lo stesso meccanismo di
+      // frame/applica/annulla cosi' il backtracking li annulla come tutto
+      // il resto se la giornata viene poi scartata per altri motivi.
+      function candidatiBasePranzo(gi, paeseOk) {
+        const altriDelPasto = compagniDiPasto(gi, 'pranzo');
+        const base = (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === 'pane' &&
+          paeseOk(p) && !rifiutato(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p);
+        return concatenaLivelli([contorni.filter(base)], rng, altriDelPasto);
+      }
+      function assegnaBasePranzoScelto(gi, piatto) {
+        statoGiorni[gi].basePranzo = piatto;
+        usati.add(piatto.id);
+        return () => { delete statoGiorni[gi].basePranzo; usati.delete(piatto.id); };
+      }
+
+      function candidatiSpuntino3(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
+        const st = statoGiorni[gi];
+        const altri = [st.spuntino, st.spuntino2].filter(Boolean);
+        const base = (p) =>
+          !usati.has(p.id) && !rifiutato(p) && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
+          !altri.some(a => a.id === p.id) && principaleLiberoOggi(gi, p);
+        const proprio = spuntini.filter(p => compatibile(p, profiloGiorno) && base(p));
+        const neutro = spuntini.filter(p => (p.profilo === 'neutro' || !p.profilo) && base(p));
+        return concatenaLivelli([proprio, neutro], rng);
+      }
+      function assegnaSpuntino3Scelto(gi, piatto) {
+        statoGiorni[gi].spuntino3 = piatto;
+        usati.add(piatto.id);
+        return () => { delete statoGiorni[gi].spuntino3; usati.delete(piatto.id); };
+      }
+
+      // Rifa' la scelta della colazione preferendo le piu' ricche in kcal
+      // (non il solito peso casuale): qui si cerca deliberatamente piu'
+      // energia, non varieta'. Annulla ripristina la colazione precedente,
+      // non la cancella - non e' un'aggiunta, e' una sostituzione.
+      function candidatiColazionePiuRicca(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
+        const base = (p) => !usati.has(p.id) && !rifiutato(p) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
+        const candidati = colazioni.filter(p => compatibile(p, profiloGiorno) && base(p));
+        return candidati.slice().sort((a, b) => (b.kcal || 0) - (a.kcal || 0));
+      }
+      function assegnaColazionePiuRicca(gi, piatto) {
+        const st = statoGiorni[gi];
+        const precedente = st.colazione;
+        if (precedente) usati.delete(precedente.id);
+        st.colazione = piatto;
+        usati.add(piatto.id);
+        return () => {
+          usati.delete(piatto.id);
+          if (precedente) { st.colazione = precedente; usati.add(precedente.id); }
+          else delete st.colazione;
+        };
       }
 
       // Determina la prossima decisione necessaria per il giorno `gi`.
@@ -1902,6 +2020,64 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // per l'ultimo slot deciso di QUESTA giornata (stesso meccanismo di
       // 'decisione === null', non uno nuovo). Il risultato si salva su
       // statoGiorni[gi] cosi' il ciclo di ricostruzione dopo non ricalcola.
+      // Ricostruisce dai valori salvati su statoGiorni[gi] lo stesso contesto
+      // (profiloGiorno, paeseOk, le cappe tempo) che prossimaDecisione calcola
+      // da zero per quel giorno - serve qui perche' gli aumenti di emergenza
+      // (vedi sopra) si decidono DOPO che il giorno e' COMPLETO, fuori dallo
+      // scope locale di prossimaDecisione.
+      function contestoGiorno(gi) {
+        const g = gi + 1;
+        const st = statoGiorni[gi];
+        const profiloGiorno = st.profiloGiorno;
+        const paeseGiorno = st.paeseGiorno;
+        const genericoOggi = st.genericoOggi;
+        const famigliaOggi = genericoOggi ? FAMIGLIA_DI_GENERICO[genericoOggi] : null;
+        const paeseOk = (p) => !paeseGiorno
+          || p.paese === paeseGiorno
+          || (genericoOggi && p.paese === genericoOggi)
+          || (opz.genericoStessaFamiglia && famigliaOggi && FAMIGLIA_DI_GENERICO[p.paese] === famigliaOggi)
+          || (opz.genericoQualunqueFamiglia && GENERICI.includes(p.paese));
+        const paeseOkLeggero = (p) => paeseOk(p) || p.paese === 'mediterraneo_generico';
+        const cappaColazione = opz.tempoAllargato ? 25 : 15;
+        const cappaSpuntino = opz.tempoAllargato ? 20 : 10;
+        return { g, profiloGiorno, paeseOk, paeseOkLeggero, cappaColazione, cappaSpuntino };
+      }
+
+      // Aumenti di emergenza, nell'ordine richiesto: pane a pranzo, terzo
+      // spuntino, colazione piu' ricca. Si ferma al primo che chiude il
+      // buco; ogni aumento e' un frame vero (pila.push+entraFrame), quindi
+      // se la giornata viene poi scartata per un altro motivo il
+      // backtracking lo annulla come qualunque altra scelta.
+      function provaAumentoKcal(gi) {
+        const st = statoGiorni[gi];
+        const ctx = contestoGiorno(gi);
+        const prova = (nomeSlot, candidati, applica) => {
+          if (!candidati.length) return false;
+          const frame = creaFrame(ctx.g, nomeSlot, candidati, applica);
+          pila.push(frame);
+          entraFrame(frame);
+          return true;
+        };
+        const ancoraCorto = () => {
+          const val = valutaGiornataScalata(pastiDi(gi), obiettivo, obiettivoProteine);
+          return val && val.kcal < obiettivo && !val.kcalOk;
+        };
+
+        if (!ancoraCorto()) return;
+        if (st.basePranzo === undefined) {
+          const pranzoHaAmido = (st.primo && st.primo.amidoReale) || (st.contornoPranzo && st.contornoPranzo.amidoReale);
+          if (!pranzoHaAmido) prova('basePranzo', candidatiBasePranzo(gi, ctx.paeseOk), (p) => assegnaBasePranzoScelto(gi, p));
+        }
+
+        if (!ancoraCorto()) return;
+        if (st.spuntino3 === undefined) {
+          prova('spuntino3', candidatiSpuntino3(gi, ctx.profiloGiorno, ctx.paeseOkLeggero, ctx.cappaSpuntino), (p) => assegnaSpuntino3Scelto(gi, p));
+        }
+
+        if (!ancoraCorto()) return;
+        prova('colazionePiuRicca', candidatiColazionePiuRicca(gi, ctx.profiloGiorno, ctx.paeseOkLeggero, ctx.cappaColazione), (p) => assegnaColazionePiuRicca(gi, p));
+      }
+
       function avanzaFinDove(giIniziale) {
         let gi = giIniziale;
         while (gi < 7) {
@@ -1910,8 +2086,16 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           if (decisione === 'COMPLETO') {
             const st = statoGiorni[gi];
             if (obiettivo) {
+              provaAumentoKcal(gi);
               const val = valutaGiornataScalata(pastiDi(gi), obiettivo, obiettivoProteine);
-              if (val && (!val.tettoOk || !val.kcalOk || !val.proteinOk) && !opz.tettoTollerante) {
+              // Il tetto sale/saturi resta allentabile dal gradino 2b
+              // (tettoTollerante); kcal e proteine NON lo sono mai, a
+              // nessun gradino (problema 2 della verifica, 2026-10-09: un
+              // gradino alto accettava giornate sotto obiettivo o sotto il
+              // minimo proteico invece di cercare altrove) - se non bastano
+              // nemmeno dopo gli aumenti di emergenza, e' un vicolo cieco
+              // vero, si torna indietro.
+              if (val && ((!val.tettoOk && !opz.tettoTollerante) || !val.kcalOk || !val.proteinOk)) {
                 const tornaA = indietro();
                 if (tornaA < 0) return { esaurito: true, motivo: 'reale' };
                 gi = tornaA;
@@ -1995,13 +2179,13 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
         if (val && !val.kcalOk) {
           concessioni.push({
-            gradino: '2b', tipo: 'allentamento', giorno: g, slot: null, vincolo: 'kcal_fabbisogno',
-            prima: `${obiettivo} ±5%`, dopo: Math.round(val.kcal),
+            gradino: null, tipo: 'vincolo_non_soddisfatto', giorno: g, slot: null, vincolo: 'kcal_fabbisogno',
+            prima: `${obiettivo} ±10%`, dopo: Math.round(val.kcal),
           });
         }
         if (val && !val.proteinOk) {
           concessioni.push({
-            gradino: '2b', tipo: 'allentamento', giorno: g, slot: null, vincolo: 'proteine_minime',
+            gradino: null, tipo: 'vincolo_non_soddisfatto', giorno: g, slot: null, vincolo: 'proteine_minime',
             prima: `>=${val.proteinMin.toFixed(1)}`, dopo: val.proteine.toFixed(1),
           });
         }
@@ -2099,7 +2283,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
 
         // Gradino 5: voto salute sotto la soglia obiettivo di 7.
-        for (const [slot, piatto] of Object.entries({ secondo: st.secondo, primo: st.primo, contornoCena: st.contornoCena, contornoPranzo: st.contornoPranzo, colazione: st.colazione, spuntino: st.spuntino, spuntino2: st.spuntino2, base: st.base })) {
+        for (const [slot, piatto] of Object.entries({ secondo: st.secondo, primo: st.primo, contornoCena: st.contornoCena, contornoPranzo: st.contornoPranzo, colazione: st.colazione, spuntino: st.spuntino, spuntino2: st.spuntino2, spuntino3: st.spuntino3, base: st.base, basePranzo: st.basePranzo })) {
           if (!piatto) continue;
           const voto = piatto.health_score;
           if (voto != null && voto < 7) {
@@ -2255,5 +2439,5 @@ module.exports = {
   GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
   caricaEsiti, SOGLIA_RIFIUTO, giornoSettimanaCorrente,
   risolviSubject, caricaCatalogoPerRisoluzione, MERCATO_ATTIVO,
-  accompagnaBene,
+  accompagnaBene, sostitutoSenzaGlutineNonRichiesto,
 };

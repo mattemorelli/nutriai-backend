@@ -1,4 +1,4 @@
-const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene } = require('./genera');
+const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene, sostitutoSenzaGlutineNonRichiesto } = require('./genera');
 
 // Allarga i vincoli a ogni giro finché non trova tre proposte.
 const GIRI = [
@@ -83,11 +83,14 @@ async function trovaProposte(supabase, userId, itemId) {
   )];
 
   const tutti = await caricaPiatti(supabase, famiglie.length ? famiglie : ['mediterranea']);
-  const { ammesso, gradito } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
+  const { ammesso, gradito, categorieVietate } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
   const { rifiutato } = await caricaEsiti(supabase, userId);
+  const haVincoloGlutine = categorieVietate.has('glutine');
   // Nello Swap non cede niente: ne' le allergie ne' le preferenze, ne' un
   // piatto gia' rifiutato due volte per gusto (stessa regola del generatore).
-  const piatti = tutti.filter((p) => ammesso(p) && gradito(p) && !rifiutato(p));
+  // Un piatto "senza glutine" non si propone a chi non ne ha bisogno
+  // (problema 4 dell'audit), stessa regola del generatore.
+  const piatti = tutti.filter((p) => ammesso(p) && gradito(p) && !rifiutato(p) && !sostitutoSenzaGlutineNonRichiesto(p, haVincoloGlutine));
 
   const originale = tutti.find(p => p.id === item.dish_id);
   const slotCercato = originale ? originale.meal_slot : item.slot;
@@ -158,11 +161,16 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
   const { item, profilo, gemelliDishIds } = await proposte(supabase, userId, itemId);
 
   // Difesa lato server: anche se il client manda un piatto vietato, non passa.
-  const { foodIdVietati } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
+  const { foodIdVietati, categorieVietate } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
   const { data: ingNuovo } = await supabase
     .from('dish_ingredients').select('food_id').eq('dish_id', nuovoDishId);
   if ((ingNuovo || []).some((i) => foodIdVietati.has(i.food_id))) {
     throw new Error('Piatto non ammesso per le allergie o la dieta dell\'utente');
+  }
+
+  const { data: nuovoNome } = await supabase.from('dishes').select('name').eq('id', nuovoDishId).maybeSingle();
+  if (nuovoNome && sostitutoSenzaGlutineNonRichiesto(nuovoNome, categorieVietate.has('glutine'))) {
+    throw new Error('Piatto non ammesso: "senza glutine" è riservato a chi esclude il glutine');
   }
 
   // Stessa difesa lato server per l'abbinamento col pasto (problema F
