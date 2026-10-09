@@ -123,6 +123,13 @@ function perSlotDa(piatti, soglia) {
 
     const profiliConSecondo = profiliAttesi;
 
+    // Stessa unione calcolata in generaESalva (2026-10-09, fix del
+    // problema C): i gruppi davvero raggiungibili in settimana sono quelli
+    // di TUTTI i profili con secondi, non solo del profilo in prova - vedi
+    // il commento su gruppiUnioneSettimana in genera.js.
+    const gruppiUnioneSettimana = new Set();
+    for (const pr of profiliConSecondo) for (const g of (gruppiPerProfilo[pr] || [])) gruppiUnioneSettimana.add(g);
+
     if (!profiliConSecondo.length) {
       righeReport.push({ combo: cfg.nome, profilo: '(nessuno)', gradinoMinimo: 'IMPOSSIBILE', stato: 'buco_vero', dettaglio: 'nessun profilo esiste per questa famiglia' });
       impossibili.push(`${cfg.nome}: nessun profilo esiste per questa famiglia`);
@@ -149,7 +156,7 @@ function perSlotDa(piatti, soglia) {
         if (passo.gradino === '2b') continue;
         const catalogo = perSlotDa(piatti, passo.soglia);
         const esito = analizzaCapienza(profilo, catalogo, {
-          paesiScelti: cfg.paesi, opz: passo.opz, rifiutato, secondiFreschiNecessari, gruppiPerProfilo,
+          paesiScelti: cfg.paesi, opz: passo.opz, rifiutato, secondiFreschiNecessari, gruppiUnioneSettimana,
         });
         if (esito.ok) { gradinoMinimo = passo.gradino; break; }
         ultimoMessaggio = esito.messaggio;

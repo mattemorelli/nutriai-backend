@@ -85,9 +85,41 @@ const LIMITI_SCALA = {
   secondo:   [0.9, 1.3],   // ancora: la porzione di proteina quasi non si tocca
 };
 
+// Tetto assoluto in grammi per portata (problema D, 2026-10-09): LIMITI_SCALA
+// scala solo in proporzione alla ricetta base, mai con un massimo assoluto -
+// su un fabbisogno kcal alto abbinato a un piatto a bassa densita' calorica
+// (verdure, legumi) questo produceva porzioni singole non realistiche
+// (misurato: 13% delle righe primo/secondo/contorno sopra 500g, fino a
+// 1038g). Il tetto vince sempre sul rapporto: le kcal che non ci stanno in
+// un piatto devono andare altrove (un altro piatto, piu' spuntino), mai
+// gonfiare oltre il tetto. Frutta secca: 40g e' lo spuntino stesso (non un
+// ingrediente fra altri), uso contiene_frutta_secca - gia' verificato
+// allineato agli ingredienti reali da verifica-flag-allergeni.js.
+const TETTO_GRAMMI = {
+  primo: 450, secondo: 350, contorno: 350, pane: 120, patate: 350, colazione: 350, spuntino: 250,
+  spuntino_frutta_secca: 40,
+};
+
 function limitiDi(p) {
-  if (p.piatto.base_amidacea) return LIMITI_SCALA.base;
-  return LIMITI_SCALA[p.slot] || [0.9, 1.2];
+  const ratio = p.piatto.base_amidacea ? LIMITI_SCALA.base : (LIMITI_SCALA[p.slot] || [0.9, 1.2]);
+  const tipo = tipoAmidoDiAccompagnamento(p.piatto);
+  const tettoGrammi = tipo === 'pane' ? TETTO_GRAMMI.pane
+    : tipo === 'patate' ? TETTO_GRAMMI.patate
+    : (p.slot === 'spuntino' && p.piatto.contiene_frutta_secca) ? TETTO_GRAMMI.spuntino_frutta_secca
+    : (TETTO_GRAMMI[p.slot] || TETTO_GRAMMI.contorno);
+  const grammiBase = p.piatto.grams || 0;
+  if (!grammiBase) return ratio;
+  const maxEffettivo = Math.min(ratio[1], tettoGrammi / grammiBase);
+  // Se la ricetta base e' gia' piu' pesante del tetto anche al minimo
+  // normale del rapporto (piatti a verdura abbondante, bassa densita'
+  // calorica: 672g di "Lenticchie e spinaci" restano 605g anche a 0.9x), il
+  // tetto vince comunque e il piatto si stringe fino li' - mai sparire, ma
+  // nemmeno sfondare il tetto. Le kcal che non ci stanno piu' su di lui
+  // vengono redistribuite sugli altri piatti dal normale ciclo di
+  // adattaGiornata (lo spazio di manovra si ricalcola sugli altri quando
+  // uno satura, non serve un meccanismo a parte).
+  if (maxEffettivo < ratio[0]) return [maxEffettivo, maxEffettivo];
+  return [ratio[0], maxEffettivo];
 }
 
 // Distribuisce il residuo calorico proporzionalmente allo spazio di manovra
@@ -151,41 +183,68 @@ function limitiProporzionali(kcal) {
 // misurando le giornate con un piatto bloccato (un piatto fisso toglie un
 // grado di liberta' alla ricerca, rendendo il caso piu' frequente, ma puo'
 // capitare a qualunque giornata).
-function valutaGiornataScalata(pastiGiorno, obiettivo) {
+// proteinOk (2026-10-09, problema B dell'audit): prima nessun controllo
+// guardava le proteine durante la generazione - solo saturi/sale/fibra/kcal.
+// Misurato: 6 profili su 7 restavano sistematicamente sotto l'85% del
+// target proteico, uno su tutti i 70 giorni generati (vedi
+// audit/analisi-generatore.md, problema 1). Soglia al 90% del minimo (non al
+// 100%): un pavimento con un po' di margine, come fibraMin, non un vincolo
+// durissimo come il tetto sale/saturi - la ricerca puo' ancora accettare un
+// giorno leggermente sotto se il resto va bene, ma segnala quanto manca.
+function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine) {
   if (!obiettivo || !pastiGiorno.length) return null;
   const adattati = adattaGiornata(pastiGiorno, obiettivo);
-  let saturi = 0, sale = 0, fibra = 0, kcal = 0;
+  let saturi = 0, sale = 0, fibra = 0, kcal = 0, proteine = 0;
   for (const { p, f } of adattati) {
     saturi += (p.piatto.satFat || 0) * f;
     sale += (p.piatto.salt || 0) * f;
     fibra += (p.piatto.fibre || 0) * f;
     kcal += (p.piatto.kcal || 0) * f;
+    proteine += (p.piatto.protein || 0) * f;
   }
   const lim = limitiProporzionali(kcal || obiettivo);
+  const proteinMin = obiettivoProteine ? obiettivoProteine * 0.90 : null;
   return {
-    saturi, sale, fibra, kcal,
-    satMax: lim.satMaxGiorno, saleMax: lim.saleMaxGiorno, fibraMin: lim.fibraMinGiorno,
+    saturi, sale, fibra, kcal, proteine,
+    satMax: lim.satMaxGiorno, saleMax: lim.saleMaxGiorno, fibraMin: lim.fibraMinGiorno, proteinMin,
     tettoOk: saturi <= lim.satMaxGiorno && sale <= lim.saleMaxGiorno,
     fibraOk: fibra >= lim.fibraMinGiorno,
     kcalOk: Math.abs(kcal - obiettivo) <= obiettivo * 0.05,
+    proteinOk: proteinMin == null || proteine >= proteinMin,
   };
 }
 
-// Frequenze settimanali dalle Linee Guida CREA 2018 (adulto, 2000 kcal),
-// scalate dalle 15 porzioni proteiche della fonte alle 7 caselle di secondo
-// di Quadrio (fattore 7/12, formaggio escluso perche' senza secondi).
-// Fonte: CREA, "Le giuste porzioni e le frequenze di consumo consigliate"
-// https://sapermangiare.an.crea.gov.it/493/le-giuste-porzioni.html
+// Sostituisce le frequenze CREA 2018 (2026-10-09): misurando le settimane
+// generate, la carne come secondo compariva quasi mai (vedi audit/
+// analisi-generatore.md, problema C). Due cause distinte, corrette insieme:
+// 1) pianoProteico riceveva i gruppi disponibili SOLO del profiloSettimana
+//    scelto per la settimana (vedi il fix piu' sotto, "gruppiUnioneSettimana"
+//    in provaGradino/analizzaCapienza) - se quel profilo era uno a catalogo
+//    povero (es. 'europeo-leggero', 9 secondi di cui 0 carne/uova), il piano
+//    non poteva MAI chiedere carne o uova per l'intera settimana, qualunque
+//    fosse la quota;
+// 2) le frequenze CREA (pensate per la popolazione generale, non per le 7
+//    caselle fisse di un piano Quadrio) assegnavano alla carne bianca un
+//    peso residuo troppo basso (freq-min = 0.167) rispetto a uova/legumi
+//    (1.75/0.75): a parita' di gruppi disponibili, lo slot "libero" andava
+//    quasi sempre a uova o legumi.
+// Numeri allineati a una richiesta esplicita dell'utente (2026-10-09): carne
+// bianca 2-3, pesce 2-3, uova 1-2, legumi 1-3 (min abbassato a 1 apposta,
+// cosi' resta uno slot libero per la varieta' settimana su settimana),
+// carne rossa al massimo 1. Somma dei minimi: 0+2+2+1+1=6, un solo slot
+// libero su 7 - redistribuito per peso fra tutti i gruppi (legumi il piu'
+// probabile, ma qualunque gruppo puo' guadagnare il settimo giorno).
 const QUOTE = {
-  carne_rossa:  { min: 0, max: 1, freq: 0.583, fonte: 'CREA 2018: 1 porzione da 100 g a settimana' },
-  carne_bianca: { min: 1, max: 3, freq: 1.167, fonte: 'CREA 2018: 2 porzioni da 100 g a settimana' },
-  pesce:        { min: 2, max: 4, freq: 1.750, fonte: 'CREA 2018: 2 porzioni da 150 g piu 1 conservata da 50 g' },
-  legumi:       { min: 1, max: 3, freq: 1.750, fonte: 'CREA 2018: 3 porzioni da 150 g a settimana' },
-  uova:         { min: 0, max: 2, freq: 1.750, fonte: 'CREA 2018: 3 uova da 50 g a settimana' },
+  carne_rossa:  { min: 0, max: 1, freq: 0.5, fonte: 'Richiesta esplicita 2026-10-09: al massimo 1 volta a settimana' },
+  carne_bianca: { min: 2, max: 3, freq: 2.5, fonte: 'Richiesta esplicita 2026-10-09: 2-3 volte a settimana' },
+  pesce:        { min: 2, max: 3, freq: 2.5, fonte: 'Richiesta esplicita 2026-10-09: 2-3 volte a settimana' },
+  legumi:       { min: 1, max: 3, freq: 2.5, fonte: 'Richiesta esplicita 2026-10-09: 2-3 volte a settimana (min 1 per lasciare un giorno libero)' },
+  uova:         { min: 1, max: 2, freq: 1.5, fonte: 'Richiesta esplicita 2026-10-09: 1-2 volte a settimana' },
   // formaggio: nessun secondo del catalogo ha un latticino come ancora
-  // proteica (misurato 19/09/2026: 0 su 710). Rimettere la quota quando
-  // esisteranno secondi a base di formaggio, non prima: un tetto su un
-  // insieme vuoto non difende niente.
+  // proteica (misurato 19/09/2026, confermato 2026-10-09: ancora 0 su 161
+  // secondi mercato IT). L'utente ha chiesto "formaggi al massimo 1": un
+  // tetto resta inutile finche' non esistono secondi a base di formaggio da
+  // limitare - un tetto su un insieme vuoto non difende niente.
 };
 
 // Categorie escluse da ciascuna dieta (prima dell'espansione CONTENUTE_IN).
@@ -585,6 +644,18 @@ const CONTENUTE_IN = {
   latticini: ['lattosio'],
 };
 
+// Tofu e tempeh sono alternative proteiche pensate per chi non mangia carne
+// ne' pesce: su un onnivoro o un pescetariano (che la quota di carne/pesce
+// ce l'hanno gia') risultano fuori posto, anche se nessuna allergia o
+// categoria li escluderebbe. Esclusione per singolo food_id, non per
+// categoria 'soia' intera: la salsa di soia come condimento resta ammessa a
+// chiunque, solo tofu/tempeh come ingrediente principale non lo sono per
+// queste due diete. Richiesta esplicita 2026-10-09.
+const ALIMENTI_VIETATI_PER_DIETA = {
+  onnivoro: ['tofu_it', 'tempeh_it', '172475'],
+  pescetariano: ['tofu_it', 'tempeh_it', '172475'],
+};
+
 // Food_id esclusi dalla sola dieta (CATEGORIE_DIETA espanso con CONTENUTE_IN),
 // senza i vincoli personali dell'utente (allergie, non graditi): serve sia a
 // generaESalva sia ai controlli di capienza fuori linea (F0), che ragionano
@@ -687,6 +758,18 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
     return { vitaminaCStato, ferroVegetale, caroteni };
   }
 
+  // Amido riconosciuto dagli ingredienti (categoria 'amido' in
+  // categorie_alimenti: pasta, riso, couscous, orzo, farro, miglio, grano
+  // saraceno, polenta, patate, pane), non dal flag ha_amido salvato sul
+  // piatto ne' dal nome - quel flag puo' essere sbagliato o mancante (vedi
+  // audit/analisi-generatore.md, problema E: contorni di couscous/orzo senza
+  // il flag, mai riconosciuti come doppio amido). Sostituisce ha_amido in
+  // ogni punto del codice che decide su base dell'amido (accompagnaBene,
+  // l'accompagnamento pane/patate a cena).
+  function amidoDaIngredienti(ingredienti) {
+    return ingredienti.some(i => (categorieDi[i.food_id] || new Set()).has('amido'));
+  }
+
   return piattiGrezzi
     .filter(p => valori[p.id])
     .map(p => ({
@@ -694,6 +777,7 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
       ...valori[p.id],
       gruppo: gruppoDa(valori[p.id].ingredienti, categorieDi),
       principale: ingredientePrincipale(valori[p.id].ingredienti),
+      amidoReale: amidoDaIngredienti(valori[p.id].ingredienti),
       ...riassuntoNutrizionale(valori[p.id].ingredienti),
     }));
 }
@@ -718,7 +802,7 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   for (let offset = 0; ; offset += PAGINA) {
     const { data: blocco, error } = await supabase
       .from('dishes')
-      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati')
+      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati, steps')
       // Cancello di mercato (vedi MERCATO_ATTIVO sopra): va PRIMA del filtro
       // famiglia/neutro perche' deve valere anche per chi e' 'neutro' - un
       // piatto 'neutro' fuori mercato non deve comparire solo perche' il
@@ -754,7 +838,7 @@ async function caricaPiattiPerId(supabase, ids) {
   if (!ids.length) return [];
   const { data: piatti, error } = await supabase
     .from('dishes')
-    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati')
+    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati, steps')
     .contains('mercati', [MERCATO_ATTIVO])
     .in('id', ids);
   if (error) throw new Error(error.message);
@@ -769,8 +853,47 @@ const compatibile = (piatto, profilo) => piatto.profilo === profilo || piatto.pr
 // altri ruoli) vive in un posto solo, quel file.
 const copreRuolo = (piatto, ruolo) => Array.isArray(piatto.ruoli_coperti) && piatto.ruoli_coperti.includes(ruolo);
 
+// Pane o patate a cena (problema A, 2026-10-09): prima candidatiBase pescava
+// QUALUNQUE contorno base_amidacea=true (anche pasta, riso, farro, orzo,
+// couscous sconditi, usati come semplice "riempimento" di calorie) - non e'
+// come si mangia in Italia, un secondo non si accompagna con un primo
+// scondito. Ora la scelta e' solo fra pane e patate (mai piu' pasta/riso/
+// cereali come riempimento), e quale dei due dipende da come e' cucinato il
+// secondo: in umido/col sugo/legumi/uova vuole il pane (per la scarpetta),
+// arrosto/al forno/alla griglia vuole le patate. Un secondo "in padella"
+// senza sugo ne' forno (pesce o carne scottati con verdure, la maggioranza
+// del catalogo) non e' ne' l'uno ne' l'altro: patate resta la scelta piu'
+// vicina alla tradizione (un fritto/scottato si accompagna piu' spesso con
+// patate che con pane).
+const FOOD_ID_PANE = new Set(['pane_comune_crea', 'pane_integrale_it', 'pane_senza_glutine_it', 'pane_segale_it', 'pane_carasau_it']);
+const FOOD_ID_PATATE = new Set(['170028']);
+
+function tipoAmidoDiAccompagnamento(piatto) {
+  const ingredienti = piatto.ingredienti || [];
+  if (ingredienti.some(i => FOOD_ID_PANE.has(i.food_id))) return 'pane';
+  if (ingredienti.some(i => FOOD_ID_PATATE.has(i.food_id))) return 'patate';
+  return null;
+}
+
+const RE_SECONDO_UMIDO = /\bin umido\b|\bcol sugo\b|\bal sugo\b|\bin guazzetto\b|\bal pomodoro\b|\bin salsa\b|\bbrasat|\bspezzatino\b|\bstufat|\bin tegame\b|\bal cartoccio\b|\bbollit|\blessat/i;
+const RE_SECONDO_ARROSTO = /\bal forno\b|\barrosto\b|\balla griglia\b|\bgrigliat|\balla brace\b|\bcroccant/i;
+
+// Il criterio (richiesto 2026-10-09): azioni di ricetta (steps) e nome del
+// piatto, non una categoria dichiarata a parte che nessuno aggiornerebbe.
+// legumi/soia/uova contano come "morbido" (pane) a prescindere dal testo,
+// perche' un piatto di legumi o una frittata non si definisce dalla tecnica
+// di cottura ma dalla sua natura (si mangia con il pane, non con le patate).
+function tipoAccompagnamentoDaSecondo(secondo) {
+  if (!secondo) return null;
+  const testo = `${secondo.name || ''} ${(secondo.steps || []).join(' ')}`.toLowerCase();
+  const morbido = secondo.gruppo === 'legumi' || secondo.gruppo === 'uova';
+  if (morbido || RE_SECONDO_UMIDO.test(testo)) return 'pane';
+  if (RE_SECONDO_ARROSTO.test(testo)) return 'patate';
+  return 'patate';
+}
+
 function accompagnaBene(accompagnamento, piattoBase) {
-  if (piattoBase.ha_amido && accompagnamento.ha_amido) return false;
+  if (piattoBase.amidoReale && accompagnamento.amidoReale) return false;
   // F2: due piatti dello stesso pasto non coprono entrambi proteina_principale
   // (l'intenzione era "non due piatti di proteina", non "stesso ruolo
   // primario" - un secondo il cui primario e' 'verdura' per peso ma che
@@ -803,7 +926,7 @@ function accompagnaBene(accompagnamento, piattoBase) {
 // principio gia' seguito per trovaCategoria.
 function analizzaCapienza(profiloSettimana, catalogo, ctx) {
   const { primi, secondi, contorni, colazioni, spuntini } = catalogo;
-  const { paesiScelti, opz, rifiutato, secondiFreschiNecessari, gruppiPerProfilo } = ctx;
+  const { paesiScelti, opz, rifiutato, secondiFreschiNecessari, gruppiUnioneSettimana } = ctx;
 
   const paesiRilevanti = new Set(paesiScelti.length ? paesiScelti : [null]);
   const genericiPropri = new Set([...paesiRilevanti].map(p => p && GENERICO_DI[p]).filter(Boolean));
@@ -824,7 +947,22 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
     ).length;
   }
 
-  const gruppiDelProfilo = gruppiPerProfilo[profiloSettimana] || new Set();
+  // Le quote dei gruppi proteici (QUOTE) sono un vincolo sull'INTERA
+  // settimana, non sul solo profiloSettimana: i giorni 3 e 6 possono pescare
+  // il secondo da un profilo diverso (vedi gruppiUnioneSettimana piu' sopra),
+  // quindi un gruppo mancante nel solo profiloSettimana in prova non rende la
+  // settimana impossibile se esiste altrove nel pool. Scoped solo per paese e
+  // rifiuti, mai per profilo - a differenza di contaDisponibili sopra, che
+  // resta scoped al profiloSettimana per il conto dei secondi FRESCHI
+  // (quello si', legato a quale profilo domina i 5 giorni normali).
+  function contaDisponibiliUnione(lista, filtroExtra) {
+    return lista.filter(p => paeseAmmesso(p) && !rifiutato(p) && (!filtroExtra || filtroExtra(p))).length;
+  }
+
+  // Vedi il commento su gruppiUnioneSettimana in generaESalva: i gruppi
+  // davvero raggiungibili in settimana sono l'unione di tutti i profili con
+  // secondi, non solo quelli del profiloSettimana in prova qui.
+  const gruppiDelProfilo = gruppiUnioneSettimana;
 
   // Dal gradino 1 in su (opz.ripetizione) candidatiSecondo ammette una
   // ripetizione nell'intera settimana: con N giorni di cottura bastano
@@ -840,9 +978,9 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
   if (!opz.quotaTollerante) {
     for (const [gruppo, q] of Object.entries(QUOTE)) {
       if (!gruppiDelProfilo.has(gruppo) || q.min <= 0) continue;
-      const nGruppo = contaDisponibili(secondi, true, (p) => p.gruppo === gruppo);
+      const nGruppo = contaDisponibiliUnione(secondi, (p) => p.gruppo === gruppo);
       if (nGruppo < q.min) {
-        return { ok: false, messaggio: `quota minima gruppo ${gruppo}: servono ${q.min}, ne ha ${nGruppo}` };
+        return { ok: false, messaggio: `quota minima gruppo ${gruppo}: servono ${q.min}, ne ha ${nGruppo} in tutta la settimana (non solo in ${profiloSettimana})` };
       }
     }
   }
@@ -854,9 +992,9 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
   // silenzioso come formaggio e' rimasto per mesi.
   for (const gruppo of Object.keys(QUOTE)) {
     if (!gruppiDelProfilo.has(gruppo)) continue;
-    const nGruppo = contaDisponibili(secondi, true, (p) => p.gruppo === gruppo);
+    const nGruppo = contaDisponibiliUnione(secondi, (p) => p.gruppo === gruppo);
     if (nGruppo === 0) {
-      console.warn(`gruppo ${gruppo} in QUOTE ma 0 secondi disponibili`);
+      console.warn(`gruppo ${gruppo} in QUOTE ma 0 secondi disponibili in tutta la settimana`);
     }
   }
 
@@ -924,6 +1062,7 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
   await espandi(categorieSgradite, foodIdSgraditi);
 
   for (const fid of await foodIdVietatiPerDieta(supabase, dieta)) foodIdVietati.add(fid);
+  for (const fid of (ALIMENTI_VIETATI_PER_DIETA[dieta] || [])) foodIdVietati.add(fid);
 
   if (nonRisolti.length) {
     console.warn(
@@ -1129,13 +1268,14 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // kcal obiettivo PRIMA che la ricerca inizi, non dopo che ha gia' finito.
   const { data: target, error: eTarget } = await supabase
     .from('energy_targets')
-    .select('id, kcal')
+    .select('id, kcal, protein_g_min')
     .eq('user_id', userId)
     .order('computed_at', { ascending: false })
     .limit(1)
     .maybeSingle();
   if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
   const obiettivo = target?.kcal ?? null;
+  const obiettivoProteine = target?.protein_g_min ?? null;
 
   const { skipPerTempo, skipTotali, rifiutato } = await caricaEsiti(supabase, userId);
 
@@ -1147,6 +1287,19 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
   const { profiliConSecondo, limiteFeriale, gruppiPerProfilo, allargato } = gruppiPerProfiloDa(piatti, minutiCorretti);
   if (!profiliConSecondo.length) throw new Error('Nessun profilo ha secondi utilizzabili');
+
+  // Bug trovato il 2026-10-09 (vedi audit/analisi-generatore.md, problema C):
+  // pianoProteico decide la sequenza di gruppi proteici di TUTTA la
+  // settimana usando solo i gruppi del profiloSettimana scelto - ma i giorni
+  // 3 e 6 possono gia' pescare un profiloGiorno diverso da profiliConSecondo
+  // (vedi prossimaDecisione piu' sotto), quindi i gruppi DAVVERO
+  // raggiungibili nella settimana sono l'unione di tutti i profili, non solo
+  // quello della settimana. Con un profiloSettimana a catalogo povero (es.
+  // 'europeo-leggero': 9 secondi, 0 carne/uova) il piano restava bloccato
+  // su legumi/pesce per tutti e 7 i giorni, qualunque fosse la quota in
+  // QUOTE - la carne non poteva mai essere pianificata, non solo essere rara.
+  const gruppiUnioneSettimana = new Set();
+  for (const pr of profiliConSecondo) for (const g of (gruppiPerProfilo[pr] || [])) gruppiUnioneSettimana.add(g);
 
   if (allargato) {
     console.log(`[genera] limite serale allargato da ${minutiCorretti} a ${limiteFeriale} min: catalogo insufficiente`);
@@ -1325,7 +1478,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     const secondiFreschiNecessari = giorniCottura.length + (cucinaOggi(1) ? 0 : 1);
 
     const catalogoSlot = { primi, secondi, contorni, colazioni, spuntini };
-    const ctxCapienza = { paesiScelti, opz, rifiutato, secondiFreschiNecessari, gruppiPerProfilo };
+    const ctxCapienza = { paesiScelti, opz, rifiutato, secondiFreschiNecessari, gruppiUnioneSettimana };
     const capienzaSufficiente = (profiloSettimana) => analizzaCapienza(profiloSettimana, catalogoSlot, ctxCapienza);
 
     const diagnosticaProfili = [];
@@ -1341,8 +1494,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
       const passiUsati = { valore: 0 };
 
-      const gruppiDelProfilo = gruppiPerProfilo[profiloSettimana] || new Set();
-      const sequenza = pianoProteico(gruppiDelProfilo, rng);
+      const sequenza = pianoProteico(gruppiUnioneSettimana, rng);
 
       // Stato mutabile di questo tentativo: ogni frame della pila sa come
       // annullare esattamente cio' che ha causato, cosi' tornare indietro e'
@@ -1577,15 +1729,23 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       function candidatiContorno(gi, ruolo, profiloGiorno, paeseGiorno, paeseOk, limiteOggi, piattoAbbinato, altroContorno) {
         const g = gi + 1;
         const trasportabileSeServe = ruolo === 'pranzo' ? (c) => (!pranzoFuoriIl(g) || c.trasportabile) : () => true;
+        // A cena, un contorno di pasta/riso/farro/orzo/couscous scondito non e'
+        // cucina italiana di casa (problema A, 2026-10-09) - non solo come
+        // "base" di riempimento (candidatiBase, che gia' li esclude), ma anche
+        // come normale contorno scelto qui: l'unico amido ammesso a cena e'
+        // pane o patate, mai un primo travestito da contorno.
+        const nonCerealeSconditoSeCena = (c) =>
+          ruolo !== 'cena' || !c.base_amidacea || tipoAmidoDiAccompagnamento(c) != null;
         const base = (c) =>
           !usati.has(c.id) && !rifiutato(c) &&
           (c.prep_min || 20) <= limiteOggi && tecnicaOk(c, g) &&
           (!altroContorno || c.id !== altroContorno.id) &&
           trasportabileSeServe(c) &&
+          nonCerealeSconditoSeCena(c) &&
           principaleLiberoOggi(gi, c);
 
         const proprio = contorni.filter(c => compatibile(c, profiloGiorno) && accompagnaBene(c, piattoAbbinato) && paeseOk(c) && base(c));
-        const neutroStretto = contorni.filter(c => (c.profilo === 'neutro' || !c.profilo) && paeseOk(c) && base(c));
+        const neutroStretto = contorni.filter(c => (c.profilo === 'neutro' || !c.profilo) && accompagnaBene(c, piattoAbbinato) && paeseOk(c) && base(c));
         const neutroLargo = contorni.filter(c => (c.profilo === 'neutro' || !c.profilo || c.paese === 'mediterraneo_generico') && accompagnaBene(c, piattoAbbinato) && base(c));
         return concatenaLivelli([proprio, neutroStretto, neutroLargo], rng, compagniDiPasto(gi, ruolo));
       }
@@ -1613,9 +1773,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         return concatenaLivelli([proprio, neutro], rng);
       }
 
-      function candidatiBase(gi, paeseOk) {
+      function candidatiBase(gi, paeseOk, tipoRichiesto) {
         const altriDelPasto = compagniDiPasto(gi, 'cena');
-        const base = (p) => p.base_amidacea && paeseOk(p) && !rifiutato(p) && principaleLiberoOggi(gi, p);
+        const base = (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipoRichiesto && paeseOk(p) && !rifiutato(p) && principaleLiberoOggi(gi, p);
         const fresco = contorni.filter(p => base(p) && !usati.has(p.id));
         // Stessa ripetizione del secondo (gradino 1, al massimo una a
         // settimana), ma mai a meno di due giorni di distanza dalla prima
@@ -1703,8 +1863,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         if (st.spuntino === undefined) pronti.push(['spuntino', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino2, cappaSpuntino)]);
         if (st.spuntino2 === undefined) pronti.push(['spuntino2', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino, cappaSpuntino)]);
         if (st.contornoCena !== undefined && st.base === undefined) {
-          const cenaHaAmido = st.secondo.ha_amido || (st.contornoCena && st.contornoCena.ha_amido);
-          if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(gi, paeseOk)]);
+          const cenaHaAmido = st.secondo.amidoReale || (st.contornoCena && st.contornoCena.amidoReale);
+          if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(gi, paeseOk, tipoAccompagnamentoDaSecondo(st.secondo))]);
           else st.base = null;
         }
 
@@ -1750,8 +1910,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           if (decisione === 'COMPLETO') {
             const st = statoGiorni[gi];
             if (obiettivo) {
-              const val = valutaGiornataScalata(pastiDi(gi), obiettivo);
-              if (val && (!val.tettoOk || !val.kcalOk) && !opz.tettoTollerante) {
+              const val = valutaGiornataScalata(pastiDi(gi), obiettivo, obiettivoProteine);
+              if (val && (!val.tettoOk || !val.kcalOk || !val.proteinOk) && !opz.tettoTollerante) {
                 const tornaA = indietro();
                 if (tornaA < 0) return { esaurito: true, motivo: 'reale' };
                 gi = tornaA;
@@ -1788,7 +1948,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         while (true) {
           let quoteRispettate = true;
           for (const [gruppo, q] of Object.entries(QUOTE)) {
-            if (!gruppiDelProfilo.has(gruppo)) continue;
+            if (!gruppiUnioneSettimana.has(gruppo)) continue;
             if ((usoGruppi[gruppo] || 0) < q.min) { quoteRispettate = false; break; }
           }
           if (quoteRispettate) break;
@@ -1823,8 +1983,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         // (altrimenti avanzaFinDove l'avrebbe scartata, vedi il gate li') - va
         // registrato come concessione, non come piatto rotto. La fibra non
         // blocca mai: solo concessione.
-        const val = st.valutazioneNutrienti || valutaGiornataScalata(pasti, obiettivo);
-        const conforme = val ? (val.tettoOk && val.fibraOk && val.kcalOk) : true;
+        const val = st.valutazioneNutrienti || valutaGiornataScalata(pasti, obiettivo, obiettivoProteine);
+        const conforme = val ? (val.tettoOk && val.fibraOk && val.kcalOk && val.proteinOk) : true;
 
         if (val && !val.tettoOk) {
           concessioni.push({
@@ -1837,6 +1997,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           concessioni.push({
             gradino: '2b', tipo: 'allentamento', giorno: g, slot: null, vincolo: 'kcal_fabbisogno',
             prima: `${obiettivo} ±5%`, dopo: Math.round(val.kcal),
+          });
+        }
+        if (val && !val.proteinOk) {
+          concessioni.push({
+            gradino: '2b', tipo: 'allentamento', giorno: g, slot: null, vincolo: 'proteine_minime',
+            prima: `>=${val.proteinMin.toFixed(1)}`, dopo: val.proteine.toFixed(1),
           });
         }
         if (val && !val.fibraOk) {
@@ -1944,7 +2110,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
       // Gradino 2: quote minime non raggiunte (una riga per gruppo, non per giorno).
       for (const [gruppo, q] of Object.entries(QUOTE)) {
-        if (!gruppiDelProfilo.has(gruppo)) continue;
+        if (!gruppiUnioneSettimana.has(gruppo)) continue;
         const ottenuto = usoGruppi[gruppo] || 0;
         if (ottenuto < q.min) {
           concessioni.push({ gradino: '2', tipo: 'allentamento', giorno: null, slot: null, vincolo: 'quota_minima_gruppo_proteico', prima: q.min, dopo: ottenuto, gruppo });
@@ -2089,4 +2255,5 @@ module.exports = {
   GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
   caricaEsiti, SOGLIA_RIFIUTO, giornoSettimanaCorrente,
   risolviSubject, caricaCatalogoPerRisoluzione, MERCATO_ATTIVO,
+  accompagnaBene,
 };

@@ -61,10 +61,37 @@ function applicaObiettivo(tdee, bmr, peso, goal) {
   return { kcal: Math.round(target), rete };
 }
 
-function proteineTarget(peso, goal, minutiAllenamento) {
-  let gPerKg = goal === 'massa' ? 1.7 : goal === 'dimagrimento' ? 1.6 : 1.4;
-  if (minutiAllenamento >= 240) gPerKg += 0.1;
-  return Math.round(peso * gPerKg);
+// Sopra un BMI di 27 il peso reale sovrastima il bisogno proteico (la massa
+// grassa non consuma proteine come la massa magra, e g/kg sul peso reale
+// diventerebbe irrealistico per chi e' molto sovrappeso): si usa un peso di
+// riferimento a BMI 25 invece del peso reale. Sotto 27 il peso reale resta
+// il riferimento, senza correzione.
+function pesoRiferimentoProteico(peso, altezzaCm) {
+  if (!altezzaCm) return peso;
+  const h = altezzaCm / 100;
+  const bmi = peso / (h * h);
+  if (bmi <= 27) return peso;
+  return 25 * h * h;
+}
+
+// 1,2-1,6 g/kg (corretto il 2026-10-09: prima dipendeva solo da peso*goal,
+// senza altezza ne' allenamento di forza specifico - due profili con lo
+// stesso prodotto peso*fattore arrivavano allo stesso minimo nonostante
+// fabbisogni energetici opposti, es. 78kg*1.4 e 68kg*1.6 arrotondano
+// entrambi a 109). Base 1.2 (mantenimento, nessun allenamento di forza);
+// +0.2 in deficit (difendere la massa magra); +0.1 in surplus; +0.2 se
+// l'allenamento di forza e' almeno 90 min/settimana (2 sedute), +0.1 se
+// c'e' ma sotto quella soglia. Tetto 1.6: la somma di deficit+forza non deve
+// mai superarlo.
+function proteineTarget({ peso, altezzaCm, goal, minutiForza }) {
+  let gPerKg = 1.2;
+  if (goal === 'dimagrimento') gPerKg += 0.2;
+  else if (goal === 'massa') gPerKg += 0.1;
+  if (minutiForza >= 90) gPerKg += 0.2;
+  else if (minutiForza > 0) gPerKg += 0.1;
+  gPerKg = Math.min(gPerKg, 1.6);
+  const pesoRif = pesoRiferimentoProteico(peso, altezzaCm);
+  return Math.round(pesoRif * gPerKg);
 }
 
 async function calcolaESalvaTarget(supabase, userId) {
@@ -115,14 +142,16 @@ async function calcolaESalvaTarget(supabase, userId) {
     modello = 'pal_legacy';
   }
 
-  const minutiTot = (sessioni || []).reduce((s, x) => s + (x.minutes_per_week || 0), 0);
+  const minutiForza = (sessioni || [])
+    .filter(s => s.activity === 'pesi')
+    .reduce((s, x) => s + (x.minutes_per_week || 0), 0);
   const { kcal, rete } = applicaObiettivo(tdee, bmr, dati.peso, u.goal);
 
   const riga = {
     user_id: userId,
     computed_at: new Date().toISOString(),
     kcal,
-    protein_g_min: proteineTarget(dati.peso, u.goal, minutiTot),
+    protein_g_min: proteineTarget({ peso: dati.peso, altezzaCm: dati.altezza, goal: u.goal, minutiForza }),
     fibre_g_min: 25,
     sat_fat_g_max: Number(((kcal * 0.10) / 9).toFixed(1)),
     free_sugar_g_max: Number(((kcal * 0.10) / 4).toFixed(1)),

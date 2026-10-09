@@ -1,4 +1,4 @@
-const { caricaPiatti, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti } = require('./genera');
+const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene } = require('./genera');
 
 // Allarga i vincoli a ogni giro finché non trova tre proposte.
 const GIRI = [
@@ -41,12 +41,28 @@ async function proposte(supabase, userId, itemId) {
     .eq('plan_id', item.plan_id);
   const giaUsati = new Set((righe || []).map(r => r.dish_id));
 
-  return { item, piano, profilo, giaUsati };
+  // 5. i piatti gemelli dello stesso pasto (lo stesso giorno, lo stesso
+  // meal, tutte le altre righe): il generatore non sceglie mai un contorno
+  // o un secondo senza controllare accompagnaBene contro il piatto abbinato
+  // - prima Swap non lo faceva affatto (non recuperava nemmeno questi dati),
+  // quindi una sostituzione poteva creare doppio amido, doppia proteina
+  // principale o lo stesso ingrediente principale ripetuto nello stesso
+  // pasto (problema F dell'audit).
+  const { data: righeGemelle } = await supabase
+    .from('plan_items')
+    .select('dish_id')
+    .eq('plan_id', item.plan_id)
+    .eq('day_of_week', item.day_of_week)
+    .eq('meal', item.meal)
+    .neq('id', itemId);
+  const gemelliDishIds = [...new Set((righeGemelle || []).map(r => r.dish_id))];
+
+  return { item, piano, profilo, giaUsati, gemelliDishIds };
 }
 
 // Cerca tre alternative, allargando i vincoli se non ne trova abbastanza.
 async function trovaProposte(supabase, userId, itemId) {
-  const { item, profilo, giaUsati } = await proposte(supabase, userId, itemId);
+  const { item, profilo, giaUsati, gemelliDishIds } = await proposte(supabase, userId, itemId);
 
   // Le preferenze vere dell'utente, come le legge il generatore
   const { data: prefRaw } = await supabase
@@ -77,6 +93,15 @@ async function trovaProposte(supabase, userId, itemId) {
   const slotCercato = originale ? originale.meal_slot : item.slot;
   const tempoBase = originale ? (originale.prep_min || 30) : (profilo?.evening_minutes || 40);
 
+  // I piatti gemelli dello stesso pasto, risolti dallo stesso catalogo
+  // arricchito (amidoReale, ruoli_coperti, principale - gli stessi campi che
+  // accompagnaBene legge in genera.js). Un gemello non trovato nel pool
+  // arricchito (dieta/famiglia diversa da quella dell'utente che sta
+  // facendo lo swap, caso raro) non puo' essere controllato e viene
+  // ignorato piuttosto che bloccare la ricerca.
+  const gemelli = gemelliDishIds.map(id => tutti.find(p => p.id === id)).filter(Boolean);
+  const accompagnaTuttiIGemelli = (p) => gemelli.every(g => accompagnaBene(p, g));
+
   // Il paese della giornata che si sta sostituendo: le proposte restano dentro
   const paeseGiorno = originale ? originale.paese : null;
   const paesiScelti = (profilo && profilo.paesi) || [];
@@ -97,7 +122,8 @@ async function trovaProposte(supabase, userId, itemId) {
       (p.prep_min || 30) <= tempoBase + giro.tempoExtra &&
       (p.health_score || 0) >= giro.scoreMin &&
       (!giro.escludiSettimana || !giaUsati.has(p.id)) &&
-      paeseCompatibile(p, giro)
+      paeseCompatibile(p, giro) &&
+      accompagnaTuttiIGemelli(p)
     );
 
     if (trovati.length >= 3 || giro === GIRI[GIRI.length - 1]) {
@@ -129,7 +155,7 @@ async function trovaProposte(supabase, userId, itemId) {
 
 // Applica la sostituzione scelta dall'utente, ricalcolando i valori nutrizionali.
 async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portionG) {
-  const { item, profilo } = await proposte(supabase, userId, itemId);
+  const { item, profilo, gemelliDishIds } = await proposte(supabase, userId, itemId);
 
   // Difesa lato server: anche se il client manda un piatto vietato, non passa.
   const { foodIdVietati } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
@@ -137,6 +163,21 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
     .from('dish_ingredients').select('food_id').eq('dish_id', nuovoDishId);
   if ((ingNuovo || []).some((i) => foodIdVietati.has(i.food_id))) {
     throw new Error('Piatto non ammesso per le allergie o la dieta dell\'utente');
+  }
+
+  // Stessa difesa lato server per l'abbinamento col pasto (problema F
+  // dell'audit): anche se trovaProposte ha gia' filtrato, applicaSostituzione
+  // e' il punto che scrive davvero sul piano - deve controllare di nuovo, non
+  // fidarsi che il client richiami per forza con un dish_id uscito da
+  // trovaProposte. Risolve il nuovo piatto e i gemelli dallo stesso catalogo
+  // arricchito di genera.js (amidoReale, ruoli_coperti, principale), non da
+  // una sua riletture a mano.
+  if (gemelliDishIds.length) {
+    const [piattoNuovo] = await caricaPiattiPerId(supabase, [nuovoDishId]);
+    const gemelli = await caricaPiattiPerId(supabase, gemelliDishIds);
+    if (piattoNuovo && gemelli.some(g => !accompagnaBene(piattoNuovo, g))) {
+      throw new Error('Piatto non ammesso: non si abbina bene con il resto del pasto (doppio amido, doppia proteina o stesso ingrediente principale)');
+    }
   }
 
   // ingredienti del nuovo piatto, per 100 g di ricetta
