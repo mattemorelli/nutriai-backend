@@ -1,0 +1,161 @@
+{
+  "piatti": [
+    {
+      "id": "5838689e-bf1d-4cee-a001-ceabaf80d6f1", "name": "Patate al forno al rosmarino", "name_en": "Roasted potatoes with rosemary",
+      "meal_slot": "contorno", "prep_min": 30,
+      "steps": ["Taglia le patate a spicchi con la buccia.", "Condisci con olio, aglio e rosmarino.", "Inforna a 200°C per 30 minuti, girando a metà."],
+      "steps_en": ["Cut the potatoes into wedges, skin on.", "Toss with oil, garlic and rosemary.", "Roast at 200°C for 30 minutes, turning halfway."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.4, "salsa_industriale": false, "base_amidacea": true, "trasportabile": true,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": true, "ha_proteina": false, "paese": "italia", "ruolo_primario": "base_amidacea", "ruoli_coperti": ["base_amidacea"],
+      "mercati": ["it"],
+      "ingredienti": [["170028", 300], ["171413", 12], ["rosmarino_it", 3], ["169230", 5]]
+    },
+    {
+      "id": "ae6cec5d-7cab-4030-b956-cdd0bc49e8c4", "name": "Patate schiacciate all'olio e prezzemolo", "name_en": "Smashed potatoes with olive oil and parsley",
+      "meal_slot": "contorno", "prep_min": 25,
+      "steps": ["Lessa le patate con la buccia.", "Scolale e schiacciale grossolanamente.", "Condisci con olio e prezzemolo tritato."],
+      "steps_en": ["Boil the potatoes, skin on.", "Drain and crush roughly.", "Dress with oil and chopped parsley."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.2, "salsa_industriale": false, "base_amidacea": true, "trasportabile": true,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": true, "ha_proteina": false, "paese": "italia", "ruolo_primario": "base_amidacea", "ruoli_coperti": ["base_amidacea"],
+      "mercati": ["it"],
+      "ingredienti": [["170028", 300], ["171413", 15], ["prezzemolo_it", 8]]
+    },
+    {
+      "id": "6897442b-0df6-439a-93d2-fffcc45850ce", "name": "Patate in tegame al pomodoro", "name_en": "Pan-stewed potatoes with tomato",
+      "meal_slot": "contorno", "prep_min": 30,
+      "steps": ["Rosola aglio e olio.", "Aggiungi patate a tocchetti e pomodoro, copri e cuoci 25 minuti.", "Finisci con basilico."],
+      "steps_en": ["Brown garlic in the oil.", "Add diced potatoes and tomato, cover and cook 25 minutes.", "Finish with basil."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.3, "salsa_industriale": false, "base_amidacea": true, "trasportabile": true,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": true, "ha_proteina": false, "paese": "italia", "ruolo_primario": "base_amidacea", "ruoli_coperti": ["base_amidacea"],
+      "mercati": ["it"],
+      "ingredienti": [["170028", 300], ["170457", 150], ["171413", 12], ["169230", 5], ["basilico_it", 5]]
+    },
+    {
+      "id": "4de053b4-3d63-4c45-89e0-9cc193bb1b28", "name": "Patate e fagiolini lessi", "name_en": "Boiled potatoes and green beans",
+      "meal_slot": "contorno", "prep_min": 25,
+      "steps": ["Lessa insieme patate a tocchetti e fagiolini.", "Scola.", "Condisci con olio."],
+      "steps_en": ["Boil diced potatoes and green beans together.", "Drain.", "Dress with oil."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.3, "salsa_industriale": false, "base_amidacea": true, "trasportabile": true,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": true, "ha_proteina": false, "paese": "italia", "ruolo_primario": "base_amidacea", "ruoli_coperti": ["base_amidacea"],
+      "mercati": ["it"],
+      "ingredienti": [["170028", 200], ["fagiolini_it", 150], ["171413", 12]]
+    },
+    {
+      "id": "b959174c-7d47-4492-bb93-cf365ec662ad", "name": "Gallette di riso con marmellata e frutta", "name_en": "Rice cakes with jam and fruit",
+      "meal_slot": "colazione", "prep_min": 3,
+      "steps": ["Spalma la marmellata sulle gallette di riso.", "Aggiungi la banana a fette."],
+      "steps_en": ["Spread jam on the rice cakes.", "Top with sliced banana."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 8.8, "salsa_industriale": false, "base_amidacea": false, "trasportabile": false,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": true, "ha_proteina": false, "paese": "italia", "ruolo_primario": "cereale", "ruoli_coperti": ["cereale", "frutta"],
+      "mercati": ["it"],
+      "ingredienti": [["gallette_riso_it", 25], ["marmellata_it", 20], ["banana_it", 100]]
+    },
+    {
+      "id": "80a59d9d-562c-4d32-b939-4432b02393ea", "name": "Yogurt di soia con frutta e semi", "name_en": "Soy yogurt with fruit and seeds",
+      "meal_slot": "colazione", "prep_min": 3,
+      "steps": ["Versa lo yogurt di soia in una ciotola.", "Aggiungi i frutti di bosco lavati e i semi di lino."],
+      "steps_en": ["Spoon the soy yogurt into a bowl.", "Add washed berries and flax seeds."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.5, "salsa_industriale": false, "base_amidacea": false, "trasportabile": false,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": false, "ha_proteina": false, "paese": "italia", "ruolo_primario": "latticino", "ruoli_coperti": ["latticino", "frutta"],
+      "mercati": ["it"],
+      "ingredienti": [["yogurt_soia_it", 150], ["frutti_bosco_it", 100], ["semi_lino_it", 10]]
+    },
+    {
+      "id": "878be54a-1e56-4a00-bc43-cc1691ae550c", "name": "Pane senza glutine tostato con marmellata", "name_en": "Toasted gluten-free bread with jam",
+      "meal_slot": "colazione", "prep_min": 5,
+      "steps": ["Tosta il pane senza glutine.", "Spalma la marmellata."],
+      "steps_en": ["Toast the gluten-free bread.", "Spread with jam."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 8.5, "salsa_industriale": false, "base_amidacea": false, "trasportabile": false,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": true, "ha_proteina": false, "paese": "italia", "ruolo_primario": "cereale", "ruoli_coperti": ["cereale"],
+      "mercati": ["it"],
+      "ingredienti": [["pane_senza_glutine_it", 60], ["marmellata_it", 20]]
+    },
+    {
+      "id": "1c6cc988-b2a1-44f3-8786-de630e7e34cc", "name": "Crema di riso con frutta", "name_en": "Rice cream with fruit",
+      "meal_slot": "colazione", "prep_min": 8,
+      "steps": ["Scalda il latte di mandorla.", "Versa la crema di riso mescolando, cuoci 3 minuti finché si addensa.", "Guarnisci con banana."],
+      "steps_en": ["Heat the almond milk.", "Stir in the rice cream, cook 3 minutes until it thickens.", "Top with banana."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.0, "salsa_industriale": false, "base_amidacea": false, "trasportabile": false,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": true,
+      "ha_amido": true, "ha_proteina": false, "paese": "italia", "ruolo_primario": "cereale", "ruoli_coperti": ["cereale", "frutta"],
+      "mercati": ["it"],
+      "ingredienti": [["crema_riso_it", 30], ["latte_mandorla_it", 150], ["banana_it", 100]]
+    },
+    {
+      "id": "e0d04f92-2280-4eaf-9704-027b1f50d34e", "name": "Bevanda vegetale con fiocchi di mais senza glutine", "name_en": "Plant milk with gluten-free corn flakes",
+      "meal_slot": "colazione", "prep_min": 3,
+      "steps": ["Versa i fiocchi di mais senza glutine in una ciotola.", "Versa sopra il latte di mandorla freddo."],
+      "steps_en": ["Pour the gluten-free corn flakes into a bowl.", "Pour the cold almond milk over."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 8.7, "salsa_industriale": false, "base_amidacea": false, "trasportabile": false,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": true,
+      "ha_amido": true, "ha_proteina": false, "paese": "italia", "ruolo_primario": "cereale", "ruoli_coperti": ["cereale"],
+      "mercati": ["it"],
+      "ingredienti": [["latte_mandorla_it", 200], ["fiocchi_mais_sg_it", 30]]
+    },
+    {
+      "id": "c6059f08-b918-4137-9e01-d167c0d66e42", "name": "Macedonia con yogurt di soia", "name_en": "Fruit salad with soy yogurt",
+      "meal_slot": "colazione", "prep_min": 8,
+      "steps": ["Taglia banana, kiwi e mela a pezzetti, dividi l'uva a metà.", "Mescola e servi con lo yogurt di soia."],
+      "steps_en": ["Cut banana, kiwi and apple into pieces, halve the grapes.", "Mix and serve with soy yogurt."],
+      "cucina": "europea", "profilo": "neutro", "famiglia": "neutra", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.4, "salsa_industriale": false, "base_amidacea": false, "trasportabile": false,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": false, "ha_proteina": false, "paese": "italia", "ruolo_primario": "frutta", "ruoli_coperti": ["frutta", "latticino"],
+      "mercati": ["it"],
+      "ingredienti": [["banana_it", 80], ["kiwi_it", 80], ["mela_it", 80], ["uva_it", 60], ["yogurt_soia_it", 100]]
+    },
+    {
+      "id": "1701f535-9e7e-4263-820e-c9c63f547f7c", "name": "Farinata di ceci", "name_en": "Chickpea flour flatbread",
+      "meal_slot": "secondo", "prep_min": 20,
+      "steps": ["Mescola la farina di ceci con acqua e lascia riposare 4 ore.", "Versa in teglia unta con l'olio e inforna a forno molto caldo 20 minuti."],
+      "steps_en": ["Whisk chickpea flour with water and rest 4 hours.", "Pour into an oiled tray and bake in a very hot oven for 20 minutes."],
+      "cucina": "europea", "profilo": "europeo-leggero", "famiglia": "mediterranea", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.1, "salsa_industriale": false, "base_amidacea": false, "trasportabile": true,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": true, "ha_proteina": true, "paese": "italia", "ruolo_primario": "proteina_principale", "ruoli_coperti": ["proteina_principale"],
+      "mercati": ["it"],
+      "ingredienti": [["farina_ceci_it", 85], ["171413", 11]],
+      "prep_anticipo": { "it": "Almeno 4 ore prima (anche la sera prima): mescola la farina di ceci con acqua fino a ottenere una crema liscia senza grumi, sala leggermente e lascia riposare a temperatura ambiente, mescolando un paio di volte. Il riposo è quello che fa venire la farinata compatta invece che gommosa.", "en": "At least 4 hours ahead (the night before works too): whisk the chickpea flour with water into a smooth, lump-free batter, season lightly with salt, and let it rest at room temperature, stirring a couple of times. The rest is what makes the farinata set firm instead of gummy.", "ore": 4 }
+    },
+    {
+      "id": "6e54ba5c-88d9-49a5-b84a-a7b06f2bac09", "name": "Polpette di lenticchie al forno con farina di ceci", "name_en": "Baked lentil patties with chickpea flour",
+      "meal_slot": "secondo", "prep_min": 25,
+      "steps": ["Trita la cipolla.", "Schiaccia le lenticchie grossolanamente.", "Unisci farina di ceci, cipolla, prezzemolo e olio.", "Forma le polpette e inforna 25 minuti a 200°C."],
+      "steps_en": ["Chop the onion.", "Crush the lentils roughly.", "Mix in chickpea flour, onion, parsley and oil.", "Shape patties and bake 25 minutes at 200°C."],
+      "cucina": "europea", "profilo": "europeo-leggero", "famiglia": "mediterranea", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.2, "salsa_industriale": false, "base_amidacea": false, "trasportabile": true,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": true, "ha_proteina": true, "paese": "italia", "ruolo_primario": "proteina_principale", "ruoli_coperti": ["proteina_principale", "verdura"],
+      "mercati": ["it"],
+      "ingredienti": [["lenticchie_cotte_it", 200], ["farina_ceci_it", 30], ["171413", 10], ["170000", 50], ["prezzemolo_it", 8]]
+    },
+    {
+      "id": "874c343d-ca14-4d9e-bdd9-c95f002c7666", "name": "Merluzzo al cartoccio con pomodorini e olive", "name_en": "Cod baked in parchment with cherry tomatoes and olives",
+      "meal_slot": "secondo", "prep_min": 20,
+      "steps": ["Condisci i pomodorini a metà con olio e aglio.", "Adagia il merluzzo su carta forno, copri con pomodorini e olive, chiudi il cartoccio.", "Inforna 18 minuti a 200°C."],
+      "steps_en": ["Toss halved cherry tomatoes with oil and garlic.", "Lay the cod on parchment, top with tomatoes and olives, seal the parcel.", "Bake 18 minutes at 200°C."],
+      "cucina": "europea", "profilo": "europeo-leggero", "famiglia": "mediterranea", "occasione": "quotidiano", "tecnica": "semplice",
+      "health_score": 9.0, "salsa_industriale": false, "base_amidacea": false, "trasportabile": false,
+      "contiene_glutine": false, "contiene_lattosio": false, "contiene_frutta_secca": false,
+      "ha_amido": false, "ha_proteina": true, "paese": "italia", "ruolo_primario": "proteina_principale", "ruoli_coperti": ["proteina_principale", "verdura", "condimento"],
+      "mercati": ["it"],
+      "ingredienti": [["171955", 180], ["pomodorini_it", 150], ["169094", 30], ["171413", 10], ["169230", 5], ["prezzemolo_it", 5]]
+    }
+  ]
+}

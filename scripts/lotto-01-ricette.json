@@ -1,0 +1,182 @@
+{
+  "azioni_cook": [
+    { "codice": "cuocere", "nome_it": "Cuocere", "nome_en": "Cook" },
+    { "codice": "aggiungere", "nome_it": "Aggiungere", "nome_en": "Add" },
+    { "codice": "soffriggere", "nome_it": "Soffriggere", "nome_en": "Sauté aromatics" },
+    { "codice": "servire", "nome_it": "Servire", "nome_en": "Serve" },
+    { "codice": "condire", "nome_it": "Condire", "nome_en": "Season" },
+    { "codice": "tagliare", "nome_it": "Tagliare", "nome_en": "Cut" },
+    { "codice": "bollire", "nome_it": "Bollire", "nome_en": "Boil" },
+    { "codice": "infornare", "nome_it": "Infornare", "nome_en": "Bake" },
+    { "codice": "disporre", "nome_it": "Disporre", "nome_en": "Arrange" },
+    { "codice": "stufare", "nome_it": "Stufare", "nome_en": "Braise" },
+    { "codice": "versare", "nome_it": "Versare", "nome_en": "Pour" },
+    { "codice": "tostare", "nome_it": "Tostare", "nome_en": "Toast" },
+    { "codice": "mescolare", "nome_it": "Mescolare", "nome_en": "Stir/Whisk together" },
+    { "codice": "grigliare", "nome_it": "Grigliare", "nome_en": "Grill" },
+    { "codice": "frullare", "nome_it": "Frullare", "nome_en": "Blend" },
+    { "codice": "scaldare", "nome_it": "Scaldare", "nome_en": "Heat (oil/water)" },
+    { "codice": "marinare", "nome_it": "Marinare", "nome_en": "Marinate" },
+    { "codice": "scolare", "nome_it": "Scolare", "nome_en": "Drain" },
+    { "codice": "farcire", "nome_it": "Farcire", "nome_en": "Stuff/fill" },
+    { "codice": "schiacciare", "nome_it": "Schiacciare", "nome_en": "Crush" },
+    { "codice": "formare", "nome_it": "Formare", "nome_en": "Shape" },
+    { "codice": "pulire", "nome_it": "Pulire", "nome_en": "Clean/trim" },
+    { "codice": "coprire", "nome_it": "Coprire", "nome_en": "Cover" },
+    { "codice": "sbattere", "nome_it": "Sbattere", "nome_en": "Whisk/beat (eggs)" },
+    { "codice": "lavare", "nome_it": "Lavare", "nome_en": "Wash/Rinse" },
+    { "codice": "rompere", "nome_it": "Rompere", "nome_en": "Crack/Break" },
+    { "codice": "sbucciare", "nome_it": "Sbucciare", "nome_en": "Peel" },
+    { "codice": "spegnere", "nome_it": "Spegnere", "nome_en": "Turn off heat" },
+    { "codice": "arrostire", "nome_it": "Arrostire", "nome_en": "Roast" },
+    { "codice": "asciugare", "nome_it": "Asciugare", "nome_en": "Pat dry" },
+    { "codice": "preriscaldare", "nome_it": "Preriscaldare", "nome_en": "Preheat (oven)" },
+    { "codice": "saltare", "nome_it": "Saltare", "nome_en": "Pan-toss (vegetables/pasta)" },
+    { "codice": "rosolare", "nome_it": "Rosolare", "nome_en": "Brown/sear (meat/fish)" },
+    { "codice": "battere", "nome_it": "Battere", "nome_en": "Pound (meat slices)" },
+    { "codice": "altro", "nome_it": "Altro", "nome_en": "Other" }
+  ],
+  "ricette": [
+    {
+      "dish_id": "5838689e-bf1d-4cee-a001-ceabaf80d6f1", "nome": "Patate al forno al rosmarino", "nome_en": "Roasted potatoes with rosemary",
+      "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "preriscaldare", "testo_it": "Accendi il forno a 200°C, statico.", "testo_en": "Turn the oven on to 200°C, conventional.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 200, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre il forno scalda, taglia le patate a spicchi lasciando la buccia.", "testo_en": "While the oven heats, cut the potatoes into wedges, skin on.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170028", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "condire", "testo_it": "Condiscile con l'olio, l'aglio tritato e il rosmarino.", "testo_en": "Toss them with the oil, the chopped garlic and the rosemary.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "rosmarino_it", "quota": 1.0 }, { "food_id": "169230", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "infornare", "testo_it": "Disponi in teglia in un solo strato e inforna, girando a metà cottura, 30 minuti, finché dorate.", "testo_en": "Spread in a single layer in a baking dish and roast, turning halfway, for 30 minutes, until golden.", "durata_min": 30, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 200, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "servire", "testo_it": "Servi calde dalla teglia.", "testo_en": "Serve hot from the dish.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "ae6cec5d-7cab-4030-b956-cdd0bc49e8c4", "nome": "Patate schiacciate all'olio e prezzemolo", "nome_en": "Smashed potatoes with olive oil and parsley",
+      "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per le patate.", "testo_en": "Put a pot of water on the heat for the potatoes.", "durata_min": 8, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Nel frattempo taglia le patate a pezzi con la buccia.", "testo_en": "Meanwhile cut the potatoes into chunks, skin on.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170028", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "bollire", "testo_it": "Lessale 20 minuti, finché il coltello entra senza resistenza.", "testo_en": "Boil for 20 minutes, until a knife slides in with no resistance.", "durata_min": 20, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "schiacciare", "testo_it": "Scolale e schiacciale grossolanamente con una forchetta, lasciando dei pezzi.", "testo_en": "Drain and crush them roughly with a fork, leaving some chunks.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "condire", "testo_it": "Condisci con l'olio e il prezzemolo tritato.", "testo_en": "Dress with the oil and the chopped parsley.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "prezzemolo_it", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "servire", "testo_it": "Servi tiepide.", "testo_en": "Serve warm.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "6897442b-0df6-439a-93d2-fffcc45850ce", "nome": "Patate in tegame al pomodoro", "nome_en": "Pan-stewed potatoes with tomato",
+      "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia le patate a tocchetti di circa 2 cm, con la buccia.", "testo_en": "Cut the potatoes into 2cm chunks, skin on.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170028", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "rosolare", "testo_it": "Scalda l'olio con l'aglio in un tegame a fuoco medio per un minuto, finché profumato.", "testo_en": "Heat the oil with the garlic in a pan over medium heat for a minute, until fragrant.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }, { "food_id": "169230", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "aggiungere", "testo_it": "Aggiungi le patate e il pomodoro a pezzi, copri e cuoci 25 minuti a fuoco basso, mescolando di tanto in tanto, finché le patate sono morbide.", "testo_en": "Add the potatoes and the chopped tomato, cover and cook over low heat for 25 minutes, stirring occasionally, until the potatoes are tender.", "durata_min": 25, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "basso", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170457", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "servire", "testo_it": "Sfoglia il basilico sopra e servi.", "testo_en": "Tear the basil over and serve.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "basilico_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "4de053b4-3d63-4c45-89e0-9cc193bb1b28", "nome": "Patate e fagiolini lessi", "nome_en": "Boiled potatoes and green beans",
+      "meal_slot": "contorno", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Metti sul fuoco una pentola d'acqua per le patate e i fagiolini.", "testo_en": "Put a pot of water on the heat for the potatoes and green beans.", "durata_min": 8, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Nel frattempo taglia le patate a tocchetti con la buccia e spunta i fagiolini.", "testo_en": "Meanwhile cut the potatoes into chunks, skin on, and trim the green beans.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170028", "quota": 1.0 }, { "food_id": "fagiolini_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "bollire", "testo_it": "Lessa insieme le patate e i fagiolini 15 minuti, finché entrambi sono teneri.", "testo_en": "Boil the potatoes and green beans together for 15 minutes, until both are tender.", "durata_min": 15, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "alto", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "scolare", "testo_it": "Scola bene.", "testo_en": "Drain well.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "condire", "testo_it": "Condisci con l'olio.", "testo_en": "Dress with the oil.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "servire", "testo_it": "Servi tiepide.", "testo_en": "Serve warm.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "b959174c-7d47-4492-bb93-cf365ec662ad", "nome": "Gallette di riso con marmellata e frutta", "nome_en": "Rice cakes with jam and fruit",
+      "meal_slot": "colazione", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "disporre", "testo_it": "Spalma la marmellata sulle gallette di riso.", "testo_en": "Spread the jam over the rice cakes.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "gallette_riso_it", "quota": 1.0 }, { "food_id": "marmellata_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Taglia la banana a rondelle e disponila sopra.", "testo_en": "Slice the banana into rounds and arrange it on top.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "banana_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "servire", "testo_it": "Servi subito, perché le gallette non restino troppo tempo a contatto con la marmellata.", "testo_en": "Serve at once, so the rice cakes don't sit too long against the jam.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "80a59d9d-562c-4d32-b939-4432b02393ea", "nome": "Yogurt di soia con frutta e semi", "nome_en": "Soy yogurt with fruit and seeds",
+      "meal_slot": "colazione", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "lavare", "testo_it": "Lava i frutti di bosco.", "testo_en": "Wash the berries.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "frutti_bosco_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "servire", "testo_it": "Versa lo yogurt di soia in una ciotola, aggiungi i frutti di bosco e cospargi con i semi di lino.", "testo_en": "Spoon the soy yogurt into a bowl, add the berries and scatter the flax seeds over.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "yogurt_soia_it", "quota": 1.0 }, { "food_id": "semi_lino_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "878be54a-1e56-4a00-bc43-cc1691ae550c", "nome": "Pane senza glutine tostato con marmellata", "nome_en": "Toasted gluten-free bread with jam",
+      "meal_slot": "colazione", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tostare", "testo_it": "Tosta le fette di pane senza glutine.", "testo_en": "Toast the slices of gluten-free bread.", "durata_min": 2, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "pane_senza_glutine_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "disporre", "testo_it": "Spalma la marmellata sulle fette calde.", "testo_en": "Spread the jam on the warm slices.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "marmellata_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "servire", "testo_it": "Servi subito.", "testo_en": "Serve at once.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "1c6cc988-b2a1-44f3-8786-de630e7e34cc", "nome": "Crema di riso con frutta", "nome_en": "Rice cream with fruit",
+      "meal_slot": "colazione", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "scaldare", "testo_it": "Scalda il latte di mandorla in un pentolino, senza farlo bollire.", "testo_en": "Heat the almond milk in a small pan, without letting it boil.", "durata_min": 3, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "latte_mandorla_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "versare", "testo_it": "Versa a pioggia la crema di riso, mescolando con una frusta.", "testo_en": "Pour in the rice cream in a thin stream, whisking.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [{ "food_id": "crema_riso_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "cuocere", "testo_it": "Cuoci mescolando 3 minuti, finché si addensa.", "testo_en": "Cook, stirring, for 3 minutes, until it thickens.", "durata_min": 3, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": "medio", "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 4, "azione": "tagliare", "testo_it": "Nel frattempo taglia la banana a rondelle.", "testo_en": "Meanwhile slice the banana into rounds.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "banana_it", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "servire", "testo_it": "Versa nella ciotola e guarnisci con la banana.", "testo_en": "Pour into a bowl and top with the banana.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "e0d04f92-2280-4eaf-9704-027b1f50d34e", "nome": "Bevanda vegetale con fiocchi di mais senza glutine", "nome_en": "Plant milk with gluten-free corn flakes",
+      "meal_slot": "colazione", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "versare", "testo_it": "Versa i fiocchi di mais senza glutine in una ciotola.", "testo_en": "Pour the gluten-free corn flakes into a bowl.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "fiocchi_mais_sg_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "versare", "testo_it": "Versa sopra la bevanda di mandorla fredda.", "testo_en": "Pour the cold almond milk over.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "latte_mandorla_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "servire", "testo_it": "Servi subito, perché i fiocchi restino croccanti.", "testo_en": "Serve at once, so the flakes stay crisp.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "c6059f08-b918-4137-9e01-d167c0d66e42", "nome": "Macedonia con yogurt di soia", "nome_en": "Fruit salad with soy yogurt",
+      "meal_slot": "colazione", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "tagliare", "testo_it": "Taglia la banana, il kiwi e la mela a pezzetti, e dividi l'uva a metà.", "testo_en": "Cut the banana, kiwi and apple into small pieces, and halve the grapes.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "banana_it", "quota": 1.0 }, { "food_id": "kiwi_it", "quota": 1.0 }, { "food_id": "mela_it", "quota": 1.0 }, { "food_id": "uva_it", "quota": 1.0 }] },
+        { "ordine": 2, "azione": "mescolare", "testo_it": "Mescola tutta la frutta in una ciotola.", "testo_en": "Toss all the fruit together in a bowl.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 3, "azione": "servire", "testo_it": "Servi con lo yogurt di soia a parte o versato sopra.", "testo_en": "Serve with the soy yogurt on the side or spooned over.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "yogurt_soia_it", "quota": 1.0 }] }
+      ]
+    },
+    {
+      "dish_id": "1701f535-9e7e-4263-820e-c9c63f547f7c", "nome": "Farinata di ceci", "nome_en": "Chickpea flour flatbread",
+      "meal_slot": "secondo", "note": [],
+      "prep_anticipo": { "it": "Almeno 4 ore prima (anche la sera prima): mescola la farina di ceci con acqua fino a ottenere una crema liscia senza grumi, sala leggermente e lascia riposare a temperatura ambiente, mescolando un paio di volte. Il riposo è quello che fa venire la farinata compatta invece che gommosa.", "en": "At least 4 hours ahead (the night before works too): whisk the chickpea flour with water into a smooth, lump-free batter, season lightly with salt, and let it rest at room temperature, stirring a couple of times. The rest is what makes the farinata set firm instead of gummy.", "ore": 4 },
+      "passi": [
+        { "ordine": 1, "azione": "preriscaldare", "testo_it": "Accendi il forno alla temperatura massima, statico.", "testo_en": "Turn the oven on to its highest setting, conventional.", "durata_min": 15, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 250, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "schiacciare", "testo_it": "Mentre il forno scalda, elimina con un cucchiaio la schiuma che si è formata in superficie sul composto riposato.", "testo_en": "While the oven heats, skim off with a spoon the foam that has formed on top of the rested batter.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "farina_ceci_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "condire", "testo_it": "Ungi bene una teglia bassa con metà dell'olio.", "testo_en": "Grease a shallow baking tray well with half the oil.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 0.5 }] },
+        { "ordine": 4, "azione": "versare", "testo_it": "Versa il composto nella teglia: deve restare uno strato sottile, non più di mezzo centimetro.", "testo_en": "Pour the batter into the tray: it should stay a thin layer, no more than half a centimetre.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 5, "azione": "condire", "testo_it": "Versa sopra il resto dell'olio.", "testo_en": "Drizzle the remaining oil over.", "durata_min": 0.5, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 0.5 }] },
+        { "ordine": 6, "azione": "infornare", "testo_it": "Inforna finché la superficie è dorata e croccante a chiazze, 20 minuti.", "testo_en": "Bake until the surface is golden and crisp in patches, 20 minutes.", "durata_min": 20, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 250, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Tagliala a spicchi e servi calda, con una macinata di pepe.", "testo_en": "Cut into wedges and serve hot, with a grinding of pepper.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "6e54ba5c-88d9-49a5-b84a-a7b06f2bac09", "nome": "Polpette di lenticchie al forno con farina di ceci", "nome_en": "Baked lentil patties with chickpea flour",
+      "meal_slot": "secondo", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "preriscaldare", "testo_it": "Accendi il forno a 200°C, statico.", "testo_en": "Turn the oven on to 200°C, conventional.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 200, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre il forno scalda, trita finemente la cipolla.", "testo_en": "While the oven heats, finely chop the onion.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "170000", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "schiacciare", "testo_it": "Schiaccia le lenticchie con una forchetta fino a un composto grossolano, non una purea.", "testo_en": "Crush the lentils with a fork into a rough mash, not a purée.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "lenticchie_cotte_it", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "mescolare", "testo_it": "Unisci la cipolla, la farina di ceci, il prezzemolo tritato e metà dell'olio, e mescola fino a ottenere un composto che si compatta.", "testo_en": "Mix in the onion, the chickpea flour, the chopped parsley and half the oil, until the mixture holds together.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "farina_ceci_it", "quota": 1.0 }, { "food_id": "prezzemolo_it", "quota": 1.0 }, { "food_id": "171413", "quota": 0.5 }] },
+        { "ordine": 5, "azione": "formare", "testo_it": "Forma delle polpette con le mani leggermente umide.", "testo_en": "Shape into patties with slightly damp hands.", "durata_min": 3, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 6, "azione": "disporre", "testo_it": "Disponi le polpette su una teglia foderata e spennellale con l'olio rimasto.", "testo_en": "Arrange the patties on a lined tray and brush with the remaining oil.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 0.5 }] },
+        { "ordine": 7, "azione": "infornare", "testo_it": "Inforna girandole a metà cottura, 25 minuti, finché dorate.", "testo_en": "Bake, turning halfway, for 25 minutes, until golden.", "durata_min": 25, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 200, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 8, "azione": "servire", "testo_it": "Servi calde.", "testo_en": "Serve hot.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] }
+      ]
+    },
+    {
+      "dish_id": "874c343d-ca14-4d9e-bdd9-c95f002c7666", "nome": "Merluzzo al cartoccio con pomodorini e olive", "nome_en": "Cod baked in parchment with cherry tomatoes and olives",
+      "meal_slot": "secondo", "note": [],
+      "passi": [
+        { "ordine": 1, "azione": "preriscaldare", "testo_it": "Accendi il forno a 200°C, statico.", "testo_en": "Turn the oven on to 200°C, conventional.", "durata_min": 12, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 200, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 2, "azione": "tagliare", "testo_it": "Mentre il forno scalda, taglia i pomodorini a metà.", "testo_en": "While the oven heats, halve the cherry tomatoes.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "pomodorini_it", "quota": 1.0 }] },
+        { "ordine": 3, "azione": "condire", "testo_it": "Condiscili con metà dell'olio, l'aglio tritato e un pizzico di sale.", "testo_en": "Toss them with half the oil, the chopped garlic and a pinch of salt.", "durata_min": 1, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 0.5 }, { "food_id": "169230", "quota": 1.0 }] },
+        { "ordine": 4, "azione": "asciugare", "testo_it": "Asciuga il merluzzo e adagialo su un foglio di carta forno.", "testo_en": "Pat the cod dry and lay it on a sheet of baking parchment.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171955", "quota": 1.0 }] },
+        { "ordine": 5, "azione": "farcire", "testo_it": "Disponi sopra i pomodorini e le olive, poi chiudi bene il cartoccio.", "testo_en": "Arrange the tomatoes and olives on top, then seal the parchment parcel well.", "durata_min": 2, "tipo_tempo": "attiva", "in_parallelo": true, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "169094", "quota": 1.0 }] },
+        { "ordine": 6, "azione": "infornare", "testo_it": "Inforna il cartoccio 18 minuti.", "testo_en": "Bake the parcel for 18 minutes.", "durata_min": 18, "tipo_tempo": "attesa", "in_parallelo": false, "temperatura_c": 200, "forno_modalita": "statico", "fuoco": null, "tempo_da_confezione": false, "ingredienti": [] },
+        { "ordine": 7, "azione": "servire", "testo_it": "Apri il cartoccio con cautela per non scottarti, condisci con il resto dell'olio e il prezzemolo tritato.", "testo_en": "Open the parcel carefully to avoid the steam, dress with the remaining oil and the chopped parsley.", "durata_min": null, "tipo_tempo": null, "in_parallelo": false, "temperatura_c": null, "forno_modalita": null, "fuoco": null, "tempo_da_confezione": false, "ingredienti": [{ "food_id": "171413", "quota": 0.5 }, { "food_id": "prezzemolo_it", "quota": 1.0 }] }
+      ]
+    }
+  ]
+}
