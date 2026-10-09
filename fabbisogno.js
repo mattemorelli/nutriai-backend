@@ -61,35 +61,35 @@ function applicaObiettivo(tdee, bmr, peso, goal) {
   return { kcal: Math.round(target), rete };
 }
 
-// Sopra un BMI di 27 il peso reale sovrastima il bisogno proteico (la massa
+// Sopra un BMI di 30 il peso reale sovrastima il bisogno proteico (la massa
 // grassa non consuma proteine come la massa magra, e g/kg sul peso reale
 // diventerebbe irrealistico per chi e' molto sovrappeso): si usa un peso di
-// riferimento a BMI 25 invece del peso reale. Sotto 27 il peso reale resta
-// il riferimento, senza correzione.
+// riferimento a BMI 25 invece del peso reale. Sotto 30 il peso reale resta
+// il riferimento, senza correzione. Soglia alzata da 27 a 30 il 2026-10-09,
+// richiesta esplicita.
 function pesoRiferimentoProteico(peso, altezzaCm) {
   if (!altezzaCm) return peso;
   const h = altezzaCm / 100;
   const bmi = peso / (h * h);
-  if (bmi <= 27) return peso;
+  if (bmi <= 30) return peso;
   return 25 * h * h;
 }
 
-// 1,2-1,6 g/kg (corretto il 2026-10-09: prima dipendeva solo da peso*goal,
-// senza altezza ne' allenamento di forza specifico - due profili con lo
-// stesso prodotto peso*fattore arrivavano allo stesso minimo nonostante
-// fabbisogni energetici opposti, es. 78kg*1.4 e 68kg*1.6 arrotondano
-// entrambi a 109). Base 1.2 (mantenimento, nessun allenamento di forza);
-// +0.2 in deficit (difendere la massa magra); +0.1 in surplus; +0.2 se
-// l'allenamento di forza e' almeno 90 min/settimana (2 sedute), +0.1 se
-// c'e' ma sotto quella soglia. Tetto 1.6: la somma di deficit+forza non deve
-// mai superarlo.
-function proteineTarget({ peso, altezzaCm, goal, minutiForza }) {
-  let gPerKg = 1.2;
-  if (goal === 'dimagrimento') gPerKg += 0.2;
-  else if (goal === 'massa') gPerKg += 0.1;
-  if (minutiForza >= 90) gPerKg += 0.2;
-  else if (minutiForza > 0) gPerKg += 0.1;
-  gPerKg = Math.min(gPerKg, 1.6);
+// Rifatta il 2026-10-09 (seconda correzione: la prima, 1.2 + 0.2 deficit +
+// 0.2 forza, dava 95g a un fabbisogno di 1590 kcal - 24% delle kcal dalla
+// sola proteina, irraggiungibile col catalogo attuale, trovato bloccando il
+// generatore su quel profilo). Il deficit calorico NON alza piu' il minimo
+// (richiesta esplicita: "anche in deficit" il sedentario resta a 1.2 g/kg -
+// la letteratura sportiva alzerebbe il minimo in deficit per difendere la
+// massa magra, ma qui si e' scelta la raggiungibilita' su un fabbisogno
+// basso rispetto all'ottimo teorico). Due fasce, non piu' quattro incrementi
+// cumulabili: 1.2 g/kg sedentario o attivita' leggera (anche in deficit),
+// 1.6 g/kg con allenamento di forza almeno 90 min/settimana (2 sedute). Fra
+// le due, un allenamento di forza presente ma sotto soglia vale 1.4 g/kg
+// (interpolazione non scritta esplicitamente nella richiesta, per non far
+// scattare la soglia come un gradino unico da zero a tutto).
+function proteineTarget({ peso, altezzaCm, minutiForza }) {
+  const gPerKg = minutiForza >= 90 ? 1.6 : minutiForza > 0 ? 1.4 : 1.2;
   const pesoRif = pesoRiferimentoProteico(peso, altezzaCm);
   return Math.round(pesoRif * gPerKg);
 }

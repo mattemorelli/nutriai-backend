@@ -71,7 +71,15 @@ const GRADINI = [
   // e dieta non entrano in questo gradino ne' in nessun altro.
   { gradino: '4b', soglia: 7, opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true } },
   { gradino: '5',  soglia: 6.5, opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true } },
-  { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true } },
+  // Ultimo gradino (2026-10-09, terza correzione: "nessuno senza piano"):
+  // SOLO qui le proteine possono restare sotto il 90% del minimo - mai nei
+  // gradini precedenti, nemmeno 5-soglia-6.5. kcal (+-10%) e il tetto sale/
+  // saturi restano vincoli veri anche qui: non e' "accetta qualunque cosa",
+  // e' "fra le combinazioni che rispettano tutto il resto, consegna quella
+  // con piu' proteine possibile invece di nessuna settimana". Il
+  // ricercatore di proteine (provaAumentoProteine) ha gia' provato a
+  // massimizzarle PRIMA che questo gradino venga anche solo tentato.
+  { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true, proteinaTollerante: true } },
 ];
 
 // Quanto ogni elemento puo' essere scalato. Le ancore hanno margini stretti,
@@ -115,7 +123,18 @@ function fattoreTetto(obiettivo) {
 }
 
 function limitiDi(p, obiettivo) {
-  const ratio = p.piatto.base_amidacea ? LIMITI_SCALA.base : (LIMITI_SCALA[p.slot] || [0.9, 1.2]);
+  let ratio = p.piatto.base_amidacea ? LIMITI_SCALA.base : (LIMITI_SCALA[p.slot] || [0.9, 1.2]);
+  // Proteine ancora sotto il minimo dopo aver scelto piatti diversi
+  // (provaAumentoProteine, problema 2 della terza correzione): lascia
+  // crescere il secondo fino a 1.5x (richiesto esplicitamente, oltre il
+  // normale 1.3) e stringe primo e pane/patate - meno proteici per kcal -
+  // sia in su che in giu', cosi' quando adattaGiornata ridistribuisce le
+  // kcal la quota in piu' finisce sul secondo, non sul primo.
+  if (p.cercaProteine) {
+    if (p.slot === 'secondo') ratio = [ratio[0], 1.5];
+    else if (p.slot === 'primo') ratio = [0.5, 1.1];
+    else if (p.piatto.base_amidacea) ratio = [0.3, 1.3];
+  }
   const tipo = tipoAmidoDiAccompagnamento(p.piatto);
   const fattore = fattoreTetto(obiettivo);
   const tettoGrammi = (tipo === 'pane' ? TETTO_GRAMMI.pane
@@ -1569,6 +1588,14 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       const ripetizioniBase = { valore: 0 };
       const giornoBaseDi = new Map();
       const statoGiorni = Array.from({ length: 7 }, () => ({}));
+      // Giorni dove il ricercatore di proteine (provaAumentoProteine) ha
+      // gia' provato a scegliere diverso e serve ancora stringere il primo/
+      // pane per lasciare crescere il secondo: letto da limitiDi tramite
+      // pastiDi (vedi piu' sotto), mai resettato a meta' tentativo - un
+      // giorno che l'ha chiesto una volta resta "affamato" per il resto di
+      // questo tentativo, non e' un problema se il tentativo viene scartato
+      // (si riparte da un Set vuoto al prossimo gradino/profilo).
+      const giorniCercaProteine = new Set();
 
       // Pre-assegna i piatti bloccati, una volta per tentativo (usati/
       // usoGruppi sono per-tentativo, azzerati qui sopra): MAI dentro la
@@ -1609,7 +1636,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         // rimettere bloccato=true sulla riga giusta al salvataggio, senza
         // dover portare il flag dentro ogni singolo campo di statoGiorni.
         const idsBloccati = new Set((st.bloccatiOggi || []).map(b => b.piatto.id));
-        const conFlag = (x) => x && { ...x, bloccato: idsBloccati.has(x.piatto.id) };
+        const cercaProteine = giorniCercaProteine.has(gi);
+        const conFlag = (x) => x && { ...x, bloccato: idsBloccati.has(x.piatto.id), cercaProteine };
         return [
           conFlag(st.colazione      && { meal: 'colazione', slot: 'colazione', piatto: st.colazione }),
           conFlag(st.primo          && { meal: 'pranzo',    slot: 'primo',     piatto: st.primo }),
@@ -2078,6 +2106,105 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         prova('colazionePiuRicca', candidatiColazionePiuRicca(gi, ctx.profiloGiorno, ctx.paeseOkLeggero, ctx.cappaColazione), (p) => assegnaColazionePiuRicca(gi, p));
       }
 
+      // Densita' proteica (g proteina per kcal): il criterio richiesto per
+      // preferire candidati "con piu' proteine per kcal", non solo piu'
+      // proteina in assoluto - un piatto da 800 kcal con 40g di proteina
+      // non e' piu' proteico di uno da 300 kcal con 25g, e' solo piu' grande.
+      const densitaProteica = (p) => (p.protein || 0) / (p.kcal || 1);
+
+      // Scambia il secondo attuale con uno piu' proteico per kcal, dallo
+      // stesso pool di candidatiSecondo ma ordinato per densita' proteica
+      // invece che per peso/salute - stesso principio di
+      // candidatiColazionePiuRicca, applicato alla proteina invece che
+      // alle kcal totali. Deve ancora abbinarsi bene col resto del pasto
+      // (accompagnaBene contro contornoCena/base).
+      function candidatiSecondoProteico(gi) {
+        const st = statoGiorni[gi];
+        const attuale = st.secondo;
+        if (!attuale) return [];
+        const altriDelPasto = [st.contornoCena, st.base].filter(Boolean);
+        const candidati = secondi.filter(p =>
+          p.id !== attuale.id && !usati.has(p.id) && !rifiutato(p) &&
+          altriDelPasto.every(c => accompagnaBene(p, c)) &&
+          principaleLiberoOggi(gi, p)
+        );
+        return candidati.slice().sort((a, b) => densitaProteica(b) - densitaProteica(a));
+      }
+      function assegnaSecondoProteico(gi, piatto) {
+        const st = statoGiorni[gi];
+        const precedente = st.secondo;
+        usati.delete(precedente.id);
+        if (precedente.gruppo) usoGruppi[precedente.gruppo]--;
+        st.secondo = piatto;
+        usati.add(piatto.id);
+        if (piatto.gruppo) usoGruppi[piatto.gruppo] = (usoGruppi[piatto.gruppo] || 0) + 1;
+        return () => {
+          usati.delete(piatto.id);
+          if (piatto.gruppo) usoGruppi[piatto.gruppo]--;
+          st.secondo = precedente;
+          usati.add(precedente.id);
+          if (precedente.gruppo) usoGruppi[precedente.gruppo] = (usoGruppi[precedente.gruppo] || 0) + 1;
+        };
+      }
+
+      // Stesso scambio per uno spuntino gia' scelto (spuntino, spuntino2 o
+      // il terzo d'emergenza): negli spuntini la richiesta e' letterale,
+      // "scegli prima quelli proteici".
+      function candidatiSpuntinoProteico(gi, nomeSlot) {
+        const st = statoGiorni[gi];
+        const attuale = st[nomeSlot];
+        if (!attuale) return [];
+        const altri = [st.spuntino, st.spuntino2, st.spuntino3].filter(p => p && p.id !== attuale.id);
+        const candidati = spuntini.filter(p =>
+          p.id !== attuale.id && !usati.has(p.id) && !rifiutato(p) &&
+          !altri.some(a => a.id === p.id) && principaleLiberoOggi(gi, p)
+        );
+        return candidati.slice().sort((a, b) => densitaProteica(b) - densitaProteica(a));
+      }
+      function assegnaSpuntinoProteico(gi, nomeSlot, piatto) {
+        const st = statoGiorni[gi];
+        const precedente = st[nomeSlot];
+        usati.delete(precedente.id);
+        st[nomeSlot] = piatto;
+        usati.add(piatto.id);
+        return () => { usati.delete(piatto.id); st[nomeSlot] = precedente; usati.add(precedente.id); };
+      }
+
+      // Ricerca delle proteine (problema 2 della terza correzione,
+      // 2026-10-09): quando la giornata e' sotto il minimo proteico,
+      // nell'ordine chiesto - secondo piu' proteico per kcal, spuntini piu'
+      // proteici uno per uno, poi (se serve ancora scalare, non solo
+      // scegliere diverso) lascia crescere il secondo fino a 1.5x stringendo
+      // primo e pane/patate. Scambi veri (pila.push+entraFrame): annullati
+      // dal backtracking come ogni altra scelta se la giornata viene poi
+      // scartata per un altro motivo.
+      function provaAumentoProteine(gi) {
+        const st = statoGiorni[gi];
+        const corto = () => {
+          const val = valutaGiornataScalata(pastiDi(gi), obiettivo, obiettivoProteine);
+          return val && !val.proteinOk;
+        };
+        const prova = (nomeSlot, candidati, applica) => {
+          if (!candidati.length) return false;
+          const frame = creaFrame(gi + 1, nomeSlot, candidati, applica);
+          pila.push(frame);
+          entraFrame(frame);
+          return true;
+        };
+
+        if (!corto()) return;
+        prova('secondoProteico', candidatiSecondoProteico(gi), (p) => assegnaSecondoProteico(gi, p));
+
+        for (const nomeSlot of ['spuntino', 'spuntino2', 'spuntino3']) {
+          if (!corto()) return;
+          if (!st[nomeSlot]) continue;
+          prova('proteico_' + nomeSlot, candidatiSpuntinoProteico(gi, nomeSlot), (p) => assegnaSpuntinoProteico(gi, nomeSlot, p));
+        }
+
+        if (!corto()) return;
+        giorniCercaProteine.add(gi);
+      }
+
       function avanzaFinDove(giIniziale) {
         let gi = giIniziale;
         while (gi < 7) {
@@ -2087,15 +2214,15 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
             const st = statoGiorni[gi];
             if (obiettivo) {
               provaAumentoKcal(gi);
+              provaAumentoProteine(gi);
               const val = valutaGiornataScalata(pastiDi(gi), obiettivo, obiettivoProteine);
               // Il tetto sale/saturi resta allentabile dal gradino 2b
-              // (tettoTollerante); kcal e proteine NON lo sono mai, a
-              // nessun gradino (problema 2 della verifica, 2026-10-09: un
-              // gradino alto accettava giornate sotto obiettivo o sotto il
-              // minimo proteico invece di cercare altrove) - se non bastano
-              // nemmeno dopo gli aumenti di emergenza, e' un vicolo cieco
-              // vero, si torna indietro.
-              if (val && ((!val.tettoOk && !opz.tettoTollerante) || !val.kcalOk || !val.proteinOk)) {
+              // (tettoTollerante); kcal non lo e' mai, a nessun gradino. Le
+              // proteine restano un vincolo vero fino al penultimo gradino -
+              // solo l'ultimo (proteinaTollerante, "nessuno senza piano")
+              // le allenta, e solo dopo che provaAumentoProteine ha gia'
+              // provato a massimizzarle.
+              if (val && ((!val.tettoOk && !opz.tettoTollerante) || !val.kcalOk || (!val.proteinOk && !opz.proteinaTollerante))) {
                 const tornaA = indietro();
                 if (tornaA < 0) return { esaurito: true, motivo: 'reale' };
                 gi = tornaA;
