@@ -502,7 +502,7 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
 async function ingredientiPiatto(supabase, dishId, portionG) {
   const { data: ing, error } = await supabase
     .from('dish_ingredients')
-    .select('food_id, grams, foods (name, name_en, unita, peso_pezzo_g)')
+    .select('food_id, grams, foods (name, name_en)')
     .eq('dish_id', dishId);
   if (error) throw new Error(error.message);
 
@@ -515,16 +515,22 @@ async function ingredientiPiatto(supabase, dishId, portionG) {
     .sort((a, b) => Number(b.grams || 0) - Number(a.grams || 0))
     .map((r) => {
       const f = r.foods || {};
-      const v = { unita: f.unita || 'peso', pezzo: f.peso_pezzo_g ? Number(f.peso_pezzo_g) : null };
       const g = Math.round(Number(r.grams || 0) * scala);
-      // Qui serve una riga sola (la schermata del piatto non ha la coppia
-      // numero-grande/nota-piccola della lista della spesa): le due parti
-      // di quantitaLeggibile si ricompongono in una stringa.
-      const { quantita, quantita_nota } = quantitaLeggibile(v, g);
+      // A differenza della lista della spesa (quantitaLeggibile, "cosa
+      // compri": confezioni, pezzi, mazzi), qui serve quanto di
+      // quell'ingrediente finisce davvero in QUESTO piatto - il peso
+      // scalato sulla porzione, non la taglia della confezione, e sempre
+      // in grammi anche per chi in lista si compra a pezzi (mai "2
+      // tomatoes", sempre "240 g"). Sotto i 2 g un numero esatto non
+      // significa niente in cucina ("1 g" di timo non si pesa): resta "a
+      // pinch". "taglia()" e' la stessa formattazione g/kg gia' usata per
+      // le taglie delle confezioni, riusata qui per un peso esatto invece
+      // che per una confezione intera.
       return {
         food_id: r.food_id,
         nome: f.name_en || f.name || r.food_id,
-        quantita: quantita_nota ? `${quantita} · ${quantita_nota}` : quantita,
+        grammi: g,
+        quantita: g < 2 ? 'a pinch' : taglia(g),
       };
     });
 }
