@@ -197,6 +197,29 @@ function rispondiServePro(res, dettaglio) {
   return res.status(403).json({ errore: ERRORE_SERVE_PRO, dettaglio });
 }
 
+// Vero se, per un non Pro, QUESTO plan_item appartiene a un giorno diverso
+// dal giorno_gratis del suo piano - va controllato PRIMA di restituire
+// qualunque dato di un piatto preso singolarmente (ingredienti, nome,
+// proposte di scambio): /piano/:planId filtra gia' i giorni dell'intera
+// settimana, ma le rotte che leggono UN piatto alla volta (per id) non
+// avevano lo stesso controllo (indagine sui contenuti bloccati, 2026-10-20
+// - un id di un giorno bloccato, se un client lo possedesse ancora - es.
+// da quando l'account era Pro - otteneva comunque ingredienti e nomi).
+// Non e' questa la funzione che decide "non trovato" o "non suo": se
+// l'item non esiste o non e' dell'utente, torna false e lascia che la
+// query vera, subito dopo in ogni rotta, lo scopra e risponda lei - stesso
+// principio del resto del file, un solo punto che decide ogni cosa.
+async function giornoBloccatoPerNonPro(supabase, userId, planItemId) {
+  const { data: item } = await supabase
+    .from('plan_items').select('day_of_week, plan_id').eq('id', planItemId).maybeSingle();
+  if (!item) return false;
+  const { data: piano } = await supabase
+    .from('plans').select('user_id, giorno_gratis').eq('id', item.plan_id).maybeSingle();
+  if (!piano || piano.user_id !== userId || piano.giorno_gratis == null) return false;
+  if (await isPro(userId)) return false;
+  return item.day_of_week !== piano.giorno_gratis;
+}
+
 // PostgREST impone un tetto di righe per risposta (di default 1000)
 // indipendente da .limit(): con piu' di 1000 piatti in tabella le righe oltre
 // la millesima spariscono in silenzio (visto anche in genera.js e tu.js).
@@ -1147,6 +1170,10 @@ app.post('/sostituisci', richiedeAuth, async (req, res) => {
     const { item_id } = req.body;
     if (!item_id) return res.status(400).json({ errore: 'item_id mancante' });
 
+    if (await giornoBloccatoPerNonPro(supabase, req.utente.id, item_id)) {
+      return rispondiServePro(res, 'giorno_bloccato');
+    }
+
     const r = await trovaProposte(supabase, req.utente.id, item_id);
     res.json(r);
   } catch (e) {
@@ -1161,6 +1188,10 @@ app.post('/sostituisci/applica', richiedeAuth, async (req, res) => {
     const { item_id, dish_id, portion_g } = req.body;
     if (!item_id || !dish_id) {
       return res.status(400).json({ errore: 'item_id o dish_id mancante' });
+    }
+
+    if (await giornoBloccatoPerNonPro(supabase, req.utente.id, item_id)) {
+      return rispondiServePro(res, 'giorno_bloccato');
     }
 
     const r = await applicaSostituzione(
@@ -1218,6 +1249,10 @@ app.get('/piatto/:planItemId', richiedeAuth, async (req, res) => {
       .from('plans').select('user_id').eq('id', item.plan_id).single();
     if (errPiano || !piano) return res.status(404).json({ errore: 'Piano non trovato' });
     if (piano.user_id !== req.utente.id) return res.status(403).json({ errore: 'Non autorizzato' });
+
+    if (await giornoBloccatoPerNonPro(supabase, req.utente.id, planItemId)) {
+      return rispondiServePro(res, 'giorno_bloccato');
+    }
 
     const ingredienti = await ingredientiPiatto(supabase, item.dish_id, item.portion_g);
     res.json({ ingredienti });

@@ -369,9 +369,27 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
     ? costruisciReparti(sommaPerAlimento(attive.filter(r => r.day_of_week === giornoSolo)))
     : { reparti: repartiSettimana, tutte: tutteSettimana };
 
-  // Impatto: SEMPRE sulla settimana intera, non su quella filtrata.
+  // I numeri di sintesi (co2_kg/co2_tipica_kg/differenza_perc, la bilancia
+  // di Impact) restano SEMPRE sulla settimana intera, Pro o no: sono solo
+  // numeri, mai un nome. peggiori/sprechi/stagione/scambio invece NOMINANO
+  // ingredienti e piatti - per un non Pro con un giorno solo sbloccato
+  // vanno calcolati SOLO su quel giorno (baseImpatto), mai sulla settimana
+  // intera: altrimenti la scheda Impact rivelerebbe cosa c'e' nei giorni
+  // bloccati, bypassando il filtro che 'reparti' applica gia' sopra (vedi
+  // l'indagine del 2026-10-20 - prima di questo cambio la carta "what
+  // weighs most"/"scambio"/"nothing thrown away" leggevano sempre
+  // tutteSettimana, un giorno intero dietro la lista ma non dietro Impact).
+  // Le percentuali dentro peggiori/scambio usano coerentemente la stessa
+  // base (co2Base): confrontare contro il totale settimanale quando la
+  // lista e' quella di un giorno solo darebbe una percentuale senza senso.
+  // Se sul sottoinsieme filtrato non c'e' abbastanza per una di queste
+  // carte, resta vuota/nulla com'era gia' previsto - MAI un ripiego sulla
+  // settimana intera.
   const co2Totale = tutteSettimana.reduce((s, v) => s + (v.impatto?.co2_kg || 0), 0);
-  const peggiori = tutteSettimana
+  const baseImpatto = filtraGiorno ? tutteViste : tutteSettimana;
+  const co2Base = filtraGiorno ? baseImpatto.reduce((s, v) => s + (v.impatto?.co2_kg || 0), 0) : co2Totale;
+
+  const peggiori = baseImpatto
     .filter(v => v.impatto)
     .sort((a, b) => b.impatto.co2_kg - a.impatto.co2_kg)
     .slice(0, 3)
@@ -379,11 +397,11 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
       nome: v.nome,
       co2_kg: v.impatto.co2_kg,
       voto: v.impatto.voto,
-      quota: co2Totale > 0 ? Math.round((v.impatto.co2_kg / co2Totale) * 100) : 0,
+      quota: co2Base > 0 ? Math.round((v.impatto.co2_kg / co2Base) * 100) : 0,
     }));
 
   // "NOTHING THROWN AWAY": fino a 3 voci, priorita' a chi avanza.
-  const sprechi = tutteSettimana
+  const sprechi = baseImpatto
     .filter(v => v.spreco)
     .sort((a, b) => (a.spreco.stato === 'avanza' ? 0 : 1) - (b.spreco.stato === 'avanza' ? 0 : 1))
     .slice(0, 3)
@@ -397,18 +415,21 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
 
   // "IN SEASON IN <MONTH>": mese corrente, zona dal profilo (se assente,
   // centro Italia dichiarato - vedi stagionalita.js).
-  const stagione = vociInStagione(tutteSettimana, new Date().getMonth() + 1, utente && utente.region_zone);
+  const stagione = vociInStagione(baseImpatto, new Date().getMonth() + 1, utente && utente.region_zone);
 
   // "WHAT WEIGHS MOST ON YOUR LIST": un solo scambio proposto, il piatto
-  // che pesa di piu' sulla CO2 della settimana (mai un piatto bloccato: non
-  // ha senso proporre di cambiare un pasto che l'utente ha fissato),
-  // confrontato con le alternative di sostituisci.js (stesso slot, stessi
-  // vincoli di dieta/allergie/preferenze dell'utente). Se non trova
-  // un'alternativa piu' leggera, niente scambio: la carta non appare (si
-  // applica la stessa regola dei dati insufficienti delle altre carte).
+  // che pesa di piu' sulla CO2 - della settimana per un Pro, del solo
+  // giorno sbloccato per un non Pro (mai un piatto bloccato: non ha senso
+  // proporre di cambiare un pasto che l'utente ha fissato, ne' mostrarne
+  // uno che non puo' nemmeno vedere), confrontato con le alternative di
+  // sostituisci.js (stesso slot, stessi vincoli di dieta/allergie/
+  // preferenze dell'utente). Se non trova un'alternativa piu' leggera,
+  // niente scambio: la carta non appare (si applica la stessa regola dei
+  // dati insufficienti delle altre carte).
   let scambio = null;
   {
-    const candidabili = attive.filter(r => !r.bloccato);
+    const righeBase = filtraGiorno ? attive.filter(r => r.day_of_week === giornoSolo) : attive;
+    const candidabili = righeBase.filter(r => !r.bloccato);
     let peggioreRiga = null, peggioreCo2 = 0;
     for (const r of candidabili) {
       const base = baseDi[r.dish_id] || 0;
@@ -429,8 +450,8 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
           if (co2p < migliorCo2) { migliorCo2 = co2p; migliore = { ...p, co2_kg: co2p }; }
         }
         if (migliore) {
-          const nuovoTotale = co2Totale - peggioreCo2 + migliore.co2_kg;
-          const guadagno = co2Totale > 0 ? Math.round((1 - nuovoTotale / co2Totale) * 100) : 0;
+          const nuovoTotale = co2Base - peggioreCo2 + migliore.co2_kg;
+          const guadagno = co2Base > 0 ? Math.round((1 - nuovoTotale / co2Base) * 100) : 0;
           if (guadagno > 0) {
             scambio = {
               item_id: peggioreRiga.id,
@@ -452,11 +473,14 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
     plan_id: id,
     week_start: weekStart,
     reparti: repartiVisti,
-    // 'totale' e' SEMPRE la settimana intera, senza eccezioni: lo legge
-    // anche la carta Impact (CO2 + costo fianco a fianco, entrambi
-    // settimanali), quindi non puo' avere un campo filtrato sul giorno in
-    // mezzo agli altri - il lettore non avrebbe modo di saperlo senza
-    // indovinare. Il giorno filtrato, quando c'e', e' un oggetto a parte.
+    // 'totale' esiste sempre, Pro o no - ma non tutti i suoi campi hanno
+    // la stessa regola: voci/co2_kg/co2_tipica_kg/differenza_perc restano
+    // SEMPRE sulla settimana intera (sono numeri, non nominano niente).
+    // peggiori/stagione/sprechi/scambio invece sono gia' ristretti al solo
+    // giorno sbloccato per un non Pro (vedi baseImpatto/co2Base sopra) -
+    // qui dentro arrivano cosi' come sono stati calcolati, non c'e' altro
+    // da filtrare a questo punto. Il giorno filtrato, quando c'e', e'
+    // comunque anche un oggetto a parte ('filtrato' sotto).
     totale: (() => {
       // grammi delle fonti proteiche, per costruire il confronto a parità di pasti
       const PROTEICHE = ['manzo','agnello','maiale','pollame','pesce_selvatico',
