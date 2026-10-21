@@ -871,6 +871,18 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
     return ingredienti.some(i => (categorieDi[i.food_id] || new Set()).has('amido'));
   }
 
+  // Tipo di amido d'accompagnamento (vedi tipoAmidoDiAccompagnamento piu'
+  // sotto, CORREZIONE 2026-10-22): dalle categorie vere 'pane'/'patate' su
+  // categorie_alimenti, mai da un elenco di food_id scritto qui. 'pane'
+  // controllato prima di 'patate' per lo stesso motivo del commento sopra
+  // (un secondo "morbido" vuole il pane anche se capitasse di contenere
+  // anche un po' di patate in ricetta).
+  function tipoAmidoDaIngredienti(ingredienti) {
+    if (ingredienti.some(i => (categorieDi[i.food_id] || new Set()).has('pane'))) return 'pane';
+    if (ingredienti.some(i => (categorieDi[i.food_id] || new Set()).has('patate'))) return 'patate';
+    return null;
+  }
+
   // Grammi (ricetta base) di frutta a guscio/arachidi nel piatto - serve al
   // tetto grammi (problema D) per limitare l'INGREDIENTE, non il piatto
   // intero: "Mela e mandorle" non deve diventare un piatto da 40g solo
@@ -893,6 +905,7 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
       gruppo: gruppoDa(valori[p.id].ingredienti, categorieDi),
       principale: ingredientePrincipale(valori[p.id].ingredienti),
       amidoReale: amidoDaIngredienti(valori[p.id].ingredienti),
+      tipoAmido: tipoAmidoDaIngredienti(valori[p.id].ingredienti),
       grammiFruttaSecca: grammiFruttaSeccaDi(valori[p.id].ingredienti),
       ...riassuntoNutrizionale(valori[p.id].ingredienti),
     }));
@@ -981,14 +994,23 @@ const copreRuolo = (piatto, ruolo) => Array.isArray(piatto.ruoli_coperti) && pia
 // del catalogo) non e' ne' l'uno ne' l'altro: patate resta la scelta piu'
 // vicina alla tradizione (un fritto/scottato si accompagna piu' spesso con
 // patate che con pane).
-const FOOD_ID_PANE = new Set(['pane_comune_crea', 'pane_integrale_it', 'pane_senza_glutine_it', 'pane_segale_it', 'pane_carasau_it']);
-const FOOD_ID_PATATE = new Set(['170028']);
-
+//
+// CORREZIONE 2026-10-22 (diagnosi crollo generatore, vedi RAPPORTO-NOTTE.md):
+// prima qui c'era un elenco fisso di 6 food_id scritti a mano (5 pani +
+// "Patate bianche"). Lo stesso bug di forma del fix allergeni di ieri: un
+// elenco chiuso invece di una categoria vera. Risultato misurato: 120 piatti
+// amidacei su 243 nel catalogo (quinoa, farro, pasta integrale, ceci...)
+// restavano "orfani", mai riconosciuti ne' come pane ne' come patate, quindi
+// mai utilizzabili come accompagnamento - la causa del crollo del 9 ottobre.
+// Ora il tipo e' precalcolato in arricchisciPiatti (vedi piatto.tipoAmido)
+// dalle categorie VERE 'pane'/'patate' su categorie_alimenti (migrazione
+// migrazioni/2026-10-22-categorie-pane-patate.sql, non eseguita sul db
+// vero), che un domani si aggiornano semplicemente taggando un nuovo
+// alimento - senza toccare questo file. Lo scopo della regola originale
+// (niente amido scondito come riempimento) resta identico: qui sotto si
+// legge solo il valore gia' calcolato, non si allarga la definizione.
 function tipoAmidoDiAccompagnamento(piatto) {
-  const ingredienti = piatto.ingredienti || [];
-  if (ingredienti.some(i => FOOD_ID_PANE.has(i.food_id))) return 'pane';
-  if (ingredienti.some(i => FOOD_ID_PATATE.has(i.food_id))) return 'patate';
-  return null;
+  return piatto.tipoAmido || null;
 }
 
 const RE_SECONDO_UMIDO = /\bin umido\b|\bcol sugo\b|\bal sugo\b|\bin guazzetto\b|\bal pomodoro\b|\bin salsa\b|\bbrasat|\bspezzatino\b|\bstufat|\bin tegame\b|\bal cartoccio\b|\bbollit|\blessat/i;
@@ -1467,7 +1489,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // un gradino che li "non applica", semplicemente non esiste codice che li
   // tocchi in questa funzione.
 
-  const MAX_PASSI = 5000; // per profilo tentato, non condiviso: un profilo povero non deve rubare il budget agli altri
+  // CORREZIONE 2026-10-22 (ricerca piu' efficiente, Parte 1 punto 11c):
+  // configurabile via opzioni.maxPassiPerProfilo, default 5000 identico a
+  // sempre - nessun chiamante esistente lo passa, quindi il comportamento
+  // di oggi non cambia. genera-v4.js lo abbassa per fare tanti tentativi
+  // brevi con seed diversi invece di uno solo lungo.
+  const MAX_PASSI = opzioni.maxPassiPerProfilo || 5000; // per profilo tentato, non condiviso: un profilo povero non deve rubare il budget agli altri
 
   // Mescola una lista con l'rng col seme, ordinata per peso (famiglia
   // preferita) DOPO il mescolamento: usata per la scelta del profilo, non
