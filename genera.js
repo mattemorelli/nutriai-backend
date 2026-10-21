@@ -607,6 +607,36 @@ function baseAlimento(s) {
     .trim();
 }
 
+// I 6 allergeni che l'onboarding offre come scelta dedicata (ESCLUSIONI in
+// screens/Onboarding.js), piu' molluschi (sempre aggiunto insieme a
+// crostacei, vedi la stessa Onboarding.js): per questi il subject dichiarato
+// e' SEMPRE il nome della categoria, mai il nome di un prodotto - un
+// alimento specifico non e' un'opzione che l'utente possa scegliere qui.
+// Devono risolvere DIRETTAMENTE sulla categoria in categorie_alimenti,
+// bypassando la ricerca per nome qui sotto.
+//
+// Bug trovato il 2026-10-21, indagine sulla capienza del generatore: la
+// ricerca per nome (sotto) viene PRIMA della categoria, quindi se il testo
+// dell'allergene combinava per sottostringa col nome di un prodotto, quel
+// prodotto vinceva e la categoria vera non veniva mai interrogata.
+// 'glutine' trovava "Pane senza glutine" e "Fiocchi di mais senza glutine"
+// (introdotti il 2026-10-09, due prodotti GIA' senza glutine - l'opposto di
+// quello da escludere): un celiaco restava con 0 piatti davvero esclusi
+// invece dei ~59 che contengono glutine. 'uova' trovava solo "Uova di
+// quaglia" invece della categoria con tutte le uova (9 alimenti): chi e'
+// allergico alle uova continuava a vedere piatti con uova di gallina. 'soia'
+// trovava 10 dei 17 alimenti con soia per nome (mancavano gli altri 7,
+// quelli il cui nome non contiene "soia" alla lettera).
+const CATEGORIA_ALLERGENE = {
+  glutine: 'glutine',
+  lattosio: 'lattosio',
+  'frutta guscio': 'frutta_guscio',
+  crostacei: 'crostacei',
+  molluschi: 'molluschi',
+  uova: 'uova',
+  soia: 'soia',
+};
+
 // Risolve un subject dichiarato da un utente (allergia, non_gradito, ...) a
 // un riferimento concreto - uno o piu' food_id, oppure una categoria intera -
 // con la STESSA logica di migra-vincoli.js: prima il nome esatto o
@@ -616,9 +646,28 @@ function baseAlimento(s) {
 // vincolo si scrive (server.js), non solo dal migra-vincoli.js lanciato a
 // mano - cosi' un vincolo nuovo esclude gia' qualcosa dal primo piano
 // generato, senza aspettare un passaggio manuale.
-function risolviSubject(subject, { mappaAlias, foods }) {
+function risolviSubject(subject, { mappaAlias, foods, foodIdPerCategoria }) {
   const s = (subject || '').trim();
   if (!s) return { tipo: 'irrisolto' };
+
+  // Allergene noto: niente ricerca per nome, mai. "In caso di dubbio si
+  // esclude" (richiesta 2026-10-21) vale anche al contrario - se la
+  // categoria risultasse vuota (nessun alimento taggato, es. un alias
+  // cancellato per errore), fermarsi con un errore e' piu' sicuro che
+  // restituire un'esclusione vuota e lasciare che il generatore proceda
+  // credendo di aver escluso qualcosa.
+  const codiceAllergene = CATEGORIA_ALLERGENE[normalizza(s)];
+  if (codiceAllergene) {
+    const presenti = (foodIdPerCategoria && foodIdPerCategoria.get(codiceAllergene)) || [];
+    if (!presenti.length) {
+      throw new Error(
+        `Allergene "${s}" non risolvibile con certezza: nessun alimento e' taggato con la ` +
+        `categoria "${codiceAllergene}" in categorie_alimenti. Il vincolo non viene applicato ` +
+        `a vuoto - va corretto il catalogo prima di proseguire.`
+      );
+    }
+    return { tipo: 'categoria', codice: codiceAllergene };
+  }
 
   const nomeDi = (f) => f.name_it || f.name;
 
@@ -657,14 +706,25 @@ function risolviSubject(subject, { mappaAlias, foods }) {
 // chiama chi scrive vincoli nuovi (server.js), non chi li legge soltanto
 // (caricaVincoli sopra continua a leggere food_id/categoria gia' scritti).
 async function caricaCatalogoPerRisoluzione(supabase) {
-  const [{ data: aliasRighe, error: eAlias }, { data: foods, error: eFoods }] = await Promise.all([
+  const [{ data: aliasRighe, error: eAlias }, { data: foods, error: eFoods }, { data: catRighe, error: eCat }] = await Promise.all([
     supabase.from('alias_categoria').select('alias, codice'),
     supabase.from('foods').select('id, name, name_it'),
+    // Serve a risolviSubject per verificare che un allergene noto (vedi
+    // CATEGORIA_ALLERGENE) abbia davvero alimenti taggati prima di fidarsi
+    // della categoria - senza questa tabella non potrebbe distinguere una
+    // categoria valida da una svuotata per errore.
+    supabase.from('categorie_alimenti').select('food_id, categoria'),
   ]);
   if (eAlias) throw new Error('lettura alias_categoria: ' + eAlias.message);
   if (eFoods) throw new Error('lettura foods: ' + eFoods.message);
+  if (eCat) throw new Error('lettura categorie_alimenti: ' + eCat.message);
   const mappaAlias = new Map((aliasRighe || []).map((r) => [r.alias, r.codice]));
-  return { mappaAlias, foods: foods || [] };
+  const foodIdPerCategoria = new Map();
+  for (const r of (catRighe || [])) {
+    if (!foodIdPerCategoria.has(r.categoria)) foodIdPerCategoria.set(r.categoria, []);
+    foodIdPerCategoria.get(r.categoria).push(r.food_id);
+  }
+  return { mappaAlias, foods: foods || [], foodIdPerCategoria };
 }
 
 // Alcune categorie ne contengono altre: il maiale e' comunque carne rossa,
@@ -2566,5 +2626,5 @@ module.exports = {
   GENERICO_DI, GENERICI, FAMIGLIA_DI_GENERICO, FAMIGLIE_PER_CUCINA, caricaVincoli,
   caricaEsiti, SOGLIA_RIFIUTO, giornoSettimanaCorrente,
   risolviSubject, caricaCatalogoPerRisoluzione, MERCATO_ATTIVO,
-  accompagnaBene, sostitutoSenzaGlutineNonRichiesto,
+  accompagnaBene, sostitutoSenzaGlutineNonRichiesto, CATEGORIA_ALLERGENE,
 };
