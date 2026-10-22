@@ -7,7 +7,7 @@ const fs = require('fs');
 const D = [
   {
     id: '40780324-d1f0-4803-ab46-b145d6fcaf7b', nome: 'Parmigiana di melanzane', nome_en: 'Baked aubergine parmigiana',
-    slot: 'secondo', prep_min: 55, tecnica: 'forno', health_score: 6.6,
+    slot: 'secondo', prep_min: 62, tecnica: 'composta', health_score: 6.6,
     ingredienti: [['melanzana_it', 320], ['passata_pomodoro_it', 150], ['170845', 80], ['parmigiano_it', 10], ['basilico_it', 3], ['171413', 12], ['169230', 3]],
     steps: [
       'Taglia le melanzane a fette e grigliale in padella senza olio.',
@@ -24,16 +24,16 @@ const D = [
     passi: [
       { azione: 'tagliare', testo_it: 'Taglia le melanzane a fette da mezzo centimetro, nel senso della lunghezza.', testo_en: 'Slice the aubergines lengthways, about half a centimetre thick.', durata_min: 8, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'melanzana_it', quota: 1 }] },
       { azione: 'grigliare', testo_it: 'Grigliale in una padella antiaderente senza olio, 3-4 minuti per lato, finché morbide e striate.', testo_en: 'Grill them in a dry non-stick pan, no oil, 3-4 minutes a side, until soft and char-striped.', durata_min: 14, tipo_tempo: 'attiva', in_parallelo: false, fuoco: 'medio', ingredienti: [] },
-      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 200°C, statico.', testo_en: 'Turn the oven on to 200°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: true, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
+      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 200°C, statico.', testo_en: 'Turn the oven on to 200°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
       { azione: 'soffriggere', testo_it: 'Scalda l\'olio con l\'aglio tritato un minuto, aggiungi la passata e il basilico, cuoci 8 minuti.', testo_en: 'Warm the oil with the chopped garlic for a minute, add the passata and basil, cook 8 minutes.', durata_min: 9, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: '171413', quota: 1 }, { food_id: '169230', quota: 1 }, { food_id: 'passata_pomodoro_it', quota: 1 }, { food_id: 'basilico_it', quota: 1 }] },
-      { azione: 'comporre', testo_it: 'In una pirofila alterna melanzane, sugo e mozzarella a fette, finisci con il parmigiano.', testo_en: 'In a baking dish, layer aubergine, sauce and sliced mozzarella, finishing with the parmesan.', durata_min: 5, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '170845', quota: 1 }, { food_id: 'parmigiano_it', quota: 1 }] },
+      { azione: 'disporre', testo_it: 'In una pirofila alterna melanzane, sugo e mozzarella a fette, finisci con il parmigiano.', testo_en: 'In a baking dish, layer aubergine, sauce and sliced mozzarella, finishing with the parmesan.', durata_min: 5, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '170845', quota: 1 }, { food_id: 'parmigiano_it', quota: 1 }] },
       { azione: 'infornare', testo_it: 'Inforna 25 minuti, finché la superficie è dorata e bollente ai bordi.', testo_en: 'Bake for 25 minutes, until the top is golden and bubbling at the edges.', durata_min: 25, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
       { azione: 'servire', testo_it: 'Lascia riposare 5 minuti prima di tagliare, altrimenti si smonta.', testo_en: 'Let it rest 5 minutes before cutting, or it falls apart.', ingredienti: [] },
     ],
   },
   {
     id: '6da03221-009a-4e78-a520-127849513f7e', nome: 'Melanzane ripiene al forno', nome_en: 'Baked stuffed aubergines',
-    slot: 'secondo', prep_min: 50, tecnica: 'forno', health_score: 7.0,
+    slot: 'secondo', prep_min: 52, tecnica: 'composta', health_score: 7.0,
     ingredienti: [['melanzana_it', 350], ['riso_integrale_cotto_it', 100], ['passata_pomodoro_it', 80], ['parmigiano_it', 20], ['pangrattato_it', 15], ['171413', 10], ['169230', 3], ['basilico_it', 2]],
     steps: [
       'Taglia le melanzane a metà e scava la polpa.',
@@ -48,17 +48,17 @@ const D = [
       'Bake at 190°C for 30 minutes, until the skins are tender.',
     ],
     passi: [
-      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 190°C, statico.', testo_en: 'Turn the oven on to 190°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: true, temperatura_c: 190, forno_modalita: 'statico', ingredienti: [] },
+      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 190°C, statico.', testo_en: 'Turn the oven on to 190°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 190, forno_modalita: 'statico', ingredienti: [] },
       { azione: 'tagliare', testo_it: 'Taglia le melanzane a metà nel senso della lunghezza e scava la polpa con un cucchiaio, lasciando un bordo di mezzo centimetro.', testo_en: 'Halve the aubergines lengthways and scoop out the flesh with a spoon, leaving a half-centimetre border.', durata_min: 8, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: 'melanzana_it', quota: 1 }] },
       { azione: 'soffriggere', testo_it: 'Trita la polpa scavata e saltala in padella con l\'olio e l\'aglio 5 minuti, finché si ammorbidisce.', testo_en: 'Chop the scooped flesh and sauté it in the oil with the garlic for 5 minutes, until softened.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 1 }, { food_id: '169230', quota: 1 }] },
       { azione: 'mescolare', testo_it: 'Fuori dal fuoco, unisci il riso, la passata, il basilico e metà del parmigiano.', testo_en: 'Off the heat, stir in the rice, passata, basil and half the parmesan.', durata_min: 2, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'riso_integrale_cotto_it', quota: 1 }, { food_id: 'passata_pomodoro_it', quota: 1 }, { food_id: 'basilico_it', quota: 1 }, { food_id: 'parmigiano_it', quota: 0.5 }] },
-      { azione: 'comporre', testo_it: 'Riempi le bucce di melanzana con il ripieno, cospargi con pangrattato e il parmigiano rimasto.', testo_en: 'Fill the aubergine shells with the mixture, sprinkle with the breadcrumbs and remaining parmesan.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'pangrattato_it', quota: 1 }, { food_id: 'parmigiano_it', quota: 0.5 }] },
+      { azione: 'disporre', testo_it: 'Riempi le bucce di melanzana con il ripieno, cospargi con pangrattato e il parmigiano rimasto.', testo_en: 'Fill the aubergine shells with the mixture, sprinkle with the breadcrumbs and remaining parmesan.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'pangrattato_it', quota: 1 }, { food_id: 'parmigiano_it', quota: 0.5 }] },
       { azione: 'infornare', testo_it: 'Disponi in una teglia e inforna 30 minuti, finché le bucce sono morbide e la superficie dorata.', testo_en: 'Place in a baking dish and bake for 30 minutes, until the skins are tender and the top golden.', durata_min: 30, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 190, forno_modalita: 'statico', ingredienti: [] },
     ],
   },
   {
     id: 'a25f97bf-7c9c-4d07-8330-ef0226cac052', nome: 'Sformato di zucca', nome_en: 'Baked pumpkin sformato',
-    slot: 'secondo', prep_min: 45, tecnica: 'forno', health_score: 6.9,
+    slot: 'secondo', prep_min: 61, tecnica: 'composta', health_score: 6.9,
     ingredienti: [['zucca_delicata_it', 350], ['uovo_grande_it', 100], ['parmigiano_it', 20], ['pangrattato_it', 10], ['171413', 8]],
     steps: [
       'Cuoci la zucca a vapore o al forno finché è morbida, poi schiacciala.',
@@ -74,7 +74,7 @@ const D = [
     ],
     passi: [
       { azione: 'cuocere', testo_it: 'Taglia la zucca a cubetti e cuocila a vapore 15 minuti, finché si schiaccia facilmente con una forchetta.', testo_en: 'Cube the pumpkin and steam it for 15 minutes, until it mashes easily with a fork.', durata_min: 15, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'zucca_delicata_it', quota: 1 }] },
-      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 180°C, statico, e ungi uno stampo con l\'olio.', testo_en: 'Turn the oven on to 180°C, conventional, and grease a baking dish with the oil.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: true, temperatura_c: 180, forno_modalita: 'statico', ingredienti: [{ food_id: '171413', quota: 1 }] },
+      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 180°C, statico, e ungi uno stampo con l\'olio.', testo_en: 'Turn the oven on to 180°C, conventional, and grease a baking dish with the oil.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 180, forno_modalita: 'statico', ingredienti: [{ food_id: '171413', quota: 1 }] },
       { azione: 'schiacciare', testo_it: 'Schiaccia la zucca con una forchetta o un passaverdure, finché è una purea senza grumi grossi.', testo_en: 'Mash the pumpkin with a fork or potato ricer, until it is a purée with no large lumps.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [] },
       { azione: 'mescolare', testo_it: 'Incorpora le uova sbattute, il parmigiano e il pangrattato alla purea tiepida.', testo_en: 'Fold the beaten eggs, parmesan and breadcrumbs into the warm purée.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'uovo_grande_it', quota: 1 }, { food_id: 'parmigiano_it', quota: 1 }, { food_id: 'pangrattato_it', quota: 1 }] },
       { azione: 'infornare', testo_it: 'Versa nello stampo e inforna 30 minuti: è pronto quando la superficie è dorata e il centro non trema più se scuoti lo stampo.', testo_en: 'Pour into the mould and bake for 30 minutes: it is ready when the top is golden and the centre no longer wobbles if you shake the dish.', durata_min: 30, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 180, forno_modalita: 'statico', ingredienti: [] },
@@ -82,7 +82,7 @@ const D = [
   },
   {
     id: '81690e67-d20a-43c4-8ce9-8f6c35c59c66', nome: 'Involtini di verza ripieni di riso e fagioli', nome_en: 'Savoy cabbage rolls with rice and beans',
-    slot: 'secondo', prep_min: 45, tecnica: 'forno', health_score: 7.5,
+    slot: 'secondo', prep_min: 56, tecnica: 'composta', health_score: 7.5,
     ingredienti: [['cavolo_verza_it', 320], ['riso_integrale_cotto_it', 150], ['fagioli_cannellini_it', 120], ['170393', 50], ['170000', 40], ['passata_pomodoro_it', 100], ['171413', 10], ['169230', 3]],
     steps: [
       'Stacca le foglie di verza e scottale in acqua bollente 2 minuti.',
@@ -97,17 +97,18 @@ const D = [
       'Cook covered at 180°C for 25 minutes, until the leaves are tender.',
     ],
     passi: [
-      { azione: 'scottare', testo_it: 'Stacca 8 foglie grandi di verza e scottale in acqua bollente 2 minuti, finché si ammorbidiscono senza rompersi.', testo_en: 'Separate 8 large cabbage leaves and blanch them in boiling water for 2 minutes, until pliable but not falling apart.', durata_min: 4, tipo_tempo: 'attesa', in_parallelo: false, tempo_da_confezione: false, ingredienti: [{ food_id: 'cavolo_verza_it', quota: 1 }] },
-      { azione: 'soffriggere', testo_it: 'Trita finemente carota e cipolla e falle appassire nell\'olio con l\'aglio 5 minuti.', testo_en: 'Finely chop the carrot and onion and soften them in the oil with the garlic for 5 minutes.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: '170393', quota: 1 }, { food_id: '170000', quota: 1 }, { food_id: '171413', quota: 1 }, { food_id: '169230', quota: 1 }] },
+      { azione: 'scaldare', testo_it: 'Metti sul fuoco una pentola con abbondante acqua e portala a bollore.', testo_en: 'Put a pot with plenty of water on the heat and bring it to a boil.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
+      { azione: 'soffriggere', testo_it: 'Nel frattempo trita finemente carota e cipolla e falle appassire nell\'olio con l\'aglio 5 minuti.', testo_en: 'Meanwhile, finely chop the carrot and onion and soften them in the oil with the garlic for 5 minutes.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: '170393', quota: 1 }, { food_id: '170000', quota: 1 }, { food_id: '171413', quota: 1 }, { food_id: '169230', quota: 1 }] },
+      { azione: 'bollire', testo_it: 'Stacca 8 foglie grandi di verza e scottale nell\'acqua bollente 2 minuti, finché si ammorbidiscono senza rompersi.', testo_en: 'Separate 8 large cabbage leaves and blanch them in the boiling water for 2 minutes, until pliable but not falling apart.', durata_min: 2, tipo_tempo: 'attesa', in_parallelo: false, tempo_da_confezione: false, ingredienti: [{ food_id: 'cavolo_verza_it', quota: 1 }] },
       { azione: 'mescolare', testo_it: 'Schiaccia metà dei fagioli con una forchetta e mescolali al riso, al soffritto e ai fagioli interi rimasti.', testo_en: 'Mash half the beans with a fork and mix them with the rice, the softened vegetables and the remaining whole beans.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'fagioli_cannellini_it', quota: 1 }, { food_id: 'riso_integrale_cotto_it', quota: 1 }] },
-      { azione: 'comporre', testo_it: 'Metti una porzione di ripieno al centro di ogni foglia e chiudila a fagottino.', testo_en: 'Place a portion of filling in the centre of each leaf and fold it into a parcel.', durata_min: 8, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [] },
-      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 180°C, statico.', testo_en: 'Turn the oven on to 180°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: true, temperatura_c: 180, forno_modalita: 'statico', ingredienti: [] },
+      { azione: 'disporre', testo_it: 'Metti una porzione di ripieno al centro di ogni foglia e chiudila a fagottino.', testo_en: 'Place a portion of filling in the centre of each leaf and fold it into a parcel.', durata_min: 8, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [] },
+      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 180°C, statico.', testo_en: 'Turn the oven on to 180°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 180, forno_modalita: 'statico', ingredienti: [] },
       { azione: 'infornare', testo_it: 'Disponi gli involtini in una pirofila, versa la passata sopra, copri con un foglio di alluminio e cuoci 25 minuti, finché le foglie sono morbide al centro.', testo_en: 'Arrange the rolls in a baking dish, pour the passata over, cover with foil and cook for 25 minutes, until the leaves are tender at the centre.', durata_min: 25, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 180, forno_modalita: 'statico', ingredienti: [{ food_id: 'passata_pomodoro_it', quota: 1 }] },
     ],
   },
   {
     id: 'ad2810df-f481-42e1-96d6-511df9c18416', nome: 'Verza e fagioli in umido', nome_en: 'Stewed savoy cabbage and beans',
-    slot: 'secondo', prep_min: 30, tecnica: 'semplice', health_score: 7.8,
+    slot: 'secondo', prep_min: 35, tecnica: 'semplice', health_score: 7.8,
     ingredienti: [['cavolo_verza_it', 250], ['fagioli_cannellini_it', 250], ['passata_pomodoro_it', 100], ['170000', 40], ['171413', 10], ['169230', 3], ['salvia_it', 1]],
     steps: [
       'Affetta la verza e la cipolla.',
@@ -124,14 +125,14 @@ const D = [
     passi: [
       { azione: 'tagliare', testo_it: 'Affetta la verza a listarelle sottili e trita la cipolla.', testo_en: 'Slice the cabbage into thin ribbons and chop the onion.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'cavolo_verza_it', quota: 1 }, { food_id: '170000', quota: 1 }] },
       { azione: 'soffriggere', testo_it: 'Scalda l\'olio e fai appassire la cipolla 5 minuti a fuoco medio.', testo_en: 'Warm the oil and soften the onion for 5 minutes over medium heat.', durata_min: 5, tipo_tempo: 'attiva', in_parallelo: false, fuoco: 'medio', ingredienti: [{ food_id: '171413', quota: 1 }] },
-      { azione: 'appassire', testo_it: 'Aggiungi la verza, l\'aglio e la salvia e falla appassire 5 minuti, mescolando.', testo_en: 'Add the cabbage, garlic and sage and let it wilt for 5 minutes, stirring.', durata_min: 5, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '169230', quota: 1 }, { food_id: 'salvia_it', quota: 1 }] },
-      { azione: 'sgocciolare', testo_it: 'Sgocciola e sciacqua i fagioli sotto l\'acqua corrente.', testo_en: 'Drain and rinse the beans under running water.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: 'fagioli_cannellini_it', quota: 1 }] },
+      { azione: 'soffriggere', testo_it: 'Aggiungi la verza, l\'aglio e la salvia e falla appassire 5 minuti, mescolando.', testo_en: 'Add the cabbage, garlic and sage and let it wilt for 5 minutes, stirring.', durata_min: 5, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '169230', quota: 1 }, { food_id: 'salvia_it', quota: 1 }] },
+      { azione: 'scolare', testo_it: 'Sgocciola e sciacqua i fagioli sotto l\'acqua corrente.', testo_en: 'Drain and rinse the beans under running water.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: 'fagioli_cannellini_it', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Unisci la passata e i fagioli, copri e cuoci a fuoco basso 18 minuti, finché la verza è morbida ma non disfatta.', testo_en: 'Add the passata and beans, cover and cook on low heat for 18 minutes, until the cabbage is tender but not falling apart.', durata_min: 18, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'basso', ingredienti: [{ food_id: 'passata_pomodoro_it', quota: 1 }] },
     ],
   },
   {
     id: 'f32a0ec0-bd0b-431a-8bcb-850d44a659f7', nome: 'Piselli e uova alla romana', nome_en: 'Roman-style peas and eggs',
-    slot: 'secondo', prep_min: 20, tecnica: 'semplice', health_score: 7.2,
+    slot: 'secondo', prep_min: 21, tecnica: 'semplice', health_score: 7.2,
     ingredienti: [['piselli_surgelati_it', 220], ['uovo_grande_it', 100], ['170000', 30], ['171413', 10], ['prezzemolo_it', 2]],
     steps: [
       'Soffriggi la cipolla tritata nell\'olio.',
@@ -155,7 +156,7 @@ const D = [
   },
   {
     id: '53a4eb0d-3695-48fd-97c9-c92f640f64c7', nome: 'Insalata tiepida di borlotti con cipolla rossa', nome_en: 'Warm borlotti bean salad with red onion',
-    slot: 'secondo', prep_min: 12, tecnica: 'semplice', health_score: 7.9,
+    slot: 'secondo', prep_min: 16, tecnica: 'semplice', health_score: 7.9,
     ingredienti: [['fagioli_borlotti_it', 280], ['cipolla_rossa_it', 50], ['sedano_it', 30], ['171413', 12], ['prezzemolo_it', 2]],
     steps: [
       'Sgocciola e scalda i fagioli borlotti.',
@@ -170,7 +171,7 @@ const D = [
       'Let it stand 10 minutes before serving.',
     ],
     passi: [
-      { azione: 'sgocciolare', testo_it: 'Sgocciola e sciacqua i fagioli, poi scaldali 2 minuti in un pentolino con un dito d\'acqua.', testo_en: 'Drain and rinse the beans, then warm them for 2 minutes in a small pan with a splash of water.', durata_min: 2, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'fagioli_borlotti_it', quota: 1 }] },
+      { azione: 'scolare', testo_it: 'Sgocciola e sciacqua i fagioli, poi scaldali 2 minuti in un pentolino con un dito d\'acqua.', testo_en: 'Drain and rinse the beans, then warm them for 2 minutes in a small pan with a splash of water.', durata_min: 2, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'fagioli_borlotti_it', quota: 1 }] },
       { azione: 'tagliare', testo_it: 'Affetta la cipolla rossa molto fine e il sedano a tocchetti piccoli.', testo_en: 'Thinly slice the red onion and cut the celery into small pieces.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: 'cipolla_rossa_it', quota: 1 }, { food_id: 'sedano_it', quota: 1 }] },
       { azione: 'condire', testo_it: 'Scola i fagioli caldi e condiscili subito con l\'olio, il sale e il pepe: assorbono meglio il condimento da caldi.', testo_en: 'Drain the warm beans and dress them right away with the oil, salt and pepper: they absorb the dressing better while warm.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 1 }] },
       { azione: 'mescolare', testo_it: 'Unisci la cipolla, il sedano e il prezzemolo e mescola.', testo_en: 'Add the onion, celery and parsley and stir.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'prezzemolo_it', quota: 1 }] },
@@ -179,7 +180,7 @@ const D = [
   },
   {
     id: 'b29d57e7-db25-4cdf-8329-e275de84c7eb', nome: 'Ceci e patate in umido', nome_en: 'Stewed chickpeas and potatoes',
-    slot: 'secondo', prep_min: 35, tecnica: 'semplice', health_score: 7.6,
+    slot: 'secondo', prep_min: 38, tecnica: 'semplice', health_score: 7.6,
     ingredienti: [['175206', 320], ['170028', 180], ['passata_pomodoro_it', 100], ['170000', 40], ['171413', 10], ['169230', 3], ['rosmarino_it', 1]],
     steps: [
       'Taglia le patate a tocchetti e la cipolla a dadini.',
@@ -197,13 +198,13 @@ const D = [
       { azione: 'tagliare', testo_it: 'Taglia le patate a tocchetti di 2 cm e trita la cipolla.', testo_en: 'Cut the potatoes into 2cm chunks and chop the onion.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '170028', quota: 1 }, { food_id: '170000', quota: 1 }] },
       { azione: 'soffriggere', testo_it: 'Scalda l\'olio, fai appassire la cipolla 4 minuti, poi aggiungi le patate e rosolale 5 minuti.', testo_en: 'Warm the oil, soften the onion for 4 minutes, then add the potatoes and brown them for 5 minutes.', durata_min: 9, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Unisci la passata, l\'aglio, il rosmarino e mezzo bicchiere d\'acqua, copri e cuoci 15 minuti, finché le patate sono quasi morbide.', testo_en: 'Add the passata, garlic, rosemary and half a glass of water, cover and cook for 15 minutes, until the potatoes are nearly tender.', durata_min: 15, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'passata_pomodoro_it', quota: 1 }, { food_id: '169230', quota: 1 }, { food_id: 'rosmarino_it', quota: 1 }] },
-      { azione: 'sgocciolare', testo_it: 'Sgocciola e sciacqua bene i ceci sotto l\'acqua corrente.', testo_en: 'Drain and rinse the chickpeas well under running water.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: '175206', quota: 1 }] },
+      { azione: 'scolare', testo_it: 'Sgocciola e sciacqua bene i ceci sotto l\'acqua corrente.', testo_en: 'Drain and rinse the chickpeas well under running water.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: '175206', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Aggiungi i ceci e cuoci altri 8 minuti scoperto, finché le patate si infilzano facilmente con una forchetta.', testo_en: 'Add the chickpeas and cook for another 8 minutes uncovered, until the potatoes are easily pierced with a fork.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
     ],
   },
   {
     id: '45754750-9c4f-4d16-a590-460258cbb5a5', nome: 'Insalata di lenticchie con sedano e carote', nome_en: 'Lentil salad with celery and carrots',
-    slot: 'secondo', prep_min: 12, tecnica: 'semplice', health_score: 7.9,
+    slot: 'secondo', prep_min: 19, tecnica: 'semplice', health_score: 7.9,
     ingredienti: [['lenticchie_cotte_it', 280], ['sedano_it', 50], ['170393', 60], ['170000', 20], ['171413', 12], ['prezzemolo_it', 2]],
     steps: [
       'Sgocciola e sciacqua le lenticchie.',
@@ -218,7 +219,7 @@ const D = [
       'Let it stand 10 minutes before serving.',
     ],
     passi: [
-      { azione: 'sgocciolare', testo_it: 'Sgocciola e sciacqua le lenticchie sotto l\'acqua corrente.', testo_en: 'Drain and rinse the lentils under running water.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'lenticchie_cotte_it', quota: 1 }] },
+      { azione: 'scolare', testo_it: 'Sgocciola e sciacqua le lenticchie sotto l\'acqua corrente.', testo_en: 'Drain and rinse the lentils under running water.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'lenticchie_cotte_it', quota: 1 }] },
       { azione: 'tagliare', testo_it: 'Taglia il sedano e le carote a dadini piccoli e trita finemente la cipolla.', testo_en: 'Dice the celery and carrots small and finely chop the onion.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'sedano_it', quota: 1 }, { food_id: '170393', quota: 1 }, { food_id: '170000', quota: 1 }] },
       { azione: 'condire', testo_it: 'Unisci tutto in una ciotola con l\'olio, il sale e il pepe e mescola bene.', testo_en: 'Combine everything in a bowl with the oil, salt and pepper and mix well.', durata_min: 2, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 1 }] },
       { azione: 'servire', testo_it: 'Cospargi di prezzemolo e lascia riposare 10 minuti a temperatura ambiente prima di servire.', testo_en: 'Sprinkle with parsley and let it stand 10 minutes at room temperature before serving.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'prezzemolo_it', quota: 1 }] },
@@ -226,7 +227,7 @@ const D = [
   },
   {
     id: '321c9301-ed8a-4417-81c3-1aa7a3bc3601', nome: 'Frittata di cavolfiore', nome_en: 'Cauliflower frittata',
-    slot: 'secondo', prep_min: 25, tecnica: 'padella', health_score: 7.0,
+    slot: 'secondo', prep_min: 24, tecnica: 'semplice', health_score: 7.0,
     ingredienti: [['cavolfiore_it', 250], ['uovo_grande_it', 150], ['parmigiano_it', 15], ['171413', 10], ['170000', 20]],
     steps: [
       'Cuoci le cimette di cavolfiore a vapore finché sono morbide.',
@@ -245,12 +246,12 @@ const D = [
       { azione: 'soffriggere', testo_it: 'Trita la cipolla e falla appassire nell\'olio 4 minuti.', testo_en: 'Chop the onion and soften it in the oil for 4 minutes.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: '170000', quota: 1 }, { food_id: '171413', quota: 1 }] },
       { azione: 'mescolare', testo_it: 'Sbatti le uova con il parmigiano, sale e pepe, poi incorpora il cavolfiore spezzettato grossolanamente.', testo_en: 'Beat the eggs with the parmesan, salt and pepper, then fold in the roughly broken-up cauliflower.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'uovo_grande_it', quota: 1 }, { food_id: 'parmigiano_it', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Versa il composto nella padella con la cipolla e cuoci a fuoco basso 8 minuti, finché i bordi sono rassodati.', testo_en: 'Pour the mixture into the pan with the onion and cook on low heat for 8 minutes, until the edges have set.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'basso', ingredienti: [] },
-      { azione: 'girare', testo_it: 'Gira la frittata con l\'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.', testo_en: 'Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.', durata_min: 3, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
+      { azione: 'altro', testo_it: 'Gira la frittata con l\'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.', testo_en: 'Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.', durata_min: 3, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
     ],
   },
   {
     id: 'e45adac9-002d-497e-88a9-172e175373e6', nome: 'Frittata di broccoli', nome_en: 'Broccoli frittata',
-    slot: 'secondo', prep_min: 25, tecnica: 'padella', health_score: 7.1,
+    slot: 'secondo', prep_min: 23, tecnica: 'semplice', health_score: 7.1,
     ingredienti: [['170379', 250], ['uovo_grande_it', 150], ['parmigiano_it', 15], ['171413', 10], ['169230', 3]],
     steps: [
       'Cuoci le cimette di broccolo a vapore finché sono morbide.',
@@ -268,12 +269,12 @@ const D = [
       { azione: 'cuocere', testo_it: 'Dividi i broccoli in cimette e cuocili a vapore 8 minuti, finché sono teneri ma ancora verdi vivi.', testo_en: 'Break the broccoli into florets and steam for 8 minutes, until tender but still bright green.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: '170379', quota: 1 }] },
       { azione: 'mescolare', testo_it: 'Sbatti le uova con il parmigiano, sale e pepe, poi incorpora i broccoli spezzettati grossolanamente.', testo_en: 'Beat the eggs with the parmesan, salt and pepper, then fold in the roughly broken-up broccoli.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'uovo_grande_it', quota: 1 }, { food_id: 'parmigiano_it', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Scalda l\'olio con l\'aglio in padella un minuto, poi versa il composto e cuoci a fuoco basso 8 minuti, finché i bordi sono rassodati.', testo_en: 'Warm the oil with the garlic in the pan for a minute, then pour in the mixture and cook on low heat for 8 minutes, until the edges have set.', durata_min: 9, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'basso', ingredienti: [{ food_id: '171413', quota: 1 }, { food_id: '169230', quota: 1 }] },
-      { azione: 'girare', testo_it: 'Gira la frittata con l\'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.', testo_en: 'Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.', durata_min: 3, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
+      { azione: 'altro', testo_it: 'Gira la frittata con l\'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.', testo_en: 'Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.', durata_min: 3, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
     ],
   },
   {
     id: '25e5dcfa-90a5-4c1c-9d6d-e363fd60d659', nome: 'Torta pasqualina', nome_en: 'Ligurian spinach and ricotta pie',
-    slot: 'secondo', prep_min: 55, tecnica: 'forno', health_score: 6.3,
+    slot: 'secondo', prep_min: 56, tecnica: 'composta', health_score: 6.3,
     ingredienti: [['172791', 35], ['spinaci_it', 90], ['ricotta_it', 60], ['uovo_grande_it', 60], ['parmigiano_it', 10], ['171413', 6], ['169230', 1]],
     steps: [
       'Fai appassire gli spinaci in padella e strizzali bene.',
@@ -288,17 +289,17 @@ const D = [
       'Bake at 190°C for 30 minutes, until golden on top.',
     ],
     passi: [
-      { azione: 'appassire', testo_it: 'Fai appassire gli spinaci in padella con l\'olio e l\'aglio 5 minuti, poi strizzali bene con le mani.', testo_en: 'Wilt the spinach in a pan with the oil and garlic for 5 minutes, then squeeze it well with your hands.', durata_min: 7, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'spinaci_it', quota: 1 }, { food_id: '171413', quota: 1 }, { food_id: '169230', quota: 1 }] },
-      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 190°C, statico.', testo_en: 'Turn the oven on to 190°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: true, temperatura_c: 190, forno_modalita: 'statico', ingredienti: [] },
+      { azione: 'soffriggere', testo_it: 'Fai appassire gli spinaci in padella con l\'olio e l\'aglio 5 minuti, poi strizzali bene con le mani.', testo_en: 'Wilt the spinach in a pan with the oil and garlic for 5 minutes, then squeeze it well with your hands.', durata_min: 7, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'spinaci_it', quota: 1 }, { food_id: '171413', quota: 1 }, { food_id: '169230', quota: 1 }] },
+      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 190°C, statico.', testo_en: 'Turn the oven on to 190°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 190, forno_modalita: 'statico', ingredienti: [] },
       { azione: 'mescolare', testo_it: 'Trita gli spinaci strizzati e mescolali con la ricotta, il parmigiano e un uovo sbattuto.', testo_en: 'Chop the squeezed spinach and mix it with the ricotta, parmesan and one beaten egg.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'ricotta_it', quota: 1 }, { food_id: 'parmigiano_it', quota: 1 }, { food_id: 'uovo_grande_it', quota: 0.5 }] },
-      { azione: 'comporre', testo_it: 'Fodera una tortiera piccola con la pasta sfoglia, versa il ripieno e livella con un cucchiaio.', testo_en: 'Line a small tin with the pastry, pour in the filling and level it with a spoon.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '172791', quota: 1 }] },
-      { azione: 'comporre', testo_it: 'Fai una piccola buca al centro e versaci l\'uovo rimasto, intero.', testo_en: 'Make a small well in the centre and crack the remaining whole egg into it.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'uovo_grande_it', quota: 0.5 }] },
+      { azione: 'disporre', testo_it: 'Fodera una tortiera piccola con la pasta sfoglia, versa il ripieno e livella con un cucchiaio.', testo_en: 'Line a small tin with the pastry, pour in the filling and level it with a spoon.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '172791', quota: 1 }] },
+      { azione: 'disporre', testo_it: 'Fai una piccola buca al centro e versaci l\'uovo rimasto, intero.', testo_en: 'Make a small well in the centre and crack the remaining whole egg into it.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'uovo_grande_it', quota: 0.5 }] },
       { azione: 'infornare', testo_it: 'Inforna 30 minuti, finché la pasta è dorata e l\'uovo è rassodato.', testo_en: 'Bake for 30 minutes, until the pastry is golden and the egg has set.', durata_min: 30, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 190, forno_modalita: 'statico', ingredienti: [] },
     ],
   },
   {
     id: 'bbde6b6d-af1c-4385-ab79-35858f9cca25', nome: 'Polpette di lenticchie in padella', nome_en: 'Pan-seared lentil patties',
-    slot: 'secondo', prep_min: 25, tecnica: 'padella', health_score: 7.7,
+    slot: 'secondo', prep_min: 22, tecnica: 'semplice', health_score: 7.7,
     ingredienti: [['lenticchie_cotte_it', 280], ['farina_ceci_it', 35], ['170000', 30], ['169230', 3], ['prezzemolo_it', 2], ['171413', 10]],
     steps: [
       'Sgocciola le lenticchie e schiacciane metà con una forchetta.',
@@ -313,7 +314,7 @@ const D = [
       'Cook in a pan with the oil for 4 minutes a side, until golden and firm.',
     ],
     passi: [
-      { azione: 'sgocciolare', testo_it: 'Sgocciola bene le lenticchie e schiacciane circa metà con una forchetta, lasciando il resto intero.', testo_en: 'Drain the lentils well and mash about half with a fork, leaving the rest whole.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'lenticchie_cotte_it', quota: 1 }] },
+      { azione: 'scolare', testo_it: 'Sgocciola bene le lenticchie e schiacciane circa metà con una forchetta, lasciando il resto intero.', testo_en: 'Drain the lentils well and mash about half with a fork, leaving the rest whole.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'lenticchie_cotte_it', quota: 1 }] },
       { azione: 'mescolare', testo_it: 'Trita finemente la cipolla e l\'aglio e mescolali alle lenticchie con la farina di ceci e il prezzemolo.', testo_en: 'Finely chop the onion and garlic and mix them into the lentils with the chickpea flour and parsley.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '170000', quota: 1 }, { food_id: '169230', quota: 1 }, { food_id: 'farina_ceci_it', quota: 1 }, { food_id: 'prezzemolo_it', quota: 1 }] },
       { azione: 'formare', testo_it: 'Lascia riposare il composto 5 minuti, poi forma 6-8 polpette con le mani bagnate.', testo_en: 'Let the mixture rest for 5 minutes, then shape into 6-8 patties with wet hands.', durata_min: 7, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
       { azione: 'cuocere', testo_it: 'Scalda l\'olio in padella e cuoci le polpette 4 minuti per lato a fuoco medio, finché sono dorate e si staccano facilmente.', testo_en: 'Warm the oil in a pan and cook the patties for 4 minutes a side over medium heat, until golden and easy to turn.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'medio', ingredienti: [{ food_id: '171413', quota: 1 }] },
@@ -321,7 +322,7 @@ const D = [
   },
   {
     id: 'c860e56f-6d76-4154-b1bd-bcd399ae30f4', nome: 'Polpette di ceci', nome_en: 'Pan-seared chickpea patties',
-    slot: 'secondo', prep_min: 25, tecnica: 'padella', health_score: 7.5,
+    slot: 'secondo', prep_min: 23, tecnica: 'semplice', health_score: 7.5,
     ingredienti: [['175206', 280], ['farina_ceci_it', 30], ['170000', 30], ['169230', 3], ['prezzemolo_it', 2], ['171413', 10]],
     steps: [
       'Sgocciola e schiaccia i ceci con una forchetta.',
@@ -336,7 +337,7 @@ const D = [
       'Cook in a pan with the oil for 4 minutes a side, until golden and firm.',
     ],
     passi: [
-      { azione: 'sgocciolare', testo_it: 'Sgocciola e sciacqua bene i ceci, poi schiacciali con una forchetta o uno schiacciapatate fino a ottenere un impasto grossolano.', testo_en: 'Drain and rinse the chickpeas well, then mash them with a fork or potato masher into a rough paste.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '175206', quota: 1 }] },
+      { azione: 'scolare', testo_it: 'Sgocciola e sciacqua bene i ceci, poi schiacciali con una forchetta o uno schiacciapatate fino a ottenere un impasto grossolano.', testo_en: 'Drain and rinse the chickpeas well, then mash them with a fork or potato masher into a rough paste.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '175206', quota: 1 }] },
       { azione: 'mescolare', testo_it: 'Trita finemente la cipolla e l\'aglio e mescolali ai ceci con la farina di ceci e il prezzemolo.', testo_en: 'Finely chop the onion and garlic and mix them into the chickpeas with the chickpea flour and parsley.', durata_min: 4, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '170000', quota: 1 }, { food_id: '169230', quota: 1 }, { food_id: 'farina_ceci_it', quota: 1 }, { food_id: 'prezzemolo_it', quota: 1 }] },
       { azione: 'formare', testo_it: 'Lascia riposare il composto 5 minuti perché la farina assorba l\'umidità, poi forma 6-8 polpette con le mani bagnate.', testo_en: 'Let the mixture rest for 5 minutes so the flour absorbs the moisture, then shape into 6-8 patties with wet hands.', durata_min: 7, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
       { azione: 'cuocere', testo_it: 'Scalda l\'olio in padella e cuoci le polpette 4 minuti per lato a fuoco medio, finché sono dorate e sode al tatto.', testo_en: 'Warm the oil in a pan and cook the patties for 4 minutes a side over medium heat, until golden and firm to the touch.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'medio', ingredienti: [{ food_id: '171413', quota: 1 }] },
@@ -361,13 +362,13 @@ const D = [
     passi: [
       { azione: 'tagliare', testo_it: 'Trita finemente la cipolla, la carota e il sedano.', testo_en: 'Finely chop the onion, carrot and celery.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '170000', quota: 1 }, { food_id: '170393', quota: 1 }, { food_id: 'sedano_it', quota: 1 }] },
       { azione: 'soffriggere', testo_it: 'Scalda l\'olio e soffriggi le verdure 8 minuti a fuoco medio, finché sono morbide e dorate.', testo_en: 'Warm the oil and sauté the vegetables for 8 minutes over medium heat, until soft and golden.', durata_min: 8, tipo_tempo: 'attiva', in_parallelo: false, fuoco: 'medio', ingredienti: [{ food_id: '171413', quota: 1 }] },
-      { azione: 'sgocciolare', testo_it: 'Sgocciola e sciacqua le lenticchie sotto l\'acqua corrente.', testo_en: 'Drain and rinse the lentils under running water.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: 'lenticchie_cotte_it', quota: 1 }] },
+      { azione: 'scolare', testo_it: 'Sgocciola e sciacqua le lenticchie sotto l\'acqua corrente.', testo_en: 'Drain and rinse the lentils under running water.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: 'lenticchie_cotte_it', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Aggiungi la passata, l\'aglio, il rosmarino e le lenticchie, copri e cuoci 15 minuti a fuoco basso, finché si forma una salsa densa.', testo_en: 'Add the passata, garlic, rosemary and lentils, cover and cook for 15 minutes on low heat, until a thick sauce forms.', durata_min: 15, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'basso', ingredienti: [{ food_id: 'passata_pomodoro_it', quota: 1 }, { food_id: '169230', quota: 1 }, { food_id: 'rosmarino_it', quota: 1 }] },
     ],
   },
   {
     id: '83f81c90-18d0-4f32-970f-d754fd7aad08', nome: 'Zucca e ceci in umido', nome_en: 'Stewed pumpkin and chickpeas',
-    slot: 'secondo', prep_min: 30, tecnica: 'semplice', health_score: 7.7,
+    slot: 'secondo', prep_min: 35, tecnica: 'semplice', health_score: 7.7,
     ingredienti: [['zucca_delicata_it', 280], ['175206', 300], ['passata_pomodoro_it', 80], ['170000', 30], ['171413', 10], ['169230', 3], ['rosmarino_it', 1]],
     steps: [
       'Taglia la zucca a cubetti e trita la cipolla.',
@@ -385,13 +386,13 @@ const D = [
       { azione: 'tagliare', testo_it: 'Taglia la zucca a cubetti di 2 cm e trita la cipolla.', testo_en: 'Cut the pumpkin into 2cm cubes and chop the onion.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'zucca_delicata_it', quota: 1 }, { food_id: '170000', quota: 1 }] },
       { azione: 'soffriggere', testo_it: 'Scalda l\'olio, fai appassire la cipolla 4 minuti, poi aggiungi la zucca e rosolala 5 minuti.', testo_en: 'Warm the oil, soften the onion for 4 minutes, then add the pumpkin and brown it for 5 minutes.', durata_min: 9, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Unisci la passata, l\'aglio, il rosmarino e mezzo bicchiere d\'acqua, copri e cuoci 12 minuti.', testo_en: 'Add the passata, garlic, rosemary and half a glass of water, cover and cook for 12 minutes.', durata_min: 12, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'passata_pomodoro_it', quota: 1 }, { food_id: '169230', quota: 1 }, { food_id: 'rosmarino_it', quota: 1 }] },
-      { azione: 'sgocciolare', testo_it: 'Sgocciola e sciacqua bene i ceci.', testo_en: 'Drain and rinse the chickpeas well.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: '175206', quota: 1 }] },
+      { azione: 'scolare', testo_it: 'Sgocciola e sciacqua bene i ceci.', testo_en: 'Drain and rinse the chickpeas well.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: '175206', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Aggiungi i ceci e cuoci altri 8 minuti scoperto, finché la zucca si schiaccia facilmente con una forchetta.', testo_en: 'Add the chickpeas and cook for another 8 minutes uncovered, until the pumpkin mashes easily with a fork.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
     ],
   },
   {
     id: '6f18108c-9cc6-4c35-b144-6c71fe64f0b6', nome: 'Frittata di patate', nome_en: 'Potato frittata',
-    slot: 'secondo', prep_min: 30, tecnica: 'padella', health_score: 6.9,
+    slot: 'secondo', prep_min: 32, tecnica: 'semplice', health_score: 6.9,
     ingredienti: [['170028', 250], ['uovo_grande_it', 150], ['170000', 50], ['171413', 12], ['parmigiano_it', 10]],
     steps: [
       'Taglia le patate a fette sottili e falle rosolare in padella con l\'olio.',
@@ -407,15 +408,15 @@ const D = [
     ],
     passi: [
       { azione: 'tagliare', testo_it: 'Taglia le patate a fette sottili, circa mezzo centimetro.', testo_en: 'Slice the potatoes thinly, about half a centimetre.', durata_min: 6, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '170028', quota: 1 }] },
-      { azione: 'cuocere', testo_it: 'Scalda l\'olio in padella e cuoci le patate e la cipolla affettata a fuoco medio-basso 15 minuti, girando spesso, finché sono morbide senza essere dorate.', testo_en: 'Warm the oil in the pan and cook the potatoes and sliced onion over medium-low heat for 15 minutes, turning often, until tender without browning.', durata_min: 15, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'medio-basso', ingredienti: [{ food_id: '171413', quota: 1 }, { food_id: '170000', quota: 1 }] },
+      { azione: 'cuocere', testo_it: 'Scalda l\'olio in padella e cuoci le patate e la cipolla affettata a fuoco basso 15 minuti, girando spesso, finché sono morbide senza essere dorate.', testo_en: 'Warm the oil in the pan and cook the potatoes and sliced onion over low heat for 15 minutes, turning often, until tender without browning.', durata_min: 15, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'basso', ingredienti: [{ food_id: '171413', quota: 1 }, { food_id: '170000', quota: 1 }] },
       { azione: 'mescolare', testo_it: 'Sbatti le uova con il parmigiano, sale e pepe.', testo_en: 'Beat the eggs with the parmesan, salt and pepper.', durata_min: 2, tipo_tempo: 'attiva', in_parallelo: true, ingredienti: [{ food_id: 'uovo_grande_it', quota: 1 }, { food_id: 'parmigiano_it', quota: 1 }] },
       { azione: 'cuocere', testo_it: 'Versa le uova sulle patate, abbassa il fuoco e cuoci 8 minuti, finché i bordi sono rassodati.', testo_en: 'Pour the eggs over the potatoes, lower the heat and cook for 8 minutes, until the edges have set.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'basso', ingredienti: [] },
-      { azione: 'girare', testo_it: 'Gira la frittata con l\'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.', testo_en: 'Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.', durata_min: 3, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
+      { azione: 'altro', testo_it: 'Gira la frittata con l\'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.', testo_en: 'Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.', durata_min: 3, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
     ],
   },
   {
     id: '717cdd9a-654b-4e7f-a7bc-74215dd84f3f', nome: 'Finocchi gratinati al forno', nome_en: 'Baked gratin fennel',
-    slot: 'contorno', prep_min: 35, tecnica: 'forno', health_score: 6.8,
+    slot: 'contorno', prep_min: 48, tecnica: 'semplice', health_score: 6.8,
     ingredienti: [['finocchi_it', 300], ['parmigiano_it', 20], ['pangrattato_it', 10], ['171413', 8]],
     steps: [
       'Taglia i finocchi a spicchi e scottali in acqua bollente 5 minuti.',
@@ -430,16 +431,17 @@ const D = [
       'Bake at 200°C for 20 minutes, until golden on top.',
     ],
     passi: [
-      { azione: 'scottare', testo_it: 'Taglia i finocchi a spicchi e scottali in acqua bollente salata 5 minuti, finché si ammorbidiscono appena.', testo_en: 'Cut the fennel into wedges and blanch in salted boiling water for 5 minutes, until just softened.', durata_min: 5, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'finocchi_it', quota: 1 }] },
-      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 200°C, statico.', testo_en: 'Turn the oven on to 200°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: true, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
-      { azione: 'comporre', testo_it: 'Scola i finocchi e disponili in una pirofila unta con metà dell\'olio.', testo_en: 'Drain the fennel and arrange it in a baking dish greased with half the oil.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 0.5 }] },
-      { azione: 'comporre', testo_it: 'Cospargi con il parmigiano e il pangrattato, poi un filo dell\'olio rimasto.', testo_en: 'Sprinkle with the parmesan and breadcrumbs, then a drizzle of the remaining oil.', durata_min: 2, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'parmigiano_it', quota: 1 }, { food_id: 'pangrattato_it', quota: 1 }, { food_id: '171413', quota: 0.5 }] },
+      { azione: 'scaldare', testo_it: 'Metti sul fuoco una pentola con abbondante acqua salata e portala a bollore.', testo_en: 'Put a pot with plenty of salted water on the heat and bring it to a boil.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
+      { azione: 'bollire', testo_it: 'Taglia i finocchi a spicchi e scottali nell\'acqua bollente 5 minuti, finché si ammorbidiscono appena.', testo_en: 'Cut the fennel into wedges and blanch in the boiling water for 5 minutes, until just softened.', durata_min: 5, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'finocchi_it', quota: 1 }] },
+      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 200°C, statico.', testo_en: 'Turn the oven on to 200°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
+      { azione: 'disporre', testo_it: 'Scola i finocchi e disponili in una pirofila unta con metà dell\'olio.', testo_en: 'Drain the fennel and arrange it in a baking dish greased with half the oil.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 0.5 }] },
+      { azione: 'disporre', testo_it: 'Cospargi con il parmigiano e il pangrattato, poi un filo dell\'olio rimasto.', testo_en: 'Sprinkle with the parmesan and breadcrumbs, then a drizzle of the remaining oil.', durata_min: 2, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'parmigiano_it', quota: 1 }, { food_id: 'pangrattato_it', quota: 1 }, { food_id: '171413', quota: 0.5 }] },
       { azione: 'infornare', testo_it: 'Inforna 20 minuti, finché la superficie è dorata e i finocchi sono morbidi se infilzati con una forchetta.', testo_en: 'Bake for 20 minutes, until the top is golden and the fennel is tender when pierced with a fork.', durata_min: 20, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
     ],
   },
   {
     id: 'ebd4c848-3fd5-42f1-8fb2-2beeb71f7118', nome: 'Cavolfiore gratinato al forno', nome_en: 'Baked gratin cauliflower',
-    slot: 'contorno', prep_min: 35, tecnica: 'forno', health_score: 6.8,
+    slot: 'contorno', prep_min: 48, tecnica: 'semplice', health_score: 6.8,
     ingredienti: [['cavolfiore_it', 300], ['parmigiano_it', 20], ['pangrattato_it', 10], ['171413', 8]],
     steps: [
       'Dividi il cavolfiore in cimette e scottalo in acqua bollente 5 minuti.',
@@ -454,16 +456,17 @@ const D = [
       'Bake at 200°C for 20 minutes, until golden on top.',
     ],
     passi: [
-      { azione: 'scottare', testo_it: 'Dividi il cavolfiore in cimette e scottalo in acqua bollente salata 5 minuti, finché si ammorbidisce appena.', testo_en: 'Break the cauliflower into florets and blanch in salted boiling water for 5 minutes, until just softened.', durata_min: 5, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'cavolfiore_it', quota: 1 }] },
-      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 200°C, statico.', testo_en: 'Turn the oven on to 200°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: true, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
-      { azione: 'comporre', testo_it: 'Scola il cavolfiore e disponilo in una pirofila unta con metà dell\'olio.', testo_en: 'Drain the cauliflower and arrange it in a baking dish greased with half the oil.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 0.5 }] },
-      { azione: 'comporre', testo_it: 'Cospargi con il parmigiano e il pangrattato, poi un filo dell\'olio rimasto.', testo_en: 'Sprinkle with the parmesan and breadcrumbs, then a drizzle of the remaining oil.', durata_min: 2, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'parmigiano_it', quota: 1 }, { food_id: 'pangrattato_it', quota: 1 }, { food_id: '171413', quota: 0.5 }] },
+      { azione: 'scaldare', testo_it: 'Metti sul fuoco una pentola con abbondante acqua salata e portala a bollore.', testo_en: 'Put a pot with plenty of salted water on the heat and bring it to a boil.', durata_min: 8, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [] },
+      { azione: 'bollire', testo_it: 'Dividi il cavolfiore in cimette e scottalo nell\'acqua bollente 5 minuti, finché si ammorbidisce appena.', testo_en: 'Break the cauliflower into florets and blanch in the boiling water for 5 minutes, until just softened.', durata_min: 5, tipo_tempo: 'attesa', in_parallelo: false, ingredienti: [{ food_id: 'cavolfiore_it', quota: 1 }] },
+      { azione: 'preriscaldare', testo_it: 'Accendi il forno a 200°C, statico.', testo_en: 'Turn the oven on to 200°C, conventional.', durata_min: 10, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
+      { azione: 'disporre', testo_it: 'Scola il cavolfiore e disponilo in una pirofila unta con metà dell\'olio.', testo_en: 'Drain the cauliflower and arrange it in a baking dish greased with half the oil.', durata_min: 3, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 0.5 }] },
+      { azione: 'disporre', testo_it: 'Cospargi con il parmigiano e il pangrattato, poi un filo dell\'olio rimasto.', testo_en: 'Sprinkle with the parmesan and breadcrumbs, then a drizzle of the remaining oil.', durata_min: 2, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'parmigiano_it', quota: 1 }, { food_id: 'pangrattato_it', quota: 1 }, { food_id: '171413', quota: 0.5 }] },
       { azione: 'infornare', testo_it: 'Inforna 20 minuti, finché la superficie è dorata e il cavolfiore è morbido se infilzato con una forchetta.', testo_en: 'Bake for 20 minutes, until the top is golden and the cauliflower is tender when pierced with a fork.', durata_min: 20, tipo_tempo: 'attesa', in_parallelo: false, temperatura_c: 200, forno_modalita: 'statico', ingredienti: [] },
     ],
   },
   {
     id: '756dfc24-796e-43d0-afe2-f6258bae08c1', nome: 'Zucca in umido con pomodoro e salvia', nome_en: 'Stewed pumpkin with tomato and sage',
-    slot: 'contorno', prep_min: 20, tecnica: 'semplice', health_score: 8.3,
+    slot: 'contorno', prep_min: 21, tecnica: 'semplice', health_score: 8.3,
     ingredienti: [['zucca_delicata_it', 280], ['passata_pomodoro_it', 60], ['salvia_it', 1], ['171413', 8], ['169230', 2]],
     steps: [
       'Taglia la zucca a cubetti.',
@@ -480,7 +483,7 @@ const D = [
     passi: [
       { azione: 'tagliare', testo_it: 'Taglia la zucca a cubetti di 2 cm.', testo_en: 'Cut the pumpkin into 2cm cubes.', durata_min: 5, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: 'zucca_delicata_it', quota: 1 }] },
       { azione: 'soffriggere', testo_it: 'Scalda l\'olio con l\'aglio affettato e la salvia un minuto, finché profumano.', testo_en: 'Warm the oil with the sliced garlic and sage for a minute, until fragrant.', durata_min: 1, tipo_tempo: 'attiva', in_parallelo: false, ingredienti: [{ food_id: '171413', quota: 1 }, { food_id: '169230', quota: 1 }, { food_id: 'salvia_it', quota: 1 }] },
-      { azione: 'cuocere', testo_it: 'Aggiungi la zucca e la passata, copri e cuoci a fuoco medio-basso 15 minuti, mescolando a metà.', testo_en: 'Add the pumpkin and passata, cover and cook over medium-low heat for 15 minutes, stirring halfway.', durata_min: 15, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'medio-basso', ingredienti: [{ food_id: 'passata_pomodoro_it', quota: 1 }] },
+      { azione: 'cuocere', testo_it: 'Aggiungi la zucca e la passata, copri e cuoci a fuoco basso 15 minuti, mescolando a metà.', testo_en: 'Add the pumpkin and passata, cover and cook over low heat for 15 minutes, stirring halfway.', durata_min: 15, tipo_tempo: 'attesa', in_parallelo: false, fuoco: 'basso', ingredienti: [{ food_id: 'passata_pomodoro_it', quota: 1 }] },
       { azione: 'servire', testo_it: 'È pronta quando la zucca si schiaccia facilmente con una forchetta ma non è disfatta.', testo_en: 'It is ready when the pumpkin mashes easily with a fork but is not falling apart.', ingredienti: [] },
     ],
   },

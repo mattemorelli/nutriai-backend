@@ -51,7 +51,7 @@
           "forno_modalita": "statico",
           "fuoco": null,
           "tempo_da_confezione": false,
-          "in_parallelo": true,
+          "in_parallelo": false,
           "ingredienti": []
         },
         {
@@ -87,7 +87,7 @@
         },
         {
           "ordine": 5,
-          "azione": "comporre",
+          "azione": "disporre",
           "testo_it": "In una pirofila alterna melanzane, sugo e mozzarella a fette, finisci con il parmigiano.",
           "testo_en": "In a baking dish, layer aubergine, sauce and sliced mozzarella, finishing with the parmesan.",
           "durata_min": 5,
@@ -156,7 +156,7 @@
           "forno_modalita": "statico",
           "fuoco": null,
           "tempo_da_confezione": false,
-          "in_parallelo": true,
+          "in_parallelo": false,
           "ingredienti": []
         },
         {
@@ -234,7 +234,7 @@
         },
         {
           "ordine": 5,
-          "azione": "comporre",
+          "azione": "disporre",
           "testo_it": "Riempi le bucce di melanzana con il ripieno, cospargi con pangrattato e il parmigiano rimasto.",
           "testo_en": "Fill the aubergine shells with the mixture, sprinkle with the breadcrumbs and remaining parmesan.",
           "durata_min": 4,
@@ -308,7 +308,7 @@
           "forno_modalita": "statico",
           "fuoco": null,
           "tempo_da_confezione": false,
-          "in_parallelo": true,
+          "in_parallelo": false,
           "ingredienti": [
             {
               "food_id": "171413",
@@ -382,28 +382,23 @@
       "passi": [
         {
           "ordine": 1,
-          "azione": "scottare",
-          "testo_it": "Stacca 8 foglie grandi di verza e scottale in acqua bollente 2 minuti, finché si ammorbidiscono senza rompersi.",
-          "testo_en": "Separate 8 large cabbage leaves and blanch them in boiling water for 2 minutes, until pliable but not falling apart.",
-          "durata_min": 4,
+          "azione": "scaldare",
+          "testo_it": "Metti sul fuoco una pentola con abbondante acqua e portala a bollore.",
+          "testo_en": "Put a pot with plenty of water on the heat and bring it to a boil.",
+          "durata_min": 8,
           "tipo_tempo": "attesa",
           "temperatura_c": null,
           "forno_modalita": null,
           "fuoco": null,
           "tempo_da_confezione": false,
           "in_parallelo": false,
-          "ingredienti": [
-            {
-              "food_id": "cavolo_verza_it",
-              "quota": 1
-            }
-          ]
+          "ingredienti": []
         },
         {
           "ordine": 2,
           "azione": "soffriggere",
-          "testo_it": "Trita finemente carota e cipolla e falle appassire nell'olio con l'aglio 5 minuti.",
-          "testo_en": "Finely chop the carrot and onion and soften them in the oil with the garlic for 5 minutes.",
+          "testo_it": "Nel frattempo trita finemente carota e cipolla e falle appassire nell'olio con l'aglio 5 minuti.",
+          "testo_en": "Meanwhile, finely chop the carrot and onion and soften them in the oil with the garlic for 5 minutes.",
           "durata_min": 6,
           "tipo_tempo": "attiva",
           "temperatura_c": null,
@@ -432,6 +427,25 @@
         },
         {
           "ordine": 3,
+          "azione": "bollire",
+          "testo_it": "Stacca 8 foglie grandi di verza e scottale nell'acqua bollente 2 minuti, finché si ammorbidiscono senza rompersi.",
+          "testo_en": "Separate 8 large cabbage leaves and blanch them in the boiling water for 2 minutes, until pliable but not falling apart.",
+          "durata_min": 2,
+          "tipo_tempo": "attesa",
+          "temperatura_c": null,
+          "forno_modalita": null,
+          "fuoco": null,
+          "tempo_da_confezione": false,
+          "in_parallelo": false,
+          "ingredienti": [
+            {
+              "food_id": "cavolo_verza_it",
+              "quota": 1
+            }
+          ]
+        },
+        {
+          "ordine": 4,
           "azione": "mescolare",
           "testo_it": "Schiaccia metà dei fagioli con una forchetta e mescolali al riso, al soffritto e ai fagioli interi rimasti.",
           "testo_en": "Mash half the beans with a fork and mix them with the rice, the softened vegetables and the remaining whole beans.",
@@ -454,8 +468,8 @@
           ]
         },
         {
-          "ordine": 4,
-          "azione": "comporre",
+          "ordine": 5,
+          "azione": "disporre",
           "testo_it": "Metti una porzione di ripieno al centro di ogni foglia e chiudila a fagottino.",
           "testo_en": "Place a portion of filling in the centre of each leaf and fold it into a parcel.",
           "durata_min": 8,
@@ -468,7 +482,7 @@
           "ingredienti": []
         },
         {
-          "ordine": 5,
+          "ordine": 6,
           "azione": "preriscaldare",
           "testo_it": "Accendi il forno a 180°C, statico.",
           "testo_en": "Turn the oven on to 180°C, conventional.",
@@ -478,11 +492,11 @@
           "forno_modalita": "statico",
           "fuoco": null,
           "tempo_da_confezione": false,
-          "in_parallelo": true,
+          "in_parallelo": false,
           "ingredienti": []
         },
         {
-          "ordine": 6,
+          "ordine": 7,
           "azione": "infornare",
           "testo_it": "Disponi gli involtini in una pirofila, versa la passata sopra, copri con un foglio di alluminio e cuoci 25 minuti, finché le foglie sono morbide al centro.",
           "testo_en": "Arrange the rolls in a baking dish, pour the passata over, cover with foil and cook for 25 minutes, until the leaves are tender at the centre.",
@@ -553,7 +567,7 @@
         },
         {
           "ordine": 3,
-          "azione": "appassire",
+          "azione": "soffriggere",
           "testo_it": "Aggiungi la verza, l'aglio e la salvia e falla appassire 5 minuti, mescolando.",
           "testo_en": "Add the cabbage, garlic and sage and let it wilt for 5 minutes, stirring.",
           "durata_min": 5,
@@ -576,7 +590,7 @@
         },
         {
           "ordine": 4,
-          "azione": "sgocciolare",
+          "azione": "scolare",
           "testo_it": "Sgocciola e sciacqua i fagioli sotto l'acqua corrente.",
           "testo_en": "Drain and rinse the beans under running water.",
           "durata_min": 1,
@@ -726,7 +740,7 @@
       "passi": [
         {
           "ordine": 1,
-          "azione": "sgocciolare",
+          "azione": "scolare",
           "testo_it": "Sgocciola e sciacqua i fagioli, poi scaldali 2 minuti in un pentolino con un dito d'acqua.",
           "testo_en": "Drain and rinse the beans, then warm them for 2 minutes in a small pan with a splash of water.",
           "durata_min": 2,
@@ -898,7 +912,7 @@
         },
         {
           "ordine": 4,
-          "azione": "sgocciolare",
+          "azione": "scolare",
           "testo_it": "Sgocciola e sciacqua bene i ceci sotto l'acqua corrente.",
           "testo_en": "Drain and rinse the chickpeas well under running water.",
           "durata_min": 1,
@@ -940,7 +954,7 @@
       "passi": [
         {
           "ordine": 1,
-          "azione": "sgocciolare",
+          "azione": "scolare",
           "testo_it": "Sgocciola e sciacqua le lenticchie sotto l'acqua corrente.",
           "testo_en": "Drain and rinse the lentils under running water.",
           "durata_min": 1,
@@ -1112,7 +1126,7 @@
         },
         {
           "ordine": 5,
-          "azione": "girare",
+          "azione": "altro",
           "testo_it": "Gira la frittata con l'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.",
           "testo_en": "Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.",
           "durata_min": 3,
@@ -1200,7 +1214,7 @@
         },
         {
           "ordine": 4,
-          "azione": "girare",
+          "azione": "altro",
           "testo_it": "Gira la frittata con l'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.",
           "testo_en": "Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.",
           "durata_min": 3,
@@ -1223,7 +1237,7 @@
       "passi": [
         {
           "ordine": 1,
-          "azione": "appassire",
+          "azione": "soffriggere",
           "testo_it": "Fai appassire gli spinaci in padella con l'olio e l'aglio 5 minuti, poi strizzali bene con le mani.",
           "testo_en": "Wilt the spinach in a pan with the oil and garlic for 5 minutes, then squeeze it well with your hands.",
           "durata_min": 7,
@@ -1259,7 +1273,7 @@
           "forno_modalita": "statico",
           "fuoco": null,
           "tempo_da_confezione": false,
-          "in_parallelo": true,
+          "in_parallelo": false,
           "ingredienti": []
         },
         {
@@ -1291,7 +1305,7 @@
         },
         {
           "ordine": 4,
-          "azione": "comporre",
+          "azione": "disporre",
           "testo_it": "Fodera una tortiera piccola con la pasta sfoglia, versa il ripieno e livella con un cucchiaio.",
           "testo_en": "Line a small tin with the pastry, pour in the filling and level it with a spoon.",
           "durata_min": 4,
@@ -1310,7 +1324,7 @@
         },
         {
           "ordine": 5,
-          "azione": "comporre",
+          "azione": "disporre",
           "testo_it": "Fai una piccola buca al centro e versaci l'uovo rimasto, intero.",
           "testo_en": "Make a small well in the centre and crack the remaining whole egg into it.",
           "durata_min": 1,
@@ -1352,7 +1366,7 @@
       "passi": [
         {
           "ordine": 1,
-          "azione": "sgocciolare",
+          "azione": "scolare",
           "testo_it": "Sgocciola bene le lenticchie e schiacciane circa metà con una forchetta, lasciando il resto intero.",
           "testo_en": "Drain the lentils well and mash about half with a fork, leaving the rest whole.",
           "durata_min": 3,
@@ -1444,7 +1458,7 @@
       "passi": [
         {
           "ordine": 1,
-          "azione": "sgocciolare",
+          "azione": "scolare",
           "testo_it": "Sgocciola e sciacqua bene i ceci, poi schiacciali con una forchetta o uno schiacciapatate fino a ottenere un impasto grossolano.",
           "testo_en": "Drain and rinse the chickpeas well, then mash them with a fork or potato masher into a rough paste.",
           "durata_min": 4,
@@ -1582,7 +1596,7 @@
         },
         {
           "ordine": 3,
-          "azione": "sgocciolare",
+          "azione": "scolare",
           "testo_it": "Sgocciola e sciacqua le lenticchie sotto l'acqua corrente.",
           "testo_en": "Drain and rinse the lentils under running water.",
           "durata_min": 1,
@@ -1706,7 +1720,7 @@
         },
         {
           "ordine": 4,
-          "azione": "sgocciolare",
+          "azione": "scolare",
           "testo_it": "Sgocciola e sciacqua bene i ceci.",
           "testo_en": "Drain and rinse the chickpeas well.",
           "durata_min": 1,
@@ -1768,13 +1782,13 @@
         {
           "ordine": 2,
           "azione": "cuocere",
-          "testo_it": "Scalda l'olio in padella e cuoci le patate e la cipolla affettata a fuoco medio-basso 15 minuti, girando spesso, finché sono morbide senza essere dorate.",
-          "testo_en": "Warm the oil in the pan and cook the potatoes and sliced onion over medium-low heat for 15 minutes, turning often, until tender without browning.",
+          "testo_it": "Scalda l'olio in padella e cuoci le patate e la cipolla affettata a fuoco basso 15 minuti, girando spesso, finché sono morbide senza essere dorate.",
+          "testo_en": "Warm the oil in the pan and cook the potatoes and sliced onion over low heat for 15 minutes, turning often, until tender without browning.",
           "durata_min": 15,
           "tipo_tempo": "attesa",
           "temperatura_c": null,
           "forno_modalita": null,
-          "fuoco": "medio-basso",
+          "fuoco": "basso",
           "tempo_da_confezione": false,
           "in_parallelo": false,
           "ingredienti": [
@@ -1827,7 +1841,7 @@
         },
         {
           "ordine": 5,
-          "azione": "girare",
+          "azione": "altro",
           "testo_it": "Gira la frittata con l'aiuto di un piatto e cuoci altri 3 minuti, finché non è più liquida al centro.",
           "testo_en": "Flip the frittata using a plate and cook for another 3 minutes, until it is no longer runny in the centre.",
           "durata_min": 3,
@@ -1850,9 +1864,23 @@
       "passi": [
         {
           "ordine": 1,
-          "azione": "scottare",
-          "testo_it": "Taglia i finocchi a spicchi e scottali in acqua bollente salata 5 minuti, finché si ammorbidiscono appena.",
-          "testo_en": "Cut the fennel into wedges and blanch in salted boiling water for 5 minutes, until just softened.",
+          "azione": "scaldare",
+          "testo_it": "Metti sul fuoco una pentola con abbondante acqua salata e portala a bollore.",
+          "testo_en": "Put a pot with plenty of salted water on the heat and bring it to a boil.",
+          "durata_min": 8,
+          "tipo_tempo": "attesa",
+          "temperatura_c": null,
+          "forno_modalita": null,
+          "fuoco": null,
+          "tempo_da_confezione": false,
+          "in_parallelo": false,
+          "ingredienti": []
+        },
+        {
+          "ordine": 2,
+          "azione": "bollire",
+          "testo_it": "Taglia i finocchi a spicchi e scottali nell'acqua bollente 5 minuti, finché si ammorbidiscono appena.",
+          "testo_en": "Cut the fennel into wedges and blanch in the boiling water for 5 minutes, until just softened.",
           "durata_min": 5,
           "tipo_tempo": "attesa",
           "temperatura_c": null,
@@ -1868,7 +1896,7 @@
           ]
         },
         {
-          "ordine": 2,
+          "ordine": 3,
           "azione": "preriscaldare",
           "testo_it": "Accendi il forno a 200°C, statico.",
           "testo_en": "Turn the oven on to 200°C, conventional.",
@@ -1878,12 +1906,12 @@
           "forno_modalita": "statico",
           "fuoco": null,
           "tempo_da_confezione": false,
-          "in_parallelo": true,
+          "in_parallelo": false,
           "ingredienti": []
         },
         {
-          "ordine": 3,
-          "azione": "comporre",
+          "ordine": 4,
+          "azione": "disporre",
           "testo_it": "Scola i finocchi e disponili in una pirofila unta con metà dell'olio.",
           "testo_en": "Drain the fennel and arrange it in a baking dish greased with half the oil.",
           "durata_min": 3,
@@ -1901,8 +1929,8 @@
           ]
         },
         {
-          "ordine": 4,
-          "azione": "comporre",
+          "ordine": 5,
+          "azione": "disporre",
           "testo_it": "Cospargi con il parmigiano e il pangrattato, poi un filo dell'olio rimasto.",
           "testo_en": "Sprinkle with the parmesan and breadcrumbs, then a drizzle of the remaining oil.",
           "durata_min": 2,
@@ -1928,7 +1956,7 @@
           ]
         },
         {
-          "ordine": 5,
+          "ordine": 6,
           "azione": "infornare",
           "testo_it": "Inforna 20 minuti, finché la superficie è dorata e i finocchi sono morbidi se infilzati con una forchetta.",
           "testo_en": "Bake for 20 minutes, until the top is golden and the fennel is tender when pierced with a fork.",
@@ -1952,9 +1980,23 @@
       "passi": [
         {
           "ordine": 1,
-          "azione": "scottare",
-          "testo_it": "Dividi il cavolfiore in cimette e scottalo in acqua bollente salata 5 minuti, finché si ammorbidisce appena.",
-          "testo_en": "Break the cauliflower into florets and blanch in salted boiling water for 5 minutes, until just softened.",
+          "azione": "scaldare",
+          "testo_it": "Metti sul fuoco una pentola con abbondante acqua salata e portala a bollore.",
+          "testo_en": "Put a pot with plenty of salted water on the heat and bring it to a boil.",
+          "durata_min": 8,
+          "tipo_tempo": "attesa",
+          "temperatura_c": null,
+          "forno_modalita": null,
+          "fuoco": null,
+          "tempo_da_confezione": false,
+          "in_parallelo": false,
+          "ingredienti": []
+        },
+        {
+          "ordine": 2,
+          "azione": "bollire",
+          "testo_it": "Dividi il cavolfiore in cimette e scottalo nell'acqua bollente 5 minuti, finché si ammorbidisce appena.",
+          "testo_en": "Break the cauliflower into florets and blanch in the boiling water for 5 minutes, until just softened.",
           "durata_min": 5,
           "tipo_tempo": "attesa",
           "temperatura_c": null,
@@ -1970,7 +2012,7 @@
           ]
         },
         {
-          "ordine": 2,
+          "ordine": 3,
           "azione": "preriscaldare",
           "testo_it": "Accendi il forno a 200°C, statico.",
           "testo_en": "Turn the oven on to 200°C, conventional.",
@@ -1980,12 +2022,12 @@
           "forno_modalita": "statico",
           "fuoco": null,
           "tempo_da_confezione": false,
-          "in_parallelo": true,
+          "in_parallelo": false,
           "ingredienti": []
         },
         {
-          "ordine": 3,
-          "azione": "comporre",
+          "ordine": 4,
+          "azione": "disporre",
           "testo_it": "Scola il cavolfiore e disponilo in una pirofila unta con metà dell'olio.",
           "testo_en": "Drain the cauliflower and arrange it in a baking dish greased with half the oil.",
           "durata_min": 3,
@@ -2003,8 +2045,8 @@
           ]
         },
         {
-          "ordine": 4,
-          "azione": "comporre",
+          "ordine": 5,
+          "azione": "disporre",
           "testo_it": "Cospargi con il parmigiano e il pangrattato, poi un filo dell'olio rimasto.",
           "testo_en": "Sprinkle with the parmesan and breadcrumbs, then a drizzle of the remaining oil.",
           "durata_min": 2,
@@ -2030,7 +2072,7 @@
           ]
         },
         {
-          "ordine": 5,
+          "ordine": 6,
           "azione": "infornare",
           "testo_it": "Inforna 20 minuti, finché la superficie è dorata e il cavolfiore è morbido se infilzato con una forchetta.",
           "testo_en": "Bake for 20 minutes, until the top is golden and the cauliflower is tender when pierced with a fork.",
@@ -2101,13 +2143,13 @@
         {
           "ordine": 3,
           "azione": "cuocere",
-          "testo_it": "Aggiungi la zucca e la passata, copri e cuoci a fuoco medio-basso 15 minuti, mescolando a metà.",
-          "testo_en": "Add the pumpkin and passata, cover and cook over medium-low heat for 15 minutes, stirring halfway.",
+          "testo_it": "Aggiungi la zucca e la passata, copri e cuoci a fuoco basso 15 minuti, mescolando a metà.",
+          "testo_en": "Add the pumpkin and passata, cover and cook over low heat for 15 minutes, stirring halfway.",
           "durata_min": 15,
           "tipo_tempo": "attesa",
           "temperatura_c": null,
           "forno_modalita": null,
-          "fuoco": "medio-basso",
+          "fuoco": "basso",
           "tempo_da_confezione": false,
           "in_parallelo": false,
           "ingredienti": [
