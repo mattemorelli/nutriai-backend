@@ -1,0 +1,1361 @@
+{
+  "piatti": [
+    {
+      "id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "name": "Parmigiana di melanzane",
+      "name_en": "Baked aubergine parmigiana",
+      "meal_slot": "secondo",
+      "prep_min": 55,
+      "steps": [
+        "Taglia le melanzane a fette e grigliale in padella senza olio.",
+        "Fai un sugo veloce con passata, aglio e basilico.",
+        "Alterna strati di melanzane, sugo e mozzarella, finisci con parmigiano.",
+        "Inforna a 200°C per 25 minuti, finché la superficie è dorata."
+      ],
+      "steps_en": [
+        "Slice the aubergines and grill them in a dry pan, no oil, until char-striped.",
+        "Make a quick sauce with the passata, garlic and basil.",
+        "Layer aubergine, sauce and mozzarella, finishing with the parmesan on top.",
+        "Bake at 200°C for 25 minutes, until golden on top."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "forno",
+      "health_score": 6.6,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "melanzana_it",
+          320
+        ],
+        [
+          "passata_pomodoro_it",
+          150
+        ],
+        [
+          "170845",
+          80
+        ],
+        [
+          "parmigiano_it",
+          10
+        ],
+        [
+          "basilico_it",
+          3
+        ],
+        [
+          "171413",
+          12
+        ],
+        [
+          "169230",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "6da03221-009a-4e78-a520-127849513f7e",
+      "name": "Melanzane ripiene al forno",
+      "name_en": "Baked stuffed aubergines",
+      "meal_slot": "secondo",
+      "prep_min": 50,
+      "steps": [
+        "Taglia le melanzane a metà e scava la polpa.",
+        "Trita la polpa e mescolala con riso, passata e metà del parmigiano.",
+        "Riempi le melanzane, copri con pangrattato e parmigiano.",
+        "Inforna a 190°C per 30 minuti, finché le bucce sono morbide."
+      ],
+      "steps_en": [
+        "Halve the aubergines and scoop out the flesh.",
+        "Chop the flesh and mix it with the rice, passata and half the parmesan.",
+        "Fill the aubergine shells, top with breadcrumbs and parmesan.",
+        "Bake at 190°C for 30 minutes, until the skins are tender."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "forno",
+      "health_score": 7,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": true,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": true,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "melanzana_it",
+          350
+        ],
+        [
+          "riso_integrale_cotto_it",
+          100
+        ],
+        [
+          "passata_pomodoro_it",
+          80
+        ],
+        [
+          "parmigiano_it",
+          20
+        ],
+        [
+          "pangrattato_it",
+          15
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "169230",
+          3
+        ],
+        [
+          "basilico_it",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "a25f97bf-7c9c-4d07-8330-ef0226cac052",
+      "name": "Sformato di zucca",
+      "name_en": "Baked pumpkin sformato",
+      "meal_slot": "secondo",
+      "prep_min": 45,
+      "steps": [
+        "Cuoci la zucca a vapore o al forno finché è morbida, poi schiacciala.",
+        "Mescola la purea con uova, parmigiano e pangrattato.",
+        "Versa in uno stampo unto e inforna a 180°C per 30 minuti.",
+        "È pronto quando la superficie è dorata e non trema più al centro."
+      ],
+      "steps_en": [
+        "Steam or roast the pumpkin until tender, then mash it.",
+        "Mix the purée with the eggs, parmesan and breadcrumbs.",
+        "Pour into a greased mould and bake at 180°C for 30 minutes.",
+        "It is ready when the top is golden and the centre no longer wobbles."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "forno",
+      "health_score": 6.9,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": true,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "zucca_delicata_it",
+          350
+        ],
+        [
+          "uovo_grande_it",
+          100
+        ],
+        [
+          "parmigiano_it",
+          20
+        ],
+        [
+          "pangrattato_it",
+          10
+        ],
+        [
+          "171413",
+          8
+        ]
+      ]
+    },
+    {
+      "id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "name": "Involtini di verza ripieni di riso e fagioli",
+      "name_en": "Savoy cabbage rolls with rice and beans",
+      "meal_slot": "secondo",
+      "prep_min": 45,
+      "steps": [
+        "Stacca le foglie di verza e scottale in acqua bollente 2 minuti.",
+        "Mescola riso, fagioli schiacciati, carota e cipolla per il ripieno.",
+        "Avvolgi il ripieno in ogni foglia e disponi gli involtini in una pirofila con la passata.",
+        "Cuoci coperto a 180°C per 25 minuti, finché le foglie sono morbide."
+      ],
+      "steps_en": [
+        "Separate the cabbage leaves and blanch them in boiling water for 2 minutes.",
+        "Mix the rice, mashed beans, carrot and onion for the filling.",
+        "Wrap the filling in each leaf and arrange the rolls in a dish with the passata.",
+        "Cook covered at 180°C for 25 minutes, until the leaves are tender."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "forno",
+      "health_score": 7.5,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": true,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "cavolo_verza_it",
+          320
+        ],
+        [
+          "riso_integrale_cotto_it",
+          150
+        ],
+        [
+          "fagioli_cannellini_it",
+          120
+        ],
+        [
+          "170393",
+          50
+        ],
+        [
+          "170000",
+          40
+        ],
+        [
+          "passata_pomodoro_it",
+          100
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "169230",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "name": "Verza e fagioli in umido",
+      "name_en": "Stewed savoy cabbage and beans",
+      "meal_slot": "secondo",
+      "prep_min": 30,
+      "steps": [
+        "Affetta la verza e la cipolla.",
+        "Soffriggi la cipolla nell'olio, poi aggiungi la verza e falla appassire.",
+        "Unisci passata, aglio, salvia e fagioli sgocciolati.",
+        "Cuoci coperto 18 minuti, finché la verza è morbida."
+      ],
+      "steps_en": [
+        "Slice the cabbage and the onion.",
+        "Soften the onion in the oil, then add the cabbage and let it wilt.",
+        "Add the passata, garlic, sage and drained beans.",
+        "Cook covered for 18 minutes, until the cabbage is tender."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "semplice",
+      "health_score": 7.8,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "cavolo_verza_it",
+          250
+        ],
+        [
+          "fagioli_cannellini_it",
+          250
+        ],
+        [
+          "passata_pomodoro_it",
+          100
+        ],
+        [
+          "170000",
+          40
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "169230",
+          3
+        ],
+        [
+          "salvia_it",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "f32a0ec0-bd0b-431a-8bcb-850d44a659f7",
+      "name": "Piselli e uova alla romana",
+      "name_en": "Roman-style peas and eggs",
+      "meal_slot": "secondo",
+      "prep_min": 20,
+      "steps": [
+        "Soffriggi la cipolla tritata nell'olio.",
+        "Aggiungi i piselli surgelati e un po' d'acqua, cuoci 10 minuti.",
+        "Fai due buche nei piselli e versaci le uova.",
+        "Copri e cuoci finché l'albume è rassodato e il tuorlo ancora morbido."
+      ],
+      "steps_en": [
+        "Soften the chopped onion in the oil.",
+        "Add the frozen peas and a little water, cook for 10 minutes.",
+        "Make two wells in the peas and crack the eggs into them.",
+        "Cover and cook until the white has set and the yolk is still soft."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "semplice",
+      "health_score": 7.2,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "piselli_surgelati_it",
+          220
+        ],
+        [
+          "uovo_grande_it",
+          100
+        ],
+        [
+          "170000",
+          30
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "prezzemolo_it",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "53a4eb0d-3695-48fd-97c9-c92f640f64c7",
+      "name": "Insalata tiepida di borlotti con cipolla rossa",
+      "name_en": "Warm borlotti bean salad with red onion",
+      "meal_slot": "secondo",
+      "prep_min": 12,
+      "steps": [
+        "Sgocciola e scalda i fagioli borlotti.",
+        "Affetta finemente la cipolla rossa e il sedano.",
+        "Condisci tutto con olio, sale e pepe.",
+        "Lascia riposare 10 minuti prima di servire."
+      ],
+      "steps_en": [
+        "Drain and warm the borlotti beans.",
+        "Thinly slice the red onion and celery.",
+        "Dress everything with oil, salt and pepper.",
+        "Let it stand 10 minutes before serving."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "semplice",
+      "health_score": 7.9,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "fagioli_borlotti_it",
+          280
+        ],
+        [
+          "cipolla_rossa_it",
+          50
+        ],
+        [
+          "sedano_it",
+          30
+        ],
+        [
+          "171413",
+          12
+        ],
+        [
+          "prezzemolo_it",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "name": "Ceci e patate in umido",
+      "name_en": "Stewed chickpeas and potatoes",
+      "meal_slot": "secondo",
+      "prep_min": 35,
+      "steps": [
+        "Taglia le patate a tocchetti e la cipolla a dadini.",
+        "Soffriggi la cipolla, poi aggiungi le patate e rosola 5 minuti.",
+        "Unisci passata, aglio, rosmarino e un po' d'acqua, cuoci 15 minuti.",
+        "Aggiungi i ceci sgocciolati e cuoci altri 8 minuti."
+      ],
+      "steps_en": [
+        "Cut the potatoes into chunks and dice the onion.",
+        "Soften the onion, then add the potatoes and brown them for 5 minutes.",
+        "Add the passata, garlic, rosemary and a little water, cook for 15 minutes.",
+        "Add the drained chickpeas and cook for another 8 minutes."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "semplice",
+      "health_score": 7.6,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": true,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "175206",
+          320
+        ],
+        [
+          "170028",
+          180
+        ],
+        [
+          "passata_pomodoro_it",
+          100
+        ],
+        [
+          "170000",
+          40
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "169230",
+          3
+        ],
+        [
+          "rosmarino_it",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "45754750-9c4f-4d16-a590-460258cbb5a5",
+      "name": "Insalata di lenticchie con sedano e carote",
+      "name_en": "Lentil salad with celery and carrots",
+      "meal_slot": "secondo",
+      "prep_min": 12,
+      "steps": [
+        "Sgocciola e sciacqua le lenticchie.",
+        "Taglia sedano e carote a dadini piccoli, trita la cipolla.",
+        "Mescola tutto con olio, sale e pepe.",
+        "Lascia riposare 10 minuti prima di servire."
+      ],
+      "steps_en": [
+        "Drain and rinse the lentils.",
+        "Dice the celery and carrots small, chop the onion.",
+        "Mix everything with oil, salt and pepper.",
+        "Let it stand 10 minutes before serving."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "semplice",
+      "health_score": 7.9,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "lenticchie_cotte_it",
+          280
+        ],
+        [
+          "sedano_it",
+          50
+        ],
+        [
+          "170393",
+          60
+        ],
+        [
+          "170000",
+          20
+        ],
+        [
+          "171413",
+          12
+        ],
+        [
+          "prezzemolo_it",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "321c9301-ed8a-4417-81c3-1aa7a3bc3601",
+      "name": "Frittata di cavolfiore",
+      "name_en": "Cauliflower frittata",
+      "meal_slot": "secondo",
+      "prep_min": 25,
+      "steps": [
+        "Cuoci le cimette di cavolfiore a vapore finché sono morbide.",
+        "Sbatti le uova con il parmigiano e il cavolfiore spezzettato.",
+        "Versa in padella con l'olio e cuoci piano da un lato.",
+        "Gira e finisci di cuocere finché il centro non è più liquido."
+      ],
+      "steps_en": [
+        "Steam the cauliflower florets until tender.",
+        "Beat the eggs with the parmesan and the broken-up cauliflower.",
+        "Pour into the pan with the oil and cook gently on one side.",
+        "Flip and finish cooking until the centre is no longer runny."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "padella",
+      "health_score": 7,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "cavolfiore_it",
+          250
+        ],
+        [
+          "uovo_grande_it",
+          150
+        ],
+        [
+          "parmigiano_it",
+          15
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "170000",
+          20
+        ]
+      ]
+    },
+    {
+      "id": "e45adac9-002d-497e-88a9-172e175373e6",
+      "name": "Frittata di broccoli",
+      "name_en": "Broccoli frittata",
+      "meal_slot": "secondo",
+      "prep_min": 25,
+      "steps": [
+        "Cuoci le cimette di broccolo a vapore finché sono morbide.",
+        "Sbatti le uova con il parmigiano e i broccoli spezzettati.",
+        "Versa in padella con l'olio e l'aglio e cuoci piano da un lato.",
+        "Gira e finisci di cuocere finché il centro non è più liquido."
+      ],
+      "steps_en": [
+        "Steam the broccoli florets until tender.",
+        "Beat the eggs with the parmesan and the broken-up broccoli.",
+        "Pour into the pan with the oil and garlic and cook gently on one side.",
+        "Flip and finish cooking until the centre is no longer runny."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "padella",
+      "health_score": 7.1,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "170379",
+          250
+        ],
+        [
+          "uovo_grande_it",
+          150
+        ],
+        [
+          "parmigiano_it",
+          15
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "169230",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "25e5dcfa-90a5-4c1c-9d6d-e363fd60d659",
+      "name": "Torta pasqualina",
+      "name_en": "Ligurian spinach and ricotta pie",
+      "meal_slot": "secondo",
+      "prep_min": 55,
+      "steps": [
+        "Fai appassire gli spinaci in padella e strizzali bene.",
+        "Mescola gli spinaci con ricotta, parmigiano e un uovo.",
+        "Fodera una tortiera con la pasta sfoglia, versa il ripieno e fai una buca per l'uovo rimasto.",
+        "Inforna a 190°C per 30 minuti, finché la superficie è dorata."
+      ],
+      "steps_en": [
+        "Wilt the spinach in a pan and squeeze it well.",
+        "Mix the spinach with the ricotta, parmesan and one egg.",
+        "Line a tin with the pastry, pour in the filling and make a well for the remaining egg.",
+        "Bake at 190°C for 30 minutes, until golden on top."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "forno",
+      "health_score": 6.3,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": true,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": true,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "172791",
+          35
+        ],
+        [
+          "spinaci_it",
+          90
+        ],
+        [
+          "ricotta_it",
+          60
+        ],
+        [
+          "uovo_grande_it",
+          60
+        ],
+        [
+          "parmigiano_it",
+          10
+        ],
+        [
+          "171413",
+          6
+        ],
+        [
+          "169230",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "bbde6b6d-af1c-4385-ab79-35858f9cca25",
+      "name": "Polpette di lenticchie in padella",
+      "name_en": "Pan-seared lentil patties",
+      "meal_slot": "secondo",
+      "prep_min": 25,
+      "steps": [
+        "Sgocciola le lenticchie e schiacciane metà con una forchetta.",
+        "Mescola con farina di ceci, cipolla e aglio tritati, prezzemolo.",
+        "Forma delle polpette con le mani umide.",
+        "Cuocile in padella con l'olio 4 minuti per lato, finché sono dorate e sode."
+      ],
+      "steps_en": [
+        "Drain the lentils and mash half of them with a fork.",
+        "Mix with chickpea flour, chopped onion and garlic, parsley.",
+        "Shape into patties with damp hands.",
+        "Cook in a pan with the oil for 4 minutes a side, until golden and firm."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "padella",
+      "health_score": 7.7,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": true,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "lenticchie_cotte_it",
+          280
+        ],
+        [
+          "farina_ceci_it",
+          35
+        ],
+        [
+          "170000",
+          30
+        ],
+        [
+          "169230",
+          3
+        ],
+        [
+          "prezzemolo_it",
+          2
+        ],
+        [
+          "171413",
+          10
+        ]
+      ]
+    },
+    {
+      "id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4",
+      "name": "Polpette di ceci",
+      "name_en": "Pan-seared chickpea patties",
+      "meal_slot": "secondo",
+      "prep_min": 25,
+      "steps": [
+        "Sgocciola e schiaccia i ceci con una forchetta.",
+        "Mescola con farina di ceci, cipolla e aglio tritati, prezzemolo.",
+        "Forma delle polpette con le mani umide.",
+        "Cuocile in padella con l'olio 4 minuti per lato, finché sono dorate e sode."
+      ],
+      "steps_en": [
+        "Drain and mash the chickpeas with a fork.",
+        "Mix with chickpea flour, chopped onion and garlic, parsley.",
+        "Shape into patties with damp hands.",
+        "Cook in a pan with the oil for 4 minutes a side, until golden and firm."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "padella",
+      "health_score": 7.5,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": true,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "175206",
+          280
+        ],
+        [
+          "farina_ceci_it",
+          30
+        ],
+        [
+          "170000",
+          30
+        ],
+        [
+          "169230",
+          3
+        ],
+        [
+          "prezzemolo_it",
+          2
+        ],
+        [
+          "171413",
+          10
+        ]
+      ]
+    },
+    {
+      "id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "name": "Lenticchie in umido con verdure",
+      "name_en": "Stewed lentils with vegetables",
+      "meal_slot": "secondo",
+      "prep_min": 30,
+      "steps": [
+        "Trita cipolla, carota e sedano per il soffritto.",
+        "Soffriggi le verdure nell'olio 8 minuti, finché sono morbide.",
+        "Aggiungi passata, aglio, rosmarino e le lenticchie sgocciolate.",
+        "Cuoci 15 minuti a fuoco basso, finché si è formata una salsa densa."
+      ],
+      "steps_en": [
+        "Chop the onion, carrot and celery for the soffritto.",
+        "Sauté the vegetables in the oil for 8 minutes, until soft.",
+        "Add the passata, garlic, rosemary and drained lentils.",
+        "Cook for 15 minutes on low heat, until a thick sauce has formed."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "semplice",
+      "health_score": 7.8,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "lenticchie_cotte_it",
+          300
+        ],
+        [
+          "170393",
+          50
+        ],
+        [
+          "sedano_it",
+          40
+        ],
+        [
+          "170000",
+          40
+        ],
+        [
+          "passata_pomodoro_it",
+          80
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "169230",
+          3
+        ],
+        [
+          "rosmarino_it",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "name": "Zucca e ceci in umido",
+      "name_en": "Stewed pumpkin and chickpeas",
+      "meal_slot": "secondo",
+      "prep_min": 30,
+      "steps": [
+        "Taglia la zucca a cubetti e trita la cipolla.",
+        "Soffriggi la cipolla, poi aggiungi la zucca e rosola 5 minuti.",
+        "Unisci passata, aglio, rosmarino e un po' d'acqua, cuoci 12 minuti.",
+        "Aggiungi i ceci sgocciolati e cuoci altri 8 minuti, finché la zucca è morbida."
+      ],
+      "steps_en": [
+        "Cube the pumpkin and chop the onion.",
+        "Soften the onion, then add the pumpkin and brown it for 5 minutes.",
+        "Add the passata, garlic, rosemary and a little water, cook for 12 minutes.",
+        "Add the drained chickpeas and cook for another 8 minutes, until the pumpkin is tender."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "semplice",
+      "health_score": 7.7,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "zucca_delicata_it",
+          280
+        ],
+        [
+          "175206",
+          300
+        ],
+        [
+          "passata_pomodoro_it",
+          80
+        ],
+        [
+          "170000",
+          30
+        ],
+        [
+          "171413",
+          10
+        ],
+        [
+          "169230",
+          3
+        ],
+        [
+          "rosmarino_it",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+      "name": "Frittata di patate",
+      "name_en": "Potato frittata",
+      "meal_slot": "secondo",
+      "prep_min": 30,
+      "steps": [
+        "Taglia le patate a fette sottili e falle rosolare in padella con l'olio.",
+        "Aggiungi la cipolla e cuoci finché le patate sono morbide.",
+        "Sbatti le uova con il parmigiano e versale sulle patate.",
+        "Cuoci piano da entrambi i lati, finché il centro non è più liquido."
+      ],
+      "steps_en": [
+        "Slice the potatoes thinly and brown them in the pan with the oil.",
+        "Add the onion and cook until the potatoes are tender.",
+        "Beat the eggs with the parmesan and pour them over the potatoes.",
+        "Cook gently on both sides, until the centre is no longer runny."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "padella",
+      "health_score": 6.9,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": true,
+      "ha_proteina": true,
+      "paese": "italia",
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "170028",
+          250
+        ],
+        [
+          "uovo_grande_it",
+          150
+        ],
+        [
+          "170000",
+          50
+        ],
+        [
+          "171413",
+          12
+        ],
+        [
+          "parmigiano_it",
+          10
+        ]
+      ]
+    },
+    {
+      "id": "717cdd9a-654b-4e7f-a7bc-74215dd84f3f",
+      "name": "Finocchi gratinati al forno",
+      "name_en": "Baked gratin fennel",
+      "meal_slot": "contorno",
+      "prep_min": 35,
+      "steps": [
+        "Taglia i finocchi a spicchi e scottali in acqua bollente 5 minuti.",
+        "Disponili in una pirofila unta d'olio.",
+        "Cospargi con parmigiano e pangrattato.",
+        "Inforna a 200°C per 20 minuti, finché sono dorati in superficie."
+      ],
+      "steps_en": [
+        "Cut the fennel into wedges and blanch in boiling water for 5 minutes.",
+        "Arrange them in an oiled baking dish.",
+        "Sprinkle with parmesan and breadcrumbs.",
+        "Bake at 200°C for 20 minutes, until golden on top."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "forno",
+      "health_score": 6.8,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": true,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": false,
+      "paese": "italia",
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "finocchi_it",
+          300
+        ],
+        [
+          "parmigiano_it",
+          20
+        ],
+        [
+          "pangrattato_it",
+          10
+        ],
+        [
+          "171413",
+          8
+        ]
+      ]
+    },
+    {
+      "id": "ebd4c848-3fd5-42f1-8fb2-2beeb71f7118",
+      "name": "Cavolfiore gratinato al forno",
+      "name_en": "Baked gratin cauliflower",
+      "meal_slot": "contorno",
+      "prep_min": 35,
+      "steps": [
+        "Dividi il cavolfiore in cimette e scottalo in acqua bollente 5 minuti.",
+        "Disponilo in una pirofila unta d'olio.",
+        "Cospargi con parmigiano e pangrattato.",
+        "Inforna a 200°C per 20 minuti, finché è dorato in superficie."
+      ],
+      "steps_en": [
+        "Break the cauliflower into florets and blanch in boiling water for 5 minutes.",
+        "Arrange it in an oiled baking dish.",
+        "Sprinkle with parmesan and breadcrumbs.",
+        "Bake at 200°C for 20 minutes, until golden on top."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "forno",
+      "health_score": 6.8,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": true,
+      "contiene_lattosio": true,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": false,
+      "paese": "italia",
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "cavolfiore_it",
+          300
+        ],
+        [
+          "parmigiano_it",
+          20
+        ],
+        [
+          "pangrattato_it",
+          10
+        ],
+        [
+          "171413",
+          8
+        ]
+      ]
+    },
+    {
+      "id": "756dfc24-796e-43d0-afe2-f6258bae08c1",
+      "name": "Zucca in umido con pomodoro e salvia",
+      "name_en": "Stewed pumpkin with tomato and sage",
+      "meal_slot": "contorno",
+      "prep_min": 20,
+      "steps": [
+        "Taglia la zucca a cubetti.",
+        "Scalda l'olio con l'aglio e la salvia un minuto.",
+        "Aggiungi la zucca e la passata, copri e cuoci 15 minuti.",
+        "È pronta quando si schiaccia facilmente con una forchetta."
+      ],
+      "steps_en": [
+        "Cut the pumpkin into cubes.",
+        "Warm the oil with the garlic and sage for a minute.",
+        "Add the pumpkin and passata, cover and cook for 15 minutes.",
+        "It is ready when it mashes easily with a fork."
+      ],
+      "cucina": "europea",
+      "profilo": "mediterraneo",
+      "famiglia": "mediterranea",
+      "occasione": "quotidiano",
+      "tecnica": "semplice",
+      "health_score": 8.3,
+      "salsa_industriale": false,
+      "base_amidacea": false,
+      "trasportabile": true,
+      "contiene_glutine": false,
+      "contiene_lattosio": false,
+      "contiene_frutta_secca": false,
+      "ha_amido": false,
+      "ha_proteina": false,
+      "paese": "italia",
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura"
+      ],
+      "mercati": [
+        "it"
+      ],
+      "ingredienti": [
+        [
+          "zucca_delicata_it",
+          280
+        ],
+        [
+          "passata_pomodoro_it",
+          60
+        ],
+        [
+          "salvia_it",
+          1
+        ],
+        [
+          "171413",
+          8
+        ],
+        [
+          "169230",
+          2
+        ]
+      ]
+    }
+  ]
+}
