@@ -1,0 +1,305 @@
+[
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro",
+    "ok": true,
+    "gradino": "2",
+    "concessioni": 7,
+    "secondi": 4.343
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+glutine",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 14.114
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+lattosio",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 1,
+    "secondi": 3.394
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+frutta_guscio",
+    "ok": true,
+    "gradino": "0",
+    "concessioni": 0,
+    "secondi": 2.03
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+crostacei",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 0,
+    "secondi": 2.506
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+uova",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 1,
+    "secondi": 3.029
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+soia",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 0,
+    "secondi": 3.276
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+glutine+lattosio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 15.45
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+glutine+frutta_guscio",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 0,
+    "secondi": 3.552
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "onnivoro+lattosio+uova",
+    "ok": true,
+    "gradino": "0",
+    "concessioni": 1,
+    "secondi": 1.92
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano",
+    "ok": true,
+    "gradino": "2",
+    "concessioni": 4,
+    "secondi": 3.328
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+glutine",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001)",
+    "secondi": 21.302
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+lattosio",
+    "ok": true,
+    "gradino": "2",
+    "concessioni": 0,
+    "secondi": 4.364
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+frutta_guscio",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 1,
+    "secondi": 4.009
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+crostacei",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 3,
+    "secondi": 4.263
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+uova",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 1,
+    "secondi": 4.785
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+soia",
+    "ok": true,
+    "gradino": "1",
+    "concessioni": 0,
+    "secondi": 2.899
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+glutine+lattosio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 20.184
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+glutine+frutta_guscio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001)",
+    "secondi": 16.587
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "pescetariano+lattosio+uova",
+    "ok": true,
+    "gradino": "0",
+    "concessioni": 1,
+    "secondi": 2.66
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 8.298
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano+glutine",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 22.192
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano+lattosio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001)",
+    "secondi": 8.139
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano+frutta_guscio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 6.644
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano+uova",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 8.184
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano+soia",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): europeo-leggero: impossibile per aritmetica - servono 7 secondi distinti, ne ha 6, mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001)",
+    "secondi": 7.859
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano+glutine+lattosio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 21.27
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano+glutine+frutta_guscio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 19.123
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegetariano+lattosio+uova",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 8.699
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegano",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001)",
+    "secondi": 8.709
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegano+glutine",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 22.141
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegano+lattosio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001)",
+    "secondi": 8.917
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegano+frutta_guscio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001)",
+    "secondi": 10.488
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegano+soia",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): europeo-leggero: impossibile per aritmetica - servono 7 secondi distinti, ne ha 6, mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001)",
+    "secondi": 5.67
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegano+glutine+lattosio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 1 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 2 (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 2b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 3a (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 3b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 4 (soglia 7): mediterraneo: tetto passi raggiunto (passi: 5001), europeo-leggero: tetto passi raggiunto (passi: 5001) || gradino 4b (soglia 7): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6.5): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001) || gradino 5 (soglia 6): europeo-leggero: tetto passi raggiunto (passi: 5001), mediterraneo: tetto passi raggiunto (passi: 5001)",
+    "secondi": 21.684
+  },
+  {
+    "versione": "v4-accompagnamenti",
+    "seed": 42,
+    "combo": "vegano+glutine+frutta_guscio",
+    "ok": false,
+    "errore": "Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. gradino 0 (soglia 7): mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 1 (soglia 7): europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 2 (soglia 7): mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 2b (soglia 7): mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 3a (soglia 7): europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 3b (soglia 7): mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 4 (soglia 7): europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 4b (soglia 7): mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 5 (soglia 6.5): mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5 || gradino 5 (soglia 6): europeo-leggero: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5, mediterraneo: impossibile per aritmetica - servono 7 colazioni distinte, ne ha 5",
+    "secondi": 3.827
+  }
+]
