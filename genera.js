@@ -1966,14 +1966,26 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // fine giornata le kcal restano sotto obiettivo perche' ogni piatto e'
       // gia' al suo tetto in grammi, non c'e' piu' spazio per gonfiare un
       // piatto esistente - va aggiunta capacita' nuova. Nell'ordine chiesto:
-      // pane anche a pranzo, un terzo spuntino, una colazione piu' ricca.
-      // Chiamati SOLO da avanzaFinDove quando serve (non sono decisioni
-      // sempre presenti come le altre), ma con lo stesso meccanismo di
-      // frame/applica/annulla cosi' il backtracking li annulla come tutto
-      // il resto se la giornata viene poi scartata per altri motivi.
-      function candidatiBasePranzo(gi, paeseOk) {
+      // un contorno amidaceo anche a pranzo, un terzo spuntino, una
+      // colazione piu' ricca. Chiamati SOLO da avanzaFinDove quando serve
+      // (non sono decisioni sempre presenti come le altre), ma con lo
+      // stesso meccanismo di frame/applica/annulla cosi' il backtracking li
+      // annulla come tutto il resto se la giornata viene poi scartata per
+      // altri motivi.
+      //
+      // CORREZIONE 2026-10-22 (richiesta dell'utente): questo contorno era
+      // sempre "pane", mai "patate" - una scelta mai decisa, solo quella che
+      // capitava di scrivere quando e' stato implementato il 9 ottobre
+      // (commit 4cda843, "Aumenti di emergenza... pane anche a pranzo").
+      // Nessun motivo forte per la differenza dalla regola di cena: il
+      // secondo del giorno e' lo stesso sia a pranzo (come avanzo, se oggi
+      // non si cucina) sia a cena, quindi la stessa logica "pane o patate
+      // secondo cosa sta meglio col secondo" (tipoAccompagnamentoDaSecondo,
+      // usata da candidatiBase per la cena) vale identica qui: e' il tipo
+      // richiesto a cambiare da chiamata a chiamata, non piu' un valore fisso.
+      function candidatiBasePranzo(gi, paeseOk, tipoRichiesto) {
         const altriDelPasto = compagniDiPasto(gi, 'pranzo');
-        const base = (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === 'pane' &&
+        const base = (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipoRichiesto &&
           paeseOk(p) && !rifiutato(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p);
         return concatenaLivelli([contorni.filter(base)], rng, altriDelPasto);
       }
@@ -2181,7 +2193,10 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         if (!ancoraCorto()) return;
         if (st.basePranzo === undefined) {
           const pranzoHaAmido = (st.primo && st.primo.amidoReale) || (st.contornoPranzo && st.contornoPranzo.amidoReale);
-          if (!pranzoHaAmido) prova('basePranzo', candidatiBasePranzo(gi, ctx.paeseOk), (p) => assegnaBasePranzoScelto(gi, p));
+          if (!pranzoHaAmido) {
+            const tipoRichiesto = tipoAccompagnamentoDaSecondo(st.secondo);
+            prova('basePranzo', candidatiBasePranzo(gi, ctx.paeseOk, tipoRichiesto), (p) => assegnaBasePranzoScelto(gi, p));
+          }
         }
 
         if (!ancoraCorto()) return;

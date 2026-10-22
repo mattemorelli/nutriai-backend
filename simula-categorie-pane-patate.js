@@ -3,11 +3,20 @@
 // patate.sql, SENZA scrivere nulla nel database vero - serve solo per
 // misurare/testare stanotte prima che la migrazione venga lanciata domani.
 // Usato da bisect-matrice.js e da misura-tipo-amido.js.
+//
+// Aggiunta 2026-10-22 (sera): gallette_riso_it, 167557 (gallette al
+// sesamo) e polenta_it - gli alimenti dietro i 3 nuovi accompagnamenti
+// senza glutine (vedi migrazioni/2026-10-22-accompagnamenti-pane-senza-
+// glutine.sql). Nessuno dei tre e' usato altrove come contorno (sono gia'
+// ingredienti di una colazione e di un primo esistenti: vedi quella
+// migrazione per la verifica che taggarli 'pane' non li tocca), quindi
+// l'aggiunta qui e' innocua per il resto del catalogo.
 const EXTRA = [
   ['pane_comune_crea', 'pane'], ['pane_integrale_it', 'pane'], ['pane_senza_glutine_it', 'pane'],
   ['pane_segale_it', 'pane'], ['pane_carasau_it', 'pane'], ['grissini_it', 'pane'],
   ['174957', 'pane'], ['167942', 'pane'], ['174915', 'pane'], ['174924', 'pane'],
   ['170028', 'patate'],
+  ['gallette_riso_it', 'pane'], ['167557', 'pane'], ['polenta_it', 'pane'],
 ].map(([food_id, categoria]) => ({ food_id, categoria }));
 
 function clienteConCategoriePanePatate(reale) {

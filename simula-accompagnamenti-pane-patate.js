@@ -20,6 +20,19 @@ const ACCOMPAGNAMENTI = [
     steps: ['Rompi il pane carasau in pezzi.'], steps_en: ['Break the carasau bread into pieces.'], prep_min: 1 },
   { id: 'v4-pane-senza-glutine', nome: 'Pane senza glutine', food_id: 'pane_senza_glutine_it', grammi: 60, glutine: false,
     steps: ['Taglia il pane senza glutine a fette.'], steps_en: ['Slice the gluten-free bread.'], prep_min: 1 },
+  // Aggiunta 2026-10-22 (sera): a chi ha il glutine come vincolo assoluto
+  // "Pane senza glutine" (sopra) restava spesso l'UNICO accompagnamento
+  // morbido disponibile - un solo piatto per tutta la settimana. Questi tre
+  // sono alimenti gia' in foods, nessuno creato apposta: gallette di riso e
+  // polenta sono gia' usati altrove in catalogo (colazione/primo), qui
+  // diventano anche un contorno "pane" a se' stante, porzione CREA.
+  { id: 'v4-gallette-riso', nome: 'Gallette di riso', food_id: 'gallette_riso_it', grammi: 25, glutine: false,
+    steps: ['Servi le gallette di riso.'], steps_en: ['Serve the rice cakes.'], prep_min: 1 },
+  { id: 'v4-gallette-sesamo', nome: 'Gallette di riso al sesamo', food_id: '167557', grammi: 25, glutine: false,
+    steps: ['Servi le gallette di riso al sesamo.'], steps_en: ['Serve the sesame rice cakes.'], prep_min: 1 },
+  { id: 'v4-polenta', nome: 'Polenta', food_id: 'polenta_it', grammi: 200, glutine: false, tecnica: 'padella',
+    steps: ['Scalda la polenta gia\' cotta in padella con un filo d\'olio per 5 minuti, o al microonde.'],
+    steps_en: ['Warm the pre-cooked polenta in a pan with a little oil for 5 minutes, or in the microwave.'], prep_min: 5 },
   { id: 'v4-patate-lesse', nome: 'Patate lesse', food_id: '170028', grammi: 250, glutine: false, tecnica: 'bollitura',
     steps: ['Lava le patate e lessale intere in acqua salata per 25-30 minuti, finché sono morbide al centro.', 'Scola, lascia intiepidire e pela, poi taglia a tocchi.'],
     steps_en: ['Wash the potatoes and boil them whole in salted water for 25-30 minutes until tender in the centre.', 'Drain, let cool slightly and peel, then cut into chunks.'], prep_min: 30 },
