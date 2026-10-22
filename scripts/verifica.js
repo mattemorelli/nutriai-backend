@@ -1,0 +1,103 @@
+// CONTROLLO PRIMA DEL PUSH - cosa fa e come si lancia
+// ======================================================
+// In italiano semplice: prima di spingere codice sul repository, questo
+// comando controlla che il generatore di piani non sia rotto. Lancia in
+// fila cinque controlli e si ferma al primo segno rosso, dicendo
+// chiaramente quale: se anche uno solo fallisce, l'intero comando fallisce
+// (exit code diverso da 0) e git non lascia partire il push (e' installato
+// come hook pre-push, vedi scripts/installa-hook-pre-push.sh).
+//
+// I cinque controlli, in ordine:
+//   1. node --check su tutti i file .js del backend - niente di rotto a
+//      livello di sintassi (non esegue il codice, solo lo legge).
+//   2. verifica-flag-allergeni.js - le etichette "contiene glutine/
+//      lattosio/frutta a guscio" dei piatti devono coincidere con gli
+//      ingredienti veri.
+//   3. verifica-risoluzione-allergeni.js - ogni allergene dell'onboarding
+//      deve escludere la sua categoria intera, mai un singolo prodotto per
+//      nome (il bug del 21 ottobre).
+//   4. verifica-tipo-amido.js - il controllo permanente pane/patate (il
+//      bug del 9 ottobre): il riconoscimento deve passare dalle categorie
+//      vere, non da un elenco fisso, e i numeri devono essere quelli
+//      attesi.
+//   5. scripts/verifica-matrice-ridotta.js - 12 combinazioni dieta+allergie
+//      rappresentative (non tutte le 36x3 della matrice completa, quella
+//      ci vuole troppo per un controllo ad ogni push) devono generare una
+//      settimana valida.
+//
+// Uso: npm run verifica
+// (lo stesso identico comando lo lancia da solo git, da questa cartella,
+// ad ogni "git push" - vedi scripts/installa-hook-pre-push.sh)
+//
+// IMPORTANTE, oggi 2026-10-23: i controlli 2 e 4 possono fallire per motivi
+// legittimi che NON sono bug di questo script:
+//   - il controllo 4 (pane/patate) fallisce finche' le migrazioni di
+//     stanotte (categorie pane/patate + gli accompagnamenti e i piatti
+//     nuovi) non sono state eseguite sul database vero - e' lo stato
+//     reale di oggi, non un errore: il codice e' pronto, il database non
+//     ancora.
+//   - il controllo 2 (flag allergeni) oggi trova una discrepanza
+//     preesistente e scollegata da questa sessione (un piatto greco con un
+//     flag lattosio sbagliato) - segnalala, ma non e' nuova.
+// Il comando li lancia comunque entrambi, come richiesto: fallire quando
+// c'e' davvero qualcosa che non va e' il punto di questo controllo, non un
+// difetto da aggiustare nascondendo il problema.
+const { execFileSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RADICE = path.join(__dirname, '..');
+const risultati = [];
+
+function passo(titolo, fn) {
+  console.log(`\n=== ${titolo} ===`);
+  const inizio = Date.now();
+  try {
+    fn();
+    const secondi = (Date.now() - inizio) / 1000;
+    console.log(`OK (${secondi.toFixed(1)}s)`);
+    risultati.push({ titolo, ok: true, secondi });
+  } catch (e) {
+    const secondi = (Date.now() - inizio) / 1000;
+    console.log(`FALLITO (${secondi.toFixed(1)}s): ${e.message}`);
+    risultati.push({ titolo, ok: false, secondi, errore: e.message });
+  }
+}
+
+function lanciaNodeCheck() {
+  const file = fs.readdirSync(RADICE).filter((f) => f.endsWith('.js'));
+  const fileScripts = fs.readdirSync(path.join(RADICE, 'scripts')).filter((f) => f.endsWith('.js')).map((f) => 'scripts/' + f);
+  const tutti = [...file, ...fileScripts];
+  const falliti = [];
+  for (const f of tutti) {
+    try {
+      execFileSync(process.execPath, ['--check', f], { cwd: RADICE, stdio: 'pipe' });
+    } catch (e) {
+      falliti.push(`${f}: ${e.stderr?.toString().split('\n')[0] || e.message}`);
+    }
+  }
+  console.log(`  ${tutti.length} file controllati`);
+  if (falliti.length) throw new Error(`${falliti.length} file con errori di sintassi:\n    ` + falliti.join('\n    '));
+}
+
+function lanciaScript(relPath) {
+  execFileSync(process.execPath, [relPath], { cwd: RADICE, stdio: 'inherit' });
+}
+
+passo('1. node --check sui file del backend', lanciaNodeCheck);
+passo('2. Flag allergeni (contiene_glutine/lattosio/frutta_secca) coerenti con gli ingredienti', () => lanciaScript('verifica-flag-allergeni.js'));
+passo('3. Risoluzione allergeni: ogni vincolo esclude la categoria intera', () => lanciaScript('verifica-risoluzione-allergeni.js'));
+passo('4. Controllo permanente pane/patate', () => lanciaScript('verifica-tipo-amido.js'));
+passo('5. Matrice ridotta (12 combinazioni dieta+allergie)', () => lanciaScript('scripts/verifica-matrice-ridotta.js'));
+
+const falliti = risultati.filter((r) => !r.ok);
+console.log(`\n${'='.repeat(60)}`);
+console.log(`RIEPILOGO: ${risultati.length - falliti.length}/${risultati.length} controlli superati.`);
+for (const r of risultati) console.log(`  ${r.ok ? 'OK  ' : 'XX  '} ${r.titolo}`);
+
+if (falliti.length) {
+  console.log(`\n${falliti.length} controllo/i falliti - il push NON deve continuare.`);
+  process.exitCode = 1;
+} else {
+  console.log('\nTutti i controlli superati.');
+}
