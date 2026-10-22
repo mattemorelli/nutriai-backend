@@ -1021,13 +1021,26 @@ const RE_SECONDO_ARROSTO = /\bal forno\b|\barrosto\b|\balla griglia\b|\bgrigliat
 // legumi/soia/uova contano come "morbido" (pane) a prescindere dal testo,
 // perche' un piatto di legumi o una frittata non si definisce dalla tecnica
 // di cottura ma dalla sua natura (si mangia con il pane, non con le patate).
-function tipoAccompagnamentoDaSecondo(secondo) {
-  if (!secondo) return null;
+//
+// CORREZIONE 2026-10-22 (sera, seconda del giorno): restituisce un ORDINE
+// di preferenza, non piu' un tipo unico - misurato stanotte che per
+// vegetariano/vegano il gruppo e' SEMPRE legumi o uova (mai "arrosto"), 0
+// richieste di patate su migliaia di tentativi in tutta la ricerca. Chi ha
+// il glutine come vincolo assoluto restava quindi legato ai soli pane senza
+// glutine (4 piatti) per coprire da 4 a 7 cene su 7 a settimana - troppo
+// pochi. "Legumi/uova con le patate" e' comunque un abbinamento reale di
+// cucina di casa (lenticchie e patate, fagioli e patate, uova e patate - non
+// inventato): qui le patate diventano un secondo livello, provato solo se
+// non c'e' nessun pane (fresco o ripetibile) disponibile - per chi NON ha
+// il glutine come vincolo il pane resta la prima scelta esattamente come
+// prima, questo tocca solo i casi in cui il pane manca.
+function tipiAccompagnamentoDaSecondo(secondo) {
+  if (!secondo) return [];
   const testo = `${secondo.name || ''} ${(secondo.steps || []).join(' ')}`.toLowerCase();
   const morbido = secondo.gruppo === 'legumi' || secondo.gruppo === 'uova';
-  if (morbido || RE_SECONDO_UMIDO.test(testo)) return 'pane';
-  if (RE_SECONDO_ARROSTO.test(testo)) return 'patate';
-  return 'patate';
+  if (morbido || RE_SECONDO_UMIDO.test(testo)) return ['pane', 'patate'];
+  if (RE_SECONDO_ARROSTO.test(testo)) return ['patate'];
+  return ['patate'];
 }
 
 // Un piatto "senza glutine" e' una sostituzione pensata per chi il glutine
@@ -1947,19 +1960,28 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         return concatenaLivelli([proprio, neutro], rng);
       }
 
-      function candidatiBase(gi, paeseOk, tipoRichiesto) {
+      // tipiRichiesti e' un ordine di preferenza (es. ['pane', 'patate']), non
+      // un valore unico - vedi tipiAccompagnamentoDaSecondo. Ogni tipo genera
+      // il suo livello "fresco" prima di passare al tipo successivo, cosi' un
+      // pane fresco batte sempre una patata fresca quando entrambi esistono
+      // (la preferenza del secondo resta la prima scelta), ma una patata
+      // fresca batte un pane ripetuto quando il pane e' scarso - meglio
+      // variare piatto che ripetere lo stesso, a parita' di tipo "giusto" o
+      // "di scorta". I livelli "ripetuto" di ciascun tipo vengono dopo tutti
+      // i "fresco", nello stesso ordine di preferenza.
+      function candidatiBase(gi, paeseOk, tipiRichiesti) {
         const altriDelPasto = compagniDiPasto(gi, 'cena');
-        const base = (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipoRichiesto && paeseOk(p) && !rifiutato(p) && principaleLiberoOggi(gi, p);
-        const fresco = contorni.filter(p => base(p) && !usati.has(p.id));
+        const baseDiTipo = (tipo) => (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipo && paeseOk(p) && !rifiutato(p) && principaleLiberoOggi(gi, p);
+        const freschi = tipiRichiesti.map((tipo) => contorni.filter(p => baseDiTipo(tipo)(p) && !usati.has(p.id)));
         // Stessa ripetizione del secondo (gradino 1, al massimo una a
         // settimana), ma mai a meno di due giorni di distanza dalla prima
         // volta: un contorno con l'amido ripetuto il giorno dopo si
         // sentirebbe "lo stesso pasto di ieri" in un modo che un secondo
         // ripetuto a distanza non da'.
-        const ripetuto = (opz.ripetizione && ripetizioniBase.valore < 1)
-          ? contorni.filter(p => base(p) && usati.has(p.id) && giornoBaseDi.has(p.id) && Math.abs(giornoBaseDi.get(p.id) - gi) >= 2)
+        const ripetuti = (opz.ripetizione && ripetizioniBase.valore < 1)
+          ? tipiRichiesti.map((tipo) => contorni.filter(p => baseDiTipo(tipo)(p) && usati.has(p.id) && giornoBaseDi.has(p.id) && Math.abs(giornoBaseDi.get(p.id) - gi) >= 2))
           : [];
-        return concatenaLivelli([fresco, ripetuto], rng, altriDelPasto);
+        return concatenaLivelli([...freschi, ...ripetuti], rng, altriDelPasto);
       }
 
       // Aumenti di emergenza (problema 1/2 della verifica, 2026-10-09): se a
@@ -1981,13 +2003,15 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // secondo del giorno e' lo stesso sia a pranzo (come avanzo, se oggi
       // non si cucina) sia a cena, quindi la stessa logica "pane o patate
       // secondo cosa sta meglio col secondo" (tipoAccompagnamentoDaSecondo,
-      // usata da candidatiBase per la cena) vale identica qui: e' il tipo
-      // richiesto a cambiare da chiamata a chiamata, non piu' un valore fisso.
-      function candidatiBasePranzo(gi, paeseOk, tipoRichiesto) {
+      // usata da candidatiBase per la cena) vale identica qui: e' l'ordine di
+      // preferenza a cambiare da chiamata a chiamata, non piu' un valore
+      // fisso (vedi tipiAccompagnamentoDaSecondo, correzione 2026-10-22 sera).
+      function candidatiBasePranzo(gi, paeseOk, tipiRichiesti) {
         const altriDelPasto = compagniDiPasto(gi, 'pranzo');
-        const base = (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipoRichiesto &&
+        const baseDiTipo = (tipo) => (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipo &&
           paeseOk(p) && !rifiutato(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p);
-        return concatenaLivelli([contorni.filter(base)], rng, altriDelPasto);
+        const livelli = tipiRichiesti.map((tipo) => contorni.filter(baseDiTipo(tipo)));
+        return concatenaLivelli(livelli, rng, altriDelPasto);
       }
       function assegnaBasePranzoScelto(gi, piatto) {
         statoGiorni[gi].basePranzo = piatto;
@@ -2109,7 +2133,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         if (st.spuntino2 === undefined) pronti.push(['spuntino2', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino, cappaSpuntino)]);
         if (st.contornoCena !== undefined && st.base === undefined) {
           const cenaHaAmido = st.secondo.amidoReale || (st.contornoCena && st.contornoCena.amidoReale);
-          if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(gi, paeseOk, tipoAccompagnamentoDaSecondo(st.secondo))]);
+          if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(gi, paeseOk, tipiAccompagnamentoDaSecondo(st.secondo))]);
           else st.base = null;
         }
 
@@ -2194,8 +2218,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         if (st.basePranzo === undefined) {
           const pranzoHaAmido = (st.primo && st.primo.amidoReale) || (st.contornoPranzo && st.contornoPranzo.amidoReale);
           if (!pranzoHaAmido) {
-            const tipoRichiesto = tipoAccompagnamentoDaSecondo(st.secondo);
-            prova('basePranzo', candidatiBasePranzo(gi, ctx.paeseOk, tipoRichiesto), (p) => assegnaBasePranzoScelto(gi, p));
+            const tipiRichiesti = tipiAccompagnamentoDaSecondo(st.secondo);
+            prova('basePranzo', candidatiBasePranzo(gi, ctx.paeseOk, tipiRichiesti), (p) => assegnaBasePranzoScelto(gi, p));
           }
         }
 
