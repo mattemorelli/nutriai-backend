@@ -2307,7 +2307,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
         if (!ancoraCorto()) return;
         if (st.spuntino3 === undefined) {
-          prova('spuntino3', candidatiSpuntino3(gi, ctx.profiloGiorno, ctx.paeseOkLeggero, ctx.cappaSpuntino), (p) => assegnaSpuntino3Scelto(gi, p));
+          prova('spuntino3', candidatiSpuntino3(gi, ctx.profiloGiorno, ctx.paeseOkLeggero, ctx.cappaSpuntino), (p) => assegnaSpuntinoScelto(gi, 'spuntino3', p));
         }
 
         if (!ancoraCorto()) return;
