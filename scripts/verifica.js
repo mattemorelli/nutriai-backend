@@ -2,12 +2,12 @@
 // ======================================================
 // In italiano semplice: prima di spingere codice sul repository, questo
 // comando controlla che il generatore di piani non sia rotto. Lancia in
-// fila sei controlli e si ferma al primo segno rosso, dicendo chiaramente
+// fila sette controlli e si ferma al primo segno rosso, dicendo chiaramente
 // quale: se anche uno solo fallisce, l'intero comando fallisce (exit code
 // diverso da 0) e git non lascia partire il push (e' installato come hook
 // pre-push, vedi scripts/installa-hook-pre-push.sh).
 //
-// I sei controlli, in ordine:
+// I sette controlli, in ordine:
 //   1. node --check su tutti i file .js del backend - niente di rotto a
 //      livello di sintassi (non esegue il codice, solo lo legge).
 //   2. verifica-flag-allergeni.js - le etichette "contiene glutine/
@@ -33,6 +33,12 @@
 //      rappresentative (non tutte le 36x3 della matrice completa, quella
 //      ci vuole troppo per un controllo ad ogni push) devono generare una
 //      settimana valida.
+//   7. scripts/verifica-nomi-piatti.js - nessun nome di piatto (italiano o
+//      inglese) contiene parole tecniche o note interne ("proxy", "test",
+//      "tmp", parentesi con il meal_slot dentro...) - il controllo nato il
+//      23 ottobre dall'audit dei nomi, dopo aver trovato "Pecorino con fave
+//      (proxy lenticchie)" nel catalogo. Blocca solo per il mercato 'it'
+//      (l'unico attivo oggi); per gli altri mercati stampa solo un avviso.
 //
 // Uso: npm run verifica
 // (lo stesso identico comando lo lancia da solo git, da questa cartella,
@@ -86,6 +92,7 @@ passo('3. Risoluzione allergeni: ogni vincolo esclude la categoria intera', () =
 passo('4. Controllo permanente pane/patate', () => lanciaScript('verifica-tipo-amido.js'));
 passo('5. Ricette Cook: azioni/fuoco/quote validi su tutto il database', () => lanciaScript('scripts/verifica-ricette.js --db'));
 passo('6. Matrice ridotta (12 combinazioni dieta+allergie)', () => lanciaScript('scripts/verifica-matrice-ridotta.js'));
+passo('7. Nomi dei piatti: niente note tecniche o interne nel mercato "it"', () => lanciaScript('scripts/verifica-nomi-piatti.js'));
 
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);

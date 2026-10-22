@@ -41,23 +41,15 @@ const filePiatti = argPiatti ? argPiatti.slice('--piatti='.length) : null;
 // avviso (vedi stampaEccezioni sotto) anche quando l'errore sottostante
 // non si verifica piu' - e' un promemoria permanente finche' la riga qui
 // sotto non viene tolta a mano, dopo la correzione.
-// AGGIORNATO 2026-10-23 (sera): "Cavolfiore al forno" tolto da qui - era un
-// falso allarme causato da un bug di QUESTO script (vedi leggiTutto/
-// paginazione sotto), non un problema vero del piatto: ricetta_passi ha
-// 1208 righe, oltre il limite di 1000 per richiesta di Supabase/PostgREST,
-// e la lettura senza range() si troncava in silenzio - il suo dish_id
-// cadeva oltre il millesimo in ordine alfabetico, risultava con 1 solo
-// passo invece dei 5 veri e corretti. Corretta la paginazione, sono emersi
-// 2 piatti nuovi con lo stesso problema delle lenticchie di "Pecorino con
-// fave" (un ingrediente riagganciato alla versione cotta senza aggiornare
-// la ricetta), prima nascosti dalla stessa troncatura.
-const ECCEZIONI_NOTE = {
-  '5a7b2d90-c4b0-4c1e-85e1-8676c9412e37': { nome: 'Insalata di ceci e verdure', da: '2026-10-23', motivo: "un passo cita l'alimento 174285 invece del vero 175206 (ceci) - ricetta scollegata da un reaggancio ingrediente mai aggiornato" },
-  'a2900001-0000-0000-0000-000000000012': { nome: 'Pecorino con fave (proxy lenticchie)', da: '2026-10-23', motivo: "un passo cita l'alimento 172420 invece del vero lenticchie_cotte_it - il piatto si chiama \"fave\" ma usa lenticchie, nome non onesto" },
-  'b1a00001-0000-0000-0000-000000000013': { nome: 'Pasta integrale con tonno e olive', da: '2026-10-23', motivo: "le olive (169094), ingrediente vero del piatto, non compaiono in nessun passo della ricetta" },
-  'd1000001-0000-0000-0000-000000000001': { nome: 'Pasta con lenticchie rosse', da: '2026-10-23', motivo: "un passo cita l'alimento lenticchie_rosse_it invece del vero lenticchie_rosse_cotte_it - stesso reaggancio mai aggiornato di Pecorino con fave, scoperto dopo la correzione della paginazione" },
-  'd3c6cf5e-69e5-4683-abd3-85d86d8f830a': { nome: 'Zuppa di lenticchie', da: '2026-10-23', motivo: "un passo cita l'alimento 172420 invece del vero lenticchie_cotte_it - stesso reaggancio mai aggiornato di Pecorino con fave, scoperto dopo la correzione della paginazione" },
-};
+// AGGIORNATO 2026-10-23 (notte): tutti i 5 piatti di questa lista sono stati
+// corretti (passi riallineati ai veri dish_ingredients; "Pecorino con fave"
+// riagganciato alle fave vere, nome senza piu' "proxy") e la lista e' stata
+// svuotata. Il controllo del 23 ottobre aveva anche rivelato un bug di
+// QUESTO script (vedi leggiTutto/paginazione sotto): la lettura di
+// ricetta_passi (1208 righe) senza range() si troncava in silenzio al
+// millesimo record, causando un falso allarme su "Cavolfiore al forno" e
+// nascondendone 2 veri ("Pasta con lenticchie rosse", "Zuppa di lenticchie").
+const ECCEZIONI_NOTE = {};
 
 const FUOCO_VALIDI = new Set(['basso', 'medio', 'alto']);
 const TIPO_TEMPO_VALIDI = new Set(['attiva', 'attesa']);
