@@ -481,6 +481,30 @@ function mescola(a, rng) {
   return b;
 }
 
+// CORREZIONE 2026-10-23 (richiesta dell'utente): nessuno mangia 7
+// colazioni diverse a settimana - prima il generatore ne pretendeva 7
+// distinte (vedi analizzaCapienza) perche' le colazioni condividevano con
+// tutti gli altri pasti il divieto di ripetersi nella settimana. Ora la
+// settimana sceglie fino a 3 colazioni diverse per INGREDIENTE PRINCIPALE
+// (mai tre yogurt) una volta sola, e ruotano sui 7 giorni (vedi
+// candidatiColazione, che le usa in quest'ordine di preferenza); se per il
+// profilo ce ne sono meno di 3 compatibili, la settimana usa solo quelle -
+// mai un errore, solo una rotazione piu' corta. Non e' piu' legata a
+// 'usati': lo stesso piatto puo' tornare quanti giorni serve.
+function pianoColazioni(colazioniAmmesse, rng) {
+  const mescolate = mescola(colazioniAmmesse, rng);
+  const viste = new Set();
+  const uniche = [];
+  for (const c of mescolate) {
+    const chiave = c.principale || c.id;
+    if (viste.has(chiave)) continue;
+    viste.add(chiave);
+    uniche.push(c);
+    if (uniche.length === 3) break;
+  }
+  return uniche;
+}
+
 // Costruisce in anticipo l'ordine dei gruppi proteici della settimana,
 // cosi' le quote sono garantite invece di sperate.
 function pianoProteico(gruppiDisponibili, rng) {
@@ -1166,11 +1190,19 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
   const nContorni = contaDisponibili(contorni, false);
   if (nContorni < 14) return { ok: false, messaggio: `servono almeno 14 contorni distinti (cena+pranzo), ne ha ${nContorni}` };
 
+  // CORREZIONE 2026-10-23: le colazioni ruotano (fino a 3 per settimana,
+  // vedi pianoColazioni), non servono piu' 7 distinte - ne basta 1, la
+  // rotazione usera' quelle che ci sono (anche solo 1 o 2).
   const nColazioni = contaDisponibili(colazioni, false);
-  if (nColazioni < 7) return { ok: false, messaggio: `servono 7 colazioni distinte, ne ha ${nColazioni}` };
+  if (nColazioni < 1) return { ok: false, messaggio: `serve almeno 1 colazione, ne ha 0` };
 
+  // CORREZIONE 2026-10-23: gli spuntini si ripetono fino a 3 volte a
+  // settimana (usoSpuntini), non servono piu' 14 distinti (2 al giorno x 7)
+  // - bastano i distinti necessari a coprire 14 usi senza mai superare 3
+  // ripetizioni ciascuno: ceil(14/3) = 5.
+  const SPUNTINI_MINIMI = Math.ceil(14 / 3);
   const nSpuntini = contaDisponibili(spuntini, false);
-  if (nSpuntini < 14) return { ok: false, messaggio: `servono almeno 14 spuntini distinti, ne ha ${nSpuntini}` };
+  if (nSpuntini < SPUNTINI_MINIMI) return { ok: false, messaggio: `servono almeno ${SPUNTINI_MINIMI} spuntini distinti (si ripetono al massimo 3 volte ciascuno), ne ha ${nSpuntini}` };
 
   return { ok: true };
 }
@@ -1671,11 +1703,25 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       const passiUsati = { valore: 0 };
 
       const sequenza = pianoProteico(gruppiUnioneSettimana, rng);
+      // Colazioni ammesse per questa settimana: stesso criterio compatibile()
+      // usato dentro candidatiColazione (profilo proprio o neutro), cosi' la
+      // rotazione scelta qui e' sempre coerente con cio' che candidatiColazione
+      // accetterebbe comunque giorno per giorno.
+      const sequenzaColazioni = pianoColazioni(colazioni.filter(p => compatibile(p, profiloSettimana) && !rifiutato(p)), rng);
+      if (sequenzaColazioni.length < 3) {
+        console.warn(`[genera] colazioni in rotazione per ${profiloSettimana}: solo ${sequenzaColazioni.length} disponibili (ne servirebbero 3 per ingrediente principale distinto)`);
+      }
 
       // Stato mutabile di questo tentativo: ogni frame della pila sa come
       // annullare esattamente cio' che ha causato, cosi' tornare indietro e'
       // la semplice inversa di andare avanti.
       const usati = new Set();
+      // CORREZIONE 2026-10-23: gli spuntini non condividono piu' 'usati' - si
+      // ripetono quanto serve nella settimana, ma al massimo 3 volte per
+      // piatto (letto qui, mai nello stesso giorno per costruzione: le
+      // candidatiSpuntino* escludono sempre gli altri spuntini di quel
+      // giorno a prescindere da questo contatore).
+      const usoSpuntini = new Map();
       const usoGruppi = {};
       const usoSalse = { valore: 0 };
       const ripetizioniSecondo = { valore: 0 }; // gradino 1: al massimo una nell'intera settimana
@@ -1937,21 +1983,40 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         return concatenaLivelli([proprio, neutroStretto, neutroLargo], rng, compagniDiPasto(gi, ruolo));
       }
 
+      // CORREZIONE 2026-10-23: niente piu' !usati.has - le colazioni possono
+      // ripetersi nella settimana, la varieta' e' garantita a monte dalla
+      // rotazione (sequenzaColazioni, fino a 3 per ingrediente principale
+      // distinto). Il giorno prova PRIMA quella che gli tocca in rotazione
+      // (gi % lunghezza), poi le altre 1-2 della rotazione se quella di oggi
+      // scontra un altro pasto dello stesso giorno (principaleLiberoOggi),
+      // e solo come ultima risorsa il resto del catalogo - cosi' la
+      // settimana resta quasi sempre a 3 colazioni diverse, ma un vicolo
+      // cieco non blocca comunque tutta la giornata.
       function candidatiColazione(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
-        const base = (p) => !usati.has(p.id) && !rifiutato(p) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
+        const base = (p) => !rifiutato(p) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
+        const assegnata = sequenzaColazioni.length ? sequenzaColazioni[gi % sequenzaColazioni.length] : null;
+        const diOggi = assegnata && base(assegnata) ? [assegnata] : [];
+        const altreDellaRotazione = sequenzaColazioni.filter(c => (!assegnata || c.id !== assegnata.id) && base(c));
         const proprio = colazioni.filter(p => compatibile(p, profiloGiorno) && base(p));
         const neutro = colazioni.filter(p => (p.profilo === 'neutro' || !p.profilo) && base(p));
-        return concatenaLivelli([proprio, neutro], rng);
+        return concatenaLivelli([diOggi, altreDellaRotazione, proprio, neutro], rng);
       }
 
       // F3, seconda regola: non due spuntini con base amidacea nello stesso
       // giorno (due spuntini a cracker/gallette, invece di uno a frutta e
       // uno amidaceo). copreRuolo legge ruoli_coperti gia' calcolato da F1
       // (classifica-ruoli-piatti.js), non lo ricalcola.
+      //
+      // CORREZIONE 2026-10-23: niente piu' !usati.has - gli spuntini sono
+      // pensati per essere semplici e ripetibili (frutta, yogurt, frutta
+      // secca...), quindi possono tornare piu' giorni, ma al massimo 3 volte
+      // a settimana per piatto (usoSpuntini). Mai due volte nello stesso
+      // giorno: lo garantisce gia' "!altroSpuntino || p.id !== altroSpuntino.id"
+      // qui sotto, indipendente dal nuovo tetto.
       function candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, altroSpuntino, cappaMinuti) {
         const altroEAmidaceo = altroSpuntino && copreRuolo(altroSpuntino, 'base_amidacea');
         const base = (p) =>
-          !usati.has(p.id) && !rifiutato(p) && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
+          !rifiutato(p) && (usoSpuntini.get(p.id) || 0) < 3 && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
           (!altroSpuntino || p.id !== altroSpuntino.id) &&
           (!altroEAmidaceo || !copreRuolo(p, 'base_amidacea')) &&
           principaleLiberoOggi(gi, p);
@@ -2019,42 +2084,59 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         return () => { delete statoGiorni[gi].basePranzo; usati.delete(piatto.id); };
       }
 
+      // Stesso tetto di 3 usi a settimana di candidatiSpuntino (usoSpuntini,
+      // non piu' 'usati'), mai lo stesso piatto di spuntino/spuntino2 oggi.
       function candidatiSpuntino3(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
         const st = statoGiorni[gi];
         const altri = [st.spuntino, st.spuntino2].filter(Boolean);
         const base = (p) =>
-          !usati.has(p.id) && !rifiutato(p) && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
+          !rifiutato(p) && (usoSpuntini.get(p.id) || 0) < 3 && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
           !altri.some(a => a.id === p.id) && principaleLiberoOggi(gi, p);
         const proprio = spuntini.filter(p => compatibile(p, profiloGiorno) && base(p));
         const neutro = spuntini.filter(p => (p.profilo === 'neutro' || !p.profilo) && base(p));
         return concatenaLivelli([proprio, neutro], rng);
       }
-      function assegnaSpuntino3Scelto(gi, piatto) {
-        statoGiorni[gi].spuntino3 = piatto;
-        usati.add(piatto.id);
-        return () => { delete statoGiorni[gi].spuntino3; usati.delete(piatto.id); };
+      // Unico punto che davvero assegna uno spuntino (spuntino/spuntino2/
+      // spuntino3 passano tutti di qui): incrementa usoSpuntini invece di
+      // 'usati', cosi' lo stesso piatto resta scegliibile altri giorni fino
+      // al tetto di 3.
+      function assegnaSpuntinoScelto(gi, nomeSlot, piatto) {
+        statoGiorni[gi][nomeSlot] = piatto;
+        usoSpuntini.set(piatto.id, (usoSpuntini.get(piatto.id) || 0) + 1);
+        return () => {
+          delete statoGiorni[gi][nomeSlot];
+          const n = (usoSpuntini.get(piatto.id) || 1) - 1;
+          if (n <= 0) usoSpuntini.delete(piatto.id); else usoSpuntini.set(piatto.id, n);
+        };
       }
 
       // Rifa' la scelta della colazione preferendo le piu' ricche in kcal
       // (non il solito peso casuale): qui si cerca deliberatamente piu'
       // energia, non varieta'. Annulla ripristina la colazione precedente,
-      // non la cancella - non e' un'aggiunta, e' una sostituzione.
+      // non la cancella - non e' un'aggiunta, e' una sostituzione. Non
+      // guarda la rotazione (sequenzaColazioni): e' una via d'emergenza per
+      // le kcal, puo' eccezionalmente introdurre una quarta colazione se
+      // serve davvero.
       function candidatiColazionePiuRicca(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
-        const base = (p) => !usati.has(p.id) && !rifiutato(p) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
+        const base = (p) => !rifiutato(p) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
         const candidati = colazioni.filter(p => compatibile(p, profiloGiorno) && base(p));
         return candidati.slice().sort((a, b) => (b.kcal || 0) - (a.kcal || 0));
       }
       function assegnaColazionePiuRicca(gi, piatto) {
         const st = statoGiorni[gi];
         const precedente = st.colazione;
-        if (precedente) usati.delete(precedente.id);
         st.colazione = piatto;
-        usati.add(piatto.id);
         return () => {
-          usati.delete(piatto.id);
-          if (precedente) { st.colazione = precedente; usati.add(precedente.id); }
+          if (precedente) st.colazione = precedente;
           else delete st.colazione;
         };
+      }
+      // Unico punto che assegna la colazione del giorno (sia la scelta
+      // normale sia, con lo stesso meccanismo, quella di rotazione): niente
+      // 'usati', vedi candidatiColazione.
+      function assegnaColazioneScelto(gi, piatto) {
+        statoGiorni[gi].colazione = piatto;
+        return () => { delete statoGiorni[gi].colazione; };
       }
 
       // Determina la prossima decisione necessaria per il giorno `gi`.
@@ -2150,9 +2232,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           primo: (p) => assegnaSlot(gi, 'primo', p),
           contornoCena: (p) => assegnaSlot(gi, 'contornoCena', p),
           contornoPranzo: (p) => assegnaSlot(gi, 'contornoPranzo', p),
-          colazione: (p) => assegnaSlot(gi, 'colazione', p),
-          spuntino: (p) => assegnaSlot(gi, 'spuntino', p),
-          spuntino2: (p) => assegnaSlot(gi, 'spuntino2', p),
+          colazione: (p) => assegnaColazioneScelto(gi, p),
+          spuntino: (p) => assegnaSpuntinoScelto(gi, 'spuntino', p),
+          spuntino2: (p) => assegnaSpuntinoScelto(gi, 'spuntino2', p),
           base: (p) => assegnaBaseScelto(gi, p),
         };
         return creaFrame(g, scelto.nomeSlot, scelto.candidati, applicaPerSlot[scelto.nomeSlot]);
