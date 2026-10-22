@@ -1391,17 +1391,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // passa false quando l'utente spegne "Keep the dishes you locked".
   const mantieniBloccati = opzioni.mantieniBloccati !== false;
 
-  // MISURAZIONE TEMPORANEA (24 ottobre 2026): per capire perche' in
-  // produzione (Render) una generazione impiega 20-37s contro 1.3s in
-  // locale - vedi il prompt "VELOCITA' IN PRODUZIONE". Attiva solo con
-  // opzioni.misuraTempi true (nessun chiamante esistente la passa): zero
-  // effetto sul comportamento o la risposta normale. Da togliere a fine
-  // indagine, con tutti i suoi punti di misura sotto.
-  const _misuraTempi = opzioni.misuraTempi === true;
-  const _t0 = Date.now();
-  const _tappe = [];
-  const _tappa = (nome) => { if (_misuraTempi) _tappe.push({ nome, ms: Date.now() - _t0 }); };
-
   // Seed esplicito se passato (per rigiocare un fallimento segnalato),
   // altrimenti generato qui - ma sempre salvato col piano, cosi' ogni
   // generazione e' rigiocabile a posteriori, non solo quando lo si prevede.
@@ -1447,13 +1436,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     return 1;
   };
 
-  _tappa('preferenze_e_profilo');
 
   const dieta = profiloUtente?.diet || 'onnivoro';
   const { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito, categorieVietate } =
     await caricaVincoli(supabase, userId, dieta);
   const haVincoloGlutine = categorieVietate.has('glutine');
-  _tappa('vincoli');
 
   // Cosa l'utente ha deciso di tenere dalla settimana precedente
   const { data: pianoVecchio, error: ePiano } = await supabase
@@ -1501,7 +1488,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       }
     }
   }
-  _tappa('piano_vecchio_e_bloccati');
 
   const cucinaOggi = (g) => giorniCottura.includes(g);
   const ferialeG = (g) => g <= 5;
@@ -1522,7 +1508,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // vero per voto salute si applica in memoria a ogni tentativo, cosi' non
   // si riinterroga il database per ogni gradino della scala.
   let piatti = await caricaPiatti(supabase, famiglie, 6);
-  _tappa('catalogo');
 
   // La dieta è un vincolo assoluto: si applica una volta sola, a monte,
   // così quote, piano proteico e selezione lavorano già su piatti ammessi.
@@ -1549,10 +1534,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
   const obiettivo = target?.kcal ?? null;
   const obiettivoProteine = target?.protein_g_min ?? null;
-  _tappa('obiettivo');
 
   const { skipPerTempo, skipTotali, rifiutato } = await caricaEsiti(supabase, userId);
-  _tappa('esiti');
 
   // Se piu' della meta' dei salti e' per mancanza di tempo, il limite
   // dichiarato non regge la vita reale e va stretto di dieci minuti.
@@ -2765,7 +2748,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   }
 
   const { settimana: migliore, punteggio: migliorPunteggio, concessioni, usoGruppi } = esito;
-  _tappa('ricerca');
 
   // target/obiettivo letti all'inizio della funzione, non qui: vedi sopra.
 
@@ -2828,7 +2810,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       throw new Error(`Inserimento pasti fallito: ${errItems.message}`);
     }
   }
-  _tappa('salvataggio');
 
   return {
     plan_id: salva ? piano.id : null, giorni_conformi: Math.floor(migliorPunteggio), seed,
@@ -2838,9 +2819,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
     // li mostra come "N locked dish(es) no longer fit your profile".
     piatti_bloccati_scartati: piattiBloccatiScartati,
-    // MISURAZIONE TEMPORANEA: vedi sopra. undefined quando non richiesto, cosi'
-    // JSON.stringify lo omette e la risposta normale resta identica a prima.
-    _tempi: _misuraTempi ? _tappe : undefined,
   };
 }
 
