@@ -10,15 +10,14 @@
 // frutta a guscio) e due combinazioni miste a caso per coprire
 // lattosio/uova/crostacei.
 //
-// NOTA PER CHI MANTIENE QUESTO FILE: oggi (2026-10-23) usa
-// simula-lotto-02.js, che inietta nel catalogo i 9+3 accompagnamenti
-// pane/patate di stanotte E i 20 piatti del lotto 02 - nessuno dei due e'
-// ancora stato scritto sul database vero (vedi scripts/esegui-lotto-02.js,
-// non eseguito). Quando quelle migrazioni verranno davvero applicate, il
-// catalogo reale conterra' gia' tutto: togli il wrapper e torna a leggere
-// 'reale' direttamente, altrimenti continuerai a simulare qualcosa che
-// esiste gia' (inoffensivo, ma inutile, e un domani un lotto 03 andrebbe
-// aggiunto qui a mano se questo file non viene aggiornato).
+// AGGIORNATO 2026-10-23 (sera): le migrazioni pane/patate e il lotto 02
+// sono stati applicati davvero al database (vedi i commit di oggi) - non
+// serve piu' simulare nulla, il catalogo reale li contiene gia'. Prima
+// usava simula-lotto-02.js per testare prima della scrittura; ora legge
+// 'reale' direttamente. Se in futuro un lotto 03 viene preparato ma non
+// ancora scritto, va di nuovo avvolto in un wrapper di simulazione simile,
+// qui o in un file a parte - senza, questo controllo valida solo cio' che
+// e' gia' nel database, non cio' che sta per entrarci.
 //
 // Uso: node scripts/verifica-matrice-ridotta.js
 // Fallisce (exit code 1) se una sola delle 12 combinazioni non riesce.
@@ -27,17 +26,15 @@ const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 const supabaseReale = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const { generaESalva, risolviSubject, caricaCatalogoPerRisoluzione } = require('../genera.js');
-const { clienteConLotto02 } = require('../simula-lotto-02.js');
 
 const SEED = 2026;
 
 function clienteFinto(reale, profiloSintetico, vincoliSintetici) {
-  const base = clienteConLotto02(reale);
   return {
     from(tabella) {
       if (tabella === 'users') return { select() { return this; }, eq() { return this; }, maybeSingle: async () => ({ data: profiloSintetico, error: null }) };
       if (tabella === 'user_constraints') return { select() { return this; }, eq: async () => ({ data: vincoliSintetici, error: null }) };
-      return base.from(tabella);
+      return reale.from(tabella);
     },
   };
 }
