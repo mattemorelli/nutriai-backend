@@ -40,6 +40,29 @@ const CORPUS_VERSION = 'v8-paesi-e-vincoli';
 // dishes.mercati e la lista dei piatti qualificati per 'it'.
 const MERCATO_ATTIVO = 'it';
 
+// PostgREST impone un tetto di righe per risposta (di default 1000)
+// indipendente da .limit(): una lettura a tutta tabella (senza .eq/.in che
+// la restringa) va sempre paginata con .range() e un ordinamento unico,
+// altrimenti le righe oltre la millesima spariscono in silenzio - stessa
+// funzione di server.js/spesa.js/tu.js, duplicata qui apposta (genera.js
+// non le importa, per non introdurre una dipendenza incrociata). Scoperto
+// il 23 ottobre in scripts/verifica-ricette.js (ricetta_passi troncata a
+// 1000 righe su 1208 reali); l'audit del 24 ottobre ha trovato che QUESTO
+// file leggeva foods/categorie_alimenti/tag_nutrizionali/alias_categoria
+// per intero, senza paginazione, a ogni generazione - tabelle oggi sotto
+// 1000 righe ma che crescono con il catalogo, quindi a rischio futuro.
+async function paginaTutto(costruisciQuery) {
+  const righe = [];
+  const PAGINA = 1000;
+  for (let offset = 0; ; offset += PAGINA) {
+    const { data: blocco, error } = await costruisciQuery(offset, offset + PAGINA - 1);
+    if (error) throw new Error(error.message);
+    righe.push(...(blocco || []));
+    if (!blocco || blocco.length < PAGINA) break;
+  }
+  return righe;
+}
+
 // ---- La scala: si sale di un gradino solo dopo aver esaurito onestamente quello precedente ----
 // Ogni gradino eredita gli allentamenti di quelli precedenti (si sale,
 // non si passa da uno all'altro): 3a e 3b restano due gradini distinti
@@ -730,18 +753,15 @@ function risolviSubject(subject, { mappaAlias, foods, foodIdPerCategoria }) {
 // chiama chi scrive vincoli nuovi (server.js), non chi li legge soltanto
 // (caricaVincoli sopra continua a leggere food_id/categoria gia' scritti).
 async function caricaCatalogoPerRisoluzione(supabase) {
-  const [{ data: aliasRighe, error: eAlias }, { data: foods, error: eFoods }, { data: catRighe, error: eCat }] = await Promise.all([
-    supabase.from('alias_categoria').select('alias, codice'),
-    supabase.from('foods').select('id, name, name_it'),
+  const [aliasRighe, foods, catRighe] = await Promise.all([
+    paginaTutto((da, a) => supabase.from('alias_categoria').select('alias, codice').order('alias').range(da, a)),
+    paginaTutto((da, a) => supabase.from('foods').select('id, name, name_it').order('id').range(da, a)),
     // Serve a risolviSubject per verificare che un allergene noto (vedi
     // CATEGORIA_ALLERGENE) abbia davvero alimenti taggati prima di fidarsi
     // della categoria - senza questa tabella non potrebbe distinguere una
     // categoria valida da una svuotata per errore.
-    supabase.from('categorie_alimenti').select('food_id, categoria'),
+    paginaTutto((da, a) => supabase.from('categorie_alimenti').select('food_id, categoria').order('food_id').order('categoria').range(da, a)),
   ]);
-  if (eAlias) throw new Error('lettura alias_categoria: ' + eAlias.message);
-  if (eFoods) throw new Error('lettura foods: ' + eFoods.message);
-  if (eCat) throw new Error('lettura categorie_alimenti: ' + eCat.message);
   const mappaAlias = new Map((aliasRighe || []).map((r) => [r.alias, r.codice]));
   const foodIdPerCategoria = new Map();
   for (const r of (catRighe || [])) {
@@ -787,7 +807,86 @@ const ALIMENTI_VIETATI_PER_DIETA = {
 // per dieta+paese senza un utente reale dietro. Estratta a se' perche' un
 // controllo fuori linea deve interrogare la STESSA fonte di esclusione, non
 // una sua reimplementazione.
+// Cache di riferimento in memoria (Fase 5, 2026-10-24): dishes, dish_ingredients
+// (con i foods agganciati), tag_nutrizionali e categorie_alimenti sono dati
+// di CATALOGO - uguali per ogni utente, cambiano solo quando si pubblica un
+// piatto nuovo - non dati personali da rileggere a ogni chiamata. Prima di
+// questa cache, generaESalva li rileggeva per intero 2 volte a chiamata (una
+// volta per il pool di ricerca via caricaPiatti, una seconda per i piatti
+// bloccati via caricaPiattiPerId) piu' le espansioni di categorie_alimenti
+// dentro caricaVincoli: misurato in produzione su Render, 20-37s a
+// generazione contro 1.3s della stessa chiamata in locale con salva:false -
+// la differenza era quasi tutta rete (10-15 andate e ritorni verso Supabase
+// in sequenza, non il calcolo). Con la cache, il catalogo si legge una sola
+// volta ogni DURATA_CACHE_MS (non per sempre: un piatto nuovo pubblicato deve
+// comunque apparire entro quella finestra, senza richiedere un riavvio del
+// server) e ogni chiamata successiva filtra in memoria, zero rete.
+// cachePromessaInCorso evita lo stampede: se due richieste arrivano mentre la
+// cache e' scaduta, la seconda aspetta la STESSA lettura della prima invece
+// di farne una propria.
+const DURATA_CACHE_MS = 10 * 60 * 1000; // 10 minuti
+let cacheRiferimento = null;
+let cachePromessaInCorso = null;
+
+async function caricaRiferimento(supabase) {
+  if (cacheRiferimento && Date.now() < cacheRiferimento.scadenza) return cacheRiferimento;
+  if (cachePromessaInCorso) return cachePromessaInCorso;
+
+  cachePromessaInCorso = (async () => {
+    const [dishesCrudi, tagRighe, catRighe] = await Promise.all([
+      // Il mercato (MERCATO_ATTIVO) resta un cancello assoluto applicato qui,
+      // non un filtro da ripetere in memoria a ogni chiamata - nessun
+      // chiamante deve mai vedere un piatto fuori mercato, nemmeno un piatto
+      // bloccato (vedi la nota su caricaPiattiPerId piu' sotto).
+      paginaTutto((da, a) => supabase
+        .from('dishes')
+        .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati, steps')
+        .contains('mercati', [MERCATO_ATTIVO])
+        .order('id')
+        .range(da, a)),
+      paginaTutto((da, a) => supabase.from('tag_nutrizionali').select('food_id, tag').order('food_id').order('tag').range(da, a)),
+      paginaTutto((da, a) => supabase.from('categorie_alimenti').select('food_id, categoria').order('food_id').order('categoria').range(da, a)),
+    ]);
+
+    const tagDi = {};
+    for (const r of tagRighe) (tagDi[r.food_id] ||= new Set()).add(r.tag);
+
+    const categorieDi = {};
+    const foodIdsPerCategoria = {};
+    for (const r of catRighe) {
+      (categorieDi[r.food_id] ||= new Set()).add(r.categoria);
+      (foodIdsPerCategoria[r.categoria] ||= new Set()).add(r.food_id);
+    }
+
+    // Ingredienti di TUTTO il catalogo, a blocchi di 200 id (stesso tetto di
+    // PostgREST di sempre), una sola volta invece che per ogni sottoinsieme
+    // che un chiamante potrebbe chiedere.
+    const ingredientiPerDish = {};
+    const tuttiGliId = dishesCrudi.map((d) => d.id);
+    for (let i = 0; i < tuttiGliId.length; i += 200) {
+      const blocco = tuttiGliId.slice(i, i + 200);
+      const righe = await paginaTutto((da, a) => supabase
+        .from('dish_ingredients')
+        .select('dish_id, food_id, grams, foods (name, kcal_100g, protein_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g, stato, categoria_impatto)')
+        .in('dish_id', blocco)
+        .order('dish_id').order('food_id')
+        .range(da, a));
+      for (const r of righe) (ingredientiPerDish[r.dish_id] ||= []).push(r);
+    }
+
+    return { scadenza: Date.now() + DURATA_CACHE_MS, dishesCrudi, ingredientiPerDish, tagDi, categorieDi, foodIdsPerCategoria };
+  })();
+
+  try {
+    cacheRiferimento = await cachePromessaInCorso;
+    return cacheRiferimento;
+  } finally {
+    cachePromessaInCorso = null;
+  }
+}
+
 async function foodIdVietatiPerDieta(supabase, dieta) {
+  const { foodIdsPerCategoria } = await caricaRiferimento(supabase);
   const codiciDietaEspansi = new Set();
   for (const codice of (CATEGORIE_DIETA[dieta] || [])) {
     codiciDietaEspansi.add(codice);
@@ -796,58 +895,29 @@ async function foodIdVietatiPerDieta(supabase, dieta) {
 
   const vietati = new Set();
   for (const codice of codiciDietaEspansi) {
-    const { data: righe } = await supabase
-      .from('categorie_alimenti')
-      .select('food_id')
-      .eq('categoria', codice);
-    for (const r of (righe || [])) vietati.add(r.food_id);
+    for (const fid of (foodIdsPerCategoria[codice] || [])) vietati.add(fid);
   }
   return vietati;
 }
 
-// Dalle righe grezze di 'dishes' ai piatti pronti per il generatore: carica
-// tag_nutrizionali e categorie_alimenti (indipendenti dai piatti), poi gli
-// ingredienti di OGNI piatto a blocchi di 200 id (il tetto di PostgREST),
-// e calcola kcal/protein/gruppo/principale/riassunto nutrizionale per
-// ciascuno. Condivisa da caricaPiatti (il pool filtrato per la ricerca) e
-// caricaPiattiPerId (un piatto bloccato specifico, a prescindere da
-// famiglia/soglia salute/occasione - l'utente l'ha gia' approvato bloccandolo).
-async function arricchisciPiatti(supabase, piattiGrezzi) {
+// Dalle righe grezze di 'dishes' (dalla cache) ai piatti pronti per il
+// generatore: calcola kcal/protein/gruppo/principale/riassunto nutrizionale
+// per ciascuno, leggendo gli ingredienti e le tabelle di enrichment dalla
+// cache di riferimento invece che dal database. Condivisa da caricaPiatti
+// (il pool filtrato per la ricerca) e caricaPiattiPerId (un piatto bloccato
+// specifico, a prescindere da famiglia/soglia salute/occasione - l'utente
+// l'ha gia' approvato bloccandolo). Sincrona apposta: tutto cio' che le
+// serve e' gia' in memoria, nessuna chiamata di rete qui dentro.
+function arricchisciPiattiDaCache(piattiGrezzi, cache) {
   if (!piattiGrezzi.length) return [];
-  const ids = piattiGrezzi.map(p => p.id);
-
-  // F4: tag_nutrizionali (fonte_vitamina_c, ferro_vegetale, caroteni) -
-  // caricata una volta, indipendente dai piatti. Vedi genera.js piu' sotto
-  // per le due regole che la usano, e migrazione-tag-nutrizionali.js per le
-  // fonti di ogni riga.
-  const { data: tagRighe, error: eTag } = await supabase.from('tag_nutrizionali').select('food_id, tag');
-  if (eTag) throw new Error(eTag.message);
-  const tagDi = {};
-  for (const r of (tagRighe || [])) (tagDi[r.food_id] ||= new Set()).add(r.tag);
-
-  // Fase 2 (2026-09-16): categorie_alimenti caricata una volta sola, stessa
-  // forma di tagDi - food_id -> Set di categorie. Usata da gruppoDa()
-  // sull'ancora proteica, non per determinare il ruolo (vedi la nota sopra
-  // GRUPPO_DA_CATEGORIA).
-  const { data: catRighe, error: eCat } = await supabase.from('categorie_alimenti').select('food_id, categoria');
-  if (eCat) throw new Error(eCat.message);
-  const categorieDi = {};
-  for (const r of (catRighe || [])) (categorieDi[r.food_id] ||= new Set()).add(r.categoria);
+  const { ingredientiPerDish, tagDi, categorieDi } = cache;
 
   const valori = {};
-  for (let i = 0; i < ids.length; i += 200) {
-    const blocco = ids.slice(i, i + 200);
-    const { data: righe, error: e2 } = await supabase
-      .from('dish_ingredients')
-      .select('dish_id, food_id, grams, foods (name, kcal_100g, protein_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g, stato, categoria_impatto)')
-      .in('dish_id', blocco);
-    if (e2) throw new Error(e2.message);
-
+  for (const p of piattiGrezzi) {
+    const righe = ingredientiPerDish[p.id];
+    if (!righe) continue;
+    const v = { kcal: 0, protein: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0, ingredienti: [] };
     for (const r of righe) {
-      if (!valori[r.dish_id]) {
-        valori[r.dish_id] = { kcal: 0, protein: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0, ingredienti: [] };
-      }
-      const v = valori[r.dish_id];
       const f = r.foods || {};
       const k = r.grams / 100;
       v.kcal    += (f.kcal_100g    || 0) * k;
@@ -859,6 +929,7 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
       v.grams   += r.grams;
       v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', grams: r.grams, stato: f.stato || null, protein_100g: f.protein_100g || 0, categoria_impatto: f.categoria_impatto || null });
     }
+    valori[p.id] = v;
   }
 
   // F4: riassunto nutrizionale del piatto, dai tag sugli ingredienti.
@@ -936,10 +1007,10 @@ async function arricchisciPiatti(supabase, piattiGrezzi) {
 }
 
 async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
-  // PostgREST impone un tetto di righe per risposta (di default 1000)
-  // indipendente da .limit(): con 1741 piatti nel db va paginato con
-  // .range(), altrimenti i piatti inseriti per ultimi (es. centro_nord_generico)
-  // restano sempre fuori dal generatore.
+  // Dalla cache di riferimento (vedi caricaRiferimento sopra), non piu' da
+  // una query diretta: stesso identico filtro di prima (mercato, soglia
+  // salute, profilo non nullo, occasione, famiglia-o-neutro), applicato in
+  // memoria sulle righe gia' lette.
   //
   // Il filtro per famiglia (bug corretto il 2026-09-12: prima 'famiglie' non
   // veniva usato affatto, la query caricava sempre l'intero catalogo) NON
@@ -948,33 +1019,17 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
   // famiglia, e in dishes 33 piatti neutri hanno famiglia='mediterranea'
   // invece di 'neutra' - filtrarli via famiglia li farebbe sparire per un
   // utente che ha scelto un'altra famiglia, mentre oggi sono visibili a tutti.
-  const filtroFamiglia = `profilo.eq.neutro,famiglia.in.(${famiglie.join(',')})`;
+  const cache = await caricaRiferimento(supabase);
+  const famiglieSet = new Set(famiglie);
+  const piatti = cache.dishesCrudi.filter((p) =>
+    p.health_score >= sogliaSalute &&
+    p.profilo != null &&
+    ['quotidiano', 'lungo'].includes(p.occasione) &&
+    (p.profilo === 'neutro' || famiglieSet.has(p.famiglia))
+  );
 
-  const piatti = [];
-  const PAGINA = 1000;
-  for (let offset = 0; ; offset += PAGINA) {
-    const { data: blocco, error } = await supabase
-      .from('dishes')
-      .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati, steps')
-      // Cancello di mercato (vedi MERCATO_ATTIVO sopra): va PRIMA del filtro
-      // famiglia/neutro perche' deve valere anche per chi e' 'neutro' - un
-      // piatto 'neutro' fuori mercato non deve comparire solo perche' il
-      // bypass famiglia lo farebbe passare comunque.
-      .contains('mercati', [MERCATO_ATTIVO])
-      .gte('health_score', sogliaSalute)
-      .not('profilo', 'is', null)
-      .in('occasione', ['quotidiano', 'lungo'])
-      .or(filtroFamiglia)
-      .order('id')
-      .range(offset, offset + PAGINA - 1);
-
-    if (error) throw new Error(error.message);
-    piatti.push(...blocco);
-    if (blocco.length < PAGINA) break;
-  }
-
-  if (!piatti?.length) throw new Error('Nessun piatto etichettato per le cucine scelte');
-  return arricchisciPiatti(supabase, piatti);
+  if (!piatti.length) throw new Error('Nessun piatto etichettato per le cucine scelte');
+  return arricchisciPiattiDaCache(piatti, cache);
 }
 
 // Un piatto bloccato specifico, indipendentemente da famiglia/soglia
@@ -986,16 +1041,15 @@ async function caricaPiatti(supabase, famiglie, sogliaSalute = 7) {
 // prima del lancio-solo-Italia che oggi risulta fuori mercato deve
 // sbloccarsi da solo, non restare in piano. Chi chiama questa funzione
 // (bloccatiPerGiorno in generaESalva) tratta gia' un id non risolto come
-// "scartato", quindi non serve altro codice: basta non farlo tornare qui.
+// "scartato", quindi non serve altro codice: basta non farlo tornare qui -
+// la cache di riferimento e' gia' filtrata per mercato (vedi caricaRiferimento),
+// quindi basta cercare per id dentro le righe che contiene.
 async function caricaPiattiPerId(supabase, ids) {
   if (!ids.length) return [];
-  const { data: piatti, error } = await supabase
-    .from('dishes')
-    .select('id, name, name_en, meal_slot, cucina, profilo, famiglia, ha_amido, ha_proteina, prep_min, occasione, tecnica, health_score, salsa_industriale, base_amidacea, trasportabile, contiene_glutine, contiene_lattosio, contiene_frutta_secca, paese, ruolo_primario, ruoli_coperti, mercati, steps')
-    .contains('mercati', [MERCATO_ATTIVO])
-    .in('id', ids);
-  if (error) throw new Error(error.message);
-  return arricchisciPiatti(supabase, piatti || []);
+  const cache = await caricaRiferimento(supabase);
+  const idsSet = new Set(ids);
+  const piatti = cache.dishesCrudi.filter((p) => idsSet.has(p.id));
+  return arricchisciPiattiDaCache(piatti, cache);
 }
 
 const compatibile = (piatto, profilo) => piatto.profilo === profilo || piatto.profilo === 'neutro';
@@ -1026,7 +1080,7 @@ const copreRuolo = (piatto, ruolo) => Array.isArray(piatto.ruoli_coperti) && pia
 // amidacei su 243 nel catalogo (quinoa, farro, pasta integrale, ceci...)
 // restavano "orfani", mai riconosciuti ne' come pane ne' come patate, quindi
 // mai utilizzabili come accompagnamento - la causa del crollo del 9 ottobre.
-// Ora il tipo e' precalcolato in arricchisciPiatti (vedi piatto.tipoAmido)
+// Ora il tipo e' precalcolato in arricchisciPiattiDaCache (vedi piatto.tipoAmido)
 // dalle categorie VERE 'pane'/'patate' su categorie_alimenti (migrazione
 // migrazioni/2026-10-22-categorie-pane-patate.sql, non eseguita sul db
 // vero), che un domani si aggiornano semplicemente taggando un nuovo
@@ -1242,18 +1296,18 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
     nonRisolti.push(v.subject || '(vuoto)');
   }
 
-  const espandi = async (codici, destinazione) => {
-    if (!codici.size) return;
-    const { data: righe, error: eRighe } = await supabase
-      .from('categorie_alimenti')
-      .select('food_id')
-      .in('categoria', [...codici]);
-    if (eRighe) throw new Error('lettura categorie_alimenti: ' + eRighe.message);
-    for (const r of righe || []) destinazione.add(r.food_id);
+  // Dalla cache di riferimento (vedi caricaRiferimento sopra), non piu' da
+  // una query per ogni chiamata: stessa espansione categoria -> food_id,
+  // letta in memoria.
+  const { foodIdsPerCategoria } = await caricaRiferimento(supabase);
+  const espandi = (codici, destinazione) => {
+    for (const codice of codici) {
+      for (const fid of (foodIdsPerCategoria[codice] || [])) destinazione.add(fid);
+    }
   };
 
-  await espandi(categorieDaEspandere, foodIdVietati);
-  await espandi(categorieSgradite, foodIdSgraditi);
+  espandi(categorieDaEspandere, foodIdVietati);
+  espandi(categorieSgradite, foodIdSgraditi);
 
   for (const fid of await foodIdVietatiPerDieta(supabase, dieta)) foodIdVietati.add(fid);
   for (const fid of (ALIMENTI_VIETATI_PER_DIETA[dieta] || [])) foodIdVietati.add(fid);
@@ -1337,6 +1391,17 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // passa false quando l'utente spegne "Keep the dishes you locked".
   const mantieniBloccati = opzioni.mantieniBloccati !== false;
 
+  // MISURAZIONE TEMPORANEA (24 ottobre 2026): per capire perche' in
+  // produzione (Render) una generazione impiega 20-37s contro 1.3s in
+  // locale - vedi il prompt "VELOCITA' IN PRODUZIONE". Attiva solo con
+  // opzioni.misuraTempi true (nessun chiamante esistente la passa): zero
+  // effetto sul comportamento o la risposta normale. Da togliere a fine
+  // indagine, con tutti i suoi punti di misura sotto.
+  const _misuraTempi = opzioni.misuraTempi === true;
+  const _t0 = Date.now();
+  const _tappe = [];
+  const _tappa = (nome) => { if (_misuraTempi) _tappe.push({ nome, ms: Date.now() - _t0 }); };
+
   // Seed esplicito se passato (per rigiocare un fallimento segnalato),
   // altrimenti generato qui - ma sempre salvato col piano, cosi' ogni
   // generazione e' rigiocabile a posteriori, non solo quando lo si prevede.
@@ -1382,10 +1447,13 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     return 1;
   };
 
+  _tappa('preferenze_e_profilo');
+
   const dieta = profiloUtente?.diet || 'onnivoro';
   const { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito, categorieVietate } =
     await caricaVincoli(supabase, userId, dieta);
   const haVincoloGlutine = categorieVietate.has('glutine');
+  _tappa('vincoli');
 
   // Cosa l'utente ha deciso di tenere dalla settimana precedente
   const { data: pianoVecchio, error: ePiano } = await supabase
@@ -1433,6 +1501,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       }
     }
   }
+  _tappa('piano_vecchio_e_bloccati');
 
   const cucinaOggi = (g) => giorniCottura.includes(g);
   const ferialeG = (g) => g <= 5;
@@ -1453,6 +1522,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // vero per voto salute si applica in memoria a ogni tentativo, cosi' non
   // si riinterroga il database per ogni gradino della scala.
   let piatti = await caricaPiatti(supabase, famiglie, 6);
+  _tappa('catalogo');
 
   // La dieta è un vincolo assoluto: si applica una volta sola, a monte,
   // così quote, piano proteico e selezione lavorano già su piatti ammessi.
@@ -1479,8 +1549,10 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
   const obiettivo = target?.kcal ?? null;
   const obiettivoProteine = target?.protein_g_min ?? null;
+  _tappa('obiettivo');
 
   const { skipPerTempo, skipTotali, rifiutato } = await caricaEsiti(supabase, userId);
+  _tappa('esiti');
 
   // Se piu' della meta' dei salti e' per mancanza di tempo, il limite
   // dichiarato non regge la vita reale e va stretto di dieci minuti.
@@ -2693,6 +2765,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   }
 
   const { settimana: migliore, punteggio: migliorPunteggio, concessioni, usoGruppi } = esito;
+  _tappa('ricerca');
 
   // target/obiettivo letti all'inizio della funzione, non qui: vedi sopra.
 
@@ -2755,6 +2828,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       throw new Error(`Inserimento pasti fallito: ${errItems.message}`);
     }
   }
+  _tappa('salvataggio');
 
   return {
     plan_id: salva ? piano.id : null, giorni_conformi: Math.floor(migliorPunteggio), seed,
@@ -2764,6 +2838,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
     // li mostra come "N locked dish(es) no longer fit your profile".
     piatti_bloccati_scartati: piattiBloccatiScartati,
+    // MISURAZIONE TEMPORANEA: vedi sopra. undefined quando non richiesto, cosi'
+    // JSON.stringify lo omette e la risposta normale resta identica a prima.
+    _tempi: _misuraTempi ? _tappe : undefined,
   };
 }
 

@@ -1043,7 +1043,11 @@ app.post('/genera-piano', richiedeAuth, async (req, res) => {
     // sempre). Il foglio "nuova settimana" lo manda false quando l'utente
     // spegne "Keep the dishes you locked".
     const mantieniBloccati = req.body?.mantieni_bloccati !== false;
-    const piano = await generaESalva(supabase, req.utente.id, undefined, { mantieniBloccati });
+    // misura_tempi: flag temporaneo (24 ottobre 2026, indagine velocita' in
+    // produzione) - nessun client dell'app lo manda, va rimosso a fine
+    // indagine insieme alla strumentazione in generaESalva (vedi genera.js).
+    const misuraTempi = req.body?.misura_tempi === true;
+    const piano = await generaESalva(supabase, req.utente.id, undefined, { mantieniBloccati, misuraTempi });
     res.json({ ok: true, ...piano });
   } catch (err) {
     console.error('ERRORE /genera-piano:', err);
