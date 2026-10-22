@@ -105,6 +105,17 @@ const GRADINI = [
   { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true, proteinaTollerante: true } },
 ];
 
+// Perche' un tentativo (un profilo, a un gradino) si e' fermato senza
+// successo - tre motivi possibili, mai una regola cambiata: il tetto dei
+// passi (C16, sopra) resta identico, 'tempo' e' solo un secondo tetto,
+// sullo stesso punto di controllo (vedi avanzaFinDove), per il tetto di
+// tempo massimo di ricerca (24 ottobre, indagine velocita' in produzione).
+function descrizioneMotivoEsaurimento(motivo) {
+  if (motivo === 'tetto') return 'tetto passi raggiunto';
+  if (motivo === 'tempo') return 'tempo massimo di ricerca raggiunto';
+  return 'esaurimento reale';
+}
+
 // Quanto ogni elemento puo' essere scalato. Le ancore hanno margini stretti,
 // le leve margini ampi. E' questa distinzione che evita le porzioni assurde.
 const LIMITI_SCALA = {
@@ -2472,6 +2483,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         let gi = giIniziale;
         while (gi < 7) {
           if (passiUsati.valore > MAX_PASSI) return { esaurito: true, motivo: 'tetto' };
+          if (Date.now() > scadenzaRicerca) return { esaurito: true, motivo: 'tempo' };
           const decisione = prossimaDecisione(gi);
           if (decisione === 'COMPLETO') {
             const st = statoGiorni[gi];
@@ -2509,7 +2521,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
       const primoTentativo = avanzaFinDove(0);
       if (primoTentativo.esaurito) {
-        diagnosticaProfili.push(`${profiloSettimana}: ${primoTentativo.motivo === 'tetto' ? 'tetto passi raggiunto' : 'esaurimento reale'} (passi: ${passiUsati.valore})`);
+        diagnosticaProfili.push(`${profiloSettimana}: ${descrizioneMotivoEsaurimento(primoTentativo.motivo)} (passi: ${passiUsati.valore})`);
         continue profiliEsterni;
       }
 
@@ -2531,7 +2543,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           if (tornaA < 0) { diagnosticaProfili.push(`${profiloSettimana}: quote proteiche mai soddisfatte (esaurimento reale)`); continue profiliEsterni; }
           const ripreso = avanzaFinDove(tornaA);
           if (ripreso.esaurito) {
-            diagnosticaProfili.push(`${profiloSettimana}: ${ripreso.motivo === 'tetto' ? 'tetto passi raggiunto' : 'esaurimento reale'} durante la ricerca quote (passi: ${passiUsati.valore})`);
+            diagnosticaProfili.push(`${profiloSettimana}: ${descrizioneMotivoEsaurimento(ripreso.motivo)} durante la ricerca quote (passi: ${passiUsati.valore})`);
             continue profiliEsterni;
           }
         }
@@ -2710,11 +2722,34 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     return { ok: false, diagnosticaProfili };
   }
 
+  // Tetto di TEMPO sulla ricerca (24 ottobre 2026, indagine velocita' in
+  // produzione: la scala provava tutti i gradini da 0 a 5 per intero prima
+  // di arrendersi, anche quando il tempo per profilo+gradino era gia'
+  // lunghissimo su un server piu' lento - misurato 20-35s su Render per un
+  // profilo che in locale impiega 1-2s, stesso numero di passi). Non e' un
+  // allentamento di regola: e' un secondo tetto, oltre a quello dei passi
+  // (MAX_PASSI, dentro provaGradino), sullo STESSO punto di controllo
+  // (avanzaFinDove) - un tentativo che lo supera si considera esaurito
+  // esattamente come se avesse esaurito i passi, la scala passa al gradino
+  // successivo o si ferma. Configurabile via opzioni.tempoMassimoMs
+  // (nessun chiamante esistente lo passa, quindi il default si applica
+  // sempre): se il tempo scade PRIMA che un gradino sia stato tentato,
+  // quel gradino (e tutti i successivi) non vengono nemmeno provati - la
+  // scala si ferma con l'esito migliore trovato finora (un gradino riuscito
+  // prima della scadenza), o con lo stesso errore di oggi se nessun gradino
+  // e' ancora riuscito.
+  const scadenzaRicerca = Date.now() + (opzioni.tempoMassimoMs ?? 4000);
+
   let esito = null;
   let gradinoRaggiunto = null;
   const diagnosticaCompleta = [];
 
   for (const passo of GRADINI) {
+    if (Date.now() > scadenzaRicerca) {
+      console.log(`[scala] tempo massimo di ricerca raggiunto prima del gradino ${passo.gradino}: la scala si ferma qui`);
+      diagnosticaCompleta.push(`gradino ${passo.gradino} (soglia ${passo.soglia}): non tentato, tempo massimo di ricerca raggiunto`);
+      break;
+    }
     const r = provaGradino(passo.opz, passo.soglia);
     if (r.ok) {
       console.log(`[scala] gradino ${passo.gradino} (soglia ${passo.soglia}): RIUSCITO`);
