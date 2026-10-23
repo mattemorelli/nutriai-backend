@@ -1432,6 +1432,18 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // passa false quando l'utente spegne "Keep the dishes you locked".
   const mantieniBloccati = opzioni.mantieniBloccati !== false;
 
+  // MISURAZIONE TEMPORANEA (25 ottobre 2026, memoria della cache su Render
+  // piano gratuito, 512MB): attiva solo con opzioni.misuraMemoria (nessun
+  // chiamante esistente la passa). Da togliere a fine indagine.
+  const _misuraMemoria = opzioni.misuraMemoria === true;
+  const _memoria = [];
+  const _scattaMemoria = (quando) => {
+    if (!_misuraMemoria) return;
+    const m = process.memoryUsage();
+    _memoria.push({ quando, rss_mb: +(m.rss / 1048576).toFixed(1), heapUsed_mb: +(m.heapUsed / 1048576).toFixed(1), heapTotal_mb: +(m.heapTotal / 1048576).toFixed(1), external_mb: +(m.external / 1048576).toFixed(1) });
+  };
+  _scattaMemoria('ingresso (prima della cache)');
+
   // Seed esplicito se passato (per rigiocare un fallimento segnalato),
   // altrimenti generato qui - ma sempre salvato col piano, cosi' ogni
   // generazione e' rigiocabile a posteriori, non solo quando lo si prevede.
@@ -1482,6 +1494,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   const { foodIdVietati, foodIdSgraditi, nonRisolti, ammesso, gradito, categorieVietate } =
     await caricaVincoli(supabase, userId, dieta);
   const haVincoloGlutine = categorieVietate.has('glutine');
+  _scattaMemoria('dopo il caricamento della cache');
 
   // Cosa l'utente ha deciso di tenere dalla settimana precedente
   const { data: pianoVecchio, error: ePiano } = await supabase
@@ -2982,6 +2995,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     }
   }
 
+  _scattaMemoria('fine generazione (ricerca completata)');
+
   return {
     plan_id: salva ? piano.id : null, giorni_conformi: Math.floor(migliorPunteggio), seed,
     gradino: gradinoRaggiunto, concessioni, uso_gruppi: { ...usoGruppi },
@@ -2990,6 +3005,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
     // li mostra come "N locked dish(es) no longer fit your profile".
     piatti_bloccati_scartati: piattiBloccatiScartati,
+    // MISURAZIONE TEMPORANEA: vedi sopra. undefined quando non richiesto.
+    _memoria: _misuraMemoria ? _memoria : undefined,
   };
 }
 
