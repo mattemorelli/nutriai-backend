@@ -40,6 +40,16 @@ const CORPUS_VERSION = 'v8-paesi-e-vincoli';
 // dishes.mercati e la lista dei piatti qualificati per 'it'.
 const MERCATO_ATTIVO = 'it';
 
+// Pavimento di tempo per il PRANZO (24 ottobre 2026, audit "piano_impossibile"):
+// evening_minutes e' dichiarato per la cena, non esiste un campo utente per
+// il pranzo. Il primo (bollire l'acqua e' un tempo fisico reale) ha una
+// mediana di 30 min nel catalogo e un solo piatto sotto i 15 - usare il
+// tetto stretto della cena anche per il primo rendeva impossibile ogni
+// profilo con una cena rapida, anche quando la cena da sola sarebbe stata
+// benissimo risolvibile. 25 min e' appena sopra il 10 percentile dei primi
+// reali (20,5): abbastanza perche' esista sempre una scelta vera.
+const LIMITE_PRANZO_MINIMO = 25;
+
 // PostgREST impone un tetto di righe per risposta (di default 1000)
 // indipendente da .limit(): una lettura a tutta tabella (senza .eq/.in che
 // la restringa) va sempre paginata con .range() e un ordinamento unico,
@@ -2255,12 +2265,24 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         // prodotto, non un allentamento della scala.
         const limiteBase = ferialeG(g) ? limiteFeriale : Math.max(limiteFeriale, 75);
         const limiteOggi = limiteBase;
+        // CORREZIONE (24 ottobre 2026, audit "piano_impossibile"): il primo
+        // (e il suo contorno) e' a PRANZO, non a cena - usare lo stesso
+        // tetto di evening_minutes (pensato per la cena, vedi il nome del
+        // campo) lo strangolava: nel catalogo esiste UN SOLO primo sotto i
+        // 15 minuti in tutto il mercato 'it' (una crema fredda), contro una
+        // mediana reale di 30 minuti (bollire l'acqua richiede tempo fisico,
+        // non e' un limite del catalogo). Nessuna scelta dichiarata
+        // dall'utente esiste per il tempo del pranzo - LIMITE_PRANZO_MINIMO
+        // e' un pavimento di prodotto, non preso dal profilo, cosi' un
+        // tetto di cena stretto non si riversa piu' sul pranzo.
+        const limiteBasePranzo = ferialeG(g) ? Math.max(limiteFeriale, LIMITE_PRANZO_MINIMO) : Math.max(limiteFeriale, 75);
         const cappaColazione = 15;
         const cappaSpuntino = 10;
 
         st.paeseGiorno = paeseGiorno;
         st.genericoOggi = genericoOggi;
         st.limiteBase = limiteBase;
+        st.limiteBasePranzo = limiteBasePranzo;
 
         if (st.secondo === undefined && !cucinaOggi(g)) {
           for (let k = gi - 1; k >= 0; k--) {
@@ -2276,9 +2298,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
 
         const pronti = [];
-        if (st.primo === undefined) pronti.push(['primo', () => candidatiPrimo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteOggi)]);
+        if (st.primo === undefined) pronti.push(['primo', () => candidatiPrimo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteBasePranzo)]);
         if (st.contornoCena === undefined) pronti.push(['contornoCena', () => candidatiContorno(gi, 'cena', profiloGiorno, paeseGiorno, paeseOk, limiteOggi, st.secondo, st.contornoPranzo)]);
-        if (st.primo !== undefined && st.contornoPranzo === undefined) pronti.push(['contornoPranzo', () => candidatiContorno(gi, 'pranzo', profiloGiorno, paeseGiorno, paeseOk, limiteOggi, st.primo, st.contornoCena)]);
+        if (st.primo !== undefined && st.contornoPranzo === undefined) pronti.push(['contornoPranzo', () => candidatiContorno(gi, 'pranzo', profiloGiorno, paeseGiorno, paeseOk, limiteBasePranzo, st.primo, st.contornoCena)]);
         if (st.colazione === undefined) pronti.push(['colazione', () => candidatiColazione(gi, profiloGiorno, paeseOkLeggero, cappaColazione)]);
         if (st.spuntino === undefined) pronti.push(['spuntino', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino2, cappaSpuntino)]);
         if (st.spuntino2 === undefined) pronti.push(['spuntino2', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino, cappaSpuntino)]);
@@ -2675,10 +2697,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           }
         }
 
-        // Gradino 4: tetto dei minuti allentato.
+        // Gradino 4: tetto dei minuti allentato. primo/contornoPranzo contro
+        // il loro proprio tetto (limiteBasePranzo), non quello della cena.
         for (const [slot, piatto, cappa] of [
-          ['secondo', st.secondo, st.limiteBase], ['primo', st.primo, st.limiteBase],
-          ['contornoCena', st.contornoCena, st.limiteBase], ['contornoPranzo', st.contornoPranzo, st.limiteBase],
+          ['secondo', st.secondo, st.limiteBase], ['primo', st.primo, st.limiteBasePranzo],
+          ['contornoCena', st.contornoCena, st.limiteBase], ['contornoPranzo', st.contornoPranzo, st.limiteBasePranzo],
           ['colazione', st.colazione, 15], ['spuntino', st.spuntino, 10], ['spuntino2', st.spuntino2, 10],
         ]) {
           if (!piatto || (slot === 'secondo' && (st.secondoEAvanzo || st.secondoERipetizione))) continue;
@@ -2838,6 +2861,32 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           ? { tempo_cena_min: limiteSuggerito, testo: `Cena in ${limiteSuggerito} minuti invece di ${limiteFeriale}` }
           : null,
       };
+    }
+
+    // Stesso sospetto sul PRIMO (pranzo, non cena - vedi LIMITE_PRANZO_MINIMO
+    // sopra): il primo ha una mediana reale di 30 minuti nel catalogo
+    // (bollire l'acqua e' un tempo fisico), quindi anche col pavimento di
+    // prodotto possono restare pochi primi compatibili. Solo se il pranzo a
+    // casa serve almeno un giorno - altrimenti il primo non e' mai pianificato.
+    const serveMaiIlPrimo = [1, 2, 3, 4, 5, 6, 7].some((g) => !pranzoFuoriIl(g));
+    if (serveMaiIlPrimo) {
+      const limiteFerialePranzoDiagnostico = Math.max(limiteFeriale, LIMITE_PRANZO_MINIMO);
+      const primiRilevanti = piatti.filter((p) => p.meal_slot === 'primo' && (p.profilo === 'neutro' || famiglie.includes(p.famiglia)));
+      const primiEntroTempo = primiRilevanti.filter((p) => (p.prep_min || 30) <= limiteFerialePranzoDiagnostico && (p.tecnica || 'semplice') === 'semplice');
+      if (primiEntroTempo.length < 3) {
+        const profiliRilevantiPrimo = [...new Set(primiRilevanti.map((p) => p.profilo))];
+        const { limite: limiteSuggeritoPrimo } = limiteEfficace(primiRilevanti, profiliRilevantiPrimo, limiteFerialePranzoDiagnostico, 3);
+        return {
+          errore: 'piano_impossibile',
+          vincolo_bloccante: 'tempo_pranzo',
+          dettaglio: `Con ${limiteFerialePranzoDiagnostico} minuti per il primo a pranzo, solo ${primiEntroTempo.length} primi sono disponibili per le cucine scelte - non bastano per completare una settimana.`,
+          tempo_dichiarato_min: limiteFerialePranzoDiagnostico,
+          piatti_compatibili: primiEntroTempo.length,
+          suggerimento: limiteSuggeritoPrimo > limiteFerialePranzoDiagnostico
+            ? { tempo_pranzo_min: limiteSuggeritoPrimo, testo: `Primo a pranzo con ${limiteSuggeritoPrimo} minuti invece di ${limiteFerialePranzoDiagnostico}` }
+            : null,
+        };
+      }
     }
 
     // Nessuna causa specifica identificata: resta la diagnosi completa
