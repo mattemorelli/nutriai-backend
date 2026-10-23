@@ -1050,11 +1050,7 @@ app.post('/genera-piano', richiedeAuth, async (req, res) => {
     // sempre). Il foglio "nuova settimana" lo manda false quando l'utente
     // spegne "Keep the dishes you locked".
     const mantieniBloccati = req.body?.mantieni_bloccati !== false;
-    // misura_memoria: flag temporaneo (25 ottobre 2026, indagine memoria
-    // della cache su Render) - nessun client reale lo manda, va rimosso a
-    // fine indagine insieme alla strumentazione in generaESalva.
-    const misuraMemoria = req.body?.misura_memoria === true;
-    const piano = await generaESalva(supabase, req.utente.id, undefined, { mantieniBloccati, misuraMemoria });
+    const piano = await generaESalva(supabase, req.utente.id, undefined, { mantieniBloccati });
     // piano_impossibile (25 ottobre 2026, principio inviolabile): nessun
     // piano trovato senza violare una scelta dell'utente - una risposta
     // riconoscibile (422), non un 500 generico ne' un piano scorretto.
