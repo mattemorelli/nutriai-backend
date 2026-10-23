@@ -132,13 +132,30 @@ function descrizioneMotivoEsaurimento(motivo) {
 
 // Quanto ogni elemento puo' essere scalato. Le ancore hanno margini stretti,
 // le leve margini ampi. E' questa distinzione che evita le porzioni assurde.
+//
+// CORREZIONE (25 ottobre 2026, "porzioni che scalano invece di aggiungere
+// piatti"): secondo e contorno allargati dentro l'intervallo di porzione
+// singola che le linee guida (LARN/CREA) considerano normale per un pasto,
+// non oltre - una porzione di carne/pesce/legumi va comunemente da ~100g a
+// ~200g secondo il fabbisogno della persona (un'ancora stretta a 0.9-1.3
+// su una base di 150g restava 135-195g, sotto il range alto reale); le
+// verdure come contorno tollerano porzioni piu' ampie senza diventare
+// irrealistiche (restano a bassa densita' calorica). Prima di questa
+// correzione, un fabbisogno alto (misurato: 3200 kcal) con un'ancora troppo
+// stretta esauriva lo spazio di scala quasi subito e faceva scattare gli
+// aumenti di emergenza (pane a pranzo, terzo spuntino, colazione piu'
+// ricca) - una giornata con piu' voce invece di porzioni piu' generose. Il
+// tetto assoluto (TETTO_GRAMMI sotto) resta la vera rete di sicurezza
+// contro le porzioni assurde: questi rapporti non bastano da soli a
+// produrne una, ci vuole anche un piatto a bassa densita' e un fabbisogno
+// molto alto, ed e' li' che TETTO_GRAMMI interviene.
 const LIMITI_SCALA = {
   base:      [0.4, 2.2],   // riso, pasta, pane, patate: la leva principale
   colazione: [0.8, 2.0],
   spuntino:  [0.8, 2.0],
   primo:     [0.7, 1.8],
-  contorno:  [0.8, 1.5],
-  secondo:   [0.9, 1.3],   // ancora: la porzione di proteina quasi non si tocca
+  contorno:  [0.8, 1.8],   // era 1.5: le verdure tollerano porzioni piu' ampie
+  secondo:   [0.85, 1.5],  // era 0.9-1.3: resta un'ancora, ma copre l'intervallo LARN 100-200g
 };
 
 // Tetto assoluto in grammi per portata (problema D, 2026-10-09): LIMITI_SCALA
