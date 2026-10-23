@@ -78,7 +78,14 @@ const COMBO = [
     const inizio = Date.now();
     try {
       const r = await generaESalva(finto, crypto.randomUUID(), SEED, { salva: false });
-      risultati.push({ etichetta, ok: true, gradino: r.gradino, secondi: (Date.now() - inizio) / 1000 });
+      // piano_impossibile (25 ottobre 2026): generaESalva ora RITORNA questo
+      // esito invece di lanciare un errore - va trattato come un fallimento
+      // qui, altrimenti risulterebbe "OK" con un gradino inesistente.
+      if (r.errore === 'piano_impossibile') {
+        risultati.push({ etichetta, ok: false, errore: `piano_impossibile (${r.vincolo_bloccante}): ${r.dettaglio}`, secondi: (Date.now() - inizio) / 1000 });
+      } else {
+        risultati.push({ etichetta, ok: true, gradino: r.gradino, secondi: (Date.now() - inizio) / 1000 });
+      }
     } catch (e) {
       risultati.push({ etichetta, ok: false, errore: e.message, secondi: (Date.now() - inizio) / 1000 });
     }

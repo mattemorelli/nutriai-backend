@@ -783,6 +783,13 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
       piano = await generaESalva(supabase, utenteId);
     }
 
+    // piano_impossibile (25 ottobre 2026, principio inviolabile): stesso
+    // trattamento di /genera-piano - una risposta riconoscibile (422), il
+    // profilo resta comunque salvato (kcal/tdee), solo il piano manca.
+    if (piano?.errore === 'piano_impossibile') {
+      return res.status(422).json({ kcal: target.kcal, tdee: target.tdee_predetto, ...piano });
+    }
+
     res.json(giornoGratisGiaUsato
       ? { ok: true, kcal: target.kcal, tdee: target.tdee_predetto, piano: null, giorno_gratis_gia_usato: true }
       : { ok: true, kcal: target.kcal, tdee: target.tdee_predetto, ...piano });
@@ -1044,6 +1051,10 @@ app.post('/genera-piano', richiedeAuth, async (req, res) => {
     // spegne "Keep the dishes you locked".
     const mantieniBloccati = req.body?.mantieni_bloccati !== false;
     const piano = await generaESalva(supabase, req.utente.id, undefined, { mantieniBloccati });
+    // piano_impossibile (25 ottobre 2026, principio inviolabile): nessun
+    // piano trovato senza violare una scelta dell'utente - una risposta
+    // riconoscibile (422), non un 500 generico ne' un piano scorretto.
+    if (piano.errore === 'piano_impossibile') return res.status(422).json(piano);
     res.json({ ok: true, ...piano });
   } catch (err) {
     console.error('ERRORE /genera-piano:', err);

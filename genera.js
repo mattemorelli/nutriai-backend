@@ -86,14 +86,18 @@ const GRADINI = [
   { gradino: '2b', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true } },
   { gradino: '3a', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true } },
   { gradino: '3b', soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true } },
-  { gradino: '4',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true } },
+  { gradino: '4',  soglia: 7,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true } },
   // 4b (2026-09-20): le preferenze alimentari (kind non_gradito + severity
-  // preferibile) cedono qui, e solo qui. Dopo il tempo allargato perche' un
-  // piatto sgradito pesa piu' di una ricetta lunga; prima della soglia salute
-  // perche' il voto e' la promessa centrale del prodotto. Allergie, intolleranze
-  // e dieta non entrano in questo gradino ne' in nessun altro.
-  { gradino: '4b', soglia: 7, opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true } },
-  { gradino: '5',  soglia: 6.5, opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true } },
+  // preferibile) cedono qui, e solo qui - prima della soglia salute perche'
+  // il voto e' la promessa centrale del prodotto. Allergie, intolleranze
+  // e dieta non entrano in questo gradino ne' in nessun altro. CORREZIONE
+  // (25 ottobre 2026, principio inviolabile): il tempo dichiarato (tetto
+  // minuti per pasto) NON e' mai fra le cose che un gradino allenta - era
+  // l'unica eccezione (tempoAllargato, tolto da qui e da tutti i gradini) e
+  // violava "tempo per i pasti" dichiarato dall'utente, una scelta sua,
+  // non una regola di qualita' interna.
+  { gradino: '4b', soglia: 7, opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, preferenzeTolleranti: true } },
+  { gradino: '5',  soglia: 6.5, opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, preferenzeTolleranti: true } },
   // Ultimo gradino (2026-10-09, terza correzione: "nessuno senza piano"):
   // SOLO qui le proteine possono restare sotto il 90% del minimo - mai nei
   // gradini precedenti, nemmeno 5-soglia-6.5. kcal (+-10%) e il tetto sale/
@@ -102,7 +106,7 @@ const GRADINI = [
   // con piu' proteine possibile invece di nessuna settimana". Il
   // ricercatore di proteine (provaAumentoProteine) ha gia' provato a
   // massimizzarle PRIMA che questo gradino venga anche solo tentato.
-  { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, tempoAllargato: true, preferenzeTolleranti: true, proteinaTollerante: true } },
+  { gradino: '5',  soglia: 6,   opz: { ripetizione: true, quotaTollerante: true, tettoTollerante: true, genericoStessaFamiglia: true, genericoQualunqueFamiglia: true, preferenzeTolleranti: true, proteinaTollerante: true } },
 ];
 
 // Perche' un tentativo (un profilo, a un gradino) si e' fermato senza
@@ -577,9 +581,14 @@ function pianoProteico(gruppiDisponibili, rng) {
   return mescola(piano, rng).slice(0, 7);
 }
 
-// I minuti dichiarati sono una preferenza, non un muro. Se con quel limite
-// nessun profilo ha abbastanza secondi, si allarga di 10 minuti alla volta:
-// meglio una cena da 30 minuti che nessuna cena.
+// CORREZIONE (25 ottobre 2026, principio inviolabile): il tempo dichiarato
+// e' una scelta dell'utente, non una preferenza che un gradino puo' allargare
+// - la vecchia versione di questa funzione (e di chi la chiamava) allargava
+// il limite in automatico quando il catalogo era insufficiente, e quel
+// limite allargato finiva nella ricerca vera (limiteFeriale). Da oggi questa
+// funzione serve SOLO a diagnosticare "quanti piatti ci sarebbero con X
+// minuti in piu'" per il messaggio di errore (vedi diagnosticaTempoBlocca
+// piu' sotto) - nessun chiamante la usa piu' per decidere il limite reale.
 function limiteEfficace(secondi, profili, minutiDichiarati, minimoRichiesto) {
   for (const extra of [0, 10, 20, 35, 50]) {
     const limite = minutiDichiarati + extra;
@@ -596,26 +605,20 @@ function limiteEfficace(secondi, profili, minutiDichiarati, minimoRichiesto) {
 }
 
 // Da un catalogo gia' filtrato per dieta, i profili con secondi utilizzabili
-// e i gruppi proteici che ciascuno copre entro il limite serale effettivo.
-// Estratta da generaESalva perche' il controllo di capienza fuori linea (F0)
-// deve vedere lo stesso catalogo che vedrebbe una generazione vera, non una
-// sua approssimazione con soglie ricalcolate a mano.
+// e i gruppi proteici che ciascuno copre entro il limite serale DICHIARATO
+// (mai allargato, vedi la correzione sopra limiteEfficace). Estratta da
+// generaESalva perche' il controllo di capienza fuori linea (F0) deve
+// vedere lo stesso catalogo che vedrebbe una generazione vera, non una sua
+// approssimazione con soglie ricalcolate a mano.
 function gruppiPerProfiloDa(piatti, minutiSera = 45) {
   const profiliConSecondo = [...new Set(
     piatti.filter(p => p.meal_slot === 'secondo' && p.profilo !== 'neutro').map(p => p.profilo)
   )];
 
-  const { limite: limiteFeriale, allargato } = limiteEfficace(
-    piatti.filter(p => p.meal_slot === 'secondo' && p.profilo !== 'neutro'),
-    profiliConSecondo,
-    minutiSera,
-    8
-  );
-
   const gruppiPerProfilo = {};
   for (const p of piatti.filter(x =>
     x.meal_slot === 'secondo' && x.profilo !== 'neutro' &&
-    (x.prep_min || 30) <= limiteFeriale &&
+    (x.prep_min || 30) <= minutiSera &&
     (x.tecnica || 'semplice') === 'semplice'
   )) {
     if (p.gruppo) {
@@ -624,7 +627,7 @@ function gruppiPerProfiloDa(piatti, minutiSera = 45) {
     }
   }
 
-  return { profiliConSecondo, limiteFeriale, gruppiPerProfilo, allargato };
+  return { profiliConSecondo, gruppiPerProfilo };
 }
 
 // Normalizza una stringa per il confronto fra alias: minuscole, accenti
@@ -1554,7 +1557,10 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     ? Math.max(15, minutiSera - 10)
     : minutiSera;
 
-  const { profiliConSecondo, limiteFeriale, gruppiPerProfilo, allargato } = gruppiPerProfiloDa(piatti, minutiCorretti);
+  // limiteFeriale e' il tempo reale dichiarato (minutiCorretti), sempre -
+  // mai allargato da gruppiPerProfiloDa (vedi la correzione sopra).
+  const limiteFeriale = minutiCorretti;
+  const { profiliConSecondo, gruppiPerProfilo } = gruppiPerProfiloDa(piatti, minutiCorretti);
   if (!profiliConSecondo.length) throw new Error('Nessun profilo ha secondi utilizzabili');
 
   // Bug trovato il 2026-10-09 (vedi audit/analisi-generatore.md, problema C):
@@ -1569,10 +1575,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // QUOTE - la carne non poteva mai essere pianificata, non solo essere rara.
   const gruppiUnioneSettimana = new Set();
   for (const pr of profiliConSecondo) for (const g of (gruppiPerProfilo[pr] || [])) gruppiUnioneSettimana.add(g);
-
-  if (allargato) {
-    console.log(`[genera] limite serale allargato da ${minutiCorretti} a ${limiteFeriale} min: catalogo insufficiente`);
-  }
 
   // Fase 3 Passo B: non si prefiltra piu' quali profili sono "abbastanza
   // ricchi" (la vecchia soglia >=5 secondi e >=2 gruppi proteici misurava la
@@ -1737,7 +1739,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // gradino 0 = obiettivo, nessun allentamento. sogliaSalute e' passata a
   // parte perche' al gradino 5 scende sotto 7 in due passi (6.5 poi 6),
   // sempre dentro lo stesso gradino 5.
-  function provaGradino(opz, sogliaSalute) {
+  function provaGradino(opz, sogliaSalute, scadenza) {
     const insiemeBase = opz.preferenzeTolleranti ? piattiConSgraditi : piatti;
     const perSlot = (slot) => insiemeBase.filter(p => p.meal_slot === slot && (p.health_score == null || p.health_score >= sogliaSalute));
     const primi     = perSlot('primo');
@@ -2246,14 +2248,15 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           || (opz.genericoStessaFamiglia && famigliaOggi && FAMIGLIA_DI_GENERICO[p.paese] === famigliaOggi)
           || (opz.genericoQualunqueFamiglia && GENERICI.includes(p.paese));
         const paeseOkLeggero = (p) => paeseOk(p) || p.paese === 'mediterraneo_generico';
+        // CORREZIONE (25 ottobre 2026, principio inviolabile): limiteFeriale
+        // e' sempre il tempo reale dichiarato (vedi minutiCorretti sopra) -
+        // nessun gradino lo allarga mai (tempoAllargato tolto, vedi GRADINI).
+        // Il weekend (Math.max(..., 75)) resta un'assunzione di base del
+        // prodotto, non un allentamento della scala.
         const limiteBase = ferialeG(g) ? limiteFeriale : Math.max(limiteFeriale, 75);
-        // Gradino 4: +10 minuti. Resta minimo perche' e' comunque solo un
-        // livello IN PIU' nella lista di candidati di ogni slot (concatenaLivelli
-        // non lo aggiunge come filtro sostitutivo ma come coda), quindi entra
-        // in gioco solo quando i piatti entro il tempo normale non bastano.
-        const limiteOggi = opz.tempoAllargato ? limiteBase + 10 : limiteBase;
-        const cappaColazione = opz.tempoAllargato ? 25 : 15;
-        const cappaSpuntino = opz.tempoAllargato ? 20 : 10;
+        const limiteOggi = limiteBase;
+        const cappaColazione = 15;
+        const cappaSpuntino = 10;
 
         st.paeseGiorno = paeseGiorno;
         st.genericoOggi = genericoOggi;
@@ -2337,8 +2340,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           || (opz.genericoStessaFamiglia && famigliaOggi && FAMIGLIA_DI_GENERICO[p.paese] === famigliaOggi)
           || (opz.genericoQualunqueFamiglia && GENERICI.includes(p.paese));
         const paeseOkLeggero = (p) => paeseOk(p) || p.paese === 'mediterraneo_generico';
-        const cappaColazione = opz.tempoAllargato ? 25 : 15;
-        const cappaSpuntino = opz.tempoAllargato ? 20 : 10;
+        // Stesso principio di sopra: tetti fissi, mai allargati da un gradino.
+        const cappaColazione = 15;
+        const cappaSpuntino = 10;
         return { g, profiloGiorno, paeseOk, paeseOkLeggero, cappaColazione, cappaSpuntino };
       }
 
@@ -2483,7 +2487,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         let gi = giIniziale;
         while (gi < 7) {
           if (passiUsati.valore > MAX_PASSI) return { esaurito: true, motivo: 'tetto' };
-          if (Date.now() > scadenzaRicerca) return { esaurito: true, motivo: 'tempo' };
+          if (Date.now() > scadenza) return { esaurito: true, motivo: 'tempo' };
           const decisione = prossimaDecisione(gi);
           if (decisione === 'COMPLETO') {
             const st = statoGiorni[gi];
@@ -2730,27 +2734,38 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // allentamento di regola: e' un secondo tetto, oltre a quello dei passi
   // (MAX_PASSI, dentro provaGradino), sullo STESSO punto di controllo
   // (avanzaFinDove) - un tentativo che lo supera si considera esaurito
-  // esattamente come se avesse esaurito i passi, la scala passa al gradino
-  // successivo o si ferma. Configurabile via opzioni.tempoMassimoMs
-  // (nessun chiamante esistente lo passa, quindi il default si applica
-  // sempre): se il tempo scade PRIMA che un gradino sia stato tentato,
-  // quel gradino (e tutti i successivi) non vengono nemmeno provati - la
-  // scala si ferma con l'esito migliore trovato finora (un gradino riuscito
-  // prima della scadenza), o con lo stesso errore di oggi se nessun gradino
-  // e' ancora riuscito.
+  // esattamente come se avesse esaurito i passi.
+  //
+  // CORREZIONE URGENTE (25 ottobre 2026): la prima versione applicava il
+  // tetto di tempo a TUTTI i gradini, compreso l'ultimo - quello che la
+  // scala stessa commenta come "nessuno senza piano" (vedi sopra, GRADINI).
+  // In produzione questo ha fatto FALLIRE profili che prima ricevevano
+  // sempre un piano (misurato: l'account di test con cena in 20 minuti,
+  // da gradino 5 riuscito in 51-59s a errore in 5s). Un errore e' peggio
+  // di un'attesa: ora il tetto di tempo vale solo per i gradini PRIMA
+  // dell'ultimo (gradiniConTetto sotto) - se il tempo scade durante uno di
+  // questi, si salta DIRETTAMENTE all'ultimo gradino (gradinoFinale),
+  // tentato SENZA alcun tetto di tempo, solo col tetto dei passi di
+  // sempre (MAX_PASSI) - esattamente il comportamento di prima di ieri per
+  // quel gradino. Risultato: profili facili restano veloci (risolti ai
+  // primi gradini, dentro il tempo massimo); profili difficili restano
+  // lenti come sempre, ma ricevono sempre un piano - mai un errore che
+  // prima non c'era.
   const scadenzaRicerca = Date.now() + (opzioni.tempoMassimoMs ?? 4000);
+  const gradiniConTetto = GRADINI.slice(0, -1);
+  const gradinoFinale = GRADINI[GRADINI.length - 1];
 
   let esito = null;
   let gradinoRaggiunto = null;
   const diagnosticaCompleta = [];
 
-  for (const passo of GRADINI) {
+  for (const passo of gradiniConTetto) {
     if (Date.now() > scadenzaRicerca) {
-      console.log(`[scala] tempo massimo di ricerca raggiunto prima del gradino ${passo.gradino}: la scala si ferma qui`);
+      console.log(`[scala] tempo massimo di ricerca raggiunto prima del gradino ${passo.gradino}: si salta direttamente all'ultimo gradino (${gradinoFinale.gradino}), senza tetto di tempo`);
       diagnosticaCompleta.push(`gradino ${passo.gradino} (soglia ${passo.soglia}): non tentato, tempo massimo di ricerca raggiunto`);
       break;
     }
-    const r = provaGradino(passo.opz, passo.soglia);
+    const r = provaGradino(passo.opz, passo.soglia, scadenzaRicerca);
     if (r.ok) {
       console.log(`[scala] gradino ${passo.gradino} (soglia ${passo.soglia}): RIUSCITO`);
       esito = r; gradinoRaggiunto = passo.gradino; break;
@@ -2759,27 +2774,82 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     diagnosticaCompleta.push(`gradino ${passo.gradino} (soglia ${passo.soglia}): ${r.diagnosticaProfili.join(', ') || 'nessun profilo'}`);
   }
 
+  // L'ultimo gradino, sempre - mai col tetto di tempo (vedi sopra): e' la
+  // garanzia che nessun profilo resti senza piano solo perche' il tempo e'
+  // scaduto prima di arrivarci.
   if (!esito) {
-    // Residuo ammesso da C4: se anche al gradino piu' permissivo non esiste
-    // NESSUN secondo compatibile con dieta/allergie per il paese scelto, il
-    // messaggio dice esattamente questo, non una frase generica - e' l'unico
-    // fallimento che dieta e allergie da sole possono causare, e la scala non
-    // ha ne' deve avere un gradino che le tocchi.
+    const r = provaGradino(gradinoFinale.opz, gradinoFinale.soglia, Infinity);
+    if (r.ok) {
+      console.log(`[scala] ultimo gradino ${gradinoFinale.gradino} (soglia ${gradinoFinale.soglia}, senza tetto di tempo): RIUSCITO`);
+      esito = r; gradinoRaggiunto = gradinoFinale.gradino;
+    } else {
+      console.log(`[scala] ultimo gradino ${gradinoFinale.gradino} (soglia ${gradinoFinale.soglia}, senza tetto di tempo): esaurito per tutti i profili - ${r.diagnosticaProfili.join(' | ') || 'nessun profilo'}`);
+      diagnosticaCompleta.push(`gradino ${gradinoFinale.gradino} (soglia ${gradinoFinale.soglia}): ${r.diagnosticaProfili.join(', ') || 'nessun profilo'}`);
+    }
+  }
+
+  if (!esito) {
+    // DIAGNOSI STRUTTURATA (25 ottobre 2026, principio inviolabile - punto
+    // A4): nessun piano trovato nemmeno all'ultimo gradino, senza aver mai
+    // violato una scelta dell'utente (dieta, allergie, tempo...). Non e' un
+    // errore generico ne' un piano scorretto: e' una risposta riconoscibile
+    // (errore: 'piano_impossibile') con quale scelta blocca, quanti piatti
+    // sarebbero compatibili e quale modifica minima lo sbloccherebbe -
+    // l'interfaccia che la mostra all'utente si disegna altrove, qui si
+    // prepara solo il dato. RETURN, non throw: chi chiama (server.js) deve
+    // controllare piano.errore prima di trattare il risultato come un piano.
+
+    // Caso piu' netto (residuo ammesso da C4): NESSUN secondo compatibile
+    // con dieta/allergie esiste per il paese scelto, a prescindere dal
+    // tempo - il catalogo manca del tutto per questa combinazione.
     const paeseUnico = paesiScelti[0] || null;
     const genericoUnico = paeseUnico ? GENERICO_DI[paeseUnico] : null;
     const nessunSecondoPerPaese = paeseUnico
       ? !piatti.some(p => p.meal_slot === 'secondo' && (p.paese === paeseUnico || p.paese === genericoUnico))
       : false;
     if (nessunSecondoPerPaese) {
-      throw new Error(
-        `Nessun secondo compatibile con la dieta dichiarata e' disponibile per ${paeseUnico} (o il suo generico ${genericoUnico}). ` +
-        `Manca il catalogo per questa combinazione, non e' un limite della ricerca.`
-      );
+      return {
+        errore: 'piano_impossibile',
+        vincolo_bloccante: 'paese',
+        dettaglio: `Nessun secondo compatibile con la dieta dichiarata e' disponibile per ${paeseUnico} (o il suo generico ${genericoUnico}). Manca il catalogo per questa combinazione.`,
+        piatti_compatibili: 0,
+        suggerimento: null,
+      };
     }
-    throw new Error(
-      `Nessuna settimana completabile nonostante la scala di allentamento fino al gradino 5. ` +
-      diagnosticaCompleta.join(' || ')
-    );
+
+    // Sospetto piu' comune (vedi l'audit del 24 ottobre sulla matrice
+    // allargata): troppo pochi secondi delle cucine scelte rientrano nel
+    // tempo REALE dichiarato (limiteFeriale, mai allargato). Stessa soglia
+    // (8) che il resto del codice usa per giudicare un profilo "abbastanza
+    // ricco" (vedi limiteEfficace/gruppiPerProfiloDa sopra) - qui SOLO per
+    // diagnosticare il messaggio, mai per cambiare la ricerca vera.
+    const secondiRilevanti = piatti.filter(p => p.meal_slot === 'secondo' && (p.profilo === 'neutro' || famiglie.includes(p.famiglia)));
+    const entroTempo = secondiRilevanti.filter(p => (p.prep_min || 30) <= limiteFeriale && (p.tecnica || 'semplice') === 'semplice');
+    if (entroTempo.length < 8) {
+      const profiliRilevanti = [...new Set(secondiRilevanti.map((p) => p.profilo))];
+      const { limite: limiteSuggerito } = limiteEfficace(secondiRilevanti, profiliRilevanti, limiteFeriale, 8);
+      return {
+        errore: 'piano_impossibile',
+        vincolo_bloccante: 'tempo_cena',
+        dettaglio: `Con ${limiteFeriale} minuti per la cena, solo ${entroTempo.length} secondi sono disponibili per le cucine scelte - non bastano per completare una settimana rispettando dieta e allergie.`,
+        tempo_dichiarato_min: limiteFeriale,
+        piatti_compatibili: entroTempo.length,
+        suggerimento: limiteSuggerito > limiteFeriale
+          ? { tempo_cena_min: limiteSuggerito, testo: `Cena in ${limiteSuggerito} minuti invece di ${limiteFeriale}` }
+          : null,
+      };
+    }
+
+    // Nessuna causa specifica identificata: resta la diagnosi completa
+    // gradino per gradino, nello stesso campo di sempre.
+    return {
+      errore: 'piano_impossibile',
+      vincolo_bloccante: 'non_identificato',
+      dettaglio: `Nessuna settimana completabile nonostante la scala di allentamento fino al gradino ${gradinoFinale.gradino}, rispettando sempre dieta, allergie, tempo e le altre scelte dichiarate.`,
+      diagnostica: diagnosticaCompleta,
+      piatti_compatibili: null,
+      suggerimento: null,
+    };
   }
 
   const { settimana: migliore, punteggio: migliorPunteggio, concessioni, usoGruppi } = esito;
