@@ -33,10 +33,40 @@ per gli inserimenti in `dish_ingredients`.
    europeo-aceto/erbe, europeo-burro/panna/brasato, asiatico-soia/gochujang,
    asiatico-lime/cocco, latino-lime/messicano.)
 5. **famiglia**: mediterranea, neutra, latina, asiatica, americana.
-6. **steps_en** deve avere 5-6 passaggi che spiegano il *perché*, non solo il cosa.
-   Esempio: "sottili, perché dentro un cartoccio niente si mescola".
-   **steps** in italiano ne ha 2-3, sintetici.
-7. **Temperature interne**: pollame 74C, maiale 63C, pesce 63C, manzo 52C al sangue.
+6. **steps** e **steps_en** devono essere completi in entrambe le lingue e avere lo
+   stesso numero di passaggi, 5-8 (non più "steps sintetico in italiano, steps_en
+   esteso in inglese" come nella versione precedente di questa regola). Ogni
+   passaggio spiega il *perché*, non solo il cosa: esempio "sottili, perché dentro
+   un cartoccio niente si mescola". Un passaggio contiene **una sola azione** (non
+   accorpare due operazioni indipendenti in un unico passaggio). I tempi vanno
+   sempre nel formato "X min" o "X-Y min" (mai "qualche minuto"/"a few minutes",
+   mai secondi/ore isolati senza convertirli in min). Un'azione che corre in
+   parallelo a un timer già avviato (acqua che bolle, forno, un'altra padella)
+   inizia il passaggio con "Mentre ..."/"While ...", non con "nel frattempo"/
+   "meanwhile" a metà frase: la modalità Cook usa la parola iniziale del passaggio
+   per decidere se tenere visibile il timer del passaggio precedente (regola F,
+   vedi valida-ricette-cook.js). Il tempo di un passaggio "Mentre"/"While" non si
+   somma al tempo totale della ricetta, perché corre in parallelo a un processo
+   già contato.
+7. **Temperature interne e segnali di cottura** (FSIS/USDA). Per specie:
+   - **pollame** (pollo, tacchino, anatra, quaglia, faraona): 74°C.
+   - **carne macinata e ripieni di carne** (qualsiasi specie): 71°C.
+   - **tagli interi** di manzo, vitello, maiale, agnello, canguro: 63°C + 3 min di
+     riposo esplicito nel testo (regola C, vedi valida-ricette-cook.js).
+   - **pesce**: 63°C oppure il segnale visivo equivalente (carne opaca che si
+     sfalda con la forchetta) — non serve citare entrambi.
+   - **crostacei e molluschi**: polpa opaca e soda, nessuna temperatura numerica.
+   Il termometro (temperatura numerica in °C) si cita **solo se il pezzo è spesso
+   almeno 2 cm** (petto di pollo intero, trancio di pesce, pezzo di carne intero).
+   Sotto i 2 cm (fettine, scaloppine, codette di gamberi, cosce sottili come la
+   quaglia) il termometro non è attendibile: si usa tempo + segnale visivo/al
+   tatto (es. "la coscia si muove liberamente nell'articolazione", "i succhi sono
+   chiari", "la pelle è dorata e croccante").
+   **"Senza tracce rosa"/"no pink remains"** si usa **solo** per pollo, tacchino e
+   carne macinata di qualsiasi specie: **mai per l'anatra** (la sua carne resta
+   scura per natura, il test del rosa non è applicabile) **né per tagli interi di
+   carne rossa** (manzo, vitello, agnello, canguro), dove a 63°C il colore interno
+   non è un indicatore di sicurezza.
 8. **Verificare i duplicati** prima di inserire: un piatto con lo stesso nome
    nello stesso paese non va aggiunto.
 9. **ruolo_primario e ruoli_coperti** (Fase 4 F1, 2026-09-12). Ruoli:
