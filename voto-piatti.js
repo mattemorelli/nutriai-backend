@@ -34,7 +34,7 @@
 // allarme. Quando divergono molto, o e' sbagliata la ricetta o e' sbagliato il
 // voto — ed e' il controllo che oggi non esiste.
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 // I limiti giornalieri che genera.js gia' applica (const LIMITI). Le soglie
@@ -154,7 +154,15 @@ function votoCalcolato(v, salsaIndustriale) {
   };
 }
 
-(async () => {
+// Riuso minimo e non invasivo: la formula va copiata una volta sola, non
+// duplicata altrove (rischio di scostamento silenzioso fra le due copie).
+// L'IIFE sotto resta sola lettura com'era - gira SOLO quando il file e'
+// eseguito direttamente (`node voto-piatti.js`), non quando viene require()-ato
+// per la funzione: altrimenti anche solo importare votoCalcolato farebbe
+// scattare l'intero audit/calibrazione come effetto collaterale.
+module.exports = { votoCalcolato, SOGLIE, PESI, CARNE_PROCESSATA_APPROVATA };
+
+if (require.main === module) (async () => {
   const c = new Client({ connectionString: process.env.DATABASE_URL });
   await c.connect();
 
