@@ -14,7 +14,7 @@
 // categoria che si e' svuotata rispetto a quanto registrato qui sotto.
 //
 // Uso: node verifica-risoluzione-allergeni.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 const { risolviSubject, caricaCatalogoPerRisoluzione, CATEGORIA_ALLERGENE, normalizza } = require('./genera.js');

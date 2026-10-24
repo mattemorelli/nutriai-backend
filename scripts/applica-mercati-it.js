@@ -8,7 +8,7 @@
 // era un ingrediente estraneo non raccontato da nessuna parte.
 //
 // Una sola transazione: se qualcosa fallisce non resta nulla a metà.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');

@@ -2,7 +2,7 @@
 // accompagnamento 'pane' o 'patate' (dopo la Correzione 1, simulata senza
 // scrivere nel database), per ciascuna dieta e per chi ha allergia al
 // glutine. Risponde al punto 1 della richiesta di oggi.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const { caricaPiatti, foodIdVietatiPerDieta, risolviSubject, caricaCatalogoPerRisoluzione } = require('./genera.js');

@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 function normalizza(s) {

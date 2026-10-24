@@ -2,7 +2,7 @@
 // accompagnamenti pane/patate sempre disponibili (simula-accompagnamenti-
 // pane-patate.js) oltre alla Correzione 1. Risponde al punto 3 della
 // richiesta di oggi.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const fs = require('fs');
 const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');

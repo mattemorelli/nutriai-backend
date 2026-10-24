@@ -21,7 +21,7 @@
 // Questo script confronta i due metodi piatto per piatto e stampa dove
 // cambiano idea. Si guarda l'output PRIMA di cambiare genera.js.
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 // --- il metodo di oggi, copiato da genera.js senza modifiche ---

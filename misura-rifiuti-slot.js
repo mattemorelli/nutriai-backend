@@ -5,7 +5,7 @@
 // meal_outcomes e le rimuove alla fine.
 // Uso: node misura-rifiuti-slot.js <USER_ID di test>
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva, caricaPiatti, FAMIGLIE_PER_CUCINA } = require('./genera.js');
 

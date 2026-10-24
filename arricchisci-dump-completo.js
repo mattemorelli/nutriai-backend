@@ -3,7 +3,7 @@
 // nova_group, additives_n, nutri_score) e i nutrienti grezzi per il voto_salute
 // (Fase 2), leggendo il dump completo scaricato in dati/off-fresh.csv.gz.
 // Nessuna chiamata API: un'unica passata sul file.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const fs = require('fs');
 const zlib = require('zlib');

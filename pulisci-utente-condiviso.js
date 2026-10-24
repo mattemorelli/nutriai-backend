@@ -1,7 +1,7 @@
 // Cancella i piani accumulati sull'utente di test condiviso storico
 // (b8b2e50e), debito di settimane di verifiche precedenti - non piani di
 // oggi. Uso singolo, non un comando ricorrente come pulisci-utenti-test.js.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const commit = process.argv[2] === '--commit';
 const USER_ID = 'b8b2e50e-508d-4591-83ba-aea7b88fe27b';

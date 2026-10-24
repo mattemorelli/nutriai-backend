@@ -1,7 +1,7 @@
 // Come matrice-v4.js, ma usa generaESalvaV4 (tanti tentativi brevi con
 // seed diversi, Parte 1 punto 11c) invece della chiamata diretta a
 // generaESalva. SOLA LETTURA, nessuna scrittura.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const fs = require('fs');
 const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');

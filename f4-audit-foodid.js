@@ -13,7 +13,7 @@
 // mantenendo l'alimento) e salva la proposta in f4-foodid-proposta.json.
 // La proposta va letta e corretta a mano prima di f4-unifica-foodid.js.
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 

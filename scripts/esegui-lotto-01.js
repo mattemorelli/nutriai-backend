@@ -6,7 +6,7 @@
 //    alimenti "cotti" gia' esistenti (o nuovi), e aggiorna il loro voto salute.
 // 4. categoria_impatto su pomodorini_it/frutti_bosco_it.
 // 5. 13 piatti nuovi (dishes + dish_ingredients), ricetta_passi, ricetta_info.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const fs = require('fs');
 const piattiData = require('./lotto-01-piatti.json').piatti;

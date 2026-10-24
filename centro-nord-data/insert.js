@@ -1,6 +1,6 @@
 // Inserisce un blocco di piatti per il paese 'centro_nord_generico'.
 // Uso: node centro-nord-data/insert.js centro-nord-data/colazione.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const path = require('path');
 

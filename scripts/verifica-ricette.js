@@ -21,7 +21,7 @@
 //
 // Fallisce (exit code 1) se trova almeno un errore. Gli avvisi non
 // bloccano, ma vale la pena leggerli.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

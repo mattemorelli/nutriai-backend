@@ -12,7 +12,7 @@
 // rifiutato (rifiutato = () => false). Se un profilo risulta al limite anche
 // cosi', un utente reale con meno giorni di cottura o piatti gia' rifiutati
 // sta comunque peggio.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 const {

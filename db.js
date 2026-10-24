@@ -1,5 +1,5 @@
 // db.js — esegue SQL arbitrario su Supabase
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 const sql = process.argv[2];

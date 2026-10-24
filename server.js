@@ -6,7 +6,7 @@ const { trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto } = require
 const { listaSpesa, ingredientiPiatto, dispensa, cambiaDispensa, nascondiPerSettimana, marchePer, sceltePer, classificaInsegne } = require('./spesa');
 const { votoBarcode } = require('./voto');
 const { ritratto, carbonioSettimanale, mappaPaesi } = require('./tu');
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');

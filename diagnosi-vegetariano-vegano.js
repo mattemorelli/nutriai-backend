@@ -1,7 +1,7 @@
 // SOLA LETTURA: scompone il pool mercato IT per vegetariano/vegano, per
 // meal_slot e gruppo proteico, con la Correzione 1 + accompagnamenti
 // simulati attivi - per capire esattamente dove manca varietà (punto 4).
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const { caricaPiatti, foodIdVietatiPerDieta } = require('./genera.js');

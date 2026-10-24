@@ -16,7 +16,7 @@
 //
 // Non tocca dishes.steps/steps_en, plans, plan_items, meal_outcomes.
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 const AGGIUNTE = [

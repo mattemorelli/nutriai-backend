@@ -1,6 +1,6 @@
 // Inserisce un blocco di piatti per il paese 'regno_unito'.
 // Uso: node regno-unito-data/insert.js regno-unito-data/secondo.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const path = require('path');
 

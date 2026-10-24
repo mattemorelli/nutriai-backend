@@ -2,7 +2,7 @@
 // aver eliminato la mappa cucina->famiglia duplicata in sostituisci.js
 // (ora legge FAMIGLIE_PER_CUCINA da genera.js), controllare che
 // sostituisci.js restituisca 3 proposte del paese giusto su dieci casi reali.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 const { generaESalva } = require('./genera');

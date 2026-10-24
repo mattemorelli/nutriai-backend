@@ -17,7 +17,7 @@
 // Esce con codice diverso da 0 solo se trova errori reali di calcolo
 // (dati mancanti); i voti saturati sono sempre un AVVISO, mai un blocco -
 // la calibrazione a mano e' un giudizio, non una regola automatica.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 

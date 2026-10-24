@@ -3,7 +3,7 @@
 //   lenticchie rosse" (una sola pentola d'acqua riusata, non due)
 // - inserisce ricetta_info per le ricette del blocco 1 che hanno
 //   prep_anticipo (fave, baccalà)
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const dati = require('./cook-blocco-01-dati.json');
 

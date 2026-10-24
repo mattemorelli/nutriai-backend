@@ -8,7 +8,7 @@
 // Sempre salva:false.
 // Uso: node test-errori-lettura.js <USER_ID di test>
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva, caricaVincoli } = require('./genera.js');
 const { trovaProposte } = require('./sostituisci.js');

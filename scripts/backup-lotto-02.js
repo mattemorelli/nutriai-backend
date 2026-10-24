@@ -3,7 +3,7 @@
 // backup atteso e' "nessuna riga trovata" su dishes/dish_ingredients/
 // ricetta_passi/ricetta_info (conferma che non si sta per sovrascrivere
 // nulla). Uso: node scripts/backup-lotto-02.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

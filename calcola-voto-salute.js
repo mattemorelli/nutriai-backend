@@ -9,7 +9,7 @@
 //
 // nova_group e additivi_n intervengono sempre come aggiustamento secondario,
 // mai come base, e solo se presenti (assenti = nessun aggiustamento, mai inventati).
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 // ---- mappatura punteggio Nutri-Score (-15 ottimo, 40 pessimo) -> base 1-10 ----

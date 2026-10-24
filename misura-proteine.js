@@ -2,7 +2,7 @@
 // Non scrive niente: usa il modo prova ({ salva: false }).
 // Uso: node misura-proteine.js <USER_ID> [N_SEED] [--inverso] [--pausa]
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva, QUOTE } = require('./genera.js');
 

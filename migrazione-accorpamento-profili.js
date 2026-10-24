@@ -1,7 +1,7 @@
 // Applica l'accorpamento dei profili di sapore misurato e approvato
 // (misura-accorpamento-profili.js, 2026-09-12): 16 profili non-neutri -> 8.
 // Aggiorna SOLO dishes.profilo. Non tocca famiglia, cucina, paese, ingredienti.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

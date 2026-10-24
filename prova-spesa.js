@@ -3,7 +3,7 @@
 // lo cancella sempre alla fine (0 residui) - non tocca piani gia' esistenti.
 // Uso: node prova-spesa.js <USER_ID> [--utente-reale]
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { listaSpesa } = require('./spesa');
 const { generaESalva } = require('./genera.js');

@@ -4,7 +4,7 @@
 // collegate per ON DELETE CASCADE dove presente, ma l'ordine esplicito
 // resta più chiaro da leggere e funziona anche senza quel vincolo).
 // Uso: node scripts/rollback-lotto-02.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const ID_NUOVI = require('./lotto-02-piatti.json').piatti.map((p) => p.id);
 

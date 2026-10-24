@@ -14,7 +14,7 @@
 // elenca le discrepanze e fallisce (exit code 1) se ne trova anche una sola.
 //
 // Uso: node verifica-flag-allergeni.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

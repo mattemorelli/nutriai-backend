@@ -57,7 +57,7 @@
 // Questo file legge zero campi da categorie_alimenti e non ne scrive mai:
 // la separazione vale in entrambe le direzioni, non solo "mai derivare le
 // categorie dai ruoli" ma anche "mai derivare i ruoli dalle categorie".
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

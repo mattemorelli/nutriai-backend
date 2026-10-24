@@ -17,7 +17,7 @@
 // gia' in uso per i 39.361 voti esistenti: verificata contro i min/max reali in db).
 // Amplia solo l'ambito: tutte le righe con voto_ambientale nullo, non solo il
 // sottoinsieme italy/8-categorie/marche-frequenti/15-alla-volta.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const { calcolaVoto, modificatoriDa, categoriaDa } = require('./voto');

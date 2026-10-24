@@ -14,7 +14,7 @@
 //
 // Senza --scrivi non tocca nulla: stampa quello che farebbe e annulla.
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 const SCRIVI = process.argv.includes('--scrivi');

@@ -21,7 +21,7 @@
 //
 // Uso: node scripts/verifica-matrice-ridotta.js
 // Fallisce (exit code 1) se una sola delle 12 combinazioni non riesce.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 const supabaseReale = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

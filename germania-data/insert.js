@@ -1,6 +1,6 @@
 // Inserisce un blocco di piatti per il paese 'germania'.
 // Uso: node germania-data/insert.js germania-data/secondo.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const path = require('path');
 

@@ -37,7 +37,7 @@
 //   limone, pepe nero, cumino dei prati): lasciati su "peso" di proposito -
 //   sono sempre sotto i 15g in ricetta, "a pinch" resta la resa giusta,
 //   forzare un pezzo o una confezione sarebbe artificiale.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const CHIAVE = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 const supabase = createClient(process.env.SUPABASE_URL, CHIAVE);

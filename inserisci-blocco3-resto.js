@@ -1,6 +1,6 @@
 // F0bis, blocco 3/4 — completamento: i 2 piatti che non erano stati
 // inseriti nel run precedente (fetch fallito a meta').
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

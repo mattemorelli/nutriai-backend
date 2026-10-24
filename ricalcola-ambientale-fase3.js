@@ -3,7 +3,7 @@
 // manufacturing_places, nova_group, additivi_n) e la formula aggiornata in voto.js
 // (base da CO2, tetto differenziato 9/20). Poi rifà la stima al 35° percentile
 // sui prodotti rimasti senza modificatori reali, sui nuovi valori reali.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const { calcolaVoto, modificatoriDa } = require('./voto');
 

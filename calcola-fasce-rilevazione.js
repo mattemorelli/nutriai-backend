@@ -8,7 +8,7 @@
 // che non distorce quando un singolo prodotto ha un rapporto molto fuori
 // scala). indice_X = indice_R * rapporto(X,R), fatto per ciascun riferimento
 // e poi mediato.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 const RIFERIMENTI = { Esselunga: 121, Carrefour: 125 };

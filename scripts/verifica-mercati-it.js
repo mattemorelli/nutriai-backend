@@ -10,7 +10,7 @@
 // tra una chiamata e l'altra - le ripetizioni misurate qui sono quindi
 // un limite superiore onesto, non quello che vedrebbe un utente vero con
 // settimane di storico reale.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva, MERCATO_ATTIVO } = require('../genera');
 const { trovaProposte } = require('../sostituisci');

@@ -1,7 +1,7 @@
 // F0bis, blocco A — 6 primi vegani (asiatico-sudest, asia_generico) + 3
 // contorni vegani (latino-chimichurri, argentina). Chiudono i due gradini
 // 3b rimasti (primi asiatici, contorni argentini).
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

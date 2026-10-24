@@ -3,7 +3,7 @@
 // temporanee in meal_outcomes e le rimuove sempre, in ogni variante.
 // Uso: node misura-varianti-rifiuti.js <USER_ID di test>
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva, caricaPiatti, caricaVincoli, gruppoDa, FAMIGLIE_PER_CUCINA, QUOTE } = require('./genera.js');
 

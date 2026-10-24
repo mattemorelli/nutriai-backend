@@ -5,7 +5,7 @@
 // "fuori_casa" invece deve restare. Pulisce sempre: esiti, plan_items, piano.
 // Uso: node prova-swap-rifiuto.js <USER_ID di test>
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva } = require('./genera.js');
 const { trovaProposte } = require('./sostituisci.js');

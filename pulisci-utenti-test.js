@@ -1,7 +1,7 @@
 // Cancella tutti i piani (e i plan_items a cascata) dei 4 utenti di test
 // dedicati. Da lanciare a inizio/fine sessione di prove, cosi' non si
 // riaccumula il pantano di 13.270 piani visto il 2026-09-17.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const { TEST_USERS } = require('./test-users');
 const commit = process.argv[2] === '--commit';

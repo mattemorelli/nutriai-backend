@@ -2,7 +2,7 @@
 // Senza argomenti mostra soltanto cosa farebbe. Con --applica scrive.
 // Uso: node migra-vincoli.js [--applica]
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { trovaCategoria } = require('./genera.js');
 const crypto = require('crypto');

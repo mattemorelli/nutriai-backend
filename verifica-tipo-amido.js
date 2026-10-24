@@ -36,7 +36,7 @@
 // comportamento corretto, non un bug di questo script.
 //
 // Uso: node verifica-tipo-amido.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);

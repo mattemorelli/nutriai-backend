@@ -5,7 +5,7 @@
 // nuovi, quindi il backup atteso è "nessuna riga trovata" su entrambi i
 // fronti (conferma che non si sta per sovrascrivere nulla).
 // Uso: node migrazioni/backup-2026-10-22-accompagnamenti-pane-senza-glutine.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

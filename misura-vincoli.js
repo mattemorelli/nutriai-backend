@@ -2,7 +2,7 @@
 // Sola lettura: nessuna scrittura, nessuna generazione.
 // Uso: node misura-vincoli.js
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { trovaCategoria, CONTENUTE_IN } = require('./genera.js');
 

@@ -3,7 +3,7 @@
 // con la Correzione 1 di stanotte (pane/patate per categoria) simulata
 // tramite simula-categorie-pane-patate.js - la migrazione reale non è
 // stata lanciata sul database.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const fs = require('fs');
 const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');

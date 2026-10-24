@@ -15,7 +15,7 @@
 // FAMIGLIE_PER_CUCINA), non una loro reimplementazione approssimata.
 // Uso: node misura-pasti-casa.js <USER_ID di test>
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { caricaPiatti, FAMIGLIE_PER_CUCINA } = require('./genera.js');
 

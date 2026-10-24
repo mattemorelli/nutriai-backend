@@ -8,7 +8,7 @@
 // 3) Campione casuale di 15 secondi classificati 'pesce' col metodo nuovo,
 //    per controllare che l'ancora sia davvero il pesce e non un ingrediente
 //    marginale.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 const GRUPPO_DA_CATEGORIA = [

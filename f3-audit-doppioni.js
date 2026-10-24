@@ -6,7 +6,7 @@
 // mandorle": una riga corretta, una a cui manca l'ingrediente del nome).
 // In coda, gli stessi dati per i 5 piatti gia' trovati senza l'ingrediente
 // del nome (non duplicati, ma stesso difetto).
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 
 const NOMI_GIA_TROVATI = [

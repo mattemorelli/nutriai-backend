@@ -1,7 +1,7 @@
 // Backup, SOLA LETTURA: salva lo stato attuale delle due tabelle toccate
 // dalla migrazione 2026-10-22-categorie-pane-patate.sql, prima di lanciarla.
 // Uso: node migrazioni/backup-2026-10-22-categorie-pane-patate.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

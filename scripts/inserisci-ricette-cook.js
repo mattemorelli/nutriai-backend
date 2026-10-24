@@ -4,7 +4,7 @@
 // Non cancella mai righe esistenti: se un dish_id ha gia' dei passi, si
 // ferma e lo segnala, cosi' lo stesso script serve anche per i blocchi
 // successivi del gruppo A senza rischiare doppioni.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const path = require('path');
 const { Client } = require('pg');
 const file = process.argv[2] || './cook-prova-dati.json';

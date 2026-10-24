@@ -4,7 +4,7 @@
 // un INSERT costruito a mano per concatenazione di stringhe.
 // Idempotente per il vincolo unique(catena, categoria, data): rilanciarlo
 // con lo stesso file aggiorna le righe invece di duplicarle.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const fs = require('fs');
 const path = require('path');
 const { Client } = require('pg');

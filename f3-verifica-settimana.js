@@ -2,7 +2,7 @@
 // reimplementazione) e controlla che i gruppi proteici dei secondi
 // rispettino QUOTE. Sola lettura sul risultato, una sola scrittura vera:
 // il piano stesso, sull'utente di test condiviso gia' usato in sessione.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 const { generaESalva, QUOTE } = require('./genera.js');

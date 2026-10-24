@@ -16,7 +16,7 @@
 // (esito 'sistemato' o 'neutro_anche_con_dati_freschi') - quelli restano
 // verificati, non serve richiamare OFF una seconda volta per la stessa
 // risposta. I barcode con errore (rete/scrittura) vengono ritentati.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const { calcolaVoto, modificatoriDa, categoriaDa } = require('./voto');

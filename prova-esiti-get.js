@@ -4,7 +4,7 @@
 // Crea un piano di prova e 3 esiti finti, legge, verifica, pulisce sempre.
 // Uso: node prova-esiti-get.js <USER_ID di test>
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva } = require('./genera.js');
 

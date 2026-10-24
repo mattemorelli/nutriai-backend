@@ -3,7 +3,7 @@
 // chiede le alternative per ogni piatto e controlla se contengono glutine.
 // Uso: node misura-swap.js
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { trovaProposte } = require('./sostituisci');
 

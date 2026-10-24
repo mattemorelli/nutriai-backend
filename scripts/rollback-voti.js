@@ -14,7 +14,7 @@
 // I backup vivono in ~/Progetti/backup-supabase/ (fuori dal repository,
 // mai committati - vedi CLAUDE.md/convenzione del 25 ottobre 2026), con
 // data e ora nel nome del file.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

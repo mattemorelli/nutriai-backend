@@ -2,7 +2,7 @@
 // (scripts/cook-prova-dati.json). SOLA LETTURA: legge dish_ingredients dal
 // database solo per confrontare le quote dichiarate con gli ingredienti
 // veri del piatto, non scrive nulla.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const path = require('path');
 const { Client } = require('pg');
 const file = process.argv[2] || './cook-prova-dati.json';

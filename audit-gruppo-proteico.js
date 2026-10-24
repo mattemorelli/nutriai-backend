@@ -3,7 +3,7 @@
 // legumi/pesce del pool dell'utente di test. Non scrive niente.
 // Uso: node audit-gruppo-proteico.js
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const {
   ancoraProteica, gruppoDaRegex, GRUPPO_DA_CATEGORIA, FAMIGLIE_PER_CUCINA,

@@ -4,7 +4,7 @@
 // (es. una spolverata di parmigiano su un contorno di verdure).
 //
 // MISURA, non applica: stampa i casi al confine per validazione a occhio.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

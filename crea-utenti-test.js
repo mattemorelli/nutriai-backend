@@ -1,7 +1,7 @@
 // Crea i 4 utenti di test dedicati (una tantum, idempotente: salta chi esiste
 // gia' per email). Usa supabase.auth.admin.createUser, non tocca auth.users
 // via SQL diretto.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

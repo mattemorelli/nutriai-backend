@@ -2,7 +2,7 @@
 // ai 39.366 voti reali, poi rifà la stima al 35° percentile sui 24.326 stimati
 // usando i nuovi valori reali. Non tocca modificatori/pesi/co2_kg_per_kg:
 // solo il modo in cui si combinano, esattamente come in voto.js.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const fs = require('fs');
 

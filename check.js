@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 function leggi(nome) {
   const k = process.env[nome];

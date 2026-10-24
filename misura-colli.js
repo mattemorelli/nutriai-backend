@@ -2,7 +2,7 @@
 // Sola lettura: nessuna scrittura, nessuna generazione.
 // Uso: node misura-colli.js
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { caricaPiatti, gruppoDa, QUOTE } = require('./genera.js');
 

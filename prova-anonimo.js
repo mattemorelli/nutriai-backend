@@ -7,7 +7,7 @@
 // Uso: node prova-anonimo.js
 // Richiede il backend locale in ascolto (npm run dev / node server.js).
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 
 const URL = process.env.SUPABASE_URL;

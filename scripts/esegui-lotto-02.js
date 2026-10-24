@@ -15,7 +15,7 @@
 //   2. questo file
 //   3. verifica a mano con la query sotto, o node voto-piatti.js
 //   4. se qualcosa non va: node scripts/rollback-lotto-02.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { Client } = require('pg');
 const piattiData = require('./lotto-02-piatti.json').piatti;
 const ricetteData = require('./lotto-02-ricette.json').ricette;

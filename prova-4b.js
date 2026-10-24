@@ -2,7 +2,7 @@
 // Mette cinque preferenze impossibili sull'utente di test, misura, e le toglie.
 // Uso: node prova-4b.js <USER_ID di test>
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva } = require('./genera.js');
 const crypto = require('crypto');

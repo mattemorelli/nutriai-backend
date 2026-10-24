@@ -7,7 +7,7 @@
 // foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI): la
 // misura descrive esattamente cosa succederebbe se si accorpasse, non un
 // modello approssimato.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 const {

@@ -11,7 +11,7 @@
 //
 // Idempotente: rilanciato a cose fatte non trova piu' niente da spostare.
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 

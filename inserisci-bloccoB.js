@@ -2,7 +2,7 @@
 // mediterraneo + 7 profilo europeo-leggero. Chiudono l'ultimo pool ancora
 // in "regge solo con allentamento" al 100% delle volte (Germania/Regno
 // Unito, mai un buco vero perche' la scala arriva sempre al gradino 3a).
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

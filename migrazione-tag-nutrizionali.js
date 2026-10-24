@@ -10,7 +10,7 @@
 // fonte_grassi ELIMINATO: non e' una proprieta' dell'ingrediente, e' una
 // soglia sul TOTALE del pasto (5g), calcolata direttamente da fat_100g in
 // genera.js - non serve un tag.
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 

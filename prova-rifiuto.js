@@ -6,7 +6,7 @@
 // Scrive esiti di prova su plan_items dell'utente di test e li cancella alla fine.
 // Uso: node prova-rifiuto.js <USER_ID di test>
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva, caricaPiatti, FAMIGLIE_PER_CUCINA } = require('./genera.js');
 
