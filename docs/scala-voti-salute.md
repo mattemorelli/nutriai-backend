@@ -67,6 +67,25 @@ bassa delle proteine "pulite" (7,6) per i saturi piu' alti della specie.
    quattro numeri per 100kcal quasi identici, a meno che un quinto fattore
    (proteina animale aggiunta, metodo di cottura CON numeri a conferma,
    porzione irrealistica) lo spieghi esplicitamente.
+7. **L'hamburger di manzo in padella NON e' un riferimento per il sale**:
+   la sua ricetta non ha sale aggiunto, il suo sale/100kcal (0,069) e' basso
+   per caso, non per merito - confrontare il sale di un piatto di legumi
+   con quello dell'hamburger per dire "va bene, e' comunque piu' basso"
+   e' un confronto senza senso. Resta un riferimento valido SOLO per i
+   saturi (quelli sono la carne, non un additivo di ricetta).
+8. **Soglia fissa per un piatto di legumi senza formaggio ne' carne**
+   (24 ottobre 2026, dopo aver trovato che il sale alto di molti piatti di
+   ceci/fagioli veniva dal legume in scatola USDA, non dalla ricetta -
+   vedi `~/Progetti/calibrazione-voti-2026-10.md`): scende sotto 8,0
+   SOLO se sale > 0,30 g/100kcal, OPPURE saturi vicini a quelli
+   dell'hamburger (> 2,0 g/100kcal - qui il confronto con l'hamburger torna
+   valido, e' sui saturi). Se nessuno dei due numeri supera la soglia, il
+   piatto resta a 8,0 anche se e' il piu' alto del suo gruppo: non basta
+   "un po' peggiore degli altri legumi", serve essere vicino a una vera
+   proteina animale grassa. Se il motivo del sale alto e' un legume in
+   scatola non sciacquato, il problema e' il dato/la ricetta, non il voto:
+   correggere l'ingrediente (variante "canned, drained, rinsed" o legume
+   secco) prima di toccare health_score.
 
 ## Frutta e dolci: criterio sullo zucchero AGGIUNTO
 
