@@ -6,6 +6,7 @@ const { trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto } = require
 const { listaSpesa, ingredientiPiatto, dispensa, cambiaDispensa, nascondiPerSettimana, marchePer, sceltePer, classificaInsegne } = require('./spesa');
 const { votoBarcode } = require('./voto');
 const { ritratto, carbonioSettimanale, mappaPaesi } = require('./tu');
+const { annoNascitaValido, altezzaValida, pesoValido, calcolaBMI, obiettivoAdattoAlBMI } = require('./validazione-profilo');
 require('dotenv').config({ quiet: true });
 const express = require('express');
 const cors = require('cors');
@@ -624,14 +625,12 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
   const b = req.body || {};
 
   // --- validazione ---
-  const annoCorrente = new Date().getFullYear();
   const errori = [];
 
   if (!['M', 'F'].includes(b.sex)) errori.push('sesso non valido');
-  if (!Number.isInteger(b.birth_year) || b.birth_year < annoCorrente - 100 || b.birth_year > annoCorrente - 16)
-    errori.push('anno di nascita non valido');
-  if (!(b.height_cm >= 120 && b.height_cm <= 230)) errori.push('altezza non valida');
-  if (!(b.weight_kg >= 35 && b.weight_kg <= 300)) errori.push('peso non valido');
+  if (!annoNascitaValido(b.birth_year)) errori.push('anno di nascita non valido');
+  if (!altezzaValida(b.height_cm)) errori.push('altezza non valida');
+  if (!pesoValido(b.weight_kg)) errori.push('peso non valido');
   if (!['dimagrimento', 'mantenimento', 'massa'].includes(b.goal)) {
     errori.push(`obiettivo non valido: ricevuto "${b.goal}"`);
   }
@@ -641,6 +640,15 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
   if (!Array.isArray(b.cuisines) || b.cuisines.length === 0) errori.push('preferenze cucina mancanti');
 
   if (errori.length) return res.status(400).json({ errore: errori.join('; ') });
+
+  // Un deficit calorico a chi e' gia' sotto il range di normopeso non ha
+  // base clinica in un'app senza supervisione medica (soglia OMS, 18.5) -
+  // controllato DOPO che peso/altezza/obiettivo sono gia' validi uno per
+  // uno, cosi' il messaggio distingue "dato non valido" da "dato valido ma
+  // obiettivo non adatto a questa persona".
+  if (!obiettivoAdattoAlBMI(b.goal, calcolaBMI(b.weight_kg, b.height_cm))) {
+    return res.status(400).json({ errore: 'obiettivo_non_adatto', motivo: 'bmi_basso' });
+  }
 
   const CUCINE_VALIDE = ['europea', 'usa', 'asiatica', 'sud_americana', 'australiana'];
   if (b.cuisines.some(c => !CUCINE_VALIDE.includes(c)))
@@ -838,13 +846,12 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
   }
   if ('height_cm' in b) {
     const h = Number(b.height_cm);
-    if (!(h >= 120 && h <= 230)) return res.status(400).json({ errore: 'altezza non valida' });
+    if (!altezzaValida(h)) return res.status(400).json({ errore: 'altezza non valida' });
     aggiornamento.height_cm = h;
   }
   if ('birth_year' in b) {
-    const annoCorrente = new Date().getFullYear();
     const y = Number(b.birth_year);
-    if (!(y >= annoCorrente - 100 && y <= annoCorrente - 16)) {
+    if (!annoNascitaValido(y)) {
       return res.status(400).json({ errore: 'anno di nascita non valido' });
     }
     aggiornamento.birth_year = y;
@@ -914,6 +921,23 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
   }
 
   if (!Object.keys(aggiornamento).length) return res.status(400).json({ errore: 'nessun campo da aggiornare' });
+
+  // Stesso controllo di /onboarding (BMI sotto 18.5 + "dimagrimento"), qui
+  // serve anche se l'utente cambia SOLO l'obiettivo in un secondo momento:
+  // l'altezza puo' arrivare in questa stessa richiesta o essere gia' su
+  // users, il peso non si aggiorna mai da qui (vedi /peso) quindi si legge
+  // sempre l'ultima misura reale.
+  if (aggiornamento.goal === 'dimagrimento') {
+    const altezzaCm = aggiornamento.height_cm
+      ?? (await supabase.from('users').select('height_cm').eq('id', req.utente.id).maybeSingle()).data?.height_cm;
+    const { data: ultimaMisura } = await supabase
+      .from('body_measurements').select('weight_kg')
+      .eq('user_id', req.utente.id).order('measured_on', { ascending: false }).limit(1).maybeSingle();
+    const bmi = altezzaCm && ultimaMisura?.weight_kg ? calcolaBMI(ultimaMisura.weight_kg, altezzaCm) : null;
+    if (!obiettivoAdattoAlBMI('dimagrimento', bmi)) {
+      return res.status(400).json({ errore: 'obiettivo_non_adatto', motivo: 'bmi_basso' });
+    }
+  }
 
   const { error } = await supabase.from('users').update(aggiornamento).eq('id', req.utente.id);
   if (error) return res.status(500).json({ errore: error.message });
@@ -1545,7 +1569,7 @@ app.get('/peso', richiedeAuth, async (req, res) => {
 app.post('/peso', richiedeAuth, async (req, res) => {
   try {
     const kg = Number(req.body && req.body.weight_kg);
-    if (!(kg >= 30 && kg <= 300)) {
+    if (!pesoValido(kg)) {
       return res.status(400).json({ errore: 'Peso non valido' });
     }
 
