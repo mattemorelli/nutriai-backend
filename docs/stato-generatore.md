@@ -26,6 +26,19 @@ codice attuale. Nessuna percentuale di completezza senza criteri misurati.
 - La risposta alla radice del server include `X-Quadrio-Revision`:
   confrontarlo col commit pubblicato prima di dichiarare un deploy riuscito.
 
+## Pubblicazione verificata
+
+Commit del backend: `3a86549b818135f0ff9381f9eb2ece841e75ab99`.
+Render ha confermato `Deploy succeeded | Live`; la risposta HTTP pubblica
+riporta lo stesso commit. Backend locale di Expo riavviato sul codice
+aggiornato. La pubblicazione riguarda il backend, non un invio all'App Store.
+
+Prova online del 26/10/2026, ore 22:46 italiane: undici controlli sul
+flusso reale, autenticazione, rifiuto minorenne, onboarding adulto,
+salvataggio di sette giorni/56 porzioni, calorie, tetti in grammi,
+rilettura piano, ingredienti e spesa. Account di prova isolato, sessione e
+dati rimossi al termine, con verifica di assenza di residui.
+
 ## Cinque blocchi da chiudere per un generatore pronto al lancio
 
 ### G1 — Fabbisogno e popolazione supportata
@@ -119,6 +132,13 @@ Stato: PARZIALE.
 - Profilazione dei casi difficili: l'ultimo gradino ha ancora ricerca
   senza tetto temporale; evitare blocchi prolungati del server Node.
 - Diagnosi piu' utile di `non_identificato` e limiti di copertura dichiarati.
+- Audit dipendenze del 26/10/2026: tre avvisi nelle dipendenze di
+  produzione (`proxy-addr` critico, `body-parser` alto, `qs` moderato),
+  correzioni disponibili. Il numero di severita' non dimostra da solo
+  sfruttabilita' nella configurazione attuale; aggiornare e riverificare.
+  Il log completo della build conta anche una dipendenza di sviluppo.
+- Allineare il runtime testato e quello distribuito: locale Node 24,
+  Render Node 26 al rilascio; `engines >=20` non fissa una versione.
 - TestFlight su dispositivi veri, errori di rete, sessioni scadute,
   rigenerazioni, carico e monitoraggio di errori/latenza con rollback.
 
@@ -167,5 +187,6 @@ Il criterio e' una versione affidabile per una popolazione e un insieme
 di casi dichiarati, con problemi noti gestiti e monitoraggio; "perfetto"
 non e' una condizione dimostrabile da un campione di test.
 
-Prossimo lavoro: G3, percorsi di recupero proteico e conservazione delle
-scelte dell'utente. Poi G1/G2 con criteri nutrizionali documentati.
+Prossimo lavoro: aggiornare le dipendenze segnalate in G5 e riverificare
+il servizio. Poi G3, percorsi di recupero proteico e conservazione delle
+scelte dell'utente; seguono G1/G2 con criteri nutrizionali documentati.
