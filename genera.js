@@ -1,4 +1,5 @@
 console.log('[genera] v6-piano-proteico caricato');
+const { creaRecuperoProteico } = require('./recupero-proteico');
 
 // Il generico è ammesso solo dentro la sua famiglia: un piatto
 // "mediterraneo generico" sta bene in una giornata italiana,
@@ -1889,11 +1890,19 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         st.bloccatiOggi = lista;
         for (const b of lista) {
           if (b.meal === 'cena' && b.slot === 'secondo') { assegnaSecondoScelto(gi, b.piatto); continue; }
+          if (b.meal === 'spuntino') {
+            // Anche gli spuntini bloccati occupano un uso settimanale.
+            // Conserva tutte e tre le eventuali scelte: prima la terza
+            // sovrascriveva spuntino2 e non entrava in usoSpuntini.
+            const nomeSlot = ['spuntino', 'spuntino2', 'spuntino3'].find(nome => st[nome] === undefined);
+            if (!nomeSlot) throw new Error('Troppi spuntini bloccati nello stesso giorno');
+            assegnaSpuntinoScelto(gi, nomeSlot, b.piatto);
+            continue;
+          }
           usati.add(b.piatto.id);
           if (b.meal === 'colazione') st.colazione = b.piatto;
           else if (b.meal === 'pranzo' && b.slot === 'primo') st.primo = b.piatto;
           else if (b.meal === 'pranzo' && b.slot === 'contorno') st.contornoPranzo = b.piatto;
-          else if (b.meal === 'spuntino') { if (st.spuntino === undefined) st.spuntino = b.piatto; else st.spuntino2 = b.piatto; }
           else if (b.meal === 'cena' && b.slot === 'contorno') {
             if (b.piatto.base_amidacea) st.base = b.piatto; else st.contornoCena = b.piatto;
           }
@@ -2167,7 +2176,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // i "fresco", nello stesso ordine di preferenza.
       function candidatiBase(gi, paeseOk, tipiRichiesti) {
         const altriDelPasto = compagniDiPasto(gi, 'cena');
-        const baseDiTipo = (tipo) => (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipo && paeseOk(p) && !rifiutato(p) && principaleLiberoOggi(gi, p);
+        const limite = statoGiorni[gi].limiteBase;
+        const baseDiTipo = (tipo) => (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipo
+          && (p.prep_min || 20) <= limite && tecnicaOk(p, gi + 1)
+          && paeseOk(p) && !rifiutato(p) && principaleLiberoOggi(gi, p)
+          && altriDelPasto.every(c => accompagnaBene(p, c));
         const freschi = tipiRichiesti.map((tipo) => contorni.filter(p => baseDiTipo(tipo)(p) && !usati.has(p.id)));
         // Stessa ripetizione del secondo (gradino 1, al massimo una a
         // settimana), ma mai a meno di due giorni di distanza dalla prima
@@ -2204,8 +2217,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // fisso (vedi tipiAccompagnamentoDaSecondo, correzione 2026-10-22 sera).
       function candidatiBasePranzo(gi, paeseOk, tipiRichiesti) {
         const altriDelPasto = compagniDiPasto(gi, 'pranzo');
+        const limite = statoGiorni[gi].limiteBasePranzo;
         const baseDiTipo = (tipo) => (p) => p.base_amidacea && tipoAmidoDiAccompagnamento(p) === tipo &&
-          paeseOk(p) && !rifiutato(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p);
+          (p.prep_min || 20) <= limite && tecnicaOk(p, gi + 1) &&
+          (!pranzoFuoriIl(gi + 1) || p.trasportabile) &&
+          paeseOk(p) && !rifiutato(p) && !usati.has(p.id) && principaleLiberoOggi(gi, p) &&
+          altriDelPasto.every(c => accompagnaBene(p, c));
         const livelli = tipiRichiesti.map((tipo) => contorni.filter(baseDiTipo(tipo)));
         return concatenaLivelli(livelli, rng, altriDelPasto);
       }
@@ -2249,6 +2266,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // le kcal, puo' eccezionalmente introdurre una quarta colazione se
       // serve davvero.
       function candidatiColazionePiuRicca(gi, profiloGiorno, paeseOkLeggero, cappaMinuti) {
+        if (slotBloccato(gi, 'colazione')) return [];
         const base = (p) => !rifiutato(p) && (p.prep_min || 10) <= cappaMinuti && paeseOkLeggero(p) && principaleLiberoOggi(gi, p);
         const candidati = colazioni.filter(p => compatibile(p, profiloGiorno) && base(p));
         return candidati.slice().sort((a, b) => (b.kcal || 0) - (a.kcal || 0));
@@ -2459,69 +2477,15 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         prova('colazionePiuRicca', candidatiColazionePiuRicca(gi, ctx.profiloGiorno, ctx.paeseOkLeggero, ctx.cappaColazione), (p) => assegnaColazionePiuRicca(gi, p));
       }
 
-      // Densita' proteica (g proteina per kcal): il criterio richiesto per
-      // preferire candidati "con piu' proteine per kcal", non solo piu'
-      // proteina in assoluto - un piatto da 800 kcal con 40g di proteina
-      // non e' piu' proteico di uno da 300 kcal con 25g, e' solo piu' grande.
-      const densitaProteica = (p) => (p.protein || 0) / (p.kcal || 1);
-
-      // Scambia il secondo attuale con uno piu' proteico per kcal, dallo
-      // stesso pool di candidatiSecondo ma ordinato per densita' proteica
-      // invece che per peso/salute - stesso principio di
-      // candidatiColazionePiuRicca, applicato alla proteina invece che
-      // alle kcal totali. Deve ancora abbinarsi bene col resto del pasto
-      // (accompagnaBene contro contornoCena/base).
-      function candidatiSecondoProteico(gi) {
-        const st = statoGiorni[gi];
-        const attuale = st.secondo;
-        if (!attuale) return [];
-        const altriDelPasto = [st.contornoCena, st.base].filter(Boolean);
-        const candidati = secondi.filter(p =>
-          p.id !== attuale.id && !usati.has(p.id) && !rifiutato(p) &&
-          altriDelPasto.every(c => accompagnaBene(p, c)) &&
-          principaleLiberoOggi(gi, p)
-        );
-        return candidati.slice().sort((a, b) => densitaProteica(b) - densitaProteica(a));
-      }
-      function assegnaSecondoProteico(gi, piatto) {
-        const st = statoGiorni[gi];
-        const precedente = st.secondo;
-        usati.delete(precedente.id);
-        if (precedente.gruppo) usoGruppi[precedente.gruppo]--;
-        st.secondo = piatto;
-        usati.add(piatto.id);
-        if (piatto.gruppo) usoGruppi[piatto.gruppo] = (usoGruppi[piatto.gruppo] || 0) + 1;
-        return () => {
-          usati.delete(piatto.id);
-          if (piatto.gruppo) usoGruppi[piatto.gruppo]--;
-          st.secondo = precedente;
-          usati.add(precedente.id);
-          if (precedente.gruppo) usoGruppi[precedente.gruppo] = (usoGruppi[precedente.gruppo] || 0) + 1;
-        };
-      }
-
-      // Stesso scambio per uno spuntino gia' scelto (spuntino, spuntino2 o
-      // il terzo d'emergenza): negli spuntini la richiesta e' letterale,
-      // "scegli prima quelli proteici".
-      function candidatiSpuntinoProteico(gi, nomeSlot) {
-        const st = statoGiorni[gi];
-        const attuale = st[nomeSlot];
-        if (!attuale) return [];
-        const altri = [st.spuntino, st.spuntino2, st.spuntino3].filter(p => p && p.id !== attuale.id);
-        const candidati = spuntini.filter(p =>
-          p.id !== attuale.id && !usati.has(p.id) && !rifiutato(p) &&
-          !altri.some(a => a.id === p.id) && principaleLiberoOggi(gi, p)
-        );
-        return candidati.slice().sort((a, b) => densitaProteica(b) - densitaProteica(a));
-      }
-      function assegnaSpuntinoProteico(gi, nomeSlot, piatto) {
-        const st = statoGiorni[gi];
-        const precedente = st[nomeSlot];
-        usati.delete(precedente.id);
-        st[nomeSlot] = piatto;
-        usati.add(piatto.id);
-        return () => { usati.delete(piatto.id); st[nomeSlot] = precedente; usati.add(precedente.id); };
-      }
+      // Ogni recupero usa gli stessi selettori della scelta normale:
+      // tempi, paesi/profili e ripetizioni non hanno un percorso separato.
+      const { slotBloccato, candidatiSecondoProteico, assegnaSecondoProteico,
+        candidatiSpuntinoProteico, assegnaSpuntinoProteico } = creaRecuperoProteico({
+        statoGiorni, usati, usoGruppi, usoSalse, usoSpuntini,
+        contestoGiorno, candidatiSecondo, candidatiSpuntino, candidatiSpuntino3,
+        assegnaSecondoScelto, assegnaSpuntinoScelto,
+        accompagnaBene, tipiAccompagnamentoDaSecondo, tipoAmidoDiAccompagnamento, copreRuolo,
+      });
 
       // Ricerca delle proteine (problema 2 della terza correzione,
       // 2026-10-09): quando la giornata e' sotto il minimo proteico,

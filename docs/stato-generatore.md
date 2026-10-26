@@ -1,12 +1,13 @@
 # Quadrio — stato del generatore e criteri di rilascio
 
-Aggiornamento: 26 ottobre 2026. Questo e' il riferimento operativo da
+Aggiornamento: 26 ottobre 2026. Perimetro attuale richiesto da Matteo:
+solo generatore. Questo e' il riferimento operativo da
 aggiornare dopo ogni blocco: distinguere codice verificato, ipotesi,
 funzioni mancanti e versione effettivamente distribuita. I documenti
 precedenti descrivono anche stati storici e non vanno trattati come il
 codice attuale. Nessuna percentuale di completezza senza criteri misurati.
 
-## Blocco verificato in questa revisione
+## Primo blocco verificato e pubblicato
 
 - Porzioni: applicazione dei minimi/massimi PRIMA della redistribuzione
   calorica, anche se il totale base e' gia' vicino all'obiettivo.
@@ -88,21 +89,38 @@ realistiche, nessuno spuntino o pasto aggiunto contro la scelta dell'utente.
 
 ### G3 — Vincoli rispettati in OGNI percorso
 
-Stato: PARZIALE. Prossimo blocco tecnico prioritario.
+Stato: PARZIALE; recupero proteico corretto e verificato in locale.
+La versione distribuita resta quella indicata sopra fino a un nuovo rilascio.
+Non considerare chiuso tutto G3.
 
-- Dieta/allergie sono filtri assoluti; estendere le prove oltre i casi verdi.
-- Rivedere gli aumenti di emergenza di calorie/proteine. In particolare
-  `candidatiSecondoProteico` e `candidatiSpuntinoProteico` non riusano tutti
-  i filtri normali di tempo/paese/profilo. Rischio individuato sul codice,
-  da riprodurre con test mirati prima della correzione.
-- Questi scambi devono preservare piatti bloccati, avanzi, abbinamenti e
-  contatori di ripetizione/salse/spuntini durante avanzamento e backtracking.
-- Aggiungere disponibilita' attrezzi (es. senza forno) come dato reale
-  dell'utente: oggi la matrice lo simula filtrando il catalogo.
-- Controllare coerenza fra generazione, Swap, spostamenti, salti e spesa.
+- Recupero dei secondi e spuntini: riusa i selettori ordinari, con tempo,
+  paese/profilo, gradimenti e ripetizioni; gli accompagnamenti rispettano
+  anch'essi tempo, tecnica e compatibilita'.
+- Colazione, secondo e spuntini bloccati preservati durante gli aumenti
+  di energia/proteine. Avanzi e secondi ripetuti mantengono identita'.
+- Contatori di gruppi/salse/spuntini ripristinati quando una sostituzione
+  viene annullata; gli spuntini bloccati contano negli usi settimanali.
+- Fino a tre spuntini bloccati al giorno vengono conservati, senza che
+  il terzo sovrascriva il secondo.
+- Regressione riprodotta sulla versione precedente: i dodici casi mirati
+  di cene da 15/20 minuti e scelte bloccate fallivano sui vincoli. Sulla
+  correzione i dodici casi passano, compresi tre spuntini bloccati nello
+  stesso giorno; 13 test locali dedicati passano.
+- Confronto aggiuntivo su catalogo congelato: 32/32 settimane generate,
+  senza violazioni rilevate di porzioni, tempi, dieta/allergie o intervallo
+  calorico. Questo campione non prova tutte le combinazioni supportate.
+  Le richieste proteiche difficili possono ancora terminare all'ultimo
+  gradino con deficit proteico dichiarato: la correzione dei vincoli non
+  equivale a dimostrare che ogni target proteico sia raggiungibile.
+- Verifica completa del nuovo blocco: 13/13 gruppi superati, inclusi
+  i controlli permanenti precedenti e i 12 casi mirati sul catalogo reale.
+- Restano da aggiungere disponibilita' attrezzi (es. senza forno) come
+  dato reale dell'utente e una matrice piu' ampia di combinazioni.
+- Restano verifiche complete di coerenza fra generazione, Swap,
+  spostamenti, salti, pasti da portare e spesa.
 
-Chiuso quando: anche i percorsi di recupero e modifica rispettano tutte
-le scelte, con regressioni mirate e matrice estesa.
+Chiuso quando: tutti i percorsi di costruzione/modifica rispettano le
+scelte, con regressioni mirate e matrice estesa, non solo questi 12 casi.
 
 ### G4 — Catalogo e ricette del mercato attivo
 
@@ -187,6 +205,7 @@ Il criterio e' una versione affidabile per una popolazione e un insieme
 di casi dichiarati, con problemi noti gestiti e monitoraggio; "perfetto"
 non e' una condizione dimostrabile da un campione di test.
 
-Prossimo lavoro: aggiornare le dipendenze segnalate in G5 e riverificare
-il servizio. Poi G3, percorsi di recupero proteico e conservazione delle
-scelte dell'utente; seguono G1/G2 con criteri nutrizionali documentati.
+Prossimo lavoro nel perimetro attuale: completare la verifica di questo
+blocco, poi G1/G2 (fabbisogno, quattro modelli di pasto e spuntini) con
+criteri nutrizionali documentati. Le attivita' su infrastruttura e App
+Store restano separate dal lavoro ora richiesto sul generatore.

@@ -2,12 +2,12 @@
 // ======================================================
 // In italiano semplice: prima di spingere codice sul repository, questo
 // comando controlla che il generatore di piani non sia rotto. Lancia in
-// fila dodici controlli e ne riporta tutti gli esiti: se anche uno solo
+// fila tredici controlli e ne riporta tutti gli esiti: se anche uno solo
 // fallisce, l'intero comando fallisce (exit code
 // diverso da 0) e git non lascia partire il push (e' installato come hook
 // pre-push, vedi scripts/installa-hook-pre-push.sh).
 //
-// I dodici controlli, in ordine:
+// I tredici controlli, in ordine:
 //   1. node --check su tutti i file .js del backend - niente di rotto a
 //      livello di sintassi (non esegue il codice, solo lo legge).
 //   2. verifica-flag-allergeni.js - le etichette "contiene glutine/
@@ -60,6 +60,9 @@
 //      lettura viene scambiato per allenamenti, PAL o piatti bloccati
 //      assenti, oppure per un profilo onnivoro di default.
 //  12. test-sicurezza-input.js - limiti di eta'/peso/altezza e BMI-obiettivo.
+//  13. test-recupero-proteico.js e scripts/verifica-recupero-proteico.js:
+//      stessi filtri della scelta ordinaria, piatti bloccati preservati,
+//      contatori reversibili e 12 casi con recupero proteico difficile.
 //
 // Uso: npm run verifica
 // (lo stesso identico comando lo lancia da solo git, da questa cartella,
@@ -125,6 +128,10 @@ passo('11. Fabbisogno e profilo: errori di lettura distinti da dati assenti', ()
   lanciaScript('test-errori-profilo.js');
 });
 passo('12. Sicurezza input: eta, peso, altezza e BMI-obiettivo', () => lanciaScript('test-sicurezza-input.js'));
+passo('13. Recupero proteico: vincoli, piatti bloccati e contatori', () => {
+  lanciaScript('test-recupero-proteico.js');
+  lanciaScript('scripts/verifica-recupero-proteico.js');
+});
 
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);
