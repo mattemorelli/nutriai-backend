@@ -2,12 +2,12 @@
 // ======================================================
 // In italiano semplice: prima di spingere codice sul repository, questo
 // comando controlla che il generatore di piani non sia rotto. Lancia in
-// fila nove controlli e si ferma al primo segno rosso, dicendo chiaramente
-// quale: se anche uno solo fallisce, l'intero comando fallisce (exit code
+// fila dodici controlli e ne riporta tutti gli esiti: se anche uno solo
+// fallisce, l'intero comando fallisce (exit code
 // diverso da 0) e git non lascia partire il push (e' installato come hook
 // pre-push, vedi scripts/installa-hook-pre-push.sh).
 //
-// I nove controlli, in ordine:
+// I dodici controlli, in ordine:
 //   1. node --check su tutti i file .js del backend - niente di rotto a
 //      livello di sintassi (non esegue il codice, solo lo legge).
 //   2. verifica-flag-allergeni.js - le etichette "contiene glutine/
@@ -53,6 +53,13 @@
 //      la formula calcolerebbe da sola, mai calibrato a mano confrontando
 //      con piatti simili - nato il 25 ottobre dopo aver trovato 18 piatti
 //      recenti (lotto delle cene veloci, lotto 02) bloccati a 10.
+//  10. test-porzioni.js e scripts/verifica-profili-nutrizionali.js - limiti
+//      effettivi, target irraggiungibili, valori finali di plan_items e 12
+//      profili con kcal/proteine esplicite (la matrice ridotta non le ha).
+//  11. test-fabbisogno.js e test-errori-profilo.js - nessun errore di
+//      lettura viene scambiato per allenamenti, PAL o piatti bloccati
+//      assenti, oppure per un profilo onnivoro di default.
+//  12. test-sicurezza-input.js - limiti di eta'/peso/altezza e BMI-obiettivo.
 //
 // Uso: npm run verifica
 // (lo stesso identico comando lo lancia da solo git, da questa cartella,
@@ -109,6 +116,15 @@ passo('6. Matrice ridotta (12 combinazioni dieta+allergie)', () => lanciaScript(
 passo('7. Nomi dei piatti: niente note tecniche o interne nel mercato "it"', () => lanciaScript('scripts/verifica-nomi-piatti.js'));
 passo('8. Paginazione: niente letture di produzione a rischio di troncatura a 1000 righe', () => lanciaScript('scripts/verifica-paginazione.js'));
 passo('9. Voti salute: nessun piatto fermo al soffitto calcolato senza calibrazione a mano', () => lanciaScript('scripts/verifica-voto-saturato.js'));
+passo('10. Porzioni e 12 profili con fabbisogni espliciti', () => {
+  lanciaScript('test-porzioni.js');
+  lanciaScript('scripts/verifica-profili-nutrizionali.js');
+});
+passo('11. Fabbisogno e profilo: errori di lettura distinti da dati assenti', () => {
+  lanciaScript('test-fabbisogno.js');
+  lanciaScript('test-errori-profilo.js');
+});
+passo('12. Sicurezza input: eta, peso, altezza e BMI-obiettivo', () => lanciaScript('test-sicurezza-input.js'));
 
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);

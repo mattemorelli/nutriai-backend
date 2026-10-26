@@ -95,17 +95,22 @@ function proteineTarget({ peso, altezzaCm, minutiForza }) {
 }
 
 async function calcolaESalvaTarget(supabase, userId) {
-  const { data: u } = await supabase
+  const { data: u, error: erroreUtente } = await supabase
     .from('users').select('sex, birth_year, height_cm, goal, occupation_level')
     .eq('id', userId).single();
+  if (erroreUtente) throw new Error('lettura users: ' + erroreUtente.message);
 
-  const { data: m } = await supabase
+  const { data: m, error: erroreMisure } = await supabase
     .from('body_measurements').select('weight_kg, body_fat_pct')
     .eq('user_id', userId).order('measured_on', { ascending: false }).limit(1).maybeSingle();
+  if (erroreMisure) throw new Error('lettura body_measurements: ' + erroreMisure.message);
 
-  const { data: sessioni } = await supabase
+  const { data: sessioni, error: erroreAllenamenti } = await supabase
     .from('training_sessions').select('activity, minutes_per_week, intensity')
     .eq('user_id', userId);
+  // Una lettura fallita non significa "nessun allenamento": ignorarla
+  // sottostimava il fabbisogno e salvava quel valore come valido.
+  if (erroreAllenamenti) throw new Error('lettura training_sessions: ' + erroreAllenamenti.message);
 
   if (!u || !m || !u.height_cm || !u.birth_year) {
     throw new Error('Dati insufficienti per calcolare il fabbisogno');
@@ -134,9 +139,10 @@ async function calcolaESalvaTarget(supabase, userId) {
     tdee = Math.round((bmr * neat + sport) / 0.90);
     modello = 'neat_met';
   } else {
-    const { data: att } = await supabase
+    const { data: att, error: erroreAttivita } = await supabase
       .from('activity_periods').select('pal')
       .eq('user_id', userId).order('valid_from', { ascending: false }).limit(1).maybeSingle();
+    if (erroreAttivita) throw new Error('lettura activity_periods: ' + erroreAttivita.message);
     const pal = Number(att && att.pal) || 1.4;
     tdee = Math.round(bmr * pal);
     modello = 'pal_legacy';

@@ -26,10 +26,17 @@ const MAPPA_FLAG = {
 };
 
 async function paginato(tabella, select) {
+  const ordine = {
+    dishes: ['id'], dish_ingredients: ['dish_id', 'food_id'],
+    categorie_alimenti: ['food_id', 'categoria'],
+  }[tabella];
+  if (!ordine) throw new Error('Ordinamento non definito per ' + tabella);
   let tutti = [];
   let offset = 0;
   while (true) {
-    const { data, error } = await supabase.from(tabella).select(select).range(offset, offset + 999);
+    let query = supabase.from(tabella).select(select);
+    for (const colonna of ordine) query = query.order(colonna);
+    const { data, error } = await query.range(offset, offset + 999);
     if (error) throw new Error(`lettura ${tabella}: ${error.message}`);
     tutti.push(...data);
     if (data.length < 1000) break;
@@ -40,9 +47,8 @@ async function paginato(tabella, select) {
 
 (async () => {
   const categorieServono = [...new Set(Object.values(MAPPA_FLAG))];
-  const { data: righeCategorie, error: eCat } = await supabase
-    .from('categorie_alimenti').select('food_id, categoria').in('categoria', categorieServono);
-  if (eCat) throw new Error('lettura categorie_alimenti: ' + eCat.message);
+  const righeCategorie = (await paginato('categorie_alimenti', 'food_id, categoria'))
+    .filter(r => categorieServono.includes(r.categoria));
 
   const foodIdPerCategoria = {};
   for (const cat of categorieServono) foodIdPerCategoria[cat] = new Set();

@@ -231,7 +231,14 @@ function limitiDi(p, obiettivo) {
 // Distribuisce il residuo calorico proporzionalmente allo spazio di manovra
 // di ciascun elemento, invece di moltiplicare tutto per lo stesso fattore.
 function adattaGiornata(pasti, obiettivo) {
-  const stato = pasti.map(p => ({ p, f: 1, lim: limitiDi(p, obiettivo) }));
+  // Il punto di partenza deve gia' rispettare i limiti: una ricetta base
+  // puo' superare il tetto anche prima della redistribuzione. Partire da
+  // f=1 lasciava porzioni fuori limite quando diff<40 o mancava spazio
+  // calorico altrove; la ricerca le accettava e le salvava cosi'.
+  const stato = pasti.map(p => {
+    const lim = limitiDi(p, obiettivo);
+    return { p, f: Math.max(lim[0], Math.min(1, lim[1])), lim };
+  });
   const totale = () => stato.reduce((s, x) => s + (x.p.piatto.kcal || 0) * x.f, 0);
 
   for (let i = 0; i < 15; i++) {
@@ -243,16 +250,43 @@ function adattaGiornata(pasti, obiettivo) {
         s + (x.p.piatto.kcal || 0) * Math.max(0, x.lim[1] - x.f), 0);
       if (spazio < 1) break;
       const quota = Math.min(1, diff / spazio);
-      stato.forEach(x => { x.f += (x.lim[1] - x.f) * quota; });
+      stato.forEach(x => { x.f = Math.min(x.lim[1], x.f + Math.max(0, x.lim[1] - x.f) * quota); });
     } else {
       const spazio = stato.reduce((s, x) =>
         s + (x.p.piatto.kcal || 0) * Math.max(0, x.f - x.lim[0]), 0);
       if (spazio < 1) break;
       const quota = Math.min(1, -diff / spazio);
-      stato.forEach(x => { x.f -= (x.f - x.lim[0]) * quota; });
+      stato.forEach(x => { x.f = Math.max(x.lim[0], x.f - Math.max(0, x.f - x.lim[0]) * quota); });
     }
   }
   return stato;
+}
+
+// Un solo percorso per i valori finali di plan_items, arrotondamenti
+// compresi. Anche salva:false puo' ispezionarli con dettagli:true, senza
+// scrivere un piano e senza una seconda formula di scala nei test.
+function righePiano(settimana, obiettivo) {
+  const righe = [];
+  for (const g of settimana) {
+    const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo) : g.pasti.map(p => ({ p, f: 1 }));
+    for (const { p, f } of adattati) {
+      righe.push({
+        day_of_week: g.giorno,
+        meal: p.meal,
+        slot: p.slot,
+        dish_id: p.piatto.id,
+        portion_g: Math.round(p.piatto.grams * f),
+        kcal: Math.round(p.piatto.kcal * f),
+        protein_g: Number((p.piatto.protein * f).toFixed(1)),
+        sat_fat_g: Number((p.piatto.satFat * f).toFixed(1)),
+        fibre_g: Number((p.piatto.fibre * f).toFixed(1)),
+        salt_g: Number((p.piatto.salt * f).toFixed(2)),
+        avanzi: Boolean(p.avanzi),
+        bloccato: Boolean(p.bloccato),
+      });
+    }
+  }
+  return righe;
 }
 
 // Limiti proporzionali al fabbisogno (2026-09-17, sostituisce la costante
@@ -1446,11 +1480,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
   const preferenze = (prefRaw && prefRaw.length) ? prefRaw : [{ cucina: 'europea', rank: 1 }];
 
-  const { data: profiloUtente } = await supabase
+  const { data: profiloUtente, error: erroreProfilo } = await supabase
     .from('users')
     .select('cook_days, lunch_away, pasti_casa, evening_minutes, household_size, diet, paesi')
     .eq('id', userId)
     .maybeSingle();
+  if (erroreProfilo) throw new Error('lettura users: ' + erroreProfilo.message);
 
   const giorniCottura = (profiloUtente && Array.isArray(profiloUtente.cook_days) && profiloUtente.cook_days.length)
     ? profiloUtente.cook_days
@@ -1503,11 +1538,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   const bloccatiPerGiorno = {};
   const piattiBloccatiScartati = [];
   if (pianoVecchio && mantieniBloccati) {
-    const { data: righeBloccate } = await supabase
+    const { data: righeBloccate, error: erroreBloccati } = await supabase
       .from('plan_items')
       .select('day_of_week, meal, slot, dish_id')
       .eq('plan_id', pianoVecchio.id)
       .eq('bloccato', true);
+    if (erroreBloccati) throw new Error('lettura plan_items bloccati: ' + erroreBloccati.message);
 
     if (righeBloccate?.length) {
       const idsBloccati = [...new Set(righeBloccate.map(r => r.dish_id))];
@@ -2948,32 +2984,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     if (errPiano) throw new Error(`Creazione piano fallita: ${errPiano.message}`);
     piano = pianoInserito;
 
-    const righe = [];
-    for (const g of migliore) {
-      // Ogni giornata, bloccata o no, passa per la stessa adattaGiornata:
-      // le porzioni dei piatti bloccati possono essere riscalate come
-      // quelle di chiunque altro, solo il piatto stesso resta fisso (vedi
-      // il pre-assegnamento in provaGradino, piu' sopra).
-      const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo) : g.pasti.map(p => ({ p, f: 1 }));
-      for (const x of adattati) {
-        const p = x.p, f = x.f;
-        righe.push({
-          plan_id: piano.id,
-          day_of_week: g.giorno,
-          meal: p.meal,
-          slot: p.slot,
-          dish_id: p.piatto.id,
-          portion_g: Math.round(p.piatto.grams * f),
-          kcal: Math.round(p.piatto.kcal * f),
-          protein_g: Number((p.piatto.protein * f).toFixed(1)),
-          sat_fat_g: Number((p.piatto.satFat * f).toFixed(1)),
-          fibre_g: Number((p.piatto.fibre * f).toFixed(1)),
-          salt_g: Number((p.piatto.salt * f).toFixed(2)),
-          avanzi: Boolean(p.avanzi),
-          bloccato: Boolean(p.bloccato),
-        });
-      }
-    }
+    // I piatti bloccati restano fissi nella scelta, ma le loro porzioni
+    // rispettano gli stessi limiti di tutti gli altri.
+    const righe = righePiano(migliore, obiettivo).map(r => ({ plan_id: piano.id, ...r }));
 
     const { error: errItems } = await supabase.from('plan_items').insert(righe);
     if (errItems) {
@@ -2990,10 +3003,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
     // li mostra come "N locked dish(es) no longer fit your profile".
     piatti_bloccati_scartati: piattiBloccatiScartati,
+    ...(!salva && opzioni.dettagli === true ? { righe: righePiano(migliore, obiettivo) } : {}),
   };
 }
 
 module.exports = {
+  adattaGiornata, limitiDi, righePiano,
   generaESalva, caricaPiatti, caricaPiattiPerId, gruppoDa, gruppoDaRegex, ancoraProteica, GRUPPO_DA_CATEGORIA,
   GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN,
   CATEGORIE_DIETA, foodIdVietatiPerDieta, gruppiPerProfiloDa, analizzaCapienza, GRADINI,

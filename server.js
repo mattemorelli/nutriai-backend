@@ -568,6 +568,10 @@ app.post('/preferenze', richiedeAuth, async (req, res) => {
 // ---------- RADICE ----------
 
 app.get('/', (req, res) => {
+  // Identifica la revisione effettivamente in esecuzione su Render,
+  // senza esporre configurazione o credenziali. Permette di distinguere
+  // un push riuscito da una distribuzione realmente completata.
+  res.set('X-Quadrio-Revision', process.env.RENDER_GIT_COMMIT || 'local');
   res.send('NutriAI backend attivo.');
 });
 
