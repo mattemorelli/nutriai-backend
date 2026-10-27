@@ -142,3 +142,19 @@ test('Swap puo appoggiarsi a una componente gia presente nel resto del pasto', (
   assert.equal(preservaRuoliDelPasto(unico, dish('base', 'primo', 400, 10, [A]),
     [dish('secondo', 'secondo', 300, 30, [P]), dish('verdure', 'contorno', 100, 2, [V])]), true);
 });
+
+
+test('preferenza grassi sceglie una struttura meno grassa conservando le proteine',()=>{
+  const vecchio=dish('vecchio','primo',1000,70,[P,A,V],{fat:50});
+  const leggero=dish('leggero','primo',1000,70,[P,A,V],{fat:30});
+  const povero=dish('povero-proteine','primo',1000,60,[P,A,V],{fat:20});
+  const valuta=ps=>({kcal:1000,kcalOk:true,proteine:ps[0].piatto.protein,grassi:ps[0].piatto.fat,
+    sale:1,saturi:5,fibra:30,saleMax:5,satMax:12,fibraMin:25});
+  const week=[{giorno:1,pasti:[row('pranzo',vecchio)]}];
+  const config={settimana:week,targetProteine:80,quote:{},accompagnaBene:()=>true,valuta,
+    contesto:()=>({kcal:1000,minuti:35,piatti:[povero,leggero],baseAmmessa:()=>true,abbinamentoBaseOk:()=>true})};
+  assert.equal(miglioraModelliPasto(config).settimana[0].pasti[0].piatto.id,'vecchio');
+  const r=miglioraModelliPasto({...config,preferisciGrassi:true});
+  assert.equal(r.settimana[0].pasti[0].piatto.id,'leggero');
+  assert.equal(r.settimana[0].pasti[0].piatto.protein,70);
+});

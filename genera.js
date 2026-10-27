@@ -1,3 +1,5 @@
+const { riepilogoIngredienti } = require('./ingredienti-piano');
+const { bilanciaGrassi } = require('./bilancia-grassi');
 console.log('[genera] v6-piano-proteico caricato');
 const { creaRecuperoProteico } = require('./recupero-proteico');
 const { bilanciaProteine } = require('./bilancia-proteine');
@@ -233,7 +235,7 @@ function limitiDi(p, obiettivo) {
 
 // Distribuisce il residuo calorico proporzionalmente allo spazio di manovra
 // di ciascun elemento, invece di moltiplicare tutto per lo stesso fattore.
-function adattaGiornata(pasti, obiettivo, obiettivoProteine) {
+function adattaGiornata(pasti, obiettivo, obiettivoProteine, bilanciaLipidi = true) {
   // Il punto di partenza deve gia' rispettare i limiti: una ricetta base
   // puo' superare il tetto anche prima della redistribuzione. Partire da
   // f=1 lasciava porzioni fuori limite quando diff<40 o mancava spazio
@@ -265,7 +267,9 @@ function adattaGiornata(pasti, obiettivo, obiettivoProteine) {
   // A parita' di calorie, bilancia le porzioni delle ricette gia' scelte.
   // Gli stessi fattori sono usati nella valutazione e nel salvataggio.
   if (!obiettivoProteine) return stato;
-  return bilanciaProteine(stato, obiettivoProteine, limitiProporzionali(totale() || obiettivo));
+  const limiti = limitiProporzionali(totale() || obiettivo);
+  bilanciaProteine(stato, obiettivoProteine, limiti);
+  return bilanciaLipidi ? bilanciaGrassi(stato, obiettivoProteine, limiti) : stato;
 }
 
 // Un solo percorso per i valori finali di plan_items, arrotondamenti
@@ -274,7 +278,7 @@ function adattaGiornata(pasti, obiettivo, obiettivoProteine) {
 function righePiano(settimana, obiettivo, obiettivoProteine) {
   const righe = [];
   for (const g of settimana) {
-    const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo, obiettivoProteine) : g.pasti.map(p => ({ p, f: 1 }));
+    const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo, obiettivoProteine, true) : g.pasti.map(p => ({ p, f: 1 }));
     for (const { p, f } of adattati) {
       righe.push({
         day_of_week: g.giorno,
@@ -337,21 +341,22 @@ function limitiProporzionali(kcal) {
 // 100%): un pavimento con un po' di margine, come fibraMin, non un vincolo
 // durissimo come il tetto sale/saturi - la ricerca puo' ancora accettare un
 // giorno leggermente sotto se il resto va bene, ma segnala quanto manca.
-function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine, bilanciaPorzioni = false) {
+function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine, bilanciaPorzioni = false, bilanciaLipidi = bilanciaPorzioni) {
   if (!obiettivo || !pastiGiorno.length) return null;
-  const adattati = adattaGiornata(pastiGiorno, obiettivo, bilanciaPorzioni ? obiettivoProteine : null);
-  let saturi = 0, sale = 0, fibra = 0, kcal = 0, proteine = 0;
+  const adattati = adattaGiornata(pastiGiorno, obiettivo, bilanciaPorzioni ? obiettivoProteine : null, bilanciaLipidi);
+  let saturi = 0, sale = 0, fibra = 0, kcal = 0, proteine = 0, grassi = 0;
   for (const { p, f } of adattati) {
     saturi += (p.piatto.satFat || 0) * f;
     sale += (p.piatto.salt || 0) * f;
     fibra += (p.piatto.fibre || 0) * f;
     kcal += (p.piatto.kcal || 0) * f;
     proteine += (p.piatto.protein || 0) * f;
+    grassi += (p.piatto.fat || 0) * f;
   }
   const lim = limitiProporzionali(kcal || obiettivo);
   const proteinMin = obiettivoProteine ? obiettivoProteine * 0.90 : null;
   return {
-    saturi, sale, fibra, kcal, proteine,
+    saturi, sale, fibra, kcal, proteine, grassi: adattati.every(x=>x.p.piatto.grassiCompleti !== false && Number.isFinite(x.p.piatto.fat)) ? grassi : null,
     satMax: lim.satMaxGiorno, saleMax: lim.saleMaxGiorno, fibraMin: lim.fibraMinGiorno, proteinMin,
     tettoOk: saturi <= lim.satMaxGiorno && sale <= lim.saleMaxGiorno,
     fibraOk: fibra >= lim.fibraMinGiorno,
@@ -948,7 +953,7 @@ async function caricaRiferimento(supabase) {
       const blocco = tuttiGliId.slice(i, i + 200);
       const righe = await paginaTutto((da, a) => supabase
         .from('dish_ingredients')
-        .select('dish_id, food_id, grams, foods (name, kcal_100g, protein_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g, stato, categoria_impatto)')
+        .select('dish_id, food_id, grams, foods (name, name_it, kcal_100g, protein_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g, stato, categoria_impatto)')
         .in('dish_id', blocco)
         .order('dish_id').order('food_id')
         .range(da, a));
@@ -997,10 +1002,11 @@ function arricchisciPiattiDaCache(piattiGrezzi, cache) {
   for (const p of piattiGrezzi) {
     const righe = ingredientiPerDish[p.id];
     if (!righe) continue;
-    const v = { kcal: 0, protein: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0, ingredienti: [] };
+    const v = { kcal: 0, protein: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0, ingredienti: [], grassiCompleti: true };
     for (const r of righe) {
       const f = r.foods || {};
       const k = r.grams / 100;
+      if (!Number.isFinite(f.fat_100g) || f.fat_100g < 0) v.grassiCompleti = false;
       v.kcal    += (f.kcal_100g    || 0) * k;
       v.protein += (f.protein_100g || 0) * k;
       v.fat     += (f.fat_100g     || 0) * k;
@@ -1008,7 +1014,7 @@ function arricchisciPiattiDaCache(piattiGrezzi, cache) {
       v.fibre   += (f.fibre_100g   || 0) * k;
       v.salt    += (f.salt_100g    || 0) * k;
       v.grams   += r.grams;
-      v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', grams: r.grams, stato: f.stato || null, protein_100g: f.protein_100g || 0, categoria_impatto: f.categoria_impatto || null });
+      v.ingredienti.push({ food_id: r.food_id, nome: f.name || '', nome_it: f.name_it || null, kcal_100g: f.kcal_100g, fat_100g: f.fat_100g, grams: r.grams, stato: f.stato || null, protein_100g: f.protein_100g || 0, categoria_impatto: f.categoria_impatto || null });
     }
     valori[p.id] = v;
   }
@@ -2663,10 +2669,10 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // eredita dieta, allergie, gradimenti e soglia del tentativo riuscito;
       // i filtri di giornata restano quelli del costruttore ordinario.
       const settimanaBase = statoGiorni.map((st, i) => ({ giorno: i + 1, profilo: st.profiloGiorno, pasti: pastiDi(i) }));
-      const modelliPasti = miglioraModelliPasto({
+      const configurazioneModelli = {
         settimana: settimanaBase, targetProteine: opzioni.modelliPasto === false ? null : obiettivoProteine,
         quote: QUOTE, accompagnaBene,
-        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true),
+        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true, false),
         contesto: (g, meal) => {
           const gi = g.giorno - 1, st = statoGiorni[gi], ctx = contestoGiorno(gi);
           const limite = meal === 'pranzo' ? st.limiteBasePranzo : st.limiteBase;
@@ -2681,7 +2687,17 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
               || tipiAccompagnamentoDaSecondo(q).includes(tipoAmidoDiAccompagnamento(p))),
           };
         },
+      };
+      // Prima conserva il miglioramento proteico gia' pubblicato; poi
+      // cerca porzioni/strutture con una distribuzione dei grassi migliore.
+      // Il secondo passaggio usa quel risultato come base da preservare.
+      const modelliBase = miglioraModelliPasto(configurazioneModelli);
+      const modelliPasti = miglioraModelliPasto({ ...configurazioneModelli,
+        settimana: modelliBase.settimana, preferisciGrassi: true,
+        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true, true),
       });
+      modelliPasti.modelli = [...new Map([...modelliBase.modelli,...modelliPasti.modelli]
+        .map(m=>[`${m.giorno}:${m.meal}`,m])).values()];
       modelliPasti.settimana.forEach((g, i) => { statoGiorni[i].pastiModello = g.pasti; });
       // Frequenze delle portate proteiche a pranzo E cena, una volta per
       // gruppo e pasto. Prima il riepilogo contava soltanto i secondi serali.
@@ -3022,6 +3038,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // visibile al return finale anche quando salva=true, e un const dentro il
   // blocco sarebbe uscito di scope li' (verificato: senza questo, il ramo
   // salva=true lancia "piano is not defined", non solo quello salva=false).
+  const righeFinali = righePiano(migliore, obiettivo, obiettivoProteine);
   let piano = null;
   if (salva) {
     const { data: pianoInserito, error: errPiano } = await supabase
@@ -3046,7 +3063,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
     // I piatti bloccati restano fissi nella scelta, ma le loro porzioni
     // rispettano gli stessi limiti di tutti gli altri.
-    const righe = righePiano(migliore, obiettivo, obiettivoProteine).map(r => ({ plan_id: piano.id, ...r }));
+    const righe = righeFinali.map(r => ({ plan_id: piano.id, ...r }));
 
     const { error: errItems } = await supabase.from('plan_items').insert(righe);
     if (errItems) {
@@ -3063,7 +3080,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
     // li mostra come "N locked dish(es) no longer fit your profile".
     piatti_bloccati_scartati: piattiBloccatiScartati,
-    ...(!salva && opzioni.dettagli === true ? { righe: righePiano(migliore, obiettivo, obiettivoProteine), modelli_pasti: esito.modelliPasti } : {}),
+    ...(!salva && opzioni.dettagli === true ? { righe: righeFinali, modelli_pasti: esito.modelliPasti, riepilogo_ingredienti: riepilogoIngredienti(righeFinali, new Map(migliore.flatMap(g=>g.pasti.map(p=>[p.piatto.id,p.piatto])))) } : {}),
   };
 }
 

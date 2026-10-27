@@ -66,6 +66,17 @@ function clientePer(dieta, kcal, proteine) {
         giorni.set(r.day_of_week, g);
       }
       assert.equal(giorni.size, 7);
+      assert.equal(piano.riepilogo_ingredienti?.length,7,'Riepilogo ingredienti mancante');
+      for(const g of piano.riepilogo_ingredienti){
+        assert.ok(g.completo && g.nutrienti_completi,'Dati ingredienti incompleti');
+        const righe=piano.righe.filter(r=>r.day_of_week===g.giorno);
+        const grammi=righe.reduce((s,r)=>s+r.portion_g,0);
+        assert.ok(Math.abs(g.ingredienti.reduce((s,i)=>s+i.grammi,0)-grammi)<=g.ingredienti.length*.051,'Pesi ingredienti non coerenti con le porzioni');
+        const kcalEff=righe.reduce((s,r)=>s+piattoDi.get(r.dish_id).kcal*r.portion_g/piattoDi.get(r.dish_id).grams,0);
+        const grassiEff=righe.reduce((s,r)=>s+piattoDi.get(r.dish_id).fat*r.portion_g/piattoDi.get(r.dish_id).grams,0);
+        assert.ok(Math.abs(g.grassi.grammi-grassiEff)<.051,'Grassi discordanti');
+        assert.ok(Math.abs(g.grassi.percento_energia-grassiEff*9/kcalEff*100)<.051,'Percentuale grassi discordante');
+      }
       for (const [giorno, g] of giorni) {
         // Ogni riga puo' arrotondare di 0,5 kcal / 0,05g di proteina.
         assert.ok(Math.abs(g.kcal - kcal) <= kcal * 0.10 + g.righe * 0.5, `Giorno ${giorno}: ${g.kcal} kcal fuori target`);

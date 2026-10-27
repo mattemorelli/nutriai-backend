@@ -1,3 +1,4 @@
+const { RIFERIMENTO_GRASSI } = require('./bilancia-grassi');
 const RUOLI = ['proteina_principale', 'base_amidacea', 'verdura'];
 const copre = (p, ruolo) => (p?.ruoli_coperti || []).includes(ruolo);
 const copertura = piatti => new Set(RUOLI.filter(r => piatti.some(p => copre(p, r))));
@@ -22,7 +23,7 @@ function contaGruppi(settimana) {
 // Ottimizzazione locale sulla settimana gia' costruita. La ricerca
 // principale rimane disponibile come risultato quando non c'e' un modello
 // migliore. Nessuna ricetta viene modificata e nessun nuovo spuntino aggiunto.
-function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quote, accompagnaBene }) {
+function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quote, accompagnaBene, preferisciGrassi = false }) {
   const nuova = settimana.map(g => ({ ...g, pasti: g.pasti.slice() }));
   const gruppiPrima = contaGruppi(settimana);
   const modelli = [];
@@ -61,7 +62,8 @@ function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quo
       punteggio: punteggio(base, precedenti.map(p => p.piatto)) };
 
     function punteggio(v, ps) {
-      return [Math.round(Math.min(targetProteine, v.proteine) * 10), -ps.length, -durata(ps),
+      const scartoGrassi = preferisciGrassi && Number.isFinite(v.grassi) ? Math.max(0,v.grassi-v.kcal*RIFERIMENTO_GRASSI.maxPercento/100/9) : 0;
+      return [Math.round(Math.min(targetProteine, v.proteine) * 10), -Math.round(scartoGrassi*10), -ps.length, -durata(ps),
         ps.reduce((s, p) => s + (p.health_score || 0), 0) / ps.length];
     }
     function meglio(a, b) {
@@ -85,6 +87,7 @@ function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quo
       if ([...ruoliPrima].some(r => !ruoliDopo.has(r))) return;
       const v = valuta(pasti);
       if (!v?.kcalOk || Math.abs(v.kcal - ctx.kcal) > Math.max(40, Math.abs(base.kcal - ctx.kcal)) + EPS) return;
+      if (preferisciGrassi && Number.isFinite(base.grassi) && Number.isFinite(v.grassi) && v.grassi > v.kcal*Math.max(base.grassi/base.kcal,RIFERIMENTO_GRASSI.maxPercento/100/9)+EPS) return;
       if (v.proteine + EPS < Math.min(targetProteine, base.proteine)) return;
       if (v.sale > Math.max(base.sale, v.saleMax) + EPS) return;
       if (v.saturi / v.satMax > Math.max(1, base.saturi / base.satMax) + EPS) return;

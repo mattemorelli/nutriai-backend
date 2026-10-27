@@ -2,12 +2,12 @@
 // ======================================================
 // In italiano semplice: prima di spingere codice sul repository, questo
 // comando controlla che il generatore di piani non sia rotto. Lancia in
-// fila diciassette controlli e ne riporta tutti gli esiti: se anche uno solo
+// fila diciotto controlli e ne riporta tutti gli esiti: se anche uno solo
 // fallisce, l'intero comando fallisce (exit code
 // diverso da 0) e git non lascia partire il push (e' installato come hook
 // pre-push, vedi scripts/installa-hook-pre-push.sh).
 //
-// I diciassette controlli, in ordine:
+// I diciotto controlli, in ordine:
 //   1. node --check su tutti i file .js del backend - niente di rotto a
 //      livello di sintassi (non esegue il codice, solo lo legge).
 //   2. verifica-flag-allergeni.js - le etichette "contiene glutine/
@@ -153,6 +153,8 @@ passo('17. Modifiche del piano: atomicita, salti, ripristino, spesa e concorrenz
   lanciaScript('test-spesa-modifiche.js');
   lanciaScript('scripts/verifica-modifiche-piano-db.js');
 });
+
+passo('18. Quantita giornaliere degli ingredienti e bilanciamento dei grassi', () => lanciaScript('test-ingredienti-grassi.js'));
 
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);

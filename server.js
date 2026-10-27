@@ -1,3 +1,4 @@
+const { riepilogoIngredienti } = require('./ingredienti-piano');
 console.log('[server] avviato', new Date().toISOString());
 const { calcolaESalvaTarget, preparaTarget, salvaTarget } = require('./fabbisogno');
 const { allenamenti, massaGrassa } = require('./validazione-fabbisogno');
@@ -243,7 +244,7 @@ async function paginaTutto(costruisciQuery) {
 async function calcolaPiatto(dishId) {
   const { data: ingredienti, error } = await supabase
     .from('dish_ingredients')
-    .select('grams, foods (id, name, kcal_100g, protein_100g, carb_100g, sugar_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g)')
+    .select('food_id, grams, foods (id, name, name_it, stato, kcal_100g, protein_100g, carb_100g, sugar_100g, fat_100g, sat_fat_100g, fibre_100g, salt_100g)')
     .eq('dish_id', dishId);
 
   if (error) throw error;
@@ -251,9 +252,9 @@ async function calcolaPiatto(dishId) {
   // grams: peso totale della ricetta base (dish_ingredients), non scalato -
   // serve a risalire al fattore di scala di un plan_item (portion_g/grams),
   // lo stesso che genera.js/sostituisci.js applicano gia' a protein_g ecc.
-  const tot = { kcal: 0, protein: 0, carb: 0, sugar: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0 };
+  const tot = { kcal: 0, protein: 0, carb: 0, sugar: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0, ingredienti: [] };
   for (const riga of ingredienti) {
-    const f = riga.foods;
+    const f = riga.foods || {};
     const fattore = riga.grams / 100;
     tot.kcal    += (f.kcal_100g    || 0) * fattore;
     tot.protein += (f.protein_100g || 0) * fattore;
@@ -263,7 +264,8 @@ async function calcolaPiatto(dishId) {
     tot.satFat  += (f.sat_fat_100g || 0) * fattore;
     tot.fibre   += (f.fibre_100g   || 0) * fattore;
     tot.salt    += (f.salt_100g    || 0) * fattore;
-    tot.grams   += riga.grams;
+    tot.grams   += Number(riga.grams);
+    tot.ingredienti.push({ food_id:riga.food_id, nome:f.name, nome_it:f.name_it, stato:f.stato, grams:Number(riga.grams), kcal_100g:f.kcal_100g, fat_100g:f.fat_100g });
   }
   return tot;
 }
@@ -513,6 +515,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
       dati: giorniRisposta,
       giorni: giorniRisposta,
       obiettivi: obiettivi || null,
+      riepilogo_ingredienti: riepilogoIngredienti(righe.filter(r=>giorniRisposta.some(d=>d.giorno===r.day_of_week)),cachePiatti),
       riepilogo_nutrizionale: riepilogo.filter(g=>giorniRisposta.some(d=>d.giorno===g.giorno)),
       ...campiExtra,
     });
