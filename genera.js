@@ -1,5 +1,6 @@
 console.log('[genera] v6-piano-proteico caricato');
 const { creaRecuperoProteico } = require('./recupero-proteico');
+const { bilanciaProteine } = require('./bilancia-proteine');
 
 // Il generico è ammesso solo dentro la sua famiglia: un piatto
 // "mediterraneo generico" sta bene in una giornata italiana,
@@ -231,7 +232,7 @@ function limitiDi(p, obiettivo) {
 
 // Distribuisce il residuo calorico proporzionalmente allo spazio di manovra
 // di ciascun elemento, invece di moltiplicare tutto per lo stesso fattore.
-function adattaGiornata(pasti, obiettivo) {
+function adattaGiornata(pasti, obiettivo, obiettivoProteine) {
   // Il punto di partenza deve gia' rispettare i limiti: una ricetta base
   // puo' superare il tetto anche prima della redistribuzione. Partire da
   // f=1 lasciava porzioni fuori limite quando diff<40 o mancava spazio
@@ -260,16 +261,19 @@ function adattaGiornata(pasti, obiettivo) {
       stato.forEach(x => { x.f = Math.max(x.lim[0], x.f - Math.max(0, x.f - x.lim[0]) * quota); });
     }
   }
-  return stato;
+  // A parita' di calorie, bilancia le porzioni delle ricette gia' scelte.
+  // Gli stessi fattori sono usati nella valutazione e nel salvataggio.
+  if (!obiettivoProteine) return stato;
+  return bilanciaProteine(stato, obiettivoProteine, limitiProporzionali(totale() || obiettivo));
 }
 
 // Un solo percorso per i valori finali di plan_items, arrotondamenti
 // compresi. Anche salva:false puo' ispezionarli con dettagli:true, senza
 // scrivere un piano e senza una seconda formula di scala nei test.
-function righePiano(settimana, obiettivo) {
+function righePiano(settimana, obiettivo, obiettivoProteine) {
   const righe = [];
   for (const g of settimana) {
-    const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo) : g.pasti.map(p => ({ p, f: 1 }));
+    const adattati = obiettivo ? adattaGiornata(g.pasti, obiettivo, obiettivoProteine) : g.pasti.map(p => ({ p, f: 1 }));
     for (const { p, f } of adattati) {
       righe.push({
         day_of_week: g.giorno,
@@ -332,9 +336,9 @@ function limitiProporzionali(kcal) {
 // 100%): un pavimento con un po' di margine, come fibraMin, non un vincolo
 // durissimo come il tetto sale/saturi - la ricerca puo' ancora accettare un
 // giorno leggermente sotto se il resto va bene, ma segnala quanto manca.
-function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine) {
+function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine, bilanciaPorzioni = false) {
   if (!obiettivo || !pastiGiorno.length) return null;
-  const adattati = adattaGiornata(pastiGiorno, obiettivo);
+  const adattati = adattaGiornata(pastiGiorno, obiettivo, bilanciaPorzioni ? obiettivoProteine : null);
   let saturi = 0, sale = 0, fibra = 0, kcal = 0, proteine = 0;
   for (const { p, f } of adattati) {
     saturi += (p.piatto.satFat || 0) * f;
@@ -1471,7 +1475,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // altrimenti generato qui - ma sempre salvato col piano, cosi' ogni
   // generazione e' rigiocabile a posteriori, non solo quando lo si prevede.
   const seed = (seedIniziale != null ? Number(seedIniziale) : Math.floor(Math.random() * 4294967296)) >>> 0;
-  const rng = creaRng(seed);
 
   const { data: prefRaw, error: errPref } = await supabase
     .from('user_cuisine_preferences')
@@ -1803,7 +1806,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // gradino 0 = obiettivo, nessun allentamento. sogliaSalute e' passata a
   // parte perche' al gradino 5 scende sotto 7 in due passi (6.5 poi 6),
   // sempre dentro lo stesso gradino 5.
-  function provaGradino(opz, sogliaSalute, scadenza) {
+  function provaGradino(opz, sogliaSalute, scadenza, tentativo = 0) {
+    // Ogni gradino riparte da un flusso indipendente. Prima ereditava le
+    // estrazioni consumate dai tentativi interrotti dal tempo: lo stesso
+    // seed poteva cosi' riuscire o fallire secondo il carico del server.
+    const rng = creaRng((seed + Math.imul(tentativo, 0x9E3779B9)) >>> 0);
     const insiemeBase = opz.preferenzeTolleranti ? piattiConSgraditi : piatti;
     const perSlot = (slot) => insiemeBase.filter(p => p.meal_slot === slot && (p.health_score == null || p.health_score >= sogliaSalute));
     const primi     = perSlot('primo');
@@ -2413,8 +2420,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // sfonda e il gradino non e' ancora tollerante, e' un vicolo cieco
       // come un altro: si torna indietro e si riprova un candidato diverso
       // per l'ultimo slot deciso di QUESTA giornata (stesso meccanismo di
-      // 'decisione === null', non uno nuovo). Il risultato si salva su
-      // statoGiorni[gi] cosi' il ciclo di ricostruzione dopo non ricalcola.
+      // 'decisione === null', non uno nuovo). La ricostruzione finale
+      // ricalcola i nutrienti dopo il bilanciamento delle porzioni.
       // Ricostruisce dai valori salvati su statoGiorni[gi] lo stesso contesto
       // (profiloGiorno, paeseOk, le cappe tempo) che prossimaDecisione calcola
       // da zero per quel giorno - serve qui perche' gli aumenti di emergenza
@@ -2529,7 +2536,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           if (Date.now() > scadenza) return { esaurito: true, motivo: 'tempo' };
           const decisione = prossimaDecisione(gi);
           if (decisione === 'COMPLETO') {
-            const st = statoGiorni[gi];
             if (obiettivo) {
               provaAumentoKcal(gi);
               provaAumentoProteine(gi);
@@ -2546,7 +2552,6 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
                 gi = tornaA;
                 continue;
               }
-              st.valutazioneNutrienti = val;
             }
             gi++; continue;
           }
@@ -2601,18 +2606,14 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         const st = statoGiorni[k];
         const pasti = pastiDi(k);
 
-        // Riusa la valutazione gia' fatta DURANTE la ricerca (vedi
-        // avanzaFinDove) quando c'e'; la ricalcola solo se manca (giornata
-        // senza obiettivo kcal - nessun utente ha ancora un energy_target,
-        // capita per esempio ai profili appena creati). Una giornata con
-        // piatti bloccati arriva qui come ogni altra (vedi il pre-assegnamento
-        // in provaGradino): sale e saturi restano un vincolo vero anche per
-        // lei, valutato sugli stessi valori scalati. Se e' arrivata fin qui
-        // con tettoOk=false, il gradino corrente ha tettoTollerante=true
-        // (altrimenti avanzaFinDove l'avrebbe scartata, vedi il gate li') - va
-        // registrato come concessione, non come piatto rotto. La fibra non
-        // blocca mai: solo concessione.
-        const val = st.valutazioneNutrienti || valutaGiornataScalata(pasti, obiettivo, obiettivoProteine);
+        // Bilancia le porzioni sulla settimana gia' scelta e ricalcola
+        // TUTTI i nutrienti con gli stessi fattori del salvataggio. Nella
+        // ricerca resta il criterio precedente: introdurre il bilanciamento
+        // anche li' cambiava la sequenza dei tentativi, facendo esaurire il
+        // budget su cene rapide prima completabili. Il passaggio finale non
+        // cambia ricette, energia o vincoli: migliora le proteine nelle
+        // porzioni scelte. Le carenze residue restano dichiarate.
+        const val = valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true);
         const conforme = val ? (val.tettoOk && val.fibraOk && val.kcalOk && val.proteinOk) : true;
 
         if (val && !val.tettoOk) {
@@ -2817,13 +2818,17 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // L'ultimo gradino, sempre - mai col tetto di tempo (vedi sopra): e' la
   // garanzia che nessun profilo resti senza piano solo perche' il tempo e'
   // scaduto prima di arrivarci.
-  if (!esito) {
-    const r = provaGradino(gradinoFinale.opz, gradinoFinale.soglia, Infinity);
+  // Una ricerca limitata a MAX_PASSI puo' imboccare un ramo sterile anche
+  // quando esiste un piano. Al massimo tre flussi finali indipendenti,
+  // ciascuno con lo stesso tetto di passi, prima della diagnosi negativa.
+  // Il seme base salvato riproduce anche questi tentativi aggiuntivi.
+  for (let tentativo = 0; !esito && tentativo < 3; tentativo++) {
+    const r = provaGradino(gradinoFinale.opz, gradinoFinale.soglia, Infinity, tentativo);
     if (r.ok) {
       console.log(`[scala] ultimo gradino ${gradinoFinale.gradino} (soglia ${gradinoFinale.soglia}, senza tetto di tempo): RIUSCITO`);
       esito = r; gradinoRaggiunto = gradinoFinale.gradino;
     } else {
-      console.log(`[scala] ultimo gradino ${gradinoFinale.gradino} (soglia ${gradinoFinale.soglia}, senza tetto di tempo): esaurito per tutti i profili - ${r.diagnosticaProfili.join(' | ') || 'nessun profilo'}`);
+      console.log(`[scala] ultimo gradino ${gradinoFinale.gradino}, tentativo ${tentativo + 1}/3 (soglia ${gradinoFinale.soglia}, senza tetto di tempo): esaurito per tutti i profili - ${r.diagnosticaProfili.join(' | ') || 'nessun profilo'}`);
       diagnosticaCompleta.push(`gradino ${gradinoFinale.gradino} (soglia ${gradinoFinale.soglia}): ${r.diagnosticaProfili.join(', ') || 'nessun profilo'}`);
     }
   }
@@ -2950,7 +2955,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
     // I piatti bloccati restano fissi nella scelta, ma le loro porzioni
     // rispettano gli stessi limiti di tutti gli altri.
-    const righe = righePiano(migliore, obiettivo).map(r => ({ plan_id: piano.id, ...r }));
+    const righe = righePiano(migliore, obiettivo, obiettivoProteine).map(r => ({ plan_id: piano.id, ...r }));
 
     const { error: errItems } = await supabase.from('plan_items').insert(righe);
     if (errItems) {
@@ -2967,7 +2972,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
     // li mostra come "N locked dish(es) no longer fit your profile".
     piatti_bloccati_scartati: piattiBloccatiScartati,
-    ...(!salva && opzioni.dettagli === true ? { righe: righePiano(migliore, obiettivo) } : {}),
+    ...(!salva && opzioni.dettagli === true ? { righe: righePiano(migliore, obiettivo, obiettivoProteine) } : {}),
   };
 }
 

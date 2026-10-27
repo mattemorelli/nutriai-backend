@@ -3,6 +3,9 @@
 require('dotenv').config({ quiet: true });
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const { createRequire } = require('node:module');
 const { createClient } = require('@supabase/supabase-js');
 const { generaESalva, caricaPiatti } = require(process.argv[2] || path.join(__dirname, '../genera.js'));
 const reale = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -86,4 +89,29 @@ function cliente(dieta, minuti, kcal, proteine, bloccati = []) {
   const ok = risultati.filter(r => r.ok).length;
   console.log(`\nRecupero proteico: ${ok}/${risultati.length} casi.`);
   if (ok !== risultati.length) process.exitCode = 1;
+
+  // Orologio controllato: una prova salta subito al tentativo finale,
+  // l'altra interrompe una ricerca gia' iniziata. Il tempo virtuale rende
+  // riproducibile il difetto senza dipendere dalla velocita' del computer.
+  const file = process.argv[2] || path.join(__dirname, '../genera.js');
+  const generaConTempo = async tempoMassimoMs => {
+    let tick = 0;
+    class Orologio extends Date { static now() { return tick++; } }
+    const m = { exports: {} };
+    vm.runInNewContext(fs.readFileSync(file, 'utf8'), {
+      module: m, require: createRequire(file), console, Date: Orologio,
+    }, { filename: file });
+    return m.exports.generaESalva(cliente('onnivoro', 15, 2000, 130), ID, 2026,
+      { salva: false, dettagli: true, tempoMassimoMs });
+  };
+  const diretto = await generaConTempo(-1);
+  const interrotto = await generaConTempo(12);
+  assert.ok(!diretto.errore && !interrotto.errore, 'Tentativo finale non generato');
+  assert.equal(diretto.gradino, '5');
+  assert.equal(interrotto.gradino, '5');
+  assert.equal(JSON.stringify(interrotto.righe), JSON.stringify(diretto.righe),
+    'Il tempo del tentativo precedente cambia il piano finale');
+  assert.equal(JSON.stringify(interrotto.concessioni), JSON.stringify(diretto.concessioni),
+    'Il tempo del tentativo precedente cambia le concessioni');
+  console.log('OK riproducibilita del tentativo finale con budget temporali diversi.');
 })().catch(e => { console.error('ERRORE:', e.message); process.exitCode = 1; });

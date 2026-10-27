@@ -1,6 +1,6 @@
 # Quadrio — stato del generatore e criteri di rilascio
 
-Aggiornamento: 26 ottobre 2026. Perimetro attuale richiesto da Matteo:
+Aggiornamento: 27 ottobre 2026. Perimetro attuale richiesto da Matteo:
 solo generatore. Questo e' il riferimento operativo da
 aggiornare dopo ogni blocco: distinguere codice verificato, ipotesi,
 funzioni mancanti e versione effettivamente distribuita. I documenti
@@ -27,7 +27,7 @@ codice attuale. Nessuna percentuale di completezza senza criteri misurati.
 - La risposta alla radice del server include `X-Quadrio-Revision`:
   confrontarlo col commit pubblicato prima di dichiarare un deploy riuscito.
 
-## Pubblicazione verificata
+## Prima pubblicazione verificata
 
 Commit del backend: `3a86549b818135f0ff9381f9eb2ece841e75ab99`.
 Render ha confermato `Deploy succeeded | Live`; la risposta HTTP pubblica
@@ -39,6 +39,56 @@ flusso reale, autenticazione, rifiuto minorenne, onboarding adulto,
 salvataggio di sette giorni/56 porzioni, calorie, tetti in grammi,
 rilettura piano, ingredienti e spesa. Account di prova isolato, sessione e
 dati rimossi al termine, con verifica di assenza di residui.
+
+## Ultima pubblicazione verificata prima del nuovo blocco
+
+Commit `e1d9711965234979a633ab45095fb0c5e23728f0`: recupero proteico
+con selettori ordinari, piatti bloccati preservati, accompagnamenti entro
+i tempi e contatori degli spuntini corretti. Revisione HTTP pubblica
+confermata, undici controlli online superati e dati di prova rimossi.
+
+## Nuovo blocco: bilanciamento finale delle proteine
+
+Stato: verificato nel progetto; pubblicazione successiva ai controlli.
+
+Verifica finale: 13/13 gruppi superati, 9 nuove regressioni sulle
+porzioni, 300 giornate sintetiche, 12 casi difficili e prova del tempo
+virtuale. Matrice estesa: 32/32 settimane generate, nessuna violazione
+rilevata di porzioni, tempi, dieta/allergie o intervallo calorico.
+Nel campione con nuova ricerca restano 20/32 settimane con almeno
+un deficit proteico dichiarato (64 giorni): il generatore non e' ancora
+pienamente adeguato sul piano nutrizionale. Il confronto sugli STESSI
+piatti sotto misura separatamente il beneficio delle sole porzioni.
+
+Corretto anche un difetto preesistente di riproducibilita': i gradini
+ereditavano il generatore casuale consumato dai tentativi interrotti.
+Ora ogni gradino ha il proprio flusso; fino a tre tentativi finali
+indipendenti, con tetto di passi per ciascuno, riducono i falsi fallimenti
+di ricerca. Il limite totale di lavoro finale puo' quindi triplicare
+nei casi difficili: la latenza in produzione resta da monitorare.
+Test con orologio virtuale: identiche righe e concessioni dopo budget
+temporali diversi nei tentativi precedenti.
+
+- Redistribuisce le calorie tra le ricette gia' scelte per avvicinarsi al
+  target proteico, conservando l'energia totale e i limiti delle porzioni.
+- Mantiene sale e saturi entro i tetti esistenti; se sono gia' oltre,
+  non li peggiora. Conserva il pavimento di fibra oppure, quando manca
+  gia' fibra, non ne riduce ulteriormente la quantita'.
+- Si applica alla settimana gia' costruita. Non modifica la ricerca dei
+  piatti: la prova che inseriva il bilanciamento durante la ricerca ha
+  esaurito i tentativi in casi di cene rapide prima completabili.
+- Valutazione finale, concessioni, simulazione e salvataggio usano lo
+  stesso target e gli stessi fattori. I deficit risolti non restano
+  segnalati; quelli ancora presenti rimangono dichiarati.
+- Confronto sugli stessi piatti dei 32 piani registrati: proteine
+  aumentate in almeno 137/224 giorni; giorni sotto il minimo da 66 a
+  non piu' di 54, settimane con almeno un deficit da 18 a non piu' di 16.
+  Ricostruzione verificata su tutte le righe; per 16 giorni con flag
+  interno ambiguo si considera il beneficio minore. Nessuna variazione
+  calorica o violazione aggiuntiva dei limiti nei casi confrontati.
+- Ricerca locale di scambi calorici, non ottimizzazione globale: puo'
+  rimanere una combinazione migliore non individuata. Non certifica
+  l'adeguatezza nutrizionale dei piani e non modifica le soglie esistenti.
 
 ## Cinque blocchi da chiudere per un generatore pronto al lancio
 
@@ -89,8 +139,8 @@ realistiche, nessuno spuntino o pasto aggiunto contro la scelta dell'utente.
 
 ### G3 — Vincoli rispettati in OGNI percorso
 
-Stato: PARZIALE; recupero proteico corretto e verificato in locale.
-La versione distribuita resta quella indicata sopra fino a un nuovo rilascio.
+Stato: PARZIALE; recupero proteico corretto e pubblicato nel commit
+`e1d9711965234979a633ab45095fb0c5e23728f0`.
 Non considerare chiuso tutto G3.
 
 - Recupero dei secondi e spuntini: riusa i selettori ordinari, con tempo,

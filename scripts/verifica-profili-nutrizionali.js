@@ -73,6 +73,13 @@ function clientePer(dieta, kcal, proteine) {
           assert.ok(piano.concessioni.some(x => x.giorno === giorno && x.vincolo === 'proteine_minime'),
             `Giorno ${giorno}: deficit proteico non dichiarato`);
         }
+        const concessione = piano.concessioni.find(x => x.giorno === giorno && x.vincolo === 'proteine_minime');
+        if (concessione) {
+          assert.ok(Math.abs(g.proteine - Number(concessione.dopo)) <= g.righe * 0.05 + 0.051,
+            `Giorno ${giorno}: deficit riferito alle porzioni precedenti al bilanciamento`);
+          assert.ok(g.proteine - g.righe * 0.05 < proteine * 0.9,
+            `Giorno ${giorno}: deficit gia risolto ma ancora dichiarato`);
+        }
       }
       passati++;
       console.log(`OK  ${etichetta}, gradino ${piano.gradino}`);

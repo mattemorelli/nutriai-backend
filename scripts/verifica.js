@@ -56,13 +56,16 @@
 //  10. test-porzioni.js e scripts/verifica-profili-nutrizionali.js - limiti
 //      effettivi, target irraggiungibili, valori finali di plan_items e 12
 //      profili con kcal/proteine esplicite (la matrice ridotta non le ha).
+//      Include bilanciamento proteico a calorie costanti, sale/saturi/fibra
+//      preservati e concessioni coerenti con le porzioni finali.
 //  11. test-fabbisogno.js e test-errori-profilo.js - nessun errore di
 //      lettura viene scambiato per allenamenti, PAL o piatti bloccati
 //      assenti, oppure per un profilo onnivoro di default.
 //  12. test-sicurezza-input.js - limiti di eta'/peso/altezza e BMI-obiettivo.
 //  13. test-recupero-proteico.js e scripts/verifica-recupero-proteico.js:
 //      stessi filtri della scelta ordinaria, piatti bloccati preservati,
-//      contatori reversibili e 12 casi con recupero proteico difficile.
+//      contatori reversibili, 12 casi difficili e riproducibilita del
+//      tentativo finale dopo ricerche interrotte dal tempo.
 //
 // Uso: npm run verifica
 // (lo stesso identico comando lo lancia da solo git, da questa cartella,
