@@ -40,7 +40,7 @@ salvataggio di sette giorni/56 porzioni, calorie, tetti in grammi,
 rilettura piano, ingredienti e spesa. Account di prova isolato, sessione e
 dati rimossi al termine, con verifica di assenza di residui.
 
-## Ultima pubblicazione verificata prima del nuovo blocco
+## Pubblicazione precedente al nuovo blocco
 
 Commit `e1d9711965234979a633ab45095fb0c5e23728f0`: recupero proteico
 con selettori ordinari, piatti bloccati preservati, accompagnamenti entro
@@ -49,7 +49,12 @@ confermata, undici controlli online superati e dati di prova rimossi.
 
 ## Nuovo blocco: bilanciamento finale delle proteine
 
-Stato: verificato nel progetto; pubblicazione successiva ai controlli.
+Stato: pubblicato e verificato online il 27 ottobre 2026.
+Commit `5b99e891d0001068ad7aa909e80c2c52c000cd5b`: revisione HTTP
+confermata e 13 verifiche online superate, compresa la coerenza fra
+proteine salvate e deficit dichiarati. Account e dati di prova rimossi.
+Backend locale riavviato con lo stesso codice. I piani precedenti non
+vengono modificati: il bilanciamento vale per le nuove generazioni.
 
 Verifica finale: 13/13 gruppi superati, 9 nuove regressioni sulle
 porzioni, 300 giornate sintetiche, 12 casi difficili e prova del tempo
@@ -90,6 +95,47 @@ temporali diversi nei tentativi precedenti.
   rimanere una combinazione migliore non individuata. Non certifica
   l'adeguatezza nutrizionale dei piani e non modifica le soglie esistenti.
 
+## Nuovo blocco: tre strutture di pranzo e cena
+
+Stato: verificato nel progetto, da pubblicare dopo i controlli.
+
+- Il generatore puo' scegliere un piatto unico, un secondo con verdure
+  (con pane/patate quando serve), oppure primo, secondo e verdure.
+  La scelta migliora la giornata gia' costruita; non introduce nuovi
+  spuntini e conserva il piano precedente quando non trova miglioramenti.
+- Esclude dai nuovi modelli le ricette con ruoli mancanti, senza
+  assumere che una composizione non definita sia completa.
+- Usa ruoli e dati reali del catalogo, lo stesso pool gia' filtrato per
+  dieta, allergie e preferenze, soglia di salute, paese/profilo, tecnica,
+  trasportabilita' e tempi. Per le nuove combinazioni, la SOMMA dei tempi
+  delle ricette rispetta il budget; il percorso storico conserva ancora
+  il suo controllo per singola ricetta, non una schedulazione parallela.
+- Proteine, calorie, sale/saturi e fibra vengono rivalutati sulla giornata
+  e sulle stesse porzioni salvate. Le nuove strutture non peggiorano le
+  carenze esistenti ne' le frequenze minime/massime rispetto al piano base.
+- Frequenze ora contate sulle portate proteiche di pranzo E cena, una
+  volta per gruppo e pasto. I tetti gia' superati nel piano base restano
+  dichiarati, senza aggravarli durante il miglioramento dei modelli.
+- Supportati primo bloccato a cena, secondo bloccato a pranzo, pasto
+  completo bloccato e solo pane bloccato. Un accompagnamento generico
+  bloccato non impone piu' il suo paese a tutta la giornata.
+- Swap conserva i ruoli che il resto del pasto non fornisce, anche su
+  un piatto unico senza gemelli. Verifica anche la conferma inviata dal
+  client; componenti non risolvibili interrompono la sostituzione.
+- Corretto giorni_conformi: conta effettivamente 0-7 giornate conformi,
+  anziche' arrotondare un punteggio che comprendeva salute e completezza.
+- Verifiche: 17 nuovi test locali, 12 casi sul catalogo reale senza
+  scritture, 14/14 gruppi completi. Nel campione esteso: 32/32 settimane
+  riuscite, zero violazioni rilevate di porzioni/tempi/dieta/calorie.
+  Deficit proteici DICHIARATI: 62 -> 29 giorni su 224; 19 -> 9 settimane
+  con almeno un deficit. Il conteggio con tolleranza di arrotondamento
+  del confronto e' 60 -> 27 giorni. Sono misure del campione, non una
+  garanzia per ogni profilo e non una validazione clinica.
+- Restano aperti il modello esplicitamente freddo (trasportabile non
+  significa freddo), scelta degli spuntini, limiti per ingredienti,
+  ottimizzazione globale e coerenza completa di spostamenti/salti e
+  ricalcolo nutrizionale dopo modifiche manuali del piano.
+
 ## Cinque blocchi da chiudere per un generatore pronto al lancio
 
 ### G1 — Fabbisogno e popolazione supportata
@@ -116,13 +162,15 @@ coerenti, aggiornamenti verificati e casi rappresentativi revisionati.
 
 ### G2 — Struttura dei pasti e porzioni realistiche
 
-Stato: PROGETTATO, IMPLEMENTAZIONE MANCANTE.
+Stato: PARZIALE; tre strutture implementate nel nuovo blocco sopra.
 
-- Oggi: pranzo primo+contorno, cena secondo+contorno+base se serve;
-  non descrivere il codice come un pasto completo obbligatorio a ogni pasto.
-- Implementare quattro modelli: completo, piatto unico, secondo e
-  contorno, freddo e veloce; scelta coerente con tempo, preferenze e
-  fabbisogno, verificata su catalogo e con pasti bloccati/Swap.
+- La ricerca di base parte ancora da pranzo primo+contorno e cena
+  secondo+contorno+base; ora puo' migliorare entrambi con tre strutture.
+  Non descrivere ogni pasto come completo obbligatorio: il percorso base
+  rimane il risultato quando una alternativa non rispetta i vincoli.
+- Restano da identificare con dati affidabili i piatti davvero freddi,
+  oltre alla trasportabilita', e da ampliare la verifica delle strutture
+  su piu' paesi, fabbisogni, pasti bloccati e modifiche manuali.
 - Scegliere esplicitamente numero/presenza di spuntini. Oggi sono due
   automatici e puo' comparire un terzo per recuperare calorie.
 - Definire limiti per GRUPPO DI INGREDIENTI e per giornata: far rispettare
@@ -255,7 +303,8 @@ Il criterio e' una versione affidabile per una popolazione e un insieme
 di casi dichiarati, con problemi noti gestiti e monitoraggio; "perfetto"
 non e' una condizione dimostrabile da un campione di test.
 
-Prossimo lavoro nel perimetro attuale: completare la verifica di questo
-blocco, poi G1/G2 (fabbisogno, quattro modelli di pasto e spuntini) con
-criteri nutrizionali documentati. Le attivita' su infrastruttura e App
+Prossimo lavoro nel perimetro attuale: G2, piu' modelli di pranzo/cena
+e presenza di una portata proteica coerente con il resto della giornata;
+poi numero degli spuntini e limiti per ingredienti. G1 (fabbisogno)
+resta da validare con criteri nutrizionali documentati. Le attivita' su infrastruttura e App
 Store restano separate dal lavoro ora richiesto sul generatore.

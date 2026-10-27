@@ -1,6 +1,7 @@
 console.log('[genera] v6-piano-proteico caricato');
 const { creaRecuperoProteico } = require('./recupero-proteico');
 const { bilanciaProteine } = require('./bilancia-proteine');
+const { miglioraModelliPasto } = require('./modelli-pasto');
 
 // Il generico è ammesso solo dentro la sua famiglia: un piatto
 // "mediterraneo generico" sta bene in una giornata italiana,
@@ -1897,6 +1898,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         st.bloccatiOggi = lista;
         for (const b of lista) {
           if (b.meal === 'cena' && b.slot === 'secondo') { assegnaSecondoScelto(gi, b.piatto); continue; }
+          if (b.meal === 'pranzo' && b.slot === 'secondo') { assegnaSecondoPranzoScelto(gi, b.piatto); continue; }
           if (b.meal === 'spuntino') {
             // Anche gli spuntini bloccati occupano un uso settimanale.
             // Conserva tutte e tre le eventuali scelte: prima la terza
@@ -1906,14 +1908,29 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
             assegnaSpuntinoScelto(gi, nomeSlot, b.piatto);
             continue;
           }
+          if (b.piatto.salsa_industriale && !usati.has(b.piatto.id)) usoSalse.valore++;
+          if (b.slot === 'primo' && b.piatto.gruppo && copreRuolo(b.piatto, 'proteina_principale')) usoGruppi[b.piatto.gruppo] = (usoGruppi[b.piatto.gruppo] || 0) + 1;
           usati.add(b.piatto.id);
           if (b.meal === 'colazione') st.colazione = b.piatto;
           else if (b.meal === 'pranzo' && b.slot === 'primo') st.primo = b.piatto;
-          else if (b.meal === 'pranzo' && b.slot === 'contorno') st.contornoPranzo = b.piatto;
+          else if (b.meal === 'cena' && b.slot === 'primo') st.primoCena = b.piatto;
+          else if (b.meal === 'pranzo' && b.slot === 'contorno') {
+            if (b.piatto.base_amidacea) st.basePranzo = b.piatto; else st.contornoPranzo = b.piatto;
+          }
           else if (b.meal === 'cena' && b.slot === 'contorno') {
             if (b.piatto.base_amidacea) st.base = b.piatto; else st.contornoCena = b.piatto;
           }
         }
+        // Un secondo a pranzo o un primo a cena puo' essere la portata
+        // principale del modello bloccato: non aggiungerne un'altra fissa.
+        if (st.secondoPranzo && st.primo === undefined) st.primo = null;
+        if (st.primoCena && copreRuolo(st.primoCena, 'proteina_principale') && st.secondo === undefined) st.secondo = null;
+        if (!st.secondoPranzo && st.primo === undefined && [st.basePranzo, st.contornoPranzo].some(p => p?.amidoReale)) {
+          st.primo = null;
+          st.richiedeSecondoPranzo = true;
+        }
+        if (st.contornoPranzo === undefined && [st.primo, st.secondoPranzo].some(p => p && copreRuolo(p, 'verdura'))) st.contornoPranzo = null;
+        if (st.contornoCena === undefined && [st.secondo, st.primoCena].some(p => p && copreRuolo(p, 'verdura'))) st.contornoCena = null;
       }
 
       const pila = [];
@@ -1925,6 +1942,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // COMPLETA).
       function pastiDi(gi) {
         const st = statoGiorni[gi];
+        if (st.pastiModello) return st.pastiModello;
         // Quali id sono quelli dei piatti bloccati di oggi: serve a
         // rimettere bloccato=true sulla riga giusta al salvataggio, senza
         // dover portare il flag dentro ogni singolo campo di statoGiorni.
@@ -1934,10 +1952,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         return [
           conFlag(st.colazione      && { meal: 'colazione', slot: 'colazione', piatto: st.colazione }),
           conFlag(st.primo          && { meal: 'pranzo',    slot: 'primo',     piatto: st.primo }),
+          conFlag(st.secondoPranzo  && { meal: 'pranzo',    slot: 'secondo',   piatto: st.secondoPranzo }),
           conFlag(st.contornoPranzo && { meal: 'pranzo',    slot: 'contorno',  piatto: st.contornoPranzo }),
           conFlag(st.basePranzo     && { meal: 'pranzo',    slot: 'contorno',  piatto: st.basePranzo }),
           conFlag(st.spuntino       && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino }),
           conFlag(st.secondo        && { meal: 'cena',      slot: 'secondo',   piatto: st.secondo, avanzi: st.secondoEAvanzo }),
+          conFlag(st.primoCena      && { meal: 'cena',      slot: 'primo',     piatto: st.primoCena }),
           conFlag(st.contornoCena   && { meal: 'cena',      slot: 'contorno',  piatto: st.contornoCena }),
           conFlag(st.base           && { meal: 'cena',      slot: 'contorno',  piatto: st.base }),
           conFlag(st.spuntino2      && { meal: 'spuntino',  slot: 'spuntino',  piatto: st.spuntino2 }),
@@ -1978,6 +1998,17 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         statoGiorni[gi][nomeSlot] = piatto;
         usati.add(piatto.id);
         return () => { delete statoGiorni[gi][nomeSlot]; usati.delete(piatto.id); };
+      }
+      function assegnaSecondoPranzoScelto(gi, piatto) {
+        const salsaIncrementata = piatto.salsa_industriale && !usati.has(piatto.id);
+        const annulla = assegnaSlot(gi, 'secondoPranzo', piatto);
+        if (piatto.gruppo) usoGruppi[piatto.gruppo] = (usoGruppi[piatto.gruppo] || 0) + 1;
+        if (salsaIncrementata) usoSalse.valore++;
+        return () => {
+          annulla();
+          if (piatto.gruppo) usoGruppi[piatto.gruppo]--;
+          if (salsaIncrementata) usoSalse.valore--;
+        };
       }
       // Un secondo puo' essere: fresco (non ancora usato, il caso normale),
       // oppure - solo dal gradino 1 in su, e al massimo una volta nella
@@ -2048,7 +2079,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // riflette sempre esattamente cio' che e' assegnato adesso.
       function principaliOggi(gi) {
         const st = statoGiorni[gi];
-        return [st.colazione, st.primo, st.contornoPranzo, st.basePranzo, st.spuntino, st.secondo, st.contornoCena, st.base, st.spuntino2, st.spuntino3]
+        return [st.colazione, st.primo, st.secondoPranzo, st.contornoPranzo, st.basePranzo, st.spuntino, st.secondo, st.primoCena, st.contornoCena, st.base, st.spuntino2, st.spuntino3]
           .filter(Boolean).map(p => p.principale).filter(Boolean);
       }
       const principaleLiberoOggi = (gi, p) => !p.principale || !principaliOggi(gi).includes(p.principale);
@@ -2060,8 +2091,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // va letto da statoGiorni al momento della scelta, non assunto fisso.
       function compagniDiPasto(gi, pasto) {
         const st = statoGiorni[gi];
-        if (pasto === 'pranzo') return [st.primo, st.contornoPranzo, st.basePranzo].filter(Boolean);
-        if (pasto === 'cena') return [st.secondo, st.contornoCena, st.base].filter(Boolean);
+        if (pasto === 'pranzo') return [st.primo, st.secondoPranzo, st.contornoPranzo, st.basePranzo].filter(Boolean);
+        if (pasto === 'cena') return [st.secondo, st.primoCena, st.contornoCena, st.base].filter(Boolean);
         return [];
       }
 
@@ -2069,13 +2100,15 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // paeseOk e limiteOggi sono gia' allargati (gradini 3 e 4) da chi li
       // costruisce in prossimaDecisione, quindi qui i filtri restano
       // identici a prima: e' l'ingresso che e' piu' largo, non la logica.
-      function candidatiSecondo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteOggi) {
+      function candidatiSecondo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteOggi, meal = 'cena') {
         const g = gi + 1;
-        const gruppoRichiesto = sequenza[gi];
+        const gruppoRichiesto = meal === 'cena' ? sequenza[gi] : null;
         const baseComune = (p) =>
           !rifiutato(p) &&
           (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
+          (meal !== 'pranzo' || !pranzoFuoriIl(g) || p.trasportabile) &&
           (!p.salsa_industriale || usoSalse.valore < 1) &&
+          compagniDiPasto(gi, meal).every(c => accompagnaBene(p, c)) &&
           principaleLiberoOggi(gi, p);
 
         const proprio = secondi.filter(p => p.profilo === profiloGiorno && paeseOk(p) && baseComune(p) && !usati.has(p.id));
@@ -2086,10 +2119,10 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           : [];
         // Gradino 1, ultimo livello: una ripetizione, mai piu' di una a
         // settimana, provata solo se non c'e' altro fresco disponibile.
-        const ripetuto = (opz.ripetizione && ripetizioniSecondo.valore < 1)
+        const ripetuto = (meal === 'cena' && opz.ripetizione && ripetizioniSecondo.valore < 1)
           ? secondi.filter(p => p.profilo === profiloGiorno && paeseOk(p) && baseComune(p) && usati.has(p.id))
           : [];
-        return concatenaLivelli([proprioCentra, proprioAltro, generico, ripetuto], rng, compagniDiPasto(gi, 'cena'));
+        return concatenaLivelli([proprioCentra, proprioAltro, generico, ripetuto], rng, compagniDiPasto(gi, meal));
       }
 
       function candidatiPrimo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteOggi) {
@@ -2098,6 +2131,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           !usati.has(p.id) && !rifiutato(p) &&
           (p.prep_min || 30) <= limiteOggi && tecnicaOk(p, g) &&
           (!pranzoFuoriIl(g) || p.trasportabile) &&
+          compagniDiPasto(gi, 'pranzo').every(c => accompagnaBene(p, c)) &&
           principaleLiberoOggi(gi, p);
 
         const proprio = primi.filter(p => compatibile(p, profiloGiorno) && paeseOk(p) && base(p));
@@ -2122,6 +2156,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           (!altroContorno || c.id !== altroContorno.id) &&
           trasportabileSeServe(c) &&
           nonCerealeScondito(c) &&
+          compagniDiPasto(gi, ruolo).every(p => accompagnaBene(c, p)) &&
           principaleLiberoOggi(gi, c);
 
         const proprio = contorni.filter(c => compatibile(c, profiloGiorno) && accompagnaBene(c, piattoAbbinato) && paeseOk(c) && base(c));
@@ -2308,7 +2343,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         // settimanale - mai una ricerca per decidere il profiloGiorno:
         // il piatto bloccato l'ha gia' deciso lui.
         if (st.profiloGiorno === undefined && st.bloccatiOggi?.length) {
-          const daiBloccati = st.bloccatiOggi.map(b => b.piatto.profilo).find(p => p && p !== 'neutro');
+          const principali = st.bloccatiOggi.filter(b => ['primo', 'secondo'].includes(b.slot));
+          const daiBloccati = principali.map(b => b.piatto.profilo).find(p => p && p !== 'neutro')
+            || st.bloccatiOggi.filter(b => !GENERICI.includes(b.piatto.paese)).map(b => b.piatto.profilo).find(p => p && p !== 'neutro');
           if (daiBloccati) st.profiloGiorno = daiBloccati;
         }
 
@@ -2320,7 +2357,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         if (st.profiloGiorno === undefined) st.profiloGiorno = profiloSettimana;
 
         const profiloGiorno = st.profiloGiorno;
-        const paeseDaBloccati = st.bloccatiOggi?.length ? st.bloccatiOggi.map(b => b.piatto.paese).find(Boolean) : null;
+        const paeseDaBloccati = st.bloccatiOggi?.filter(b => ['primo', 'secondo'].includes(b.slot)).map(b => b.piatto.paese).find(Boolean)
+          || st.bloccatiOggi?.map(b => b.piatto).find(p => p.paese && !GENERICI.includes(p.paese) && p.profilo !== 'neutro')?.paese;
         const paeseGiorno = paeseDaBloccati || (paesiScelti.length ? paesiScelti[(g - 1) % paesiScelti.length] : null);
         const genericoOggi = paeseGiorno ? GENERICO_DI[paeseGiorno] : null;
         // Gradino 3a: oltre al proprio generico, si accetta il pool generico
@@ -2376,15 +2414,17 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
 
         const pronti = [];
+        if (st.richiedeSecondoPranzo && st.secondoPranzo === undefined) pronti.push(['secondoPranzo', () => candidatiSecondo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteBasePranzo, 'pranzo')]);
         if (st.primo === undefined) pronti.push(['primo', () => candidatiPrimo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteBasePranzo)]);
-        if (st.contornoCena === undefined) pronti.push(['contornoCena', () => candidatiContorno(gi, 'cena', profiloGiorno, paeseGiorno, paeseOk, limiteOggi, st.secondo, st.contornoPranzo)]);
-        if (st.primo !== undefined && st.contornoPranzo === undefined) pronti.push(['contornoPranzo', () => candidatiContorno(gi, 'pranzo', profiloGiorno, paeseGiorno, paeseOk, limiteBasePranzo, st.primo, st.contornoCena)]);
+        if (st.contornoCena === undefined) pronti.push(['contornoCena', () => candidatiContorno(gi, 'cena', profiloGiorno, paeseGiorno, paeseOk, limiteOggi, st.secondo || st.primoCena, st.contornoPranzo)]);
+        if (st.primo !== undefined && st.contornoPranzo === undefined) pronti.push(['contornoPranzo', () => candidatiContorno(gi, 'pranzo', profiloGiorno, paeseGiorno, paeseOk, limiteBasePranzo, st.primo || st.secondoPranzo, st.contornoCena)]);
         if (st.colazione === undefined) pronti.push(['colazione', () => candidatiColazione(gi, profiloGiorno, paeseOkLeggero, cappaColazione)]);
         if (st.spuntino === undefined) pronti.push(['spuntino', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino2, cappaSpuntino)]);
         if (st.spuntino2 === undefined) pronti.push(['spuntino2', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino, cappaSpuntino)]);
         if (st.contornoCena !== undefined && st.base === undefined) {
-          const cenaHaAmido = st.secondo.amidoReale || (st.contornoCena && st.contornoCena.amidoReale);
-          if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(gi, paeseOk, tipiAccompagnamentoDaSecondo(st.secondo))]);
+          const principaleCena = st.secondo || st.primoCena;
+          const cenaHaAmido = principaleCena?.amidoReale || (st.contornoCena && st.contornoCena.amidoReale);
+          if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(gi, paeseOk, tipiAccompagnamentoDaSecondo(principaleCena))]);
           else st.base = null;
         }
 
@@ -2398,6 +2438,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
 
         const applicaPerSlot = {
+          secondoPranzo: (p) => assegnaSecondoPranzoScelto(gi, p),
           primo: (p) => assegnaSlot(gi, 'primo', p),
           contornoCena: (p) => assegnaSlot(gi, 'contornoCena', p),
           contornoPranzo: (p) => assegnaSlot(gi, 'contornoPranzo', p),
@@ -2468,9 +2509,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
         if (!ancoraCorto()) return;
         if (st.basePranzo === undefined) {
-          const pranzoHaAmido = (st.primo && st.primo.amidoReale) || (st.contornoPranzo && st.contornoPranzo.amidoReale);
+          const pranzoHaAmido = (st.primo && st.primo.amidoReale) || st.secondoPranzo?.amidoReale || st.contornoPranzo?.amidoReale;
           if (!pranzoHaAmido) {
-            const tipiRichiesti = tipiAccompagnamentoDaSecondo(st.secondo);
+            const tipiRichiesti = tipiAccompagnamentoDaSecondo(st.secondoPranzo || st.primo || st.secondo || st.primoCena);
             prova('basePranzo', candidatiBasePranzo(gi, ctx.paeseOk, tipiRichiesti), (p) => assegnaBasePranzoScelto(gi, p));
           }
         }
@@ -2597,6 +2638,35 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
       }
 
+      // Prova strutture diverse sulla settimana gia' completata. Il pool
+      // eredita dieta, allergie, gradimenti e soglia del tentativo riuscito;
+      // i filtri di giornata restano quelli del costruttore ordinario.
+      const settimanaBase = statoGiorni.map((st, i) => ({ giorno: i + 1, profilo: st.profiloGiorno, pasti: pastiDi(i) }));
+      const modelliPasti = miglioraModelliPasto({
+        settimana: settimanaBase, targetProteine: opzioni.modelliPasto === false ? null : obiettivoProteine,
+        quote: QUOTE, accompagnaBene,
+        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true),
+        contesto: (g, meal) => {
+          const gi = g.giorno - 1, st = statoGiorni[gi], ctx = contestoGiorno(gi);
+          const limite = meal === 'pranzo' ? st.limiteBasePranzo : st.limiteBase;
+          return { kcal: obiettivo, minuti: limite,
+            piatti: insiemeBase.filter(p => ['primo', 'secondo', 'contorno'].includes(p.meal_slot)
+              && (p.health_score == null || p.health_score >= sogliaSalute)
+              && !rifiutato(p) && compatibile(p, ctx.profiloGiorno) && ctx.paeseOk(p)
+              && (p.prep_min || (p.meal_slot === 'contorno' ? 20 : 30)) <= limite
+              && tecnicaOk(p, g.giorno) && (meal !== 'pranzo' || !pranzoFuoriIl(g.giorno) || p.trasportabile)),
+            baseAmmessa: p => ['pane', 'patate'].includes(tipoAmidoDiAccompagnamento(p)),
+            abbinamentoBaseOk: (p, ps) => !p.base_amidacea || ps.every(q => q.meal_slot !== 'secondo'
+              || tipiAccompagnamentoDaSecondo(q).includes(tipoAmidoDiAccompagnamento(p))),
+          };
+        },
+      });
+      modelliPasti.settimana.forEach((g, i) => { statoGiorni[i].pastiModello = g.pasti; });
+      // Frequenze delle portate proteiche a pranzo E cena, una volta per
+      // gruppo e pasto. Prima il riepilogo contava soltanto i secondi serali.
+      Object.keys(usoGruppi).forEach(k => { delete usoGruppi[k]; });
+      Object.assign(usoGruppi, modelliPasti.usoGruppi);
+
       // ---- Successo a questo gradino: ricostruisce la settimana e rileva le concessioni usate ----
       const settimana = [];
       const concessioni = [];
@@ -2686,23 +2756,26 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         // C5: deviazione dalla sequenza proteica pianificata - sempre
         // registrata, a qualunque gradino, perche' non e' un allentamento
         // della scala, e' un segnale di quanto il catalogo sia magro li'.
-        if (st.secondo && !st.secondoEAvanzo && !st.secondoERipetizione) {
+        const principaleCena = pasti.find(p => p.meal === 'cena' && p.slot === 'secondo')
+          || pasti.find(p => p.meal === 'cena' && p.slot === 'primo');
+        const cenaInvariata = principaleCena?.piatto.id === st.secondo?.id;
+        if (principaleCena && !(cenaInvariata && (st.secondoEAvanzo || st.secondoERipetizione))) {
           const gruppoRichiesto = sequenza[k];
-          if (gruppoRichiesto && st.secondo.gruppo !== gruppoRichiesto) {
-            concessioni.push({ gradino: null, tipo: 'deviazione_sequenza', giorno: g, slot: 'secondo', vincolo: 'gruppo_proteico_pianificato', prima: gruppoRichiesto, dopo: st.secondo.gruppo || null });
+          if (gruppoRichiesto && principaleCena.piatto.gruppo !== gruppoRichiesto) {
+            concessioni.push({ gradino: null, tipo: 'deviazione_sequenza', giorno: g, slot: principaleCena.slot, vincolo: 'gruppo_proteico_pianificato', prima: gruppoRichiesto, dopo: principaleCena.piatto.gruppo || null });
           }
         }
 
         // Gradino 1: ripetizione del secondo.
-        if (st.secondoERipetizione) {
+        if (cenaInvariata && st.secondoERipetizione) {
           concessioni.push({ gradino: '1', tipo: 'allentamento', giorno: g, slot: 'secondo', vincolo: 'ripetizione_piatto', prima: 'nessuna ripetizione', dopo: st.secondo.name || st.secondo.id });
         }
 
         // Gradino 3a: pool generico di un'altra famiglia culinaria ma STESSA
         // macro-area (es. Germania -> mediterraneo_generico, ancora Europa).
         // Gradino 3b: davvero un'altra macro-area (es. Germania -> asiatico).
-        for (const [slot, piatto] of [['secondo', st.secondo], ['primo', st.primo], ['contornoCena', st.contornoCena], ['contornoPranzo', st.contornoPranzo]]) {
-          if (!piatto || (slot === 'secondo' && (st.secondoEAvanzo || st.secondoERipetizione))) continue;
+        for (const { slot, piatto, avanzi } of pasti.filter(p => ['pranzo', 'cena'].includes(p.meal))) {
+          if (!piatto || avanzi || (cenaInvariata && piatto.id === st.secondo?.id && st.secondoERipetizione)) continue;
           if (st.paeseGiorno && piatto.paese !== st.paeseGiorno && piatto.paese !== st.genericoOggi && GENERICI.includes(piatto.paese)) {
             const famigliaPropria = st.genericoOggi ? FAMIGLIA_DI_GENERICO[st.genericoOggi] : null;
             const stessaFamiglia = famigliaPropria && FAMIGLIA_DI_GENERICO[piatto.paese] === famigliaPropria;
@@ -2717,12 +2790,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
         // Gradino 4: tetto dei minuti allentato. primo/contornoPranzo contro
         // il loro proprio tetto (limiteBasePranzo), non quello della cena.
-        for (const [slot, piatto, cappa] of [
-          ['secondo', st.secondo, st.limiteBase], ['primo', st.primo, st.limiteBasePranzo],
-          ['contornoCena', st.contornoCena, st.limiteBase], ['contornoPranzo', st.contornoPranzo, st.limiteBasePranzo],
-          ['colazione', st.colazione, 15], ['spuntino', st.spuntino, 10], ['spuntino2', st.spuntino2, 10],
-        ]) {
-          if (!piatto || (slot === 'secondo' && (st.secondoEAvanzo || st.secondoERipetizione))) continue;
+        for (const { slot, piatto, meal, avanzi } of pasti) {
+          if (!piatto || avanzi) continue;
+          const cappa = meal === 'colazione' ? 15 : meal === 'spuntino' ? 10 : meal === 'pranzo' ? st.limiteBasePranzo : st.limiteBase;
           const minuti = piatto.prep_min || 0;
           if (minuti > cappa) {
             concessioni.push({ gradino: '4', tipo: 'allentamento', giorno: g, slot, vincolo: 'tetto_minuti', prima: cappa, dopo: minuti });
@@ -2730,7 +2800,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
 
         // Gradino 5: voto salute sotto la soglia obiettivo di 7.
-        for (const [slot, piatto] of Object.entries({ secondo: st.secondo, primo: st.primo, contornoCena: st.contornoCena, contornoPranzo: st.contornoPranzo, colazione: st.colazione, spuntino: st.spuntino, spuntino2: st.spuntino2, spuntino3: st.spuntino3, base: st.base, basePranzo: st.basePranzo })) {
+        for (const { slot, piatto } of pasti) {
           if (!piatto) continue;
           const voto = piatto.health_score;
           if (voto != null && voto < 7) {
@@ -2741,7 +2811,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
       // Gradino 2: quote minime non raggiunte (una riga per gruppo, non per giorno).
       for (const [gruppo, q] of Object.entries(QUOTE)) {
-        if (!gruppiUnioneSettimana.has(gruppo)) continue;
+        if (!gruppiUnioneSettimana.has(gruppo) && !usoGruppi[gruppo]) continue;
         const ottenuto = usoGruppi[gruppo] || 0;
         if (ottenuto < q.min) {
           concessioni.push({ gradino: '2', tipo: 'allentamento', giorno: null, slot: null, vincolo: 'quota_minima_gruppo_proteico', prima: q.min, dopo: ottenuto, gruppo });
@@ -2761,7 +2831,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         : 0;
       const punteggio = conformi + completezza * 2 + mediaSalute * 0.5;
 
-      return { ok: true, settimana, punteggio, concessioni, mediaSalute, usoGruppi };
+      return { ok: true, settimana, punteggio, concessioni, mediaSalute, usoGruppi, modelliPasti: modelliPasti.modelli };
     }
 
     return { ok: false, diagnosticaProfili };
@@ -2923,7 +2993,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     };
   }
 
-  const { settimana: migliore, punteggio: migliorPunteggio, concessioni, usoGruppi } = esito;
+  const { settimana: migliore, concessioni, usoGruppi } = esito;
 
   // target/obiettivo letti all'inizio della funzione, non qui: vedi sopra.
 
@@ -2965,14 +3035,14 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   }
 
   return {
-    plan_id: salva ? piano.id : null, giorni_conformi: Math.floor(migliorPunteggio), seed,
+    plan_id: salva ? piano.id : null, giorni_conformi: migliore.filter(g => g.conforme).length, seed,
     gradino: gradinoRaggiunto, concessioni, uso_gruppi: { ...usoGruppi },
     dish_ids: esito.settimana.flatMap((g) => g.pasti.map((x) => x.piatto.id)),
     // Piatti bloccati che non sono entrati nel piano perche' non piu'
     // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
     // li mostra come "N locked dish(es) no longer fit your profile".
     piatti_bloccati_scartati: piattiBloccatiScartati,
-    ...(!salva && opzioni.dettagli === true ? { righe: righePiano(migliore, obiettivo, obiettivoProteine) } : {}),
+    ...(!salva && opzioni.dettagli === true ? { righe: righePiano(migliore, obiettivo, obiettivoProteine), modelli_pasti: esito.modelliPasti } : {}),
   };
 }
 

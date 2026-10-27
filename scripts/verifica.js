@@ -2,12 +2,12 @@
 // ======================================================
 // In italiano semplice: prima di spingere codice sul repository, questo
 // comando controlla che il generatore di piani non sia rotto. Lancia in
-// fila tredici controlli e ne riporta tutti gli esiti: se anche uno solo
+// fila quattordici controlli e ne riporta tutti gli esiti: se anche uno solo
 // fallisce, l'intero comando fallisce (exit code
 // diverso da 0) e git non lascia partire il push (e' installato come hook
 // pre-push, vedi scripts/installa-hook-pre-push.sh).
 //
-// I tredici controlli, in ordine:
+// I quattordici controlli, in ordine:
 //   1. node --check su tutti i file .js del backend - niente di rotto a
 //      livello di sintassi (non esegue il codice, solo lo legge).
 //   2. verifica-flag-allergeni.js - le etichette "contiene glutine/
@@ -66,6 +66,8 @@
 //      stessi filtri della scelta ordinaria, piatti bloccati preservati,
 //      contatori reversibili, 12 casi difficili e riproducibilita del
 //      tentativo finale dopo ricerche interrotte dal tempo.
+//  14. Modelli di pranzo/cena: composizione, tempi complessivi, rigenerazione
+//      con portate bloccate e Swap che conserva i ruoli del pasto.
 //
 // Uso: npm run verifica
 // (lo stesso identico comando lo lancia da solo git, da questa cartella,
@@ -134,6 +136,12 @@ passo('12. Sicurezza input: eta, peso, altezza e BMI-obiettivo', () => lanciaScr
 passo('13. Recupero proteico: vincoli, piatti bloccati e contatori', () => {
   lanciaScript('test-recupero-proteico.js');
   lanciaScript('scripts/verifica-recupero-proteico.js');
+});
+
+passo('14. Modelli dei pasti e sostituzioni coerenti', () => {
+  lanciaScript('test-modelli-pasto.js');
+  lanciaScript('test-sostituisci-modelli.js');
+  lanciaScript('scripts/verifica-modelli-pasto.js');
 });
 
 const falliti = risultati.filter((r) => !r.ok);
