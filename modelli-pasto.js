@@ -20,15 +20,32 @@ function contaGruppi(settimana) {
   return usi;
 }
 
+// Ripetizioni effettive dei secondi freschi; gli avanzi non consumano
+// questo budget. Usato sia dal vincolo sia dalle concessioni finali.
+function ripetizioniSecondi(settimana) {
+  const visti=new Set(),ripetuti=[];
+  for(const g of settimana.slice().sort((a,b)=>a.giorno-b.giorno))for(const r of g.pasti) {
+    if(r.slot!=='secondo'||r.avanzi)continue;
+    if(visti.has(r.piatto.id))ripetuti.push({giorno:g.giorno,meal:r.meal,piatto:r.piatto});
+    else visti.add(r.piatto.id);
+  }
+  return ripetuti;
+}
+
 // Ottimizzazione locale sulla settimana gia' costruita. La ricerca
 // principale rimane disponibile come risultato quando non c'e' un modello
 // migliore. Nessuna ricetta viene modificata e nessun nuovo spuntino aggiunto.
-function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quote, accompagnaBene, preferisciGrassi = false }) {
+function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quote, accompagnaBene, preferisciGrassi = false, riferimentoFruttaSecca = null, ripetizioneQuantita = false }) {
   const nuova = settimana.map(g => ({ ...g, pasti: g.pasti.slice() }));
   const gruppiPrima = contaGruppi(settimana);
   const modelli = [];
   if (!targetProteine || !settimana.length) return { settimana: nuova, modelli, usoGruppi: gruppiPrima };
   const EPS = 1e-7;
+  const contaUsi = week => {
+    const usi=new Map();for(const g of week)for(const r of g.pasti)if(r.slot==='secondo'&&!r.avanzi)usi.set(r.piatto.id,(usi.get(r.piatto.id)||0)+1);return usi;
+  };
+  const usiPrima=contaUsi(settimana);
+  const maxRipetizioni=Math.max(1,ripetizioniSecondi(settimana).length);
   const minuti = p => p.prep_min ?? (p.meal_slot === 'contorno' ? 20 : 30);
   const durata = ps => ps.reduce((s, p) => s + minuti(p), 0);
   const densita = p => (p.protein || 0) / (p.kcal || 1);
@@ -44,12 +61,14 @@ function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quo
     const altri = g.pasti.filter(p => p.meal !== meal);
     const base = valuta(g.pasti);
     if (!base) continue;
+    const quantitaAttiva = Number.isFinite(riferimentoFruttaSecca);
+    if (quantitaAttiva && (!Number.isFinite(base.fruttaSecca) || !Number.isFinite(base.grassi) || base.fruttaSecca <= riferimentoFruttaSecca+.5)) continue;
     const ctx = contesto(g, meal);
     const ruoliPrima = copertura(g.pasti.map(p => p.piatto));
     const giaUsati = new Set(nuova.flatMap(d => d.pasti.filter(p => d !== g || p.meal !== meal).map(p => p.piatto.id)));
     const principali = new Set(altri.map(p => p.piatto.principale).filter(Boolean));
     const pool = ctx.piatti.filter(p => Array.isArray(p.ruoli_coperti) && p.ruoli_coperti.length
-      && !giaUsati.has(p.id) && (!p.principale || !principali.has(p.principale)));
+      && (!giaUsati.has(p.id) || (quantitaAttiva && ripetizioneQuantita && p.meal_slot==='secondo' && !resti.has(p.id))) && (!p.principale || !principali.has(p.principale)));
     const primi = ordine(pool.filter(p => p.meal_slot === 'primo'));
     const secondi = ordine(pool.filter(p => p.meal_slot === 'secondo' && copre(p, 'proteina_principale')));
     const verdure = ordine(pool.filter(p => p.meal_slot === 'contorno' && copre(p, 'verdura') && !p.base_amidacea)).slice(0, 8);
@@ -63,7 +82,8 @@ function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quo
 
     function punteggio(v, ps) {
       const scartoGrassi = preferisciGrassi && Number.isFinite(v.grassi) ? Math.max(0,v.grassi-v.kcal*RIFERIMENTO_GRASSI.maxPercento/100/9) : 0;
-      return [Math.round(Math.min(targetProteine, v.proteine) * 10), -Math.round(scartoGrassi*10), -ps.length, -durata(ps),
+      const scartoQuantita = quantitaAttiva && Number.isFinite(v.fruttaSecca) ? Math.max(0,v.fruttaSecca-riferimentoFruttaSecca) : 0;
+      return [Math.round(Math.min(targetProteine, v.proteine) * 10), -Math.round(scartoQuantita*10), -Math.round(scartoGrassi*10), -ps.length, -durata(ps),
         ps.reduce((s, p) => s + (p.health_score || 0), 0) / ps.length];
     }
     function meglio(a, b) {
@@ -86,13 +106,17 @@ function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quo
       const ruoliDopo = copertura(pasti.map(p => p.piatto));
       if ([...ruoliPrima].some(r => !ruoliDopo.has(r))) return;
       const v = valuta(pasti);
-      if (!v?.kcalOk || Math.abs(v.kcal - ctx.kcal) > Math.max(40, Math.abs(base.kcal - ctx.kcal)) + EPS) return;
+      if (!v?.kcalOk || Math.abs(v.kcal - ctx.kcal) > Math.max(40, quantitaAttiva ? ctx.kcal*.05 : 0, Math.abs(base.kcal - ctx.kcal)) + EPS) return;
+      if (quantitaAttiva && (!Number.isFinite(v.fruttaSecca) || !Number.isFinite(v.grassi) || v.fruttaSecca > base.fruttaSecca+.1)) return;
       if (preferisciGrassi && Number.isFinite(base.grassi) && Number.isFinite(v.grassi) && v.grassi > v.kcal*Math.max(base.grassi/base.kcal,RIFERIMENTO_GRASSI.maxPercento/100/9)+EPS) return;
       if (v.proteine + EPS < Math.min(targetProteine, base.proteine)) return;
       if (v.sale > Math.max(base.sale, v.saleMax) + EPS) return;
       if (v.saturi / v.satMax > Math.max(1, base.saturi / base.satMax) + EPS) return;
       if (v.fibra + EPS < Math.min(base.fibra, v.fibraMin)) return;
-      const usi = contaGruppi(nuova.map(d => d === g ? { ...g, pasti } : d));
+      const settimanaProposta = nuova.map(d => d === g ? { ...g, pasti } : d);
+      if (quantitaAttiva && ripetizioneQuantita && ripetizioniSecondi(settimanaProposta).length>maxRipetizioni) return;
+      if (quantitaAttiva && ripetizioneQuantita && [...contaUsi(settimanaProposta)].some(([id,n])=>n>Math.max(2,usiPrima.get(id)||0))) return;
+      const usi = contaGruppi(settimanaProposta);
       if (Object.keys(usi).some(gruppo => usi[gruppo] > Math.max(quote[gruppo]?.max ?? Infinity, gruppiPrima[gruppo] || 0))) return;
       if (Object.keys(quote).some(gruppo => (usi[gruppo] || 0) < Math.min(quote[gruppo].min, gruppiPrima[gruppo] || 0))) return;
       const salseDopo = new Set(nuova.flatMap(d => (d === g ? pasti : d.pasti).filter(p => p.piatto.salsa_industriale).map(p => p.piatto.id))).size;
@@ -125,4 +149,4 @@ function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quo
   return { settimana: nuova, modelli, usoGruppi: contaGruppi(nuova) };
 }
 
-module.exports = { RUOLI, preservaRuoliDelPasto, contaGruppi, miglioraModelliPasto };
+module.exports = { ripetizioniSecondi, RUOLI, preservaRuoliDelPasto, contaGruppi, miglioraModelliPasto };

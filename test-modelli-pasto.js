@@ -158,3 +158,56 @@ test('preferenza grassi sceglie una struttura meno grassa conservando le protein
   assert.equal(r.settimana[0].pasti[0].piatto.id,'leggero');
   assert.equal(r.settimana[0].pasti[0].piatto.protein,70);
 });
+
+function fixtureQuantita({ripetizione=true,modifica,quote={}}={}) {
+  const vecchio=dish('troppa-frutta-secca','primo',1000,60,[P,A,V],{fat:30,grammiFruttaSecca:70,gruppo:'legumi'});
+  const alternativo=dish('secondo-gia-usato','secondo',1000,90,[P,A,V],{fat:25,grammiFruttaSecca:20,gruppo:'pesce'});
+  const week=[{giorno:1,pasti:[row('pranzo',vecchio)]},{giorno:2,pasti:[row('cena',alternativo)]}];
+  modifica?.(week,vecchio,alternativo);
+  const valuta=ps=>{const somma=k=>ps.reduce((s,r)=>s+(r.piatto[k]||0),0);return {kcal:somma('kcal'),kcalOk:true,proteine:somma('protein'),grassi:somma('fat'),fruttaSecca:somma('grammiFruttaSecca'),sale:1,saturi:2,fibra:30,saleMax:5,satMax:12,fibraMin:25};};
+  return {week,alternativo,config:{settimana:week,targetProteine:80,preferisciGrassi:true,riferimentoFruttaSecca:40,ripetizioneQuantita:ripetizione,quote,accompagnaBene:()=>true,valuta,
+    contesto:()=>({kcal:1000,minuti:35,piatti:[alternativo],baseAmmessa:()=>true,abbinamentoBaseOk:()=>true})}};
+}
+test('recupero quantita riusa un secondo soltanto quando la ripetizione e gia consentita',()=>{
+ for(const ripetizione of [false,true]){const {config,week}=fixtureQuantita({ripetizione}),copia=structuredClone(week),r=miglioraModelliPasto(config);
+ assert.equal(r.settimana[0].pasti[0].piatto.id,ripetizione?'secondo-gia-usato':'troppa-frutta-secca');assert.deepEqual(week,copia);}
+});
+test('recupero quantita non crea un terzo uso dello stesso secondo',()=>{
+ const {config}=fixtureQuantita({modifica:(w,v,p)=>w.push({giorno:3,pasti:[row('cena',p)]})});
+ assert.equal(miglioraModelliPasto(config).modelli.length,0);
+});
+test('recupero quantita non aggiunge una seconda ripetizione gia consumata altrove',()=>{
+ const {config}=fixtureQuantita({modifica:w=>{const p=dish('altra-ripetizione','secondo',1000,90,[P,A,V],{fat:25,grammiFruttaSecca:0});for(const giorno of [3,4])w.push({giorno,pasti:[row('cena',p)]});}});
+ assert.equal(miglioraModelliPasto(config).modelli.length,0);
+});
+test('recupero quantita non riusa un piatto che ha avanzi collegati',()=>{
+ const {config}=fixtureQuantita({modifica:(w,v,p)=>w.push({giorno:3,pasti:[row('cena',p,{avanzi:true})]})});
+ assert.equal(miglioraModelliPasto(config).modelli.length,0);
+});
+test('recupero quantita lascia invariati giorni gia entro riferimento e piatti bloccati',()=>{
+ for(const tipo of ['nel-riferimento','bloccato']){const{config}=fixtureQuantita({modifica:(w,v)=>{if(tipo==='nel-riferimento')v.grammiFruttaSecca=20;else w[0].pasti[0].bloccato=true;}});assert.equal(miglioraModelliPasto(config).modelli.length,0);}
+});
+for(const [nome,extra]of [['proteine',{protein:50}],['grassi',{fat:50}],['quantita',{grammiFruttaSecca:80}],['energia',{kcal:900}]])test('recupero quantita conserva '+nome,()=>{
+ const{config}=fixtureQuantita({modifica:(w,v,p)=>Object.assign(p,extra)});assert.equal(miglioraModelliPasto(config).modelli.length,0);
+});
+test('recupero quantita conserva frequenze minime e massime dei gruppi',()=>{
+ for(const quote of [{legumi:{min:1,max:5}},{pesce:{min:0,max:1}}]){const{config}=fixtureQuantita({quote});assert.equal(miglioraModelliPasto(config).modelli.length,0);}
+});
+test('recupero quantita ammette al massimo il margine calorico previsto',()=>{
+ const{config}=fixtureQuantita({modifica:(w,v,p)=>p.kcal=950});assert.equal(miglioraModelliPasto(config).settimana[0].pasti[0].piatto.id,'secondo-gia-usato');
+});
+
+test('concessioni delle ripetizioni derivano dai secondi finali, escludendo avanzi',()=>{
+ const {ripetizioniSecondi}=require('./modelli-pasto'),p=dish('x','secondo',500,30,[P]);
+ const w=[{giorno:2,pasti:[row('pranzo',p)]},{giorno:1,pasti:[row('cena',p)]},{giorno:3,pasti:[row('cena',p,{avanzi:true})]}];
+ assert.deepEqual(ripetizioniSecondi(w).map(r=>[r.giorno,r.meal,r.piatto.id]),[[2,'pranzo','x']]);
+});
+
+test('ripetizioni legacy non autorizzano un nuovo terzo uso di un altro secondo',()=>{
+ const {config}=fixtureQuantita({modifica:(w,v,p)=>{
+   v.meal_slot='secondo';w[0].pasti[0].slot='secondo';
+   w.push({giorno:3,pasti:[row('cena',p)]});
+   for(const giorno of [4,5])w.push({giorno,pasti:[row('cena',v,{bloccato:true})]});
+ }});
+ assert.equal(miglioraModelliPasto(config).settimana[0].pasti[0].piatto.id,'troppa-frutta-secca');
+});

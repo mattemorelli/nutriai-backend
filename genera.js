@@ -5,7 +5,7 @@ const { bilanciaGrassi } = require('./bilancia-grassi');
 console.log('[genera] v6-piano-proteico caricato');
 const { creaRecuperoProteico } = require('./recupero-proteico');
 const { bilanciaProteine } = require('./bilancia-proteine');
-const { miglioraModelliPasto } = require('./modelli-pasto');
+const { ripetizioniSecondi, miglioraModelliPasto } = require('./modelli-pasto');
 
 // Il generico è ammesso solo dentro la sua famiglia: un piatto
 // "mediterraneo generico" sta bene in una giornata italiana,
@@ -2699,7 +2699,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       });
       modelliPasti.modelli = [...new Map([...modelliBase.modelli,...modelliPasti.modelli]
         .map(m=>[`${m.giorno}:${m.meal}`,m])).values()];
-      const ingredientiMigliorati = miglioraIngredienti({
+      const configurazioneIngredienti = {
         settimana: modelliPasti.settimana, targetProteine: obiettivoProteine,
         riferimento: riferimentoFruttaSecca(obiettivo), kcalTarget: obiettivo,
         valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true),
@@ -2711,8 +2711,20 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
             && ctx.paeseOkLeggero(p) && (p.prep_min || (colazione ? 10 : 5)) <= (colazione ? ctx.cappaColazione : ctx.cappaSpuntino)
             && tecnicaOk(p,g.giorno));
         },
+      };
+      const ingredientiMigliorati = miglioraIngredienti(configurazioneIngredienti);
+      // Nei soli giorni ancora oltre il riferimento, prova anche una
+      // struttura diversa di pranzo/cena conservando i vincoli precedenti.
+      const residuiMigliorati = miglioraModelliPasto({ ...configurazioneModelli, ripetizioneQuantita:opz.ripetizione,
+        settimana: ingredientiMigliorati.settimana, preferisciGrassi: true,
+        riferimentoFruttaSecca: riferimentoFruttaSecca(obiettivo),
+        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true),
       });
-      modelliPasti.settimana = ingredientiMigliorati.settimana;
+      const rifiniti = miglioraIngredienti({...configurazioneIngredienti, settimana:residuiMigliorati.settimana});
+      modelliPasti.settimana = rifiniti.settimana;
+      modelliPasti.usoGruppi = residuiMigliorati.usoGruppi;
+      modelliPasti.modelli = [...new Map([...modelliPasti.modelli,...residuiMigliorati.modelli]
+        .map(m=>[`${m.giorno}:${m.meal}`,m])).values()];
       modelliPasti.settimana.forEach((g, i) => { statoGiorni[i].pastiModello = g.pasti; });
       // Frequenze delle portate proteiche a pranzo E cena, una volta per
       // gruppo e pasto. Prima il riepilogo contava soltanto i secondi serali.
@@ -2722,6 +2734,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       // ---- Successo a questo gradino: ricostruisce la settimana e rileva le concessioni usate ----
       const settimana = [];
       const concessioni = [];
+      const ripetizioniEffettive = ripetizioniSecondi(modelliPasti.settimana);
 
       for (let k = 0; k < 7; k++) {
         const g = k + 1;
@@ -2826,8 +2839,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
 
         // Gradino 1: ripetizione del secondo.
-        if (cenaInvariata && st.secondoERipetizione) {
-          concessioni.push({ gradino: '1', tipo: 'allentamento', giorno: g, slot: 'secondo', vincolo: 'ripetizione_piatto', prima: 'nessuna ripetizione', dopo: st.secondo.name || st.secondo.id });
+        for (const r of ripetizioniEffettive.filter(r=>r.giorno===g)) {
+          concessioni.push({ gradino:'1', tipo:'allentamento', giorno:g, slot:'secondo', meal:r.meal,
+            vincolo:'ripetizione_piatto', prima:'nessuna ripetizione', dopo:r.piatto.name||r.piatto.id, dish_id:r.piatto.id });
         }
 
         // Gradino 3a: pool generico di un'altra famiglia culinaria ma STESSA
