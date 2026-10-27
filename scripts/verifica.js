@@ -154,7 +154,10 @@ passo('17. Modifiche del piano: atomicita, salti, ripristino, spesa e concorrenz
   lanciaScript('scripts/verifica-modifiche-piano-db.js');
 });
 
-passo('18. Quantita giornaliere degli ingredienti e bilanciamento dei grassi', () => lanciaScript('test-ingredienti-grassi.js'));
+passo('18. Quantita giornaliere degli ingredienti e bilanciamento dei grassi', () => {
+  lanciaScript('test-ingredienti-grassi.js');
+  lanciaScript('test-quantita-giornaliere.js');
+});
 
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);

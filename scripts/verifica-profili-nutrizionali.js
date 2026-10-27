@@ -76,6 +76,13 @@ function clientePer(dieta, kcal, proteine) {
         const grassiEff=righe.reduce((s,r)=>s+piattoDi.get(r.dish_id).fat*r.portion_g/piattoDi.get(r.dish_id).grams,0);
         assert.ok(Math.abs(g.grassi.grammi-grassiEff)<.051,'Grassi discordanti');
         assert.ok(Math.abs(g.grassi.percento_energia-grassiEff*9/kcalEff*100)<.051,'Percentuale grassi discordante');
+        const noci=righe.reduce((s,r)=>s+piattoDi.get(r.dish_id).grammiFruttaSecca*r.portion_g/piattoDi.get(r.dish_id).grams,0);
+        assert.ok(g.frutta_secca && Math.abs(g.frutta_secca.grammi-noci)<.051,'Frutta secca discordante');
+        if(g.frutta_secca.esito==='sopra_riferimento') {
+          const c=piano.concessioni.find(c=>c.giorno===g.giorno&&c.vincolo==='frutta_secca_giornaliera');
+          assert.ok(c,'Residuo giornaliero non dichiarato');assert.ok(Math.abs(c.dopo-noci)<.051,'Avviso riferito a porzioni precedenti');
+        }
+
       }
       for (const [giorno, g] of giorni) {
         // Ogni riga puo' arrotondare di 0,5 kcal / 0,05g di proteina.

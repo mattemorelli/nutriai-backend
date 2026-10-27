@@ -1,3 +1,5 @@
+const { miglioraIngredienti } = require('./migliora-ingredienti');
+const { fattoreTetto, RIFERIMENTO_FRUTTA_SECCA_G, riferimentoFruttaSecca, bilanciaFruttaSecca, riepilogoFruttaSecca } = require('./quantita-frutta-secca');
 const { riepilogoIngredienti } = require('./ingredienti-piano');
 const { bilanciaGrassi } = require('./bilancia-grassi');
 console.log('[genera] v6-piano-proteico caricato');
@@ -173,7 +175,7 @@ const LIMITI_SCALA = {
 // gonfiare oltre il tetto. Valori di riferimento per ~2000 kcal/giorno.
 const TETTO_GRAMMI = {
   primo: 450, secondo: 350, contorno: 350, pane: 120, patate: 350, colazione: 350, spuntino: 250,
-  spuntino_frutta_secca: 40,
+  spuntino_frutta_secca: RIFERIMENTO_FRUTTA_SECCA_G,
 };
 
 // I tetti sono calibrati su un fabbisogno di ~2000 kcal: un profilo a 3533
@@ -187,10 +189,6 @@ const TETTO_GRAMMI = {
 // sub-lineare con cui le porzioni reali crescono con il fabbisogno). Tetti
 // min 0.7x (verso i 1200 kcal, il minimo clinico) e max 1.8x (sopra i
 // ~4600 kcal, oltre il range di questi profili).
-function fattoreTetto(obiettivo) {
-  if (!obiettivo) return 1;
-  return Math.max(0.7, Math.min(1.8, Math.pow(obiettivo / 2000, 0.7)));
-}
 
 function limitiDi(p, obiettivo) {
   let ratio = p.piatto.base_amidacea ? LIMITI_SCALA.base : (LIMITI_SCALA[p.slot] || [0.9, 1.2]);
@@ -235,7 +233,7 @@ function limitiDi(p, obiettivo) {
 
 // Distribuisce il residuo calorico proporzionalmente allo spazio di manovra
 // di ciascun elemento, invece di moltiplicare tutto per lo stesso fattore.
-function adattaGiornata(pasti, obiettivo, obiettivoProteine, bilanciaLipidi = true) {
+function adattaGiornata(pasti, obiettivo, obiettivoProteine, bilanciaLipidi = true, bilanciaQuantita = bilanciaLipidi) {
   // Il punto di partenza deve gia' rispettare i limiti: una ricetta base
   // puo' superare il tetto anche prima della redistribuzione. Partire da
   // f=1 lasciava porzioni fuori limite quando diff<40 o mancava spazio
@@ -269,7 +267,8 @@ function adattaGiornata(pasti, obiettivo, obiettivoProteine, bilanciaLipidi = tr
   if (!obiettivoProteine) return stato;
   const limiti = limitiProporzionali(totale() || obiettivo);
   bilanciaProteine(stato, obiettivoProteine, limiti);
-  return bilanciaLipidi ? bilanciaGrassi(stato, obiettivoProteine, limiti) : stato;
+  if (bilanciaLipidi) bilanciaGrassi(stato, obiettivoProteine, limiti);
+  return bilanciaQuantita ? bilanciaFruttaSecca(stato, obiettivoProteine, limiti, obiettivo) : stato;
 }
 
 // Un solo percorso per i valori finali di plan_items, arrotondamenti
@@ -341,9 +340,9 @@ function limitiProporzionali(kcal) {
 // 100%): un pavimento con un po' di margine, come fibraMin, non un vincolo
 // durissimo come il tetto sale/saturi - la ricerca puo' ancora accettare un
 // giorno leggermente sotto se il resto va bene, ma segnala quanto manca.
-function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine, bilanciaPorzioni = false, bilanciaLipidi = bilanciaPorzioni) {
+function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine, bilanciaPorzioni = false, bilanciaLipidi = bilanciaPorzioni, bilanciaQuantita = bilanciaLipidi) {
   if (!obiettivo || !pastiGiorno.length) return null;
-  const adattati = adattaGiornata(pastiGiorno, obiettivo, bilanciaPorzioni ? obiettivoProteine : null, bilanciaLipidi);
+  const adattati = adattaGiornata(pastiGiorno, obiettivo, bilanciaPorzioni ? obiettivoProteine : null, bilanciaLipidi, bilanciaQuantita);
   let saturi = 0, sale = 0, fibra = 0, kcal = 0, proteine = 0, grassi = 0;
   for (const { p, f } of adattati) {
     saturi += (p.piatto.satFat || 0) * f;
@@ -357,6 +356,8 @@ function valutaGiornataScalata(pastiGiorno, obiettivo, obiettivoProteine, bilanc
   const proteinMin = obiettivoProteine ? obiettivoProteine * 0.90 : null;
   return {
     saturi, sale, fibra, kcal, proteine, grassi: adattati.every(x=>x.p.piatto.grassiCompleti !== false && Number.isFinite(x.p.piatto.fat)) ? grassi : null,
+    fruttaSecca: adattati.every(x=>Number.isFinite(x.p.piatto.grammiFruttaSecca))
+      ? adattati.reduce((s,{p,f})=>s+(p.piatto.grams>0 ? p.piatto.grammiFruttaSecca*Math.round(p.piatto.grams*f)/p.piatto.grams : 0),0) : null,
     satMax: lim.satMaxGiorno, saleMax: lim.saleMaxGiorno, fibraMin: lim.fibraMinGiorno, proteinMin,
     tettoOk: saturi <= lim.satMaxGiorno && sale <= lim.saleMaxGiorno,
     fibraOk: fibra >= lim.fibraMinGiorno,
@@ -2694,10 +2695,24 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       const modelliBase = miglioraModelliPasto(configurazioneModelli);
       const modelliPasti = miglioraModelliPasto({ ...configurazioneModelli,
         settimana: modelliBase.settimana, preferisciGrassi: true,
-        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true, true),
+        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true, true, false),
       });
       modelliPasti.modelli = [...new Map([...modelliBase.modelli,...modelliPasti.modelli]
         .map(m=>[`${m.giorno}:${m.meal}`,m])).values()];
+      const ingredientiMigliorati = miglioraIngredienti({
+        settimana: modelliPasti.settimana, targetProteine: obiettivoProteine,
+        riferimento: riferimentoFruttaSecca(obiettivo), kcalTarget: obiettivo,
+        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true),
+        contesto: (g,riga) => {
+          const ctx = contestoGiorno(g.giorno-1);
+          const colazione = riga.meal === 'colazione';
+          const pool = colazione ? colazioni : spuntini;
+          return pool.filter(p => !rifiutato(p) && compatibile(p,ctx.profiloGiorno)
+            && ctx.paeseOkLeggero(p) && (p.prep_min || (colazione ? 10 : 5)) <= (colazione ? ctx.cappaColazione : ctx.cappaSpuntino)
+            && tecnicaOk(p,g.giorno));
+        },
+      });
+      modelliPasti.settimana = ingredientiMigliorati.settimana;
       modelliPasti.settimana.forEach((g, i) => { statoGiorni[i].pastiModello = g.pasti; });
       // Frequenze delle portate proteiche a pranzo E cena, una volta per
       // gruppo e pasto. Prima il riepilogo contava soltanto i secondi serali.
@@ -2722,6 +2737,13 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         // porzioni scelte. Le carenze residue restano dichiarate.
         const val = valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true);
         const conforme = val ? (val.tettoOk && val.fibraOk && val.kcalOk && val.proteinOk) : true;
+
+        const quantitaFruttaSecca = val && riepilogoFruttaSecca(val.fruttaSecca,obiettivo);
+        if (quantitaFruttaSecca?.esito === 'sopra_riferimento') {
+          concessioni.push({ gradino:null, tipo:'obiettivo_tecnico_non_raggiunto', giorno:g, slot:null,
+            vincolo:'frutta_secca_giornaliera', prima:quantitaFruttaSecca.riferimento_g,
+            dopo:quantitaFruttaSecca.grammi, unita:'g', tipo_riferimento:'tecnico_non_clinico' });
+        }
 
         if (val && !val.tettoOk) {
           concessioni.push({
@@ -3080,7 +3102,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     // ammessi da dieta/allergie (es. aggiunte dopo averli bloccati) - l'app
     // li mostra come "N locked dish(es) no longer fit your profile".
     piatti_bloccati_scartati: piattiBloccatiScartati,
-    ...(!salva && opzioni.dettagli === true ? { righe: righeFinali, modelli_pasti: esito.modelliPasti, riepilogo_ingredienti: riepilogoIngredienti(righeFinali, new Map(migliore.flatMap(g=>g.pasti.map(p=>[p.piatto.id,p.piatto])))) } : {}),
+    ...(!salva && opzioni.dettagli === true ? { righe: righeFinali, modelli_pasti: esito.modelliPasti, riepilogo_ingredienti: riepilogoIngredienti(righeFinali, new Map(migliore.flatMap(g=>g.pasti.map(p=>[p.piatto.id,p.piatto]))),obiettivo) } : {}),
   };
 }
 
