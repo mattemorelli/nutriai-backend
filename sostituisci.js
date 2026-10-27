@@ -1,6 +1,7 @@
-const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene, sostitutoSenzaGlutineNonRichiesto, limitiDi } = require('./genera');
+const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene, sostitutoSenzaGlutineNonRichiesto, limitiDi, QUOTE } = require('./genera');
+const { origineAvanzo, leggiRighePiano, salvaModifiche, errorePiano, verificaModificabile, puoScambiare, settimanaPreservata } = require('./modifiche-piano');
 const { preservaRuoliDelPasto } = require('./modelli-pasto');
-const { tempoDi, ammessoNelContesto, porzioneProposta, validaPorzione, giornataPreservata, nutrientiPorzione } = require('./vincoli-swap');
+const { tempoDi, limiteTempo, ammessoNelContesto, tempoPastoPreservato, porzioneProposta, validaPorzione, giornataPreservata, nutrientiPorzione } = require('./vincoli-swap');
 
 // Allarga i vincoli a ogni giro finché non trova tre proposte.
 const GIRI = [
@@ -14,7 +15,7 @@ async function proposte(supabase, userId, itemId) {
   // 1. la riga del piano da sostituire
   const { data: item, error: e1 } = await supabase
     .from('plan_items')
-    .select('id, plan_id, day_of_week, meal, slot, dish_id, portion_g, kcal, protein_g, fibre_g, sat_fat_g, salt_g')
+    .select('*')
     .eq('id', itemId)
     .single();
   if (e1 || !item) throw new Error('Riga del piano non trovata');
@@ -38,29 +39,12 @@ async function proposte(supabase, userId, itemId) {
   if (!profilo) throw new Error('Profilo non disponibile');
 
   // 4. i piatti già usati nella settimana
-  const { data: righe, error: eRighe } = await supabase
-    .from('plan_items')
-    .select('id, dish_id, day_of_week, kcal, protein_g, fibre_g, sat_fat_g, salt_g')
-    .eq('plan_id', item.plan_id);
-  if (eRighe) throw new Error('lettura plan_items: ' + eRighe.message);
-  const giaUsati = new Set((righe || []).map(r => r.dish_id));
-
-  // 5. i piatti gemelli dello stesso pasto (lo stesso giorno, lo stesso
-  // meal, tutte le altre righe): il generatore non sceglie mai un contorno
-  // o un secondo senza controllare accompagnaBene contro il piatto abbinato
-  // - prima Swap non lo faceva affatto (non recuperava nemmeno questi dati),
-  // quindi una sostituzione poteva creare doppio amido, doppia proteina
-  // principale o lo stesso ingrediente principale ripetuto nello stesso
-  // pasto (problema F dell'audit).
-  const { data: righeGemelle, error: eGemelle } = await supabase
-    .from('plan_items')
-    .select('dish_id')
-    .eq('plan_id', item.plan_id)
-    .eq('day_of_week', item.day_of_week)
-    .eq('meal', item.meal)
-    .neq('id', itemId);
-  if (eGemelle) throw new Error('lettura plan_items gemelli: ' + eGemelle.message);
-  const gemelliDishIds = [...new Set((righeGemelle || []).map(r => r.dish_id))];
+  const righe = await leggiRighePiano(supabase, item.plan_id);
+  const corrente = righe.find(r=>r.id===item.id);
+  if (!corrente) throw errorePiano('riga_non_trovata', 'This dish is no longer in the plan.', 404);
+  Object.assign(item, corrente);
+  const giaUsati = new Set(righe.filter(r=>r.stato!=='saltato').map(r=>r.dish_id));
+  const gemelliDishIds = [...new Set(righe.filter(r=>r.day_of_week===item.day_of_week&&r.meal===item.meal&&r.id!==item.id&&r.stato!=='saltato').map(r=>r.dish_id))];
 
   // I tetti si riferiscono al target della settimana salvata, anche dopo
   // una modifica del profilo. Non prendere un target di un altro utente.
@@ -69,13 +53,14 @@ async function proposte(supabase, userId, itemId) {
   const { data: target, error: eTarget } = await qTarget.maybeSingle();
   if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
   if (!(Number(target?.kcal) > 0 && Number(target?.protein_g_min) > 0)) throw new Error('Fabbisogno del piano non disponibile');
-  return { item, piano, profilo, giaUsati, gemelliDishIds, kcalTarget: Number(target.kcal), target, righeGiornata: righe };
+  return { item, piano, profilo, giaUsati, gemelliDishIds, kcalTarget: Number(target.kcal), target, righeGiornata: righe.filter(r=>r.stato!=='saltato'), righePiano: righe };
 }
 
 // Cerca tre alternative, allargando i vincoli se non ne trova abbastanza.
 async function trovaProposte(supabase, userId, itemId) {
-  const { item, profilo, giaUsati, gemelliDishIds, kcalTarget, target, righeGiornata } = await proposte(supabase, userId, itemId);
+  const { item, profilo, giaUsati, gemelliDishIds, kcalTarget, target, righeGiornata, righePiano } = await proposte(supabase, userId, itemId);
 
+  verificaModificabile(item, righePiano);
   // Le preferenze vere dell'utente, come le legge il generatore
   const { data: prefRaw, error: ePreferenze } = await supabase
     .from('user_cuisine_preferences')
@@ -121,6 +106,8 @@ async function trovaProposte(supabase, userId, itemId) {
   const gemelli = await caricaPiattiPerId(supabase, gemelliDishIds);
   if (gemelli.length !== gemelliDishIds.length) throw new Error('Impossibile verificare il resto del pasto');
   const accompagnaTuttiIGemelli = (p) => gemelli.every(g => accompagnaBene(p, g));
+  const perId = new Map((await caricaPiattiPerId(supabase, [...new Set(righePiano.map(r=>r.dish_id))])).map(p=>[p.id,p]));
+  piatti.forEach(p=>perId.set(p.id,p));
 
   // Il paese della giornata che si sta sostituendo: le proposte restano dentro
   const paeseGiorno = originale ? originale.paese : null;
@@ -141,13 +128,15 @@ async function trovaProposte(supabase, userId, itemId) {
       p.id !== item.dish_id &&
       tempoDi(p) <= tempoBase + giro.tempoExtra &&
       ammessoNelContesto(p, item, profilo, esiti) &&
+      tempoPastoPreservato(originale,p,gemelli,item,profilo,esiti) &&
       porzioneProposta(p, item, kcalTarget, limitiDi) !== null &&
       giornataPreservata(item, righeGiornata, target, nutrientiPorzione(p, porzioneProposta(p, item, kcalTarget, limitiDi))) &&
       (p.health_score || 0) >= giro.scoreMin &&
       (!giro.escludiSettimana || !giaUsati.has(p.id)) &&
       paeseCompatibile(p, giro) &&
       preservaRuoliDelPasto(originale, p, gemelli) &&
-      accompagnaTuttiIGemelli(p)
+      accompagnaTuttiIGemelli(p) &&
+      settimanaPreservata(righePiano,righePiano.map(r=>r.id===item.id?{...r,dish_id:p.id}:r),perId,QUOTE)
     );
 
     if (trovati.length >= 3 || giro === GIRI[GIRI.length - 1]) {
@@ -177,8 +166,9 @@ async function trovaProposte(supabase, userId, itemId) {
 
 // Applica la sostituzione scelta dall'utente, ricalcolando i valori nutrizionali.
 async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portionG) {
-  const { item, profilo, gemelliDishIds, kcalTarget, target, righeGiornata } = await proposte(supabase, userId, itemId);
+  const { item, profilo, gemelliDishIds, kcalTarget, target, righeGiornata, righePiano } = await proposte(supabase, userId, itemId);
 
+  verificaModificabile(item, righePiano);
   const vincoli = await caricaVincoli(supabase, userId, profilo.diet || 'onnivoro');
   const esiti = await caricaEsiti(supabase, userId);
 
@@ -190,17 +180,21 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
   // arricchito di genera.js (amidoReale, ruoli_coperti, principale), non da
   // una sua riletture a mano.
   {
-    const risolti = await caricaPiattiPerId(supabase, [...new Set([item.dish_id, nuovoDishId, ...gemelliDishIds])]);
+    const risolti = await caricaPiattiPerId(supabase, [...new Set([nuovoDishId, ...righePiano.map(r=>r.dish_id)])]);
     const perId = new Map(risolti.map(p => [p.id, p]));
     const piattoNuovo = perId.get(nuovoDishId), originale = perId.get(item.dish_id);
     const gemelli = gemelliDishIds.map(id => perId.get(id));
     if (!piattoNuovo || !originale || gemelli.some(p => !p)) throw new Error('Impossibile verificare la composizione del pasto');
     if (piattoNuovo.meal_slot !== item.slot) throw new Error('Piatto non ammesso in questa portata');
+    if (!(piattoNuovo.health_score>=6)) throw errorePiano('piatto_non_ammesso','This dish is outside the supported catalogue.');
+    if (!settimanaPreservata(righePiano,righePiano.map(r=>r.id===item.id?{...r,dish_id:nuovoDishId}:r),perId,QUOTE)) {
+      throw errorePiano('frequenze_settimanali','This swap would unbalance the weekly food groups.');
+    }
     if (!vincoli.ammesso(piattoNuovo) || !vincoli.gradito(piattoNuovo) || esiti.rifiutato(piattoNuovo)
         || sostitutoSenzaGlutineNonRichiesto(piattoNuovo, vincoli.categorieVietate.has('glutine'))) {
       throw new Error('Piatto non ammesso per dieta, allergie o preferenze');
     }
-    if (!ammessoNelContesto(piattoNuovo, item, profilo, esiti)) throw new Error('Piatto non ammesso per tempo, tecnica o trasporto');
+    if (!ammessoNelContesto(piattoNuovo, item, profilo, esiti) || !tempoPastoPreservato(originale,piattoNuovo,gemelli,item,profilo,esiti)) throw new Error('Piatto non ammesso per tempo, tecnica o trasporto');
     validaPorzione(piattoNuovo, item, portionG, kcalTarget, limitiDi);
 
     if (!preservaRuoliDelPasto(originale, piattoNuovo, gemelli)) {
@@ -238,9 +232,7 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
     throw new Error('La sostituzione peggiorerebbe il bilanciamento della giornata');
   }
 
-  const { error } = await supabase
-    .from('plan_items')
-    .update({
+  await salvaModifiche(supabase,userId,item.plan_id,righePiano,[{id:itemId,patch:{
       dish_id: nuovoDishId,
       portion_g: portionG,
       kcal:      Math.round(tot.kcal * s),
@@ -251,91 +243,69 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
       stato: 'sostituito',
       sostituito_da_dish_id: item.dish_id,
       modificato_il: new Date().toISOString(),
-    })
-    .eq('id', itemId);
+    }}]);
 
-  if (error) throw new Error(error.message);
   return { ok: true, item_id: itemId, nuovo_dish_id: nuovoDishId };
 }
 
 // Scambia questa riga con quella dello stesso pasto/slot in un altro giorno.
 async function spostaGiorno(supabase, userId, itemId, giornoDestinazione) {
-  const { item } = await proposte(supabase, userId, itemId);
-
-  if (giornoDestinazione === item.day_of_week) {
-    throw new Error('È già in quel giorno');
+  if (!Number.isInteger(giornoDestinazione)||giornoDestinazione<1||giornoDestinazione>7) throw errorePiano('giorno_non_valido','Choose a day from Monday to Sunday.',400);
+  const {item,profilo,target,righePiano} = await proposte(supabase,userId,itemId);
+  if (giornoDestinazione===item.day_of_week) throw errorePiano('stesso_giorno','This dish is already on that day.',400);
+  verificaModificabile(item,righePiano);
+  const ids=[...new Set(righePiano.map(r=>r.dish_id))];
+  const perId=new Map((await caricaPiattiPerId(supabase,ids)).map(p=>[p.id,p]));
+  if(perId.size!==ids.length)throw errorePiano('dati_piano_incompleti','Some dishes cannot be checked. Please build a new week.');
+  const vincoli=await caricaVincoli(supabase,userId,profilo.diet||'onnivoro');
+  const esiti=await caricaEsiti(supabase,userId);
+  const candidate=righePiano.filter(r=>r.day_of_week===giornoDestinazione&&r.meal===item.meal&&r.slot===item.slot&&r.stato!=='saltato');
+  let gemella=null;
+  for(const r of candidate){
+    try { verificaModificabile(r,righePiano); } catch(e) { if(e.status===422)continue;throw e; }
+    if(![item,r].every(q=>vincoli.ammesso(perId.get(q.dish_id))&&vincoli.gradito(perId.get(q.dish_id))&&!esiti.rifiutato(perId.get(q.dish_id))))continue;
+    if(puoScambiare(item,r,righePiano,perId,profilo,esiti,target,QUOTE,accompagnaBene)){gemella=r;break;}
   }
-
-  // Possono esserci più righe con lo stesso pasto/slot (contorni, spuntini):
-  // si scambia con la prima che non sia già stata spostata.
-  const { data: candidate } = await supabase
-    .from('plan_items')
-    .select('id, day_of_week, stato')
-    .eq('plan_id', item.plan_id)
-    .eq('day_of_week', giornoDestinazione)
-    .eq('meal', item.meal)
-    .eq('slot', item.slot)
-    .order('id');
-
-  const gemella = (candidate || []).find(c => c.stato !== 'spostato') || (candidate || [])[0] || null;
-
-  const ora = new Date().toISOString();
-
-  if (!gemella) {
-    // nessuna riga da scambiare: sposta e basta
-    const { error } = await supabase
-      .from('plan_items')
-      .update({
-        day_of_week: giornoDestinazione,
-        stato: 'spostato',
-        spostato_da_giorno: item.day_of_week,
-        modificato_il: ora,
-      })
-      .eq('id', itemId);
-    if (error) throw new Error(error.message);
-    return { ok: true, scambiato: false };
-  }
-
-  // scambio: le due righe si scambiano il giorno
-  const { error: e1 } = await supabase
-    .from('plan_items')
-    .update({
-      day_of_week: giornoDestinazione,
-      stato: 'spostato',
-      spostato_da_giorno: item.day_of_week,
-      modificato_il: ora,
-    })
-    .eq('id', itemId);
-  if (e1) throw new Error(e1.message);
-
-  const { error: e2 } = await supabase
-    .from('plan_items')
-    .update({
-      day_of_week: item.day_of_week,
-      stato: 'spostato',
-      spostato_da_giorno: giornoDestinazione,
-      modificato_il: ora,
-    })
-    .eq('id', gemella.id);
-  if (e2) throw new Error(e2.message);
-
-  return { ok: true, scambiato: true, con_item: gemella.id };
+  if(!gemella)throw errorePiano('spostamento_non_compatibile','No compatible swap was found for that day. Your plan has not changed.');
+  const ora=new Date().toISOString();
+  await salvaModifiche(supabase,userId,item.plan_id,righePiano,[
+    {id:item.id,patch:{day_of_week:giornoDestinazione,stato:'spostato',spostato_da_giorno:item.day_of_week,modificato_il:ora}},
+    {id:gemella.id,patch:{day_of_week:item.day_of_week,stato:'spostato',spostato_da_giorno:giornoDestinazione,modificato_il:ora}},
+  ]);
+  return {ok:true,scambiato:true,con_item:gemella.id};
 }
 
-// Segna una riga come saltata (non la cancella: resta lo storico).
-async function saltaPasto(supabase, userId, itemId, annulla = false) {
-  await proposte(supabase, userId, itemId); // verifica proprietà
-
-  const { error } = await supabase
-    .from('plan_items')
-    .update({
-      stato: annulla ? 'previsto' : 'saltato',
-      modificato_il: annulla ? null : new Date().toISOString(),
-    })
-    .eq('id', itemId);
-
-  if (error) throw new Error(error.message);
-  return { ok: true, item_id: itemId, stato: annulla ? 'previsto' : 'saltato' };
+// Il salto e' una scelta esplicita: non gonfia automaticamente gli altri
+// pasti. La rilettura del piano mostra i totali e gli avvisi aggiornati.
+async function saltaPasto(supabase,userId,itemId,annulla=false){
+  const {item,profilo,righePiano}=await proposte(supabase,userId,itemId);
+  if(annulla ? item.stato!=='saltato' : item.stato==='saltato')return {ok:true,item_id:itemId,stato:item.stato};
+  verificaModificabile(item,righePiano,{salto:true});
+  let patch;
+  if(annulla){
+    if(item.avanzi && (!origineAvanzo(righePiano,item)||origineAvanzo(righePiano,item).stato==='saltato'))throw errorePiano('avanzi_collegati','Put the original preparation back before restoring these leftovers.');
+    const piatti=await caricaPiattiPerId(supabase,[...new Set([item.dish_id,...righePiano.filter(r=>r.day_of_week===item.day_of_week&&r.meal===item.meal&&r.stato!=='saltato').map(r=>r.dish_id)])]);
+    const idsRichiesti=new Set([item.dish_id,...righePiano.filter(r=>r.day_of_week===item.day_of_week&&r.meal===item.meal&&r.stato!=='saltato').map(r=>r.dish_id)]);
+    if(piatti.length!==idsRichiesti.size)throw errorePiano('dati_piano_incompleti','The rest of this meal cannot be checked.');
+    const p=piatti.find(p=>p.id===item.dish_id);
+    const vincoli=await caricaVincoli(supabase,userId,profilo.diet||'onnivoro');
+    const esiti=await caricaEsiti(supabase,userId);
+    if(!p||!vincoli.ammesso(p)||!vincoli.gradito(p)||esiti.rifiutato(p)||!ammessoNelContesto(p,item,profilo,esiti))throw errorePiano('piatto_non_ammesso','This dish no longer matches your diet or allergies.');
+    if(piatti.some(q=>q.id!==p.id&&!accompagnaBene(p,q)))throw errorePiano('ripristino_non_compatibile','This dish no longer fits with the rest of the meal.');
+    const perId=new Map(piatti.map(q=>[q.id,q]));
+    const durata=righePiano.filter(r=>r.day_of_week===item.day_of_week&&r.meal===item.meal&&(r.stato!=='saltato'||r.id===item.id)).reduce((s,r)=>s+(r.avanzi?0:tempoDi(perId.get(r.dish_id))),0);
+    if(durata>Math.max(limiteTempo(item,profilo,esiti),Number(item.ripristino_salto?.minuti_pasto)||0))throw errorePiano('ripristino_non_compatibile','Restoring this dish would make the meal too long to prepare.');
+    const stato=item.ripristino_salto?.stato || (item.spostato_da_giorno!=null?'spostato':item.sostituito_da_dish_id?'sostituito':'previsto');
+    patch={stato,modificato_il:item.ripristino_salto?.modificato_il??null,ripristino_salto:null};
+  }else{
+    const pasto=righePiano.filter(r=>r.day_of_week===item.day_of_week&&r.meal===item.meal&&r.stato!=='saltato');
+    const piatti=await caricaPiattiPerId(supabase,[...new Set(pasto.map(r=>r.dish_id))]);
+    const perId=new Map(piatti.map(p=>[p.id,p]));
+    const minuti=pasto.every(r=>perId.has(r.dish_id))?pasto.reduce((s,r)=>s+(r.avanzi?0:tempoDi(perId.get(r.dish_id))),0):null;
+    patch={stato:'saltato',modificato_il:new Date().toISOString(),ripristino_salto:{stato:item.stato||'previsto',modificato_il:item.modificato_il??null,minuti_pasto:minuti}};
+  }
+  await salvaModifiche(supabase,userId,item.plan_id,righePiano,[{id:item.id,patch}]);
+  return {ok:true,item_id:itemId,stato:patch.stato};
 }
 
 module.exports = { proposte, trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto, GIRI };

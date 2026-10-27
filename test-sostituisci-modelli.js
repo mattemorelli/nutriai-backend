@@ -18,33 +18,34 @@ function contesto(opzioni = {}) {
     user_cuisine_preferences: [], dish_ingredients: [], dishes: piatti };
   opzioni.modifica?.(dataset, piatti);
   let scritture = 0;
-  const supabase = { from(tabella) {
+  const supabase = { rpc: async (nome, args) => {if(opzioni.erroreRpc)return {data:null,error:opzioni.erroreRpc};assert.equal(nome,'quadrio_modifica_piano_v1');scritture++;for(const m of args.p_modifiche)Object.assign(dataset.plan_items.find(r=>r.id===m.id),m.patch);return {data:{ok:true},error:null};}, from(tabella) {
     assert.ok(Object.hasOwn(dataset, tabella));
     const filtri = [];
     const dati = () => dataset[tabella].filter(r => filtri.every(f => f(r)));
     const errore = tabella === opzioni.erroreTabella ? { message: 'rete interrotta' } : null;
-    const q = { order: () => q, limit: () => q, select: () => q, eq: (k, v) => { filtri.push(r => r[k] === v); return q; },
+    const q = { range: () => q, order: () => q, limit: () => q, select: () => q, eq: (k, v) => { filtri.push(r => r[k] === v); return q; },
       neq: (k, v) => { filtri.push(r => r[k] !== v); return q; },
       single: async () => ({ data: errore ? null : dati()[0], error: errore }), maybeSingle: async () => ({ data: errore ? null : dati()[0], error: errore }),
       then: (resolve, reject) => Promise.resolve({ data: errore ? null : dati(), error: errore }).then(resolve, reject),
       update: () => { scritture++; return q; } };
     return q;
   } };
-  const deps = { limitiDi: () => [0.5, 2], caricaPiatti: async () => [incompleto, completo],
+  const deps = { QUOTE: {}, limitiDi: () => [0.5, 2], caricaPiatti: async () => [incompleto, completo],
     caricaPiattiPerId: async (_, ids) => piatti.filter(p => ids.includes(p.id)),
     FAMIGLIE_PER_CUCINA: { europea: ['mediterranea'] }, GENERICI: [],
-    caricaVincoli: async () => ({ ammesso: () => true, gradito: () => true, categorieVietate: new Set(), foodIdVietati: new Set() }),
+    caricaVincoli: async () => ({ ammesso: opzioni.ammesso || (() => true), gradito: () => true, categorieVietate: new Set(), foodIdVietati: new Set() }),
     caricaEsiti: async () => ({ rifiutato: () => false }), accompagnaBene: () => true,
     sostitutoSenzaGlutineNonRichiesto: () => false };
   const m = { exports: {} };
   vm.runInNewContext(fs.readFileSync(require.resolve('./sostituisci'), 'utf8'), {
     module: m, console, require: name => {
       if (name === './genera') return deps;
+      if (name === './modifiche-piano') return require('./modifiche-piano');
       if (name === './vincoli-swap') return require('./vincoli-swap');
       assert.equal(name, './modelli-pasto'); return { preservaRuoliDelPasto };
     },
   });
-  return { api: m.exports, supabase, scritture: () => scritture };
+  return { api: m.exports, supabase, dataset, piatti, scritture: () => scritture };
 }
 
 test('le proposte preservano il piatto unico anche se l originale e sotto la soglia del pool', async () => {
@@ -89,4 +90,9 @@ test('Swap valido ricalcola i nutrienti e salva una sola riga',async()=>{
 test('Swap: conferma manuale che peggiora le proteine viene fermata',async()=>{
  const c=contesto({modifica:d=>{d.dish_ingredients.push({dish_id:'altro-unico',grams:350,foods:{kcal_100g:500/3.5,protein_100g:1,fibre_100g:6/3.5,sat_fat_100g:2/3.5,salt_100g:1/3.5}});}});
  await assert.rejects(c.api.applicaSostituzione(c.supabase,'utente','riga','altro-unico',350),/bilanciamento/);assert.equal(c.scritture(),0);
+});
+
+test('Swap controlla il tempo complessivo del pasto, non soltanto la singola ricetta',async()=>{
+ const c=contesto({modifica:(d,p)=>{p[2].prep_min=30;p.push({id:'verdure',meal_slot:'contorno',prep_min:15,ruoli_coperti:['verdura']});d.plan_items.push({...d.plan_items[0],id:'contorno',slot:'contorno',dish_id:'verdure',kcal:100,protein_g:0});}});
+ const r=await c.api.trovaProposte(c.supabase,'utente','riga');assert.equal(r.proposte.length,0);
 });

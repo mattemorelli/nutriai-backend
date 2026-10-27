@@ -17,6 +17,10 @@ function ammessoNelContesto(p, item, profilo, esiti = {}) {
   const fuori = profilo.pasti_casa ? profilo.pasti_casa[String(item.day_of_week)]?.pranzo === false : profilo.lunch_away;
   return item.meal !== 'pranzo' || !fuori || p.trasportabile === true;
 }
+function tempoPastoPreservato(originale, nuovo, gemelli, item, profilo, esiti = {}) {
+  const altri = gemelli.reduce((s,p)=>s+tempoDi(p),0);
+  return altri+tempoDi(nuovo)<=Math.max(limiteTempo(item,profilo,esiti),altri+tempoDi(originale));
+}
 function porzioneProposta(p, item, kcalTarget, limitiDi) {
   if (!(p.grams > 0 && p.kcal > 0 && item.kcal > 0)) return null;
   const [min, max] = limitiDi({ piatto: p, slot: item.slot }, kcalTarget);
@@ -51,4 +55,4 @@ function nutrientiPorzione(p, grammi) {
   const f=grammi/p.grams, arr=n=>Math.round(n*10)/10;
   return { kcal:Math.round(p.kcal*f), protein_g:arr(p.protein*f), fibre_g:arr(p.fibre*f), sat_fat_g:arr(p.satFat*f), salt_g:arr(p.salt*f) };
 }
-module.exports = { limiteTempo, tempoDi, ammessoNelContesto, porzioneProposta, validaPorzione, giornataPreservata, nutrientiPorzione };
+module.exports = { limiteTempo, tempoDi, ammessoNelContesto, tempoPastoPreservato, porzioneProposta, validaPorzione, giornataPreservata, nutrientiPorzione };

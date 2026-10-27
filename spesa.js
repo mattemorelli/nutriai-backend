@@ -1,5 +1,6 @@
 const { lettera, puntiCarbonio, motiviConfronto, haImballaggioRiciclabile } = require('./voto');
 const { vociInStagione } = require('./stagionalita');
+const { leggiRighePiano } = require('./modifiche-piano');
 const { trovaProposte } = require('./sostituisci');
 
 // PostgREST impone un tetto di righe per risposta (di default 1000)
@@ -216,30 +217,27 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
     weekStart = p.week_start || null;
   }
 
-  // le righe del piano che vanno davvero cucinate
-  const { data: righe, error } = await supabase
-    .from('plan_items')
-    .select('id, dish_id, portion_g, stato, avanzi, day_of_week, bloccato')
-    .eq('plan_id', id);
-  if (error) throw new Error(error.message);
-
-  const attive = (righe || []).filter(r => r.stato !== 'saltato' && !r.avanzi);
+  // Le porzioni da mangiare comprendono anche gli avanzi: vanno preparate
+  // in anticipo, ma i loro ingredienti devono comunque essere acquistati.
+  const righe = await leggiRighePiano(supabase,id);
+  const attive = righe.filter(r=>r.stato!=='saltato');
   if (!attive.length) return { plan_id: id, week_start: weekStart, reparti: [] };
 
   // portion_g è la porzione di UNA persona: chi cucina per la propria
   // famiglia ha bisogno degli ingredienti per tutti quelli che mangiano,
   // non solo per sé.
-  const { data: utente } = await supabase
+  const { data: utente, error: eUtente } = await supabase
     .from('users').select('household_size, region_zone').eq('id', userId).maybeSingle();
+  if(eUtente)throw new Error('lettura users: '+eUtente.message);
   const numeroPersone = Math.max(1, Number(utente && utente.household_size) || 1);
 
   // ingredienti di tutti i piatti coinvolti (sempre l'intera settimana:
   // servono anche per il calcolo "settimana intera" che non si filtra mai)
   const dishIds = [...new Set(attive.map(r => r.dish_id))];
-  const { data: ing } = await supabase
-    .from('dish_ingredients')
+  const ing = await paginaTutto((da,a)=>supabase.from('dish_ingredients')
     .select('dish_id, food_id, grams, foods (name, name_en, name_it, unita, peso_pezzo_g, reparto, green_score, categoria_impatto)')
-    .in('dish_id', dishIds);
+    .in('dish_id',dishIds).order('dish_id').order('food_id').range(da,a));
+  if(dishIds.some(id=>!ing.some(r=>r.dish_id===id))||ing.some(r=>!r.foods||!(Number(r.grams)>0)))throw new Error('Ingredienti della spesa non verificabili');
 
   // nomi dei piatti, per sapere dove finisce ogni ingrediente
   const { data: piatti } = await supabase

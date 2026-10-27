@@ -3,6 +3,7 @@ const { calcolaESalvaTarget, preparaTarget, salvaTarget } = require('./fabbisogn
 const { allenamenti, massaGrassa } = require('./validazione-fabbisogno');
 const { generaESalva, risolviSubject, caricaCatalogoPerRisoluzione } = require('./genera');
 const { calibra } = require('./calibra');
+const { riepilogoNutrizionale } = require('./modifiche-piano');
 const { trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto } = require('./sostituisci');
 const { listaSpesa, ingredientiPiatto, dispensa, cambiaDispensa, nascondiPerSettimana, marchePer, sceltePer, classificaInsegne } = require('./spesa');
 const { votoBarcode } = require('./voto');
@@ -211,15 +212,17 @@ function rispondiServePro(res, dettaglio) {
 // l'item non esiste o non e' dell'utente, torna false e lascia che la
 // query vera, subito dopo in ogni rotta, lo scopra e risponda lei - stesso
 // principio del resto del file, un solo punto che decide ogni cosa.
-async function giornoBloccatoPerNonPro(supabase, userId, planItemId) {
-  const { data: item } = await supabase
+async function giornoBloccatoPerNonPro(supabase, userId, planItemId, destinazione = null) {
+  const { data: item, error: erroreItem } = await supabase
     .from('plan_items').select('day_of_week, plan_id').eq('id', planItemId).maybeSingle();
+  if (erroreItem) throw new Error('lettura plan_items: '+erroreItem.message);
   if (!item) return false;
-  const { data: piano } = await supabase
+  const { data: piano, error: errorePiano } = await supabase
     .from('plans').select('user_id, giorno_gratis').eq('id', item.plan_id).maybeSingle();
+  if (errorePiano) throw new Error('lettura plans: '+errorePiano.message);
   if (!piano || piano.user_id !== userId || piano.giorno_gratis == null) return false;
   if (await isPro(userId)) return false;
-  return item.day_of_week !== piano.giorno_gratis;
+  return item.day_of_week !== piano.giorno_gratis || (destinazione != null && destinazione !== piano.giorno_gratis);
 }
 
 // PostgREST impone un tetto di righe per risposta (di default 1000)
@@ -363,7 +366,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
 
     const { data: piano, error: errPiano } = await supabase
       .from('plans')
-      .select('id, user_id, week_start, generated_at, corpus_version, giorno_gratis')
+      .select('id, user_id, week_start, generated_at, corpus_version, giorno_gratis, energy_target_id')
       .eq('id', planId)
       .single();
 
@@ -462,13 +465,15 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
         ),
       }));
 
-    const { data: obiettivi } = await supabase
+    let queryObiettivi = supabase
       .from('energy_targets')
-      .select('kcal, protein_g_min, fibre_g_min, sat_fat_g_max, salt_g_max')
-      .eq('user_id', piano.user_id)
-      .order('computed_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .select('id, kcal, protein_g_min, fibre_g_min, sat_fat_g_max, salt_g_max')
+      .eq('user_id', piano.user_id);
+    queryObiettivi = piano.energy_target_id ? queryObiettivi.eq('id',piano.energy_target_id)
+      : queryObiettivi.order('computed_at',{ascending:false}).limit(1);
+    const { data: obiettivi, error: eObiettivi } = await queryObiettivi.maybeSingle();
+    if(eObiettivi)throw new Error('lettura energy_targets: '+eObiettivi.message);
+    const riepilogo = riepilogoNutrizionale(righe,obiettivi);
 
     // 3. Non Pro e il piano ha gia' un giorno gratis assegnato: filtra sia
     // "dati" che "giorni" (oggi duplicati - devono restare identici anche
@@ -508,6 +513,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
       dati: giorniRisposta,
       giorni: giorniRisposta,
       obiettivi: obiettivi || null,
+      riepilogo_nutrizionale: riepilogo.filter(g=>giorniRisposta.some(d=>d.giorno===g.giorno)),
       ...campiExtra,
     });
   } catch (e) {
@@ -1215,8 +1221,8 @@ app.post('/sostituisci', richiedeAuth, async (req, res) => {
     res.json(r);
   } catch (e) {
     console.error('[sostituisci]', e.message);
-    const codice = e.message === 'Non autorizzato' ? 403 : 500;
-    res.status(codice).json({ errore: e.message });
+    const codice = e.status || (e.message === 'Non autorizzato' ? 403 : 500);
+    res.status(codice).json({ errore: e.code || e.message, ...(e.code ? { messaggio: e.message } : {}) });
   }
 });
 
@@ -1237,8 +1243,8 @@ app.post('/sostituisci/applica', richiedeAuth, async (req, res) => {
     res.json(r);
   } catch (e) {
     console.error('[sostituisci/applica]', e.message);
-    const codice = e.message === 'Non autorizzato' ? 403 : 500;
-    res.status(codice).json({ errore: e.message });
+    const codice = e.status || (e.message === 'Non autorizzato' ? 403 : 500);
+    res.status(codice).json({ errore: e.code || e.message, ...(e.code ? { messaggio: e.message } : {}) });
   }
 });
 
@@ -1249,12 +1255,13 @@ app.post('/sposta', richiedeAuth, async (req, res) => {
       return res.status(400).json({ errore: 'item_id o giorno mancante' });
     }
 
+    if (await giornoBloccatoPerNonPro(supabase,req.utente.id,item_id,giorno)) return rispondiServePro(res,'giorno_bloccato');
     const r = await spostaGiorno(supabase, req.utente.id, item_id, giorno);
     res.json(r);
   } catch (e) {
     console.error('[sposta]', e.message);
-    const codice = e.message === 'Non autorizzato' ? 403 : 500;
-    res.status(codice).json({ errore: e.message });
+    const codice = e.status || (e.message === 'Non autorizzato' ? 403 : 500);
+    res.status(codice).json({ errore: e.code || e.message, ...(e.code ? { messaggio: e.message } : {}) });
   }
 });
 
@@ -1263,12 +1270,13 @@ app.post('/salta', richiedeAuth, async (req, res) => {
     const { item_id, annulla } = req.body;
     if (!item_id) return res.status(400).json({ errore: 'item_id mancante' });
 
+    if (await giornoBloccatoPerNonPro(supabase,req.utente.id,item_id)) return rispondiServePro(res,'giorno_bloccato');
     const r = await saltaPasto(supabase, req.utente.id, item_id, annulla === true);
     res.json(r);
   } catch (e) {
     console.error('[salta]', e.message);
-    const codice = e.message === 'Non autorizzato' ? 403 : 500;
-    res.status(codice).json({ errore: e.message });
+    const codice = e.status || (e.message === 'Non autorizzato' ? 403 : 500);
+    res.status(codice).json({ errore: e.code || e.message, ...(e.code ? { messaggio: e.message } : {}) });
   }
 });
 
