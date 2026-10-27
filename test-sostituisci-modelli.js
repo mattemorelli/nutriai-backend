@@ -5,14 +5,14 @@ const vm = require('node:vm');
 const { preservaRuoliDelPasto } = require('./modelli-pasto');
 
 function contesto(opzioni = {}) {
-  const originale = { id: 'unico', name: 'Piatto unico', meal_slot: 'primo', health_score: 6.5, protein: 40, fibre: 6, satFat: 2, salt: 1,
+  const originale = { id: 'unico', name: 'Piatto unico', fat:10, grammiFruttaSecca:0, meal_slot: 'primo', health_score: 6.5, protein: 40, fibre: 6, satFat: 2, salt: 1,
     ruoli_coperti: ['proteina_principale', 'base_amidacea', 'verdura'], paese: 'italia', prep_min: 20, grams: 350, kcal: 500 };
   const incompleto = { id: 'pasta', name: 'Pasta', meal_slot: 'primo', health_score: 8,
     ruoli_coperti: ['base_amidacea'], paese: 'italia', prep_min: 20, kcal: 400, grams: 300 };
   const completo = { ...originale, id: 'altro-unico', health_score: 8, kcal: 500, grams: 350 };
   const piatti = [originale, incompleto, completo];
   const dataset = { plans: [{ id: 'piano', user_id: 'utente' }],
-    plan_items: [{ id: 'riga', plan_id: 'piano', day_of_week: 1, meal: 'pranzo', slot: 'primo', dish_id: 'unico', kcal: 500, protein_g: 40, fibre_g: 6, sat_fat_g: 2, salt_g: 1 }],
+    plan_items: [{ id: 'riga', plan_id: 'piano', day_of_week: 1, meal: 'pranzo', slot: 'primo', dish_id: 'unico', portion_g:350, kcal: 500, protein_g: 40, fibre_g: 6, sat_fat_g: 2, salt_g: 1 }],
     energy_targets: [{ kcal: 2400, protein_g_min: 95, user_id: 'utente' }],
     users: [{ id: 'utente', diet: 'onnivoro', evening_minutes: 35, paesi: ['italia'] }],
     user_cuisine_preferences: [], dish_ingredients: [], dishes: piatti };
@@ -95,4 +95,18 @@ test('Swap: conferma manuale che peggiora le proteine viene fermata',async()=>{
 test('Swap controlla il tempo complessivo del pasto, non soltanto la singola ricetta',async()=>{
  const c=contesto({modifica:(d,p)=>{p[2].prep_min=30;p.push({id:'verdure',meal_slot:'contorno',prep_min:15,ruoli_coperti:['verdura']});d.plan_items.push({...d.plan_items[0],id:'contorno',slot:'contorno',dish_id:'verdure',kcal:100,protein_g:0});}});
  const r=await c.api.trovaProposte(c.supabase,'utente','riga');assert.equal(r.proposte.length,0);
+});
+
+for(const [nome,campo,valore]of [['frutta secca','grammiFruttaSecca',80],['grassi','fat',45]])test(`Swap: ${nome} protetti nelle proposte e nella conferma diretta`,async()=>{
+ const c=contesto({modifica:(d,ps)=>{ps[2][campo]=valore;}});
+ const r=await c.api.trovaProposte(c.supabase,'utente','riga');assert.equal(r.proposte.length,0);
+ await assert.rejects(c.api.applicaSostituzione(c.supabase,'utente','riga','altro-unico',350),e=>e.code==='quantita_giornaliere');assert.equal(c.scritture(),0);
+});
+test('Swap: controllo frutta secca sulla porzione scelta e non sul peso base',async()=>{
+ const c=contesto({modifica:(d,ps)=>{ps[2].grammiFruttaSecca=25;}});
+ await assert.rejects(c.api.applicaSostituzione(c.supabase,'utente','riga','altro-unico',700),e=>e.code==='quantita_giornaliere');assert.equal(c.scritture(),0);
+});
+test('Swap: metadati incompleti non autorizzano un cambiamento non verificato',async()=>{
+ const c=contesto({modifica:(d,ps)=>{ps[2].fat=null;}});const r=await c.api.trovaProposte(c.supabase,'utente','riga');assert.equal(r.proposte.length,0);
+ await assert.rejects(c.api.applicaSostituzione(c.supabase,'utente','riga','altro-unico',350),e=>e.code==='quantita_giornaliere');assert.equal(c.scritture(),0);
 });

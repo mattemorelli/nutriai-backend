@@ -1,3 +1,4 @@
+const { preservaQuantitaGiornaliere } = require('./quantita-modifiche');
 const { contaGruppi, preservaRuoliDelPasto } = require('./modelli-pasto');
 const { ammessoNelContesto, giornataPreservata, tempoPastoPreservato } = require('./vincoli-swap');
 const CAMPI_NUTRIZIONALI = ['kcal', 'protein_g', 'fibre_g', 'sat_fat_g', 'salt_g'];
@@ -69,7 +70,8 @@ function puoScambiare(item, gemella, righe, perId, profilo, esiti, target, quote
     const duplicati = rs=>rs.filter(r=>attiva(r)&&r.day_of_week===vecchia.day_of_week&&perId.get(r.dish_id)?.principale===piatto.principale).length;
     if (piatto.principale && duplicati(dopo)>Math.max(1,duplicati(righe))) return false;
   }
-  return settimanaPreservata(righe,dopo,perId,quote);
+  return settimanaPreservata(righe,dopo,perId,quote)
+    && preservaQuantitaGiornaliere(righe,dopo,perId,target,[item.day_of_week,gemella.day_of_week]);
 }
 function riepilogoNutrizionale(righe, target) {
   const somma=rs=>Object.fromEntries(CAMPI_NUTRIZIONALI.map(k=>[k,Math.round(rs.reduce((s,r)=>s+Number(r[k]||0),0)*10)/10]));
@@ -85,4 +87,4 @@ function riepilogoNutrizionale(righe, target) {
     return {giorno:i+1,previsto:somma(giorno),incluso:tot,piatti_saltati:giorno.length-incluse.length,avvisi};
   });
 }
-module.exports={origineAvanzo,leggiRighePiano,salvaModifiche,errorePiano,verificaModificabile,puoScambiare,settimanaPreservata,riepilogoNutrizionale};
+module.exports={preservaQuantitaGiornaliere,origineAvanzo,leggiRighePiano,salvaModifiche,errorePiano,verificaModificabile,puoScambiare,settimanaPreservata,riepilogoNutrizionale};

@@ -5,14 +5,14 @@ const vm = require('node:vm');
 const { preservaRuoliDelPasto } = require('./modelli-pasto');
 
 function contesto(opzioni = {}) {
-  const originale = { id: 'unico', name: 'Piatto unico', meal_slot: 'primo', health_score: 6.5, protein: 40, fibre: 6, satFat: 2, salt: 1,
+  const originale = { id: 'unico', name: 'Piatto unico', fat:10, grammiFruttaSecca:0, meal_slot: 'primo', health_score: 6.5, protein: 40, fibre: 6, satFat: 2, salt: 1,
     ruoli_coperti: ['proteina_principale', 'base_amidacea', 'verdura'], paese: 'italia', prep_min: 20, grams: 350, kcal: 500 };
   const incompleto = { id: 'pasta', name: 'Pasta', meal_slot: 'primo', health_score: 8,
     ruoli_coperti: ['base_amidacea'], paese: 'italia', prep_min: 20, kcal: 400, grams: 300 };
   const completo = { ...originale, id: 'altro-unico', health_score: 8, kcal: 500, grams: 350 };
   const piatti = [originale, incompleto, completo];
   const dataset = { plans: [{ id: 'piano', user_id: 'utente' }],
-    plan_items: [{ id: 'riga', plan_id: 'piano', day_of_week: 1, meal: 'pranzo', slot: 'primo', dish_id: 'unico', kcal: 500, protein_g: 40, fibre_g: 6, sat_fat_g: 2, salt_g: 1 }],
+    plan_items: [{ id: 'riga', plan_id: 'piano', day_of_week: 1, meal: 'pranzo', slot: 'primo', dish_id: 'unico', portion_g:350, kcal: 500, protein_g: 40, fibre_g: 6, sat_fat_g: 2, salt_g: 1 }],
     energy_targets: [{ kcal: 2400, protein_g_min: 95, user_id: 'utente' }],
     users: [{ id: 'utente', diet: 'onnivoro', evening_minutes: 35, paesi: ['italia'] }],
     user_cuisine_preferences: [], dish_ingredients: [], dishes: piatti };
@@ -133,4 +133,9 @@ for(const cambiato of [false,true])test(`ripristino tempo complessivo, altro pia
  await c.api.saltaPasto(c.supabase,'utente','riga');
  if(cambiato){c.piatti.find(p=>p.id==='verdure').prep_min=35;await assert.rejects(c.api.saltaPasto(c.supabase,'utente','riga',true),e=>e.code==='ripristino_non_compatibile');}
  else{const r=await c.api.saltaPasto(c.supabase,'utente','riga',true);assert.equal(r.stato,'previsto');}
+});
+
+for(const [nome,campo,alto]of [['frutta secca','grammiFruttaSecca',80],['grassi','fat',40]])test(`spostamento conserva ${nome} anche nell'altra giornata`,async()=>{
+ const c=conDueGiorni({modifica:(d,ps)=>{ps[0][campo]=alto;ps[2][campo]=0;}});const prima=JSON.stringify(c.dataset.plan_items);
+ await assert.rejects(c.api.spostaGiorno(c.supabase,'utente','riga',2),e=>e.code==='spostamento_non_compatibile');assert.equal(c.scritture(),0);assert.equal(JSON.stringify(c.dataset.plan_items),prima);
 });

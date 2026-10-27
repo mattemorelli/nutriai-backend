@@ -1,5 +1,5 @@
 const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene, sostitutoSenzaGlutineNonRichiesto, limitiDi, QUOTE } = require('./genera');
-const { origineAvanzo, leggiRighePiano, salvaModifiche, errorePiano, verificaModificabile, puoScambiare, settimanaPreservata } = require('./modifiche-piano');
+const { preservaQuantitaGiornaliere, origineAvanzo, leggiRighePiano, salvaModifiche, errorePiano, verificaModificabile, puoScambiare, settimanaPreservata } = require('./modifiche-piano');
 const { preservaRuoliDelPasto } = require('./modelli-pasto');
 const { tempoDi, limiteTempo, ammessoNelContesto, tempoPastoPreservato, porzioneProposta, validaPorzione, giornataPreservata, nutrientiPorzione } = require('./vincoli-swap');
 
@@ -131,6 +131,7 @@ async function trovaProposte(supabase, userId, itemId) {
       tempoPastoPreservato(originale,p,gemelli,item,profilo,esiti) &&
       porzioneProposta(p, item, kcalTarget, limitiDi) !== null &&
       giornataPreservata(item, righeGiornata, target, nutrientiPorzione(p, porzioneProposta(p, item, kcalTarget, limitiDi))) &&
+      preservaQuantitaGiornaliere(righePiano,righePiano.map(r=>r.id===item.id?{...r,dish_id:p.id,portion_g:porzioneProposta(p,item,kcalTarget,limitiDi)}:r),perId,target,[item.day_of_week]) &&
       (p.health_score || 0) >= giro.scoreMin &&
       (!giro.escludiSettimana || !giaUsati.has(p.id)) &&
       paeseCompatibile(p, giro) &&
@@ -202,6 +203,9 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
     }
     if (gemelli.some(g => !accompagnaBene(piattoNuovo, g))) {
       throw new Error('Piatto non ammesso: non si abbina bene con il resto del pasto (doppio amido, doppia proteina o stesso ingrediente principale)');
+    }
+    if (!preservaQuantitaGiornaliere(righePiano,righePiano.map(r=>r.id===item.id?{...r,dish_id:nuovoDishId,portion_g:portionG}:r),perId,target,[item.day_of_week])) {
+      throw errorePiano('quantita_giornaliere','This swap would undo the daily balance of nuts or fats. Choose another dish.');
     }
   }
 
