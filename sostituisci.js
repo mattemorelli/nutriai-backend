@@ -1,5 +1,6 @@
-const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene, sostitutoSenzaGlutineNonRichiesto } = require('./genera');
+const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene, sostitutoSenzaGlutineNonRichiesto, limitiDi } = require('./genera');
 const { preservaRuoliDelPasto } = require('./modelli-pasto');
+const { tempoDi, ammessoNelContesto, porzioneProposta, validaPorzione, giornataPreservata, nutrientiPorzione } = require('./vincoli-swap');
 
 // Allarga i vincoli a ogni giro finché non trova tre proposte.
 const GIRI = [
@@ -13,7 +14,7 @@ async function proposte(supabase, userId, itemId) {
   // 1. la riga del piano da sostituire
   const { data: item, error: e1 } = await supabase
     .from('plan_items')
-    .select('id, plan_id, day_of_week, meal, slot, dish_id, portion_g, kcal')
+    .select('id, plan_id, day_of_week, meal, slot, dish_id, portion_g, kcal, protein_g, fibre_g, sat_fat_g, salt_g')
     .eq('id', itemId)
     .single();
   if (e1 || !item) throw new Error('Riga del piano non trovata');
@@ -21,7 +22,7 @@ async function proposte(supabase, userId, itemId) {
   // 2. il piano deve appartenere all'utente
   const { data: piano, error: ePiano } = await supabase
     .from('plans')
-    .select('id, user_id')
+    .select('id, user_id, energy_target_id')
     .eq('id', item.plan_id)
     .maybeSingle();
   if (ePiano) throw new Error('lettura plans: ' + ePiano.message);
@@ -30,16 +31,18 @@ async function proposte(supabase, userId, itemId) {
   // 3. il profilo dell'utente (serve per tempo e dieta)
   const { data: profilo, error: eProfilo } = await supabase
     .from('users')
-    .select('evening_minutes, diet, paesi')
+    .select('evening_minutes, diet, paesi, pasti_casa, lunch_away')
     .eq('id', userId)
     .maybeSingle();
   if (eProfilo) throw new Error('lettura users: ' + eProfilo.message);
+  if (!profilo) throw new Error('Profilo non disponibile');
 
   // 4. i piatti già usati nella settimana
-  const { data: righe } = await supabase
+  const { data: righe, error: eRighe } = await supabase
     .from('plan_items')
-    .select('dish_id')
+    .select('id, dish_id, day_of_week, kcal, protein_g, fibre_g, sat_fat_g, salt_g')
     .eq('plan_id', item.plan_id);
+  if (eRighe) throw new Error('lettura plan_items: ' + eRighe.message);
   const giaUsati = new Set((righe || []).map(r => r.dish_id));
 
   // 5. i piatti gemelli dello stesso pasto (lo stesso giorno, lo stesso
@@ -49,28 +52,37 @@ async function proposte(supabase, userId, itemId) {
   // quindi una sostituzione poteva creare doppio amido, doppia proteina
   // principale o lo stesso ingrediente principale ripetuto nello stesso
   // pasto (problema F dell'audit).
-  const { data: righeGemelle } = await supabase
+  const { data: righeGemelle, error: eGemelle } = await supabase
     .from('plan_items')
     .select('dish_id')
     .eq('plan_id', item.plan_id)
     .eq('day_of_week', item.day_of_week)
     .eq('meal', item.meal)
     .neq('id', itemId);
+  if (eGemelle) throw new Error('lettura plan_items gemelli: ' + eGemelle.message);
   const gemelliDishIds = [...new Set((righeGemelle || []).map(r => r.dish_id))];
 
-  return { item, piano, profilo, giaUsati, gemelliDishIds };
+  // I tetti si riferiscono al target della settimana salvata, anche dopo
+  // una modifica del profilo. Non prendere un target di un altro utente.
+  let qTarget = supabase.from('energy_targets').select('kcal, protein_g_min').eq('user_id', userId);
+  qTarget = piano.energy_target_id ? qTarget.eq('id', piano.energy_target_id) : qTarget.order('computed_at', { ascending: false }).limit(1);
+  const { data: target, error: eTarget } = await qTarget.maybeSingle();
+  if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
+  if (!(Number(target?.kcal) > 0 && Number(target?.protein_g_min) > 0)) throw new Error('Fabbisogno del piano non disponibile');
+  return { item, piano, profilo, giaUsati, gemelliDishIds, kcalTarget: Number(target.kcal), target, righeGiornata: righe };
 }
 
 // Cerca tre alternative, allargando i vincoli se non ne trova abbastanza.
 async function trovaProposte(supabase, userId, itemId) {
-  const { item, profilo, giaUsati, gemelliDishIds } = await proposte(supabase, userId, itemId);
+  const { item, profilo, giaUsati, gemelliDishIds, kcalTarget, target, righeGiornata } = await proposte(supabase, userId, itemId);
 
   // Le preferenze vere dell'utente, come le legge il generatore
-  const { data: prefRaw } = await supabase
+  const { data: prefRaw, error: ePreferenze } = await supabase
     .from('user_cuisine_preferences')
     .select('cucina, rank')
     .eq('user_id', userId);
 
+  if (ePreferenze) throw new Error('lettura user_cuisine_preferences: ' + ePreferenze.message);
   const preferenze = (prefRaw && prefRaw.length) ? prefRaw : [{ cucina: 'europea', rank: 1 }];
 
   // Stessa fonte di genera.js (FAMIGLIE_PER_CUCINA, esportata), non una
@@ -83,9 +95,10 @@ async function trovaProposte(supabase, userId, itemId) {
       .flatMap(p => FAMIGLIE_PER_CUCINA[p.cucina] || [])
   )];
 
-  const tutti = await caricaPiatti(supabase, famiglie.length ? famiglie : ['mediterranea']);
+  const tutti = await caricaPiatti(supabase, famiglie.length ? famiglie : ['mediterranea'], 6);
   const { ammesso, gradito, categorieVietate } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
-  const { rifiutato } = await caricaEsiti(supabase, userId);
+  const esiti = await caricaEsiti(supabase, userId);
+  const { rifiutato } = esiti;
   const haVincoloGlutine = categorieVietate.has('glutine');
   // Nello Swap non cede niente: ne' le allergie ne' le preferenze, ne' un
   // piatto gia' rifiutato due volte per gusto (stessa regola del generatore).
@@ -126,7 +139,10 @@ async function trovaProposte(supabase, userId, itemId) {
     const trovati = piatti.filter(p =>
       p.meal_slot === slotCercato &&
       p.id !== item.dish_id &&
-      (p.prep_min || 30) <= tempoBase + giro.tempoExtra &&
+      tempoDi(p) <= tempoBase + giro.tempoExtra &&
+      ammessoNelContesto(p, item, profilo, esiti) &&
+      porzioneProposta(p, item, kcalTarget, limitiDi) !== null &&
+      giornataPreservata(item, righeGiornata, target, nutrientiPorzione(p, porzioneProposta(p, item, kcalTarget, limitiDi))) &&
       (p.health_score || 0) >= giro.scoreMin &&
       (!giro.escludiSettimana || !giaUsati.has(p.id)) &&
       paeseCompatibile(p, giro) &&
@@ -145,9 +161,7 @@ async function trovaProposte(supabase, userId, itemId) {
           voto: p.health_score,
           gruppo: p.gruppo,
           // porzione scalata per mantenere le stesse calorie della riga originale
-          portion_g: p.kcal > 0
-            ? Math.round((item.kcal / p.kcal) * p.grams)
-            : p.grams,
+          portion_g: porzioneProposta(p, item, kcalTarget, limitiDi),
         }));
 
       return {
@@ -163,20 +177,10 @@ async function trovaProposte(supabase, userId, itemId) {
 
 // Applica la sostituzione scelta dall'utente, ricalcolando i valori nutrizionali.
 async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portionG) {
-  const { item, profilo, gemelliDishIds } = await proposte(supabase, userId, itemId);
+  const { item, profilo, gemelliDishIds, kcalTarget, target, righeGiornata } = await proposte(supabase, userId, itemId);
 
-  // Difesa lato server: anche se il client manda un piatto vietato, non passa.
-  const { foodIdVietati, categorieVietate } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
-  const { data: ingNuovo } = await supabase
-    .from('dish_ingredients').select('food_id').eq('dish_id', nuovoDishId);
-  if ((ingNuovo || []).some((i) => foodIdVietati.has(i.food_id))) {
-    throw new Error('Piatto non ammesso per le allergie o la dieta dell\'utente');
-  }
-
-  const { data: nuovoNome } = await supabase.from('dishes').select('name').eq('id', nuovoDishId).maybeSingle();
-  if (nuovoNome && sostitutoSenzaGlutineNonRichiesto(nuovoNome, categorieVietate.has('glutine'))) {
-    throw new Error('Piatto non ammesso: "senza glutine" è riservato a chi esclude il glutine');
-  }
+  const vincoli = await caricaVincoli(supabase, userId, profilo.diet || 'onnivoro');
+  const esiti = await caricaEsiti(supabase, userId);
 
   // Stessa difesa lato server per l'abbinamento col pasto (problema F
   // dell'audit): anche se trovaProposte ha gia' filtrato, applicaSostituzione
@@ -192,6 +196,13 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
     const gemelli = gemelliDishIds.map(id => perId.get(id));
     if (!piattoNuovo || !originale || gemelli.some(p => !p)) throw new Error('Impossibile verificare la composizione del pasto');
     if (piattoNuovo.meal_slot !== item.slot) throw new Error('Piatto non ammesso in questa portata');
+    if (!vincoli.ammesso(piattoNuovo) || !vincoli.gradito(piattoNuovo) || esiti.rifiutato(piattoNuovo)
+        || sostitutoSenzaGlutineNonRichiesto(piattoNuovo, vincoli.categorieVietate.has('glutine'))) {
+      throw new Error('Piatto non ammesso per dieta, allergie o preferenze');
+    }
+    if (!ammessoNelContesto(piattoNuovo, item, profilo, esiti)) throw new Error('Piatto non ammesso per tempo, tecnica o trasporto');
+    validaPorzione(piattoNuovo, item, portionG, kcalTarget, limitiDi);
+
     if (!preservaRuoliDelPasto(originale, piattoNuovo, gemelli)) {
       throw new Error('La sostituzione toglierebbe una componente del pasto senza rimpiazzarla');
     }
@@ -206,6 +217,7 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
     .select('grams, foods (kcal_100g, protein_100g, sat_fat_100g, fibre_100g, salt_100g)')
     .eq('dish_id', nuovoDishId);
   if (e1) throw new Error(e1.message);
+  if (!righe?.length || righe.some(r => !r.foods || !(Number(r.grams) > 0))) throw new Error('Ingredienti del piatto non verificabili');
 
   const tot = { kcal: 0, protein: 0, satFat: 0, fibre: 0, salt: 0, grams: 0 };
   for (const r of righe || []) {
@@ -216,12 +228,15 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
     tot.satFat  += (f.sat_fat_100g || 0) * k;
     tot.fibre   += (f.fibre_100g   || 0) * k;
     tot.salt    += (f.salt_100g    || 0) * k;
-    tot.grams   += r.grams;
+    tot.grams   += Number(r.grams);
   }
 
   // fattore di scala dalla ricetta base alla porzione scelta
   const s = tot.grams > 0 ? portionG / tot.grams : 1;
   const arr = (n) => Math.round(n * 10) / 10;
+  if (!giornataPreservata(item, righeGiornata, target, nutrientiPorzione(tot, portionG))) {
+    throw new Error('La sostituzione peggiorerebbe il bilanciamento della giornata');
+  }
 
   const { error } = await supabase
     .from('plan_items')

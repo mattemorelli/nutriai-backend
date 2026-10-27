@@ -1,5 +1,6 @@
 console.log('[server] avviato', new Date().toISOString());
-const { calcolaESalvaTarget } = require('./fabbisogno');
+const { calcolaESalvaTarget, preparaTarget, salvaTarget } = require('./fabbisogno');
+const { allenamenti, massaGrassa } = require('./validazione-fabbisogno');
 const { generaESalva, risolviSubject, caricaCatalogoPerRisoluzione } = require('./genera');
 const { calibra } = require('./calibra');
 const { trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto } = require('./sostituisci');
@@ -645,6 +646,12 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
 
   if (errori.length) return res.status(400).json({ errore: errori.join('; ') });
 
+  let sessioniValide, massaGrassaValida;
+  try {
+    sessioniValide = allenamenti(b.training_sessions);
+    massaGrassaValida = massaGrassa(b.body_fat_pct);
+  } catch (e) { return res.status(400).json({ errore: e.message }); }
+
   // Un deficit calorico a chi e' gia' sotto il range di normopeso non ha
   // base clinica in un'app senza supervisione medica (soglia OMS, 18.5) -
   // controllato DOPO che peso/altezza/obiettivo sono gia' validi uno per
@@ -718,16 +725,15 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
 
     // Il PAL resta scritto per compatibilità con i profili vecchi,
     // ma il calcolo userà occupation_level e training_sessions.
-    if (Array.isArray(b.training_sessions) && b.training_sessions.length) {
-      await supabase.from('training_sessions').delete().eq('user_id', req.utente.id);
-      await supabase.from('training_sessions').insert(
-        b.training_sessions.map((t) => ({
-          user_id: req.utente.id,
-          activity: t.activity,
-          minutes_per_week: Math.min(1200, Math.max(0, Number(t.minutes_per_week) || 0)),
-          intensity: ['leggera', 'moderata', 'intensa'].includes(t.intensity) ? t.intensity : 'moderata',
-        }))
+    // Anche [] deve rimuovere gli allenamenti precedenti. Un errore di
+    // scrittura interrompe il flusso, senza calcolare un target su dati vecchi.
+    const { error: eDelAllenamenti } = await supabase.from('training_sessions').delete().eq('user_id', utenteId);
+    if (eDelAllenamenti) throw new Error('allenamenti: ' + eDelAllenamenti.message);
+    if (sessioniValide.length) {
+      const { error: eInsAllenamenti } = await supabase.from('training_sessions').insert(
+        sessioniValide.map(t => ({ user_id: utenteId, ...t }))
       );
+      if (eInsAllenamenti) throw new Error('allenamenti: ' + eInsAllenamenti.message);
     }
 
     // 2. peso - upsert perche' c'e' un vincolo una-misura-al-giorno: se
@@ -740,7 +746,7 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
         measured_on: oggi,
         weight_kg: Number(b.weight_kg),
         source: 'utente',
-        body_fat_pct: b.body_fat_pct || null,
+        body_fat_pct: massaGrassaValida,
       }, { onConflict: 'user_id,measured_on' });
     if (e2) throw new Error(`peso: ${e2.message}`);
 
@@ -926,26 +932,18 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
 
   if (!Object.keys(aggiornamento).length) return res.status(400).json({ errore: 'nessun campo da aggiornare' });
 
-  // Stesso controllo di /onboarding (BMI sotto 18.5 + "dimagrimento"), qui
-  // serve anche se l'utente cambia SOLO l'obiettivo in un secondo momento:
-  // l'altezza puo' arrivare in questa stessa richiesta o essere gia' su
-  // users, il peso non si aggiorna mai da qui (vedi /peso) quindi si legge
-  // sempre l'ultima misura reale.
-  if (aggiornamento.goal === 'dimagrimento') {
-    const altezzaCm = aggiornamento.height_cm
-      ?? (await supabase.from('users').select('height_cm').eq('id', req.utente.id).maybeSingle()).data?.height_cm;
-    const { data: ultimaMisura } = await supabase
-      .from('body_measurements').select('weight_kg')
-      .eq('user_id', req.utente.id).order('measured_on', { ascending: false }).limit(1).maybeSingle();
-    const bmi = altezzaCm && ultimaMisura?.weight_kg ? calcolaBMI(ultimaMisura.weight_kg, altezzaCm) : null;
-    if (!obiettivoAdattoAlBMI('dimagrimento', bmi)) {
-      return res.status(400).json({ errore: 'obiettivo_non_adatto', motivo: 'bmi_basso' });
-    }
+  try {
+    // Anche una modifica della sola altezza puo' rendere inadatto il goal
+    // gia' salvato. Letture fallite o dati incompleti non superano il controllo.
+    const cambiaTarget = ['goal', 'height_cm', 'birth_year'].some(k => k in aggiornamento);
+    const target = cambiaTarget ? await preparaTarget(supabase, req.utente.id, { profilo: aggiornamento }) : null;
+    const { error } = await supabase.from('users').update(aggiornamento).eq('id', req.utente.id);
+    if (error) throw new Error(error.message);
+    if (target) await salvaTarget(supabase, target);
+    res.json({ ok: true, ...(target ? { target } : {}) });
+  } catch (e) {
+    res.status(e.status || 500).json({ errore: e.message, ...(e.motivo ? { motivo: e.motivo } : {}) });
   }
-
-  const { error } = await supabase.from('users').update(aggiornamento).eq('id', req.utente.id);
-  if (error) return res.status(500).json({ errore: error.message });
-  res.json({ ok: true });
 });
 
 // ---------- VINCOLI ALIMENTARI (allergie, cibi esclusi) ----------
@@ -1078,7 +1076,7 @@ app.post('/genera-piano', richiedeAuth, async (req, res) => {
     // sempre). Il foglio "nuova settimana" lo manda false quando l'utente
     // spegne "Keep the dishes you locked".
     const mantieniBloccati = req.body?.mantieni_bloccati !== false;
-    const piano = await generaESalva(supabase, req.utente.id, undefined, { mantieniBloccati });
+    const piano = await generaESalva(supabase, req.utente.id, undefined, { mantieniBloccati, numeroSpuntini: req.body?.numero_spuntini });
     // piano_impossibile (25 ottobre 2026, principio inviolabile): nessun
     // piano trovato senza violare una scelta dell'utente - una risposta
     // riconoscibile (422), non un 500 generico ne' un piano scorretto.
@@ -1086,7 +1084,7 @@ app.post('/genera-piano', richiedeAuth, async (req, res) => {
     res.json({ ok: true, ...piano });
   } catch (err) {
     console.error('ERRORE /genera-piano:', err);
-    res.status(500).json({ errore: err.message });
+    res.status(err.status || 500).json({ errore: err.message });
   }
 });
 
@@ -1577,6 +1575,8 @@ app.post('/peso', richiedeAuth, async (req, res) => {
       return res.status(400).json({ errore: 'Peso non valido' });
     }
 
+    const bodyFat = massaGrassa(req.body.body_fat_pct);
+    const target = await preparaTarget(supabase, req.utente.id, { misura: { weight_kg: kg, body_fat_pct: bodyFat } });
     const oggi = oggiLocale();
 
     // Una sola pesata al giorno: la seconda sovrascrive la prima.
@@ -1584,14 +1584,15 @@ app.post('/peso', richiedeAuth, async (req, res) => {
       user_id: req.utente.id,
       measured_on: oggi,
       weight_kg: kg,
-      body_fat_pct: req.body.body_fat_pct ? Number(req.body.body_fat_pct) : null,
+      body_fat_pct: bodyFat,
       source: 'utente',
     }, { onConflict: 'user_id,measured_on' });
 
     if (error) return res.status(500).json({ errore: error.message });
-    res.json({ ok: true });
+    await salvaTarget(supabase, target);
+    res.json({ ok: true, target });
   } catch (e) {
-    res.status(500).json({ errore: e.message });
+    res.status(e.status || 500).json({ errore: e.message, ...(e.motivo ? { motivo: e.motivo } : {}) });
   }
 });
 

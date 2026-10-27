@@ -2,12 +2,12 @@
 // ======================================================
 // In italiano semplice: prima di spingere codice sul repository, questo
 // comando controlla che il generatore di piani non sia rotto. Lancia in
-// fila quattordici controlli e ne riporta tutti gli esiti: se anche uno solo
+// fila sedici controlli e ne riporta tutti gli esiti: se anche uno solo
 // fallisce, l'intero comando fallisce (exit code
 // diverso da 0) e git non lascia partire il push (e' installato come hook
 // pre-push, vedi scripts/installa-hook-pre-push.sh).
 //
-// I quattordici controlli, in ordine:
+// I sedici controlli, in ordine:
 //   1. node --check su tutti i file .js del backend - niente di rotto a
 //      livello di sintassi (non esegue il codice, solo lo legge).
 //   2. verifica-flag-allergeni.js - le etichette "contiene glutine/
@@ -131,6 +131,7 @@ passo('10. Porzioni e 12 profili con fabbisogni espliciti', () => {
 passo('11. Fabbisogno e profilo: errori di lettura distinti da dati assenti', () => {
   lanciaScript('test-fabbisogno.js');
   lanciaScript('test-errori-profilo.js');
+  lanciaScript('test-aggiornamento-fabbisogno.js');
 });
 passo('12. Sicurezza input: eta, peso, altezza e BMI-obiettivo', () => lanciaScript('test-sicurezza-input.js'));
 passo('13. Recupero proteico: vincoli, piatti bloccati e contatori', () => {
@@ -143,6 +144,9 @@ passo('14. Modelli dei pasti e sostituzioni coerenti', () => {
   lanciaScript('test-sostituisci-modelli.js');
   lanciaScript('scripts/verifica-modelli-pasto.js');
 });
+
+passo('15. Numero spuntini scelto: diete, porzioni e conflitti con piatti bloccati', () => lanciaScript('scripts/verifica-spuntini.js'));
+passo('16. Catalogo di lancio: ingredienti, composizione e ricette legacy', () => lanciaScript('scripts/verifica-catalogo-lancio.js'));
 
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);

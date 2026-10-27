@@ -1335,7 +1335,7 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
   // settimana (usoSpuntini), non servono piu' 14 distinti (2 al giorno x 7)
   // - bastano i distinti necessari a coprire 14 usi senza mai superare 3
   // ripetizioni ciascuno: ceil(14/3) = 5.
-  const SPUNTINI_MINIMI = Math.ceil(14 / 3);
+  const SPUNTINI_MINIMI = Math.ceil(7 * (ctx.numeroSpuntini ?? 2) / 3);
   const nSpuntini = contaDisponibili(spuntini, false);
   if (nSpuntini < SPUNTINI_MINIMI) return { ok: false, messaggio: `servono almeno ${SPUNTINI_MINIMI} spuntini distinti (si ripetono al massimo 3 volte ciascuno), ne ha ${nSpuntini}` };
 
@@ -1466,6 +1466,10 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // Nessun chiamante esistente passa opzioni, quindi il default (true)
   // mantiene il comportamento di sempre.
   const salva = opzioni.salva !== false;
+  const numeroSpuntini = opzioni.numeroSpuntini ?? null;
+  if (numeroSpuntini !== null && (!Number.isInteger(numeroSpuntini) || numeroSpuntini < 0 || numeroSpuntini > 3)) {
+    throw Object.assign(new Error('numero_spuntini_non_valido'), { status: 400 });
+  }
   // Nessun chiamante esistente passa questa opzione (stesso principio di
   // "salva" sopra): di default si tengono i piatti bloccati della
   // settimana precedente, come oggi. Il foglio "nuova settimana" (You)
@@ -1569,6 +1573,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         bloccatiPerGiorno[r.day_of_week].push({ meal: r.meal, slot: r.slot, piatto });
       }
     }
+  }
+
+  if (numeroSpuntini !== null && Object.values(bloccatiPerGiorno).some(lista => lista.filter(b => b.meal === 'spuntino').length > numeroSpuntini)) {
+    return { errore: 'piano_impossibile', vincolo_bloccante: 'spuntini_bloccati',
+      dettaglio: 'Ci sono più spuntini bloccati del numero scelto. Sbloccarli oppure scegliere un numero maggiore.' };
   }
 
   const cucinaOggi = (g) => giorniCottura.includes(g);
@@ -1826,7 +1835,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     const secondiFreschiNecessari = giorniCottura.length + (cucinaOggi(1) ? 0 : 1);
 
     const catalogoSlot = { primi, secondi, contorni, colazioni, spuntini };
-    const ctxCapienza = { paesiScelti, opz, rifiutato, secondiFreschiNecessari, gruppiUnioneSettimana };
+    const ctxCapienza = { paesiScelti, opz, rifiutato, secondiFreschiNecessari, gruppiUnioneSettimana, numeroSpuntini };
     const capienzaSufficiente = (profiloSettimana) => analizzaCapienza(profiloSettimana, catalogoSlot, ctxCapienza);
 
     const diagnosticaProfili = [];
@@ -1931,6 +1940,14 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
         if (st.contornoPranzo === undefined && [st.primo, st.secondoPranzo].some(p => p && copreRuolo(p, 'verdura'))) st.contornoPranzo = null;
         if (st.contornoCena === undefined && [st.secondo, st.primoCena].some(p => p && copreRuolo(p, 'verdura'))) st.contornoCena = null;
+      }
+
+      // La scelta esplicita non viene allargata dai recuperi calorici o
+      // proteici. null conserva il comportamento automatico precedente.
+      if (numeroSpuntini !== null) for (const st of statoGiorni) {
+        for (const [i, nome] of ['spuntino', 'spuntino2', 'spuntino3'].entries()) {
+          if (i >= numeroSpuntini) st[nome] = null;
+        }
       }
 
       const pila = [];
@@ -2200,6 +2217,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         const base = (p) =>
           !rifiutato(p) && (usoSpuntini.get(p.id) || 0) < 3 && (p.prep_min || 5) <= cappaMinuti && paeseOkLeggero(p) &&
           (!altroSpuntino || p.id !== altroSpuntino.id) &&
+          (!statoGiorni[gi].spuntino3 || (p.id !== statoGiorni[gi].spuntino3.id && (!copreRuolo(p, 'base_amidacea') || !copreRuolo(statoGiorni[gi].spuntino3, 'base_amidacea')))) &&
           (!altroEAmidaceo || !copreRuolo(p, 'base_amidacea')) &&
           principaleLiberoOggi(gi, p);
         const proprio = spuntini.filter(p => compatibile(p, profiloGiorno) && base(p));
@@ -2421,6 +2439,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         if (st.colazione === undefined) pronti.push(['colazione', () => candidatiColazione(gi, profiloGiorno, paeseOkLeggero, cappaColazione)]);
         if (st.spuntino === undefined) pronti.push(['spuntino', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino2, cappaSpuntino)]);
         if (st.spuntino2 === undefined) pronti.push(['spuntino2', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino, cappaSpuntino)]);
+        // Il terzo si sceglie dopo i primi due, per non duplicarli.
+        if (numeroSpuntini === 3 && st.spuntino3 === undefined && st.spuntino !== undefined && st.spuntino2 !== undefined) pronti.push(['spuntino3', () => candidatiSpuntino3(gi, profiloGiorno, paeseOkLeggero, cappaSpuntino)]);
         if (st.contornoCena !== undefined && st.base === undefined) {
           const principaleCena = st.secondo || st.primoCena;
           const cenaHaAmido = principaleCena?.amidoReale || (st.contornoCena && st.contornoCena.amidoReale);
@@ -2445,6 +2465,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           colazione: (p) => assegnaColazioneScelto(gi, p),
           spuntino: (p) => assegnaSpuntinoScelto(gi, 'spuntino', p),
           spuntino2: (p) => assegnaSpuntinoScelto(gi, 'spuntino2', p),
+          spuntino3: (p) => assegnaSpuntinoScelto(gi, 'spuntino3', p),
           base: (p) => assegnaBaseScelto(gi, p),
         };
         return creaFrame(g, scelto.nomeSlot, scelto.candidati, applicaPerSlot[scelto.nomeSlot]);
@@ -2517,7 +2538,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
 
         if (!ancoraCorto()) return;
-        if (st.spuntino3 === undefined) {
+        if (numeroSpuntini === null && st.spuntino3 === undefined) {
           prova('spuntino3', candidatiSpuntino3(gi, ctx.profiloGiorno, ctx.paeseOkLeggero, ctx.cappaSpuntino), (p) => assegnaSpuntinoScelto(gi, 'spuntino3', p));
         }
 

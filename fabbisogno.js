@@ -1,3 +1,4 @@
+const { allenamenti, massaGrassa, validaDati, numero, erroreDati } = require('./validazione-fabbisogno');
 // I MET misurano il costo di un'attività in multipli del metabolismo a riposo.
 // Sottraiamo 1 perché quel riposo è già dentro il basale: sommarlo due volte
 // è l'errore più comune nei calcolatori online.
@@ -38,9 +39,9 @@ function calcolaBMR(dati) {
 
 function kcalAllenamento(sessioni, peso) {
   let settimanale = 0;
-  for (const s of (sessioni || [])) {
-    const met = (MET[s.activity] || MET.camminata)[s.intensity] || 4;
-    const ore = (s.minutes_per_week || 0) / 60;
+  for (const s of allenamenti(sessioni)) {
+    const met = MET[s.activity][s.intensity];
+    const ore = s.minutes_per_week / 60;
     settimanale += (met - 1) * 1.05 * peso * ore;
   }
   return settimanale / 7;
@@ -94,13 +95,14 @@ function proteineTarget({ peso, altezzaCm, minutiForza }) {
   return Math.round(pesoRif * gPerKg);
 }
 
-async function calcolaESalvaTarget(supabase, userId) {
-  const { data: u, error: erroreUtente } = await supabase
+// Prepara e valida il nuovo target PRIMA di modificare peso/profilo.
+async function preparaTarget(supabase, userId, modifiche = {}) {
+  const { data: utenteLetto, error: erroreUtente } = await supabase
     .from('users').select('sex, birth_year, height_cm, goal, occupation_level')
     .eq('id', userId).single();
   if (erroreUtente) throw new Error('lettura users: ' + erroreUtente.message);
 
-  const { data: m, error: erroreMisure } = await supabase
+  const { data: misuraLetta, error: erroreMisure } = await supabase
     .from('body_measurements').select('weight_kg, body_fat_pct')
     .eq('user_id', userId).order('measured_on', { ascending: false }).limit(1).maybeSingle();
   if (erroreMisure) throw new Error('lettura body_measurements: ' + erroreMisure.message);
@@ -112,16 +114,17 @@ async function calcolaESalvaTarget(supabase, userId) {
   // sottostimava il fabbisogno e salvava quel valore come valido.
   if (erroreAllenamenti) throw new Error('lettura training_sessions: ' + erroreAllenamenti.message);
 
-  if (!u || !m || !u.height_cm || !u.birth_year) {
-    throw new Error('Dati insufficienti per calcolare il fabbisogno');
-  }
+  const u = { ...utenteLetto, ...modifiche.profilo };
+  const m = { ...misuraLetta, ...modifiche.misura };
+  validaDati(u, m);
+  const sessioniValide = allenamenti(sessioni || []);
 
   const dati = {
     peso: Number(m.weight_kg),
     altezza: Number(u.height_cm),
     eta: new Date().getFullYear() - u.birth_year,
     sesso: u.sex,
-    bodyFatPct: m.body_fat_pct ? Number(m.body_fat_pct) : null,
+    bodyFatPct: massaGrassa(m.body_fat_pct),
   };
 
   const { valore: bmr, metodo } = calcolaBMR(dati);
@@ -132,8 +135,8 @@ async function calcolaESalvaTarget(supabase, userId) {
   let tdee, modello, sport = 0;
 
   if (haNuoviDati) {
-    const neat = NEAT[u.occupation_level] || NEAT.sedentario;
-    sport = kcalAllenamento(sessioni, dati.peso);
+    const neat = NEAT[u.occupation_level];
+    sport = kcalAllenamento(sessioniValide, dati.peso);
     // L'effetto termico del cibo vale circa il 10% dell'introito:
     // si applica sul totale, quindi si divide.
     tdee = Math.round((bmr * neat + sport) / 0.90);
@@ -143,14 +146,15 @@ async function calcolaESalvaTarget(supabase, userId) {
       .from('activity_periods').select('pal')
       .eq('user_id', userId).order('valid_from', { ascending: false }).limit(1).maybeSingle();
     if (erroreAttivita) throw new Error('lettura activity_periods: ' + erroreAttivita.message);
-    const pal = Number(att && att.pal) || 1.4;
+    if (att && (!numero(att.pal) || Number(att.pal) <= 0)) throw erroreDati('PAL non valido');
+    const pal = att ? Number(att.pal) : 1.4;
     tdee = Math.round(bmr * pal);
     modello = 'pal_legacy';
   }
 
-  const minutiForza = (sessioni || [])
+  const minutiForza = sessioniValide
     .filter(s => s.activity === 'pesi')
-    .reduce((s, x) => s + (x.minutes_per_week || 0), 0);
+    .reduce((s, x) => s + x.minutes_per_week, 0);
   const { kcal, rete } = applicaObiettivo(tdee, bmr, dati.peso, u.goal);
 
   const riga = {
@@ -163,14 +167,22 @@ async function calcolaESalvaTarget(supabase, userId) {
     free_sugar_g_max: Number(((kcal * 0.10) / 4).toFixed(1)),
     salt_g_max: 5,
     method: 'stima_iniziale',
-    confidence: dati.bodyFatPct ? 'media' : 'bassa',
+    confidence: metodo === 'katch_mcardle' ? 'media' : 'bassa',
     tdee_predetto: tdee,
     notes: `${modello} | ${metodo} | BMR ${Math.round(bmr)} | sport ${Math.round(sport)} kcal/g | TDEE ${tdee}${rete ? ' | rete ' + rete : ''}`,
   };
 
+  return riga;
+}
+
+async function salvaTarget(supabase, riga) {
   const { error } = await supabase.from('energy_targets').insert(riga);
   if (error) throw new Error('Salvataggio target fallito: ' + error.message);
   return riga;
 }
 
-module.exports = { calcolaESalvaTarget, calcolaBMR, MET, NEAT };
+async function calcolaESalvaTarget(supabase, userId) {
+  return salvaTarget(supabase, await preparaTarget(supabase, userId));
+}
+
+module.exports = { calcolaESalvaTarget, preparaTarget, salvaTarget, calcolaBMR, MET, NEAT };
