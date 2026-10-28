@@ -143,6 +143,7 @@ passo('14. Modelli dei pasti e sostituzioni coerenti', () => {
   lanciaScript('test-modelli-pasto.js');
   lanciaScript('test-sostituisci-modelli.js');
   lanciaScript('scripts/verifica-modelli-pasto.js');
+  lanciaScript('scripts/verifica-pin-pranzi.js');
 });
 
 passo('15. Numero spuntini scelto: diete, porzioni e conflitti con piatti bloccati', () => lanciaScript('scripts/verifica-spuntini.js'));
@@ -160,7 +161,14 @@ passo('18. Quantita giornaliere degli ingredienti e bilanciamento dei grassi', (
   lanciaScript('test-quantita-modifiche.js');
 });
 
-passo('19. Matrice estesa: tempi brevi, trasporto, allergie, avanzi e spuntini', () => lanciaScript('scripts/verifica-matrice-vincoli-estesa.js'));
+passo('19. Matrice estesa: tempi brevi, trasporto, allergie, avanzi e spuntini', () => {
+  lanciaScript('test-amido-canonico.cjs');
+  lanciaScript('test-pranzo-flessibile.js');
+  lanciaScript('test-pranzo-flessibile-energia.js');
+  lanciaScript('test-contratto-matrice.cjs');
+  lanciaScript('test-nutrienti-matrice.js');
+  lanciaScript('scripts/verifica-matrice-vincoli-estesa.js --min-riuscite 32');
+});
 
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);

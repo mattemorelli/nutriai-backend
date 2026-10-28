@@ -1,0 +1,391 @@
+{
+  "provenienza": {
+    "catalogo_sha256": "fa06ab37e7dbaaa836efccd3dbcb0cc0bc3aee13be2f7b4cae1f28e484145f8c",
+    "seed": 2026,
+    "kcal_target": 2000,
+    "proteine_target": 85,
+    "nota": "Giornate realmente generate usando esclusivamente il catalogo frozen. Valori dei piatti ricalcolati dagli ingredienti, senza modifiche."
+  },
+  "piatti": [
+    {
+      "id": "d1000001-0000-0000-0000-000000000011",
+      "grams": 210,
+      "kcal": 337.1,
+      "protein": 13.149999999999999,
+      "fibre": 1.44,
+      "satFat": 2.8049999999999997,
+      "salt": 0.27749999999999997
+    },
+    {
+      "id": "c1000001-0000-0000-0000-000000000005",
+      "grams": 275,
+      "kcal": 738.4000000000001,
+      "protein": 35.874,
+      "fibre": 17.16,
+      "satFat": 3.1792,
+      "salt": 0.050350000000000006
+    },
+    {
+      "id": "c2000001-0000-0000-0000-000000000059",
+      "grams": 262,
+      "kcal": 275.2,
+      "protein": 33.412000000000006,
+      "fibre": 3.906,
+      "satFat": 2.8708,
+      "salt": 0.16971999999999998
+    },
+    {
+      "id": "d1000001-0000-0000-0000-000000000012",
+      "grams": 140,
+      "kcal": 294.3,
+      "protein": 7.154,
+      "fibre": 2.46,
+      "satFat": 1.7532,
+      "salt": 1.0109
+    },
+    {
+      "id": "a1900001-0000-0000-0000-000000000012",
+      "grams": 295,
+      "kcal": 709.1,
+      "protein": 23.09,
+      "fibre": 5.9,
+      "satFat": 8.543199999999999,
+      "salt": 0.40574999999999994
+    },
+    {
+      "id": "6e54ba5c-88d9-49a5-b84a-a7b06f2bac09",
+      "grams": 298,
+      "kcal": 459.38,
+      "protein": 25.546999999999997,
+      "fibre": 20.154,
+      "satFat": 1.7306,
+      "salt": 0.03498
+    },
+    {
+      "id": "a1900001-0000-0000-0000-000000000002",
+      "grams": 295,
+      "kcal": 517.2,
+      "protein": 15.84,
+      "fibre": 18.78,
+      "satFat": 2.3961999999999994,
+      "salt": 0.035949999999999996
+    },
+    {
+      "id": "a4900001-0000-0000-0000-000000000003",
+      "grams": 310,
+      "kcal": 254.3,
+      "protein": 9.426,
+      "fibre": 1.62,
+      "satFat": 2.07,
+      "salt": 0.5016
+    },
+    {
+      "id": "33333333-0001-0001-0001-000000000001",
+      "grams": 350,
+      "kcal": 672.6,
+      "protein": 22.357999999999997,
+      "fibre": 6.24,
+      "satFat": 5.3995999999999995,
+      "salt": 0.48545
+    },
+    {
+      "id": "a3900001-0000-0000-0000-000000000012",
+      "grams": 210,
+      "kcal": 155.4,
+      "protein": 2.1,
+      "fibre": 2.6,
+      "satFat": 1.4428,
+      "salt": 0.0145
+    },
+    {
+      "id": "d3000001-0000-0000-0000-000000000071",
+      "grams": 380,
+      "kcal": 644.3,
+      "protein": 39.128,
+      "fibre": 12.05,
+      "satFat": 3.109,
+      "salt": 0.20600000000000002
+    },
+    {
+      "id": "c0000001-0000-0000-0000-000000000005",
+      "grams": 160,
+      "kcal": 281.9,
+      "protein": 7.54,
+      "fibre": 1.895,
+      "satFat": 4.5708,
+      "salt": 0.14480000000000004
+    },
+    {
+      "id": "44444444-0001-0001-0001-000000000001",
+      "grams": 415,
+      "kcal": 447.6,
+      "protein": 18.740000000000002,
+      "fibre": 7.4,
+      "satFat": 5.3671999999999995,
+      "salt": 0.51875
+    },
+    {
+      "id": "a3900001-0000-0000-0000-000000000013",
+      "grams": 175,
+      "kcal": 226.25,
+      "protein": 7.4025,
+      "fibre": 5.775,
+      "satFat": 2.1218,
+      "salt": 0.12515
+    },
+    {
+      "id": "c2000001-0000-0000-0000-000000000009",
+      "grams": 335,
+      "kcal": 231.25,
+      "protein": 29.165,
+      "fibre": 2.1000000000000005,
+      "satFat": 1.7908000000000002,
+      "salt": 0.624
+    },
+    {
+      "id": "b3a00001-0000-0000-0000-000000000010",
+      "grams": 260,
+      "kcal": 185.9,
+      "protein": 4.38,
+      "fibre": 4.800000000000001,
+      "satFat": 1.4518,
+      "salt": 0.36
+    }
+  ],
+  "giornate": [
+    {
+      "nome": "valida",
+      "caso": {
+        "dieta": "onnivoro",
+        "minuti": 15,
+        "snack": 0,
+        "fuori": false,
+        "glutine": true,
+        "avanzi": false
+      },
+      "giorno": 6,
+      "righe": [
+        {
+          "dish_id": "d1000001-0000-0000-0000-000000000011",
+          "portion_g": 325,
+          "kcal": 522,
+          "protein_g": 20.4,
+          "fibre_g": 2.2,
+          "sat_fat_g": 4.3,
+          "salt_g": 0.43
+        },
+        {
+          "dish_id": "c1000001-0000-0000-0000-000000000005",
+          "portion_g": 419,
+          "kcal": 1126,
+          "protein_g": 54.7,
+          "fibre_g": 26.2,
+          "sat_fat_g": 4.8,
+          "salt_g": 0.08
+        },
+        {
+          "dish_id": "c2000001-0000-0000-0000-000000000059",
+          "portion_g": 335,
+          "kcal": 351,
+          "protein_g": 42.7,
+          "fibre_g": 5,
+          "sat_fat_g": 3.7,
+          "salt_g": 0.22
+        }
+      ],
+      "concessioni": []
+    },
+    {
+      "nome": "proteine",
+      "caso": {
+        "dieta": "vegetariano",
+        "minuti": 20,
+        "snack": 0,
+        "fuori": false,
+        "glutine": false,
+        "avanzi": false
+      },
+      "giorno": 7,
+      "righe": [
+        {
+          "dish_id": "d1000001-0000-0000-0000-000000000012",
+          "portion_g": 112,
+          "kcal": 235,
+          "protein_g": 5.7,
+          "fibre_g": 2,
+          "sat_fat_g": 1.4,
+          "salt_g": 0.81
+        },
+        {
+          "dish_id": "a1900001-0000-0000-0000-000000000012",
+          "portion_g": 325,
+          "kcal": 780,
+          "protein_g": 25.4,
+          "fibre_g": 6.5,
+          "sat_fat_g": 9.4,
+          "salt_g": 0.45
+        },
+        {
+          "dish_id": "6e54ba5c-88d9-49a5-b84a-a7b06f2bac09",
+          "portion_g": 350,
+          "kcal": 540,
+          "protein_g": 30,
+          "fibre_g": 23.7,
+          "sat_fat_g": 2,
+          "salt_g": 0.04
+        },
+        {
+          "dish_id": "a1900001-0000-0000-0000-000000000002",
+          "portion_g": 254,
+          "kcal": 445,
+          "protein_g": 13.6,
+          "fibre_g": 16.2,
+          "sat_fat_g": 2.1,
+          "salt_g": 0.03
+        }
+      ],
+      "concessioni": [
+        {
+          "gradino": null,
+          "tipo": "vincolo_non_soddisfatto",
+          "giorno": 7,
+          "slot": null,
+          "vincolo": "proteine_minime",
+          "prima": ">=76.5",
+          "dopo": "74.8"
+        }
+      ]
+    },
+    {
+      "nome": "fibra",
+      "caso": {
+        "dieta": "onnivoro",
+        "minuti": 20,
+        "snack": 0,
+        "fuori": true,
+        "glutine": false,
+        "avanzi": false
+      },
+      "giorno": 1,
+      "righe": [
+        {
+          "dish_id": "a4900001-0000-0000-0000-000000000003",
+          "portion_g": 334,
+          "kcal": 274,
+          "protein_g": 10.2,
+          "fibre_g": 1.7,
+          "sat_fat_g": 2.2,
+          "salt_g": 0.54
+        },
+        {
+          "dish_id": "33333333-0001-0001-0001-000000000001",
+          "portion_g": 411,
+          "kcal": 790,
+          "protein_g": 26.3,
+          "fibre_g": 7.3,
+          "sat_fat_g": 6.3,
+          "salt_g": 0.57
+        },
+        {
+          "dish_id": "a3900001-0000-0000-0000-000000000012",
+          "portion_g": 236,
+          "kcal": 175,
+          "protein_g": 2.4,
+          "fibre_g": 2.9,
+          "sat_fat_g": 1.6,
+          "salt_g": 0.02
+        },
+        {
+          "dish_id": "d3000001-0000-0000-0000-000000000071",
+          "portion_g": 449,
+          "kcal": 761,
+          "protein_g": 46.2,
+          "fibre_g": 14.2,
+          "sat_fat_g": 3.7,
+          "salt_g": 0.24
+        }
+      ],
+      "concessioni": [
+        {
+          "gradino": null,
+          "tipo": "pavimento_mancato",
+          "giorno": 1,
+          "slot": null,
+          "vincolo": "fibra_minima",
+          "prima": "28.0",
+          "dopo": "26.2"
+        }
+      ]
+    },
+    {
+      "nome": "sale_saturi",
+      "caso": {
+        "dieta": "pescetariano",
+        "minuti": 20,
+        "snack": 0,
+        "fuori": true,
+        "glutine": true,
+        "avanzi": false
+      },
+      "giorno": 2,
+      "righe": [
+        {
+          "dish_id": "c0000001-0000-0000-0000-000000000005",
+          "portion_g": 320,
+          "kcal": 564,
+          "protein_g": 15.1,
+          "fibre_g": 3.8,
+          "sat_fat_g": 9.1,
+          "salt_g": 0.29
+        },
+        {
+          "dish_id": "44444444-0001-0001-0001-000000000001",
+          "portion_g": 350,
+          "kcal": 377,
+          "protein_g": 15.8,
+          "fibre_g": 6.2,
+          "sat_fat_g": 4.5,
+          "salt_g": 0.44
+        },
+        {
+          "dish_id": "a3900001-0000-0000-0000-000000000013",
+          "portion_g": 315,
+          "kcal": 407,
+          "protein_g": 13.3,
+          "fibre_g": 10.4,
+          "sat_fat_g": 3.8,
+          "salt_g": 0.23
+        },
+        {
+          "dish_id": "c2000001-0000-0000-0000-000000000009",
+          "portion_g": 350,
+          "kcal": 242,
+          "protein_g": 30.5,
+          "fibre_g": 2.2,
+          "sat_fat_g": 1.9,
+          "salt_g": 0.65
+        },
+        {
+          "dish_id": "b3a00001-0000-0000-0000-000000000010",
+          "portion_g": 350,
+          "kcal": 250,
+          "protein_g": 5.9,
+          "fibre_g": 6.5,
+          "sat_fat_g": 2,
+          "salt_g": 0.48
+        }
+      ],
+      "concessioni": [
+        {
+          "gradino": "2b",
+          "tipo": "allentamento",
+          "giorno": 2,
+          "slot": null,
+          "vincolo": "tetto_sale_saturi",
+          "prima": "sale<=5 saturi<=20.4",
+          "dopo": "sale=2.09 saturi=21.31"
+        }
+      ]
+    }
+  ]
+}
