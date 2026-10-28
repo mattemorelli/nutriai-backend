@@ -2,12 +2,12 @@
 // ======================================================
 // In italiano semplice: prima di spingere codice sul repository, questo
 // comando controlla che il generatore di piani non sia rotto. Lancia in
-// fila diciannove controlli e ne riporta tutti gli esiti: se anche uno solo
+// fila venti controlli e ne riporta tutti gli esiti: se anche uno solo
 // fallisce, l'intero comando fallisce (exit code
 // diverso da 0) e git non lascia partire il push (e' installato come hook
 // pre-push, vedi scripts/installa-hook-pre-push.sh).
 //
-// I diciannove controlli, in ordine:
+// I venti controlli, in ordine:
 //   1. node --check su tutti i file .js del backend - niente di rotto a
 //      livello di sintassi (non esegue il codice, solo lo legge).
 //   2. verifica-flag-allergeni.js - le etichette "contiene glutine/
@@ -172,6 +172,12 @@ passo('19. Matrice estesa: tempi brevi, trasporto, allergie, avanzi e spuntini',
   lanciaScript('test-contratto-matrice.cjs');
   lanciaScript('test-nutrienti-matrice.js');
   lanciaScript('scripts/verifica-matrice-vincoli-estesa.js --min-riuscite 32');
+});
+
+// Il controllo delle librerie usa gli avvisi aggiornati del registro npm.
+passo('20. Librerie HTTP e dipendenze di produzione senza vulnerabilita note', () => {
+  lanciaScript('scripts/verifica-dipendenze-http.js');
+  execFileSync('npm', ['audit', '--omit=dev', '--audit-level=low'], { cwd: RADICE, stdio: 'inherit' });
 });
 
 const falliti = risultati.filter((r) => !r.ok);
