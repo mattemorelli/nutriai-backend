@@ -34,7 +34,7 @@ const TABELLE_A_RISCHIO = [
 const FILE_DI_PRODUZIONE = [
   'server.js', 'genera.js', 'fabbisogno.js', 'calibra.js', 'sostituisci.js',
   'spesa.js', 'modifiche-piano.js', 'voto.js', 'tu.js', 'auth-middleware.js',
-  'vincoli-verificabili.js', 'classifica-ruoli-piatti.js',
+  'vincoli-verificabili.js', 'classifica-ruoli-piatti.js', 'salvataggio-generazione.js',
 ];
 
 const VERBI_SCRITTURA = ['.insert(', '.update(', '.delete(', '.upsert('];

@@ -1,3 +1,4 @@
+const {caricaContestoGenerazione,salvaGenerazione}=require('./salvataggio-generazione');
 const {preferenzaFacoltativa,riferimentoVerificabile,verificaVincoli,leggiVincoliDichiarati}=require('./vincoli-verificabili');
 const { creaPranzoFlessibile } = require('./pranzo-flessibile');
 const { miglioraIngredienti } = require('./migliora-ingredienti');
@@ -1486,6 +1487,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // generazione e' rigiocabile a posteriori, non solo quando lo si prevede.
   const seed = (seedIniziale != null ? Number(seedIniziale) : Math.floor(Math.random() * 4294967296)) >>> 0;
 
+  const contestoGenerazione=salva?await caricaContestoGenerazione(supabase,userId):null;
+
   const { data: prefRaw, error: errPref } = await supabase
     .from('user_cuisine_preferences')
     .select('cucina, rank')
@@ -1536,7 +1539,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   const { data: pianoVecchio, error: ePiano } = await supabase
     .from('plans').select('id')
     .eq('user_id', userId)
-    .order('generated_at', { ascending: false }).limit(1).maybeSingle();
+    .order('generated_at', { ascending: false }).order('id',{ascending:false}).limit(1).maybeSingle();
   if (ePiano) throw new Error('lettura plans: ' + ePiano.message);
 
   // Un piatto bloccato resta esattamente nel suo giorno, pasto e slot,
@@ -1625,6 +1628,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     .select('id, kcal, protein_g_min')
     .eq('user_id', userId)
     .order('computed_at', { ascending: false })
+    .order('id', {ascending:false})
     .limit(1)
     .maybeSingle();
   if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
@@ -3150,10 +3154,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   const righeFinali = righePiano(migliore, obiettivo, obiettivoProteine);
   let piano = null;
   if (salva) {
-    const { data: pianoInserito, error: errPiano } = await supabase
-      .from('plans')
-      .insert({
-        user_id: userId,
+    piano=await salvaGenerazione(supabase,userId,contestoGenerazione,{
         week_start: lunediCorrente(),
         giorno_gratis: giornoSettimanaCorrente(),
         generated_at: new Date().toISOString(),
@@ -3164,21 +3165,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         concessioni,
         dieta,
         paesi: paesiScelti,
-      })
-      .select('id')
-      .single();
-    if (errPiano) throw new Error(`Creazione piano fallita: ${errPiano.message}`);
-    piano = pianoInserito;
-
-    // I piatti bloccati restano fissi nella scelta, ma le loro porzioni
-    // rispettano gli stessi limiti di tutti gli altri.
-    const righe = righeFinali.map(r => ({ plan_id: piano.id, ...r }));
-
-    const { error: errItems } = await supabase.from('plan_items').insert(righe);
-    if (errItems) {
-      await supabase.from('plans').delete().eq('id', piano.id);
-      throw new Error(`Inserimento pasti fallito: ${errItems.message}`);
-    }
+    },righeFinali);
   }
 
   return {

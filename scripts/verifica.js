@@ -189,6 +189,13 @@ passo('20. Librerie HTTP e dipendenze di produzione senza vulnerabilita note', (
   execFileSync('npm', ['audit', '--omit=dev', '--audit-level=low'], { cwd: RADICE, stdio: 'inherit' });
 });
 
+passo('21. Generazione atomica: input cambiati, rollback e salvataggi concorrenti', () => {
+  lanciaScript('test-salvataggio-generazione.js');
+  lanciaScript('scripts/verifica-generazione-db.js');
+});
+
+passo('22. Preferenze personali private e catalogo pubblico in sola lettura', () => lanciaScript('scripts/verifica-permessi-generatore.js'));
+
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);
 console.log(`RIEPILOGO: ${risultati.length - falliti.length}/${risultati.length} controlli superati.`);
