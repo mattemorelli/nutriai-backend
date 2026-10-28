@@ -1,0 +1,13 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const {miglioraModelliPasto}=require('./modelli-pasto');
+const piatto=(id,minuti,extra={})=>({id,meal_slot:'primo',principale:id,prep_min:minuti,ruoli_coperti:['proteina_principale','base_amidacea','verdura'],protein:80,fibre:30,kcal:1000,health_score:8,...extra});
+const row=(p,x={})=>({meal:'pranzo',slot:p.meal_slot,piatto:p,...x});
+function fixture(mod={}){const lento=piatto('lento',40),rapido=piatto('rapido',15),week=[{giorno:1,pasti:[row(lento)]}],valuta=ps=>({kcal:1000,kcalOk:true,proteine:ps.reduce((s,r)=>s+r.piatto.protein,0),fibra:30,sale:1,saturi:5,grassi:30,fruttaSecca:0,saleMax:5,satMax:12,fibraMin:25});
+ return{lento,rapido,week,valuta,run(extra={}){return miglioraModelliPasto({settimana:week,quote:{},targetProteine:80,recuperaTempo:true,preferisciGrassi:true,riferimentoFruttaSecca:40,valuta,accompagnaBene:()=>true,contesto:()=>({kcal:1000,minuti:25,piatti:[rapido],baseAmmessa:()=>true,abbinamentoBaseOk:()=>true}),...mod,...extra});}};}
+test('recupera il tempo complessivo anche con frutta secca entro riferimento',()=>{const c=fixture(),prima=JSON.stringify(c.week),r=c.run();assert.equal(r.settimana[0].pasti[0].piatto.id,'rapido');assert.equal(JSON.stringify(c.week),prima);});
+test('non cambia un pasto gia entro i minuti disponibili',()=>{const c=fixture();c.lento.prep_min=20;c.rapido.protein=100;assert.deepEqual(c.run().settimana,c.week);});
+test('nessun recupero se l alternativa supera il tempo dell intero pasto',()=>{const c=fixture();c.rapido.prep_min=30;assert.deepEqual(c.run().settimana,c.week);});
+for(const tipo of ['bloccato','avanzi'])test('rispetta un pasto '+tipo,()=>{const c=fixture();c.week[0].pasti[0][tipo]=true;assert.deepEqual(c.run().settimana,c.week);});
+test('non modifica la fonte di un avanzo',()=>{const c=fixture();c.week.push({giorno:2,pasti:[row(c.lento,{avanzi:true})]});assert.deepEqual(c.run().settimana,c.week);});
+for(const [nome,cambio]of [['proteine',{proteine:60}],['sale',{sale:6}],['saturi',{saturi:15}],['fibra',{fibra:10}],['grassi',{grassi:60}],['frutta secca',{fruttaSecca:50}],['calorie',{kcal:800,kcalOk:false}]])test('tempo piu breve non sacrifica '+nome,()=>{const c=fixture();assert.deepEqual(c.run({valuta:ps=>({...c.valuta(ps),...(ps[0].piatto.id==='rapido'?cambio:{})})}).settimana,c.week);});
+test('metadati nutrizionali mancanti fermano la sostituzione rapida',()=>{for(const campo of ['proteine','fibra','sale','saturi','grassi','fruttaSecca']){const c=fixture();assert.deepEqual(c.run({valuta:ps=>({...c.valuta(ps),...(ps[0].piatto.id==='rapido'?{[campo]:NaN}:{})})}).settimana,c.week);}});

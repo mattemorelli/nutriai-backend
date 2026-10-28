@@ -2753,9 +2753,17 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true),
       });
       const rifiniti = miglioraIngredienti({...configurazioneIngredienti, settimana:residuiMigliorati.settimana});
-      modelliPasti.settimana = rifiniti.settimana;
-      modelliPasti.usoGruppi = residuiMigliorati.usoGruppi;
-      modelliPasti.modelli = [...new Map([...modelliPasti.modelli,...residuiMigliorati.modelli]
+      const nutrientiMigliorati = opzioni.miglioraNutrienti === false ? rifiniti
+        : miglioraIngredienti({...configurazioneIngredienti, settimana:rifiniti.settimana, miglioraNutrienti:true});
+      const tempiMigliorati = opzioni.recuperaTempo === false
+        ? {settimana:nutrientiMigliorati.settimana,usoGruppi:residuiMigliorati.usoGruppi,modelli:[]}
+        : miglioraModelliPasto({...configurazioneModelli,settimana:nutrientiMigliorati.settimana,
+          recuperaTempo:true,preferisciGrassi:true,ripetizioneQuantita:opz.ripetizione,
+          riferimentoFruttaSecca:riferimentoFruttaSecca(obiettivo),
+          valuta:pasti=>valutaGiornataScalata(pasti,obiettivo,obiettivoProteine,true)});
+      modelliPasti.settimana = tempiMigliorati.settimana;
+      modelliPasti.usoGruppi = tempiMigliorati.usoGruppi;
+      modelliPasti.modelli = [...new Map([...modelliPasti.modelli,...residuiMigliorati.modelli,...tempiMigliorati.modelli]
         .map(m=>[`${m.giorno}:${m.meal}`,m])).values()];
       modelliPasti.settimana.forEach((g, i) => { statoGiorni[i].pastiModello = g.pasti; });
       // Frequenze delle portate proteiche a pranzo E cena, una volta per
