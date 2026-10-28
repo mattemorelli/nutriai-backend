@@ -1,6 +1,6 @@
 const { riepilogoIngredienti } = require('./ingredienti-piano');
 console.log('[server] avviato', new Date().toISOString());
-const { calcolaESalvaTarget, preparaTarget, salvaTarget } = require('./fabbisogno');
+const { calcolaESalvaTarget, preparaTarget, salvaTarget, salvaAggiornamentoFabbisogno } = require('./fabbisogno');
 const { allenamenti, massaGrassa } = require('./validazione-fabbisogno');
 const { generaESalva, risolviSubject, caricaCatalogoPerRisoluzione } = require('./genera');
 const { calibra } = require('./calibra');
@@ -946,10 +946,13 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
     // Anche una modifica della sola altezza puo' rendere inadatto il goal
     // gia' salvato. Letture fallite o dati incompleti non superano il controllo.
     const cambiaTarget = ['goal', 'height_cm', 'birth_year'].some(k => k in aggiornamento);
-    const target = cambiaTarget ? await preparaTarget(supabase, req.utente.id, { profilo: aggiornamento }) : null;
-    const { error } = await supabase.from('users').update(aggiornamento).eq('id', req.utente.id);
-    if (error) throw new Error(error.message);
-    if (target) await salvaTarget(supabase, target);
+    const preparato = cambiaTarget ? await preparaTarget(supabase, req.utente.id, { profilo: aggiornamento, conSnapshot:true }) : null;
+    let target=null;
+    if(preparato)target=await salvaAggiornamentoFabbisogno(supabase,req.utente.id,preparato,{profilo:aggiornamento});
+    else {
+      const {error}=await supabase.from('users').update(aggiornamento).eq('id',req.utente.id);
+      if(error)throw new Error(error.message);
+    }
     res.json({ ok: true, ...(target ? { target } : {}) });
   } catch (e) {
     res.status(e.status || 500).json({ errore: e.message, ...(e.motivo ? { motivo: e.motivo } : {}) });
@@ -1588,20 +1591,11 @@ app.post('/peso', richiedeAuth, async (req, res) => {
     }
 
     const bodyFat = massaGrassa(req.body.body_fat_pct);
-    const target = await preparaTarget(supabase, req.utente.id, { misura: { weight_kg: kg, body_fat_pct: bodyFat } });
-    const oggi = oggiLocale();
-
-    // Una sola pesata al giorno: la seconda sovrascrive la prima.
-    const { error } = await supabase.from('body_measurements').upsert({
-      user_id: req.utente.id,
-      measured_on: oggi,
-      weight_kg: kg,
-      body_fat_pct: bodyFat,
-      source: 'utente',
-    }, { onConflict: 'user_id,measured_on' });
-
-    if (error) return res.status(500).json({ errore: error.message });
-    await salvaTarget(supabase, target);
+    const misura={measured_on:oggiLocale(),weight_kg:kg,body_fat_pct:bodyFat,source:'utente'};
+    const preparato=await preparaTarget(supabase,req.utente.id,{misura:{weight_kg:kg,body_fat_pct:bodyFat},conSnapshot:true});
+    // Misura e target appartengono alla stessa transazione; una richiesta
+    // concorrente viene riconosciuta prima di salvare qualunque modifica.
+    const target=await salvaAggiornamentoFabbisogno(supabase,req.utente.id,preparato,{misura});
     res.json({ ok: true, target });
   } catch (e) {
     res.status(e.status || 500).json({ errore: e.message, ...(e.motivo ? { motivo: e.motivo } : {}) });

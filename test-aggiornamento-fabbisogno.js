@@ -40,6 +40,17 @@ function contesto(percorso, opzioni = {}) {
     }
     return q;
   }};
+  supabase.rpc=async(nome,args)=>{
+    assert.equal(nome,'quadrio_salva_fabbisogno_v1');assert.equal(args.p_user_id,'utente');
+    assert.equal(args.p_target.user_id,'utente');assert.ok(args.p_attese.profilo&&args.p_attese.sport);
+    if(opzioni.erroreRpc)return {error:{code:opzioni.erroreRpc,message:'errore transazione'}};
+    const nuove=structuredClone(dati);
+    Object.assign(nuove.users[0],args.p_profilo);
+    if(args.p_misura)nuove.body_measurements=[{user_id:'utente',...args.p_misura}];
+    nuove.energy_targets.push(args.p_target);
+    for(const k of Object.keys(dati))dati[k]=nuove[k];
+    scritture.push({tabella:'rpc',mutazione:'transazione'});return {data:{ok:true},error:null};
+  };
   let handler;
   const da=sorgente.indexOf(`app.post('${percorso}'`), a=sorgente.indexOf('\n});',da)+5;
   assert.ok(da>=0&&a>da);
@@ -89,4 +100,10 @@ test('profilo: cambio obiettivo ricalcola il target',async()=>{
 for(const tabella of ['users','body_measurements','training_sessions'])for(const route of ['/peso','/profilo'])test(`${route}: errore ${tabella} non salva aggiornamenti`,async()=>{
  const c=contesto(route,{erroreTabella:tabella});const r=await c.chiama(route==='/peso'?{weight_kg:85}:{goal:'massa'});
  assert.equal(r.statusCode,500);assert.equal(c.scritture.length,0);
+});
+
+for(const route of ['/peso','/profilo'])for(const code of ['PT409','40001','XX000'])test(`${route}: errore atomico ${code} non lascia dati parziali`,async()=>{
+ const c=contesto(route,{erroreRpc:code}),prima=structuredClone(c.dati);
+ const r=await c.chiama(route==='/peso'?{weight_kg:85}:{goal:'massa',diet:'vegano'});
+ assert.equal(r.statusCode,code==='XX000'?500:409);assert.deepEqual(c.dati,prima);assert.equal(c.scritture.length,0);
 });

@@ -103,8 +103,8 @@ async function preparaTarget(supabase, userId, modifiche = {}) {
   if (erroreUtente) throw new Error('lettura users: ' + erroreUtente.message);
 
   const { data: misuraLetta, error: erroreMisure } = await supabase
-    .from('body_measurements').select('weight_kg, body_fat_pct')
-    .eq('user_id', userId).order('measured_on', { ascending: false }).limit(1).maybeSingle();
+    .from('body_measurements').select('id, measured_on, weight_kg, body_fat_pct')
+    .eq('user_id', userId).order('measured_on', { ascending: false }).order('id', { ascending: false }).limit(1).maybeSingle();
   if (erroreMisure) throw new Error('lettura body_measurements: ' + erroreMisure.message);
 
   const { data: sessioni, error: erroreAllenamenti } = await supabase
@@ -134,6 +134,7 @@ async function preparaTarget(supabase, userId, modifiche = {}) {
   const haNuoviDati = Boolean(u.occupation_level);
   let tdee, modello, sport = 0;
 
+  let palLetto = null;
   if (haNuoviDati) {
     const neat = NEAT[u.occupation_level];
     sport = kcalAllenamento(sessioniValide, dati.peso);
@@ -144,9 +145,10 @@ async function preparaTarget(supabase, userId, modifiche = {}) {
   } else {
     const { data: att, error: erroreAttivita } = await supabase
       .from('activity_periods').select('pal')
-      .eq('user_id', userId).order('valid_from', { ascending: false }).limit(1).maybeSingle();
+      .eq('user_id', userId).order('valid_from', { ascending: false }).order('id', { ascending: false }).limit(1).maybeSingle();
     if (erroreAttivita) throw new Error('lettura activity_periods: ' + erroreAttivita.message);
     if (att && (!numero(att.pal) || Number(att.pal) <= 0)) throw erroreDati('PAL non valido');
+    palLetto = att ? Number(att.pal) : null;
     const pal = att ? Number(att.pal) : 1.4;
     tdee = Math.round(bmr * pal);
     modello = 'pal_legacy';
@@ -172,7 +174,29 @@ async function preparaTarget(supabase, userId, modifiche = {}) {
     notes: `${modello} | ${metodo} | BMR ${Math.round(bmr)} | sport ${Math.round(sport)} kcal/g | TDEE ${tdee}${rete ? ' | rete ' + rete : ''}`,
   };
 
+  if (modifiche.conSnapshot) {
+    const {data:ultimo,error}=await supabase.from('energy_targets').select('id')
+      .eq('user_id',userId).order('computed_at',{ascending:false}).order('id',{ascending:false}).limit(1).maybeSingle();
+    if(error)throw new Error('lettura energy_targets: '+error.message);
+    const campi=['sex','birth_year','height_cm','goal','occupation_level'];
+    const profilo=Object.fromEntries(campi.map(k=>[k,utenteLetto[k]??null]));
+    const misura=misuraLetta?Object.fromEntries(['id','measured_on','weight_kg','body_fat_pct'].map(k=>[k,misuraLetta[k]??null])):null;
+    const sport=(sessioni||[]).map(r=>({activity:r.activity,minutes_per_week:r.minutes_per_week,intensity:r.intensity}))
+      .sort((a,b)=>a.activity.localeCompare(b.activity)||a.minutes_per_week-b.minutes_per_week||a.intensity.localeCompare(b.intensity));
+    return {target:riga,attese:{profilo,misura,sport,pal:palLetto,target_id:ultimo?.id??null}};
+  }
   return riga;
+}
+
+async function salvaAggiornamentoFabbisogno(supabase,userId,preparato,modifiche={}) {
+  const {error}=await supabase.rpc('quadrio_salva_fabbisogno_v1',{
+    p_user_id:userId,p_attese:preparato.attese,p_profilo:modifiche.profilo||{},p_misura:modifiche.misura||null,p_target:preparato.target,
+  });
+  if(error){
+    if(['PT409','40001'].includes(error.code))throw Object.assign(new Error('I dati sono cambiati. Rileggili e riprova.'),{status:409,motivo:'dati_modificati'});
+    throw new Error('Salvataggio fabbisogno fallito: '+error.message);
+  }
+  return preparato.target;
 }
 
 async function salvaTarget(supabase, riga) {
@@ -185,4 +209,4 @@ async function calcolaESalvaTarget(supabase, userId) {
   return salvaTarget(supabase, await preparaTarget(supabase, userId));
 }
 
-module.exports = { calcolaESalvaTarget, preparaTarget, salvaTarget, calcolaBMR, MET, NEAT };
+module.exports = { calcolaESalvaTarget, preparaTarget, salvaTarget, salvaAggiornamentoFabbisogno, calcolaBMR, MET, NEAT };
