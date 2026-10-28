@@ -18,3 +18,20 @@ test('preferenza facoltativa irrisolta non blocca una categoria valida',async()=
  const c=client([{kind:'non_gradito',severity:'preferibile',subject:'voce locale'},{kind:'allergia',severity:'assoluto',categoria:fixture.categorie_alimenti[0].categoria}]);
  const v=await caricaVincoli(c,ID);assert.equal(v.nonRisolti.length,1);assert.ok(v.foodIdVietati.size>0);
 });
+
+// La pagina Profilo deve permettere di vedere e correggere proprio il
+// vincolo che ha fermato il generatore, anche quando e' oltre la riga 1000.
+test('GET vincoli restituisce tutte le esclusioni con lo stesso lettore del generatore',async()=>{
+ const fs=require('node:fs'),vm=require('node:vm');const source=fs.readFileSync(require.resolve('./server'),'utf8');
+ const a=source.indexOf("app.get('/vincoli',"),b=source.indexOf("app.post('/vincoli',",a);let handler;
+ const c=client(Array.from({length:1001},(_,i)=>({kind:'non_gradito',severity:'preferibile',subject:'preferenza '+i,food_id:id})));
+ const ctx={supabase:c,richiedeAuth:()=>{},...require('./vincoli-verificabili'),app:{get(path,...fns){handler=fns.at(-1);}}};
+ vm.createContext(ctx);vm.runInContext(source.slice(a,b),ctx);let body,status=200;
+ const res={status(n){status=n;return res;},json(d){body=d;}};
+ await handler({utente:{id:ID}},res);assert.equal(status,200);assert.equal(body.length,1001);assert.equal(body[1000].subject,'preferenza 1000');assert.ok(!('food_id' in body[0]));
+ assert.equal(c.pagine.length,2);assert.equal(c.scritture(),0);
+});
+test('errore di lettura dei vincoli non restituisce una lista vuota',async()=>{
+ const c={from(){const q={select:()=>q,eq:()=>q,order:()=>q,range:()=>q,then:(ok,no)=>Promise.resolve({data:null,error:{message:'rete interrotta'}}).then(ok,no)};return q;}};
+ await assert.rejects(require('./vincoli-verificabili').leggiVincoliDichiarati(c,ID),/lettura user_constraints: rete interrotta/);
+});

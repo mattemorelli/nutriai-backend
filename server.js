@@ -1,4 +1,4 @@
-const {preferenzaFacoltativa,erroreVincoliNonVerificabili,verificaVincoli}=require('./vincoli-verificabili');
+const {preferenzaFacoltativa,erroreVincoliNonVerificabili,verificaVincoli,leggiVincoliDichiarati}=require('./vincoli-verificabili');
 const { riepilogoIngredienti } = require('./ingredienti-piano');
 console.log('[server] avviato', new Date().toISOString());
 const { calcolaESalvaTarget, preparaTarget, salvaTarget, salvaAggiornamentoFabbisogno } = require('./fabbisogno');
@@ -969,13 +969,10 @@ app.post('/profilo', richiedeAuth, async (req, res) => {
 // ---------- VINCOLI ALIMENTARI (allergie, cibi esclusi) ----------
 
 app.get('/vincoli', richiedeAuth, async (req, res) => {
-  const { data, error } = await supabase
-    .from('user_constraints')
-    .select('id, kind, subject, severity')
-    .eq('user_id', req.utente.id)
-    .order('declared_at', { ascending: true });
-  if (error) return res.status(500).json({ errore: error.message });
-  res.json(data || []);
+  try{
+    const righe=await leggiVincoliDichiarati(supabase,req.utente.id);
+    res.json(righe.map(({id,kind,subject,severity})=>({id,kind,subject,severity})));
+  }catch(e){res.status(500).json({errore:e.message});}
 });
 
 app.post('/vincoli', richiedeAuth, async (req, res) => {

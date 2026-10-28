@@ -57,9 +57,6 @@
 // Questo file legge zero campi da categorie_alimenti e non ne scrive mai:
 // la separazione vale in entrambe le direzioni, non solo "mai derivare le
 // categorie dai ruoli" ma anche "mai derivare i ruoli dalle categorie".
-require('dotenv').config({ quiet: true });
-const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY);
 
 const SOGLIA_SIGNIFICATIVA = 40;
 
@@ -184,14 +181,13 @@ function ruoloDaNome(nome) {
   return null;
 }
 
-async function costruisciMappaRuoli(supabase) {
+function mappaDaAlimenti(foods) {
   const mappa = new Map();
   const foodIdLegumiSoia = new Set();
 
   // Nessuna lettura da categorie_alimenti: il ruolo si deriva SOLO dal nome,
   // per tutti e sei i ruoli allo stesso modo (vedi nota RUOLO vs CATEGORIA
   // in testa al file).
-  const { data: foods } = await supabase.from('foods').select('id, name, name_it');
   for (const f of foods) {
     const nome = f.name_it || f.name || '';
     const ruolo = ruoloDaNome(nome) || ruoloDaNome(f.name || '');
@@ -202,6 +198,18 @@ async function costruisciMappaRuoli(supabase) {
   }
   const nomeDi = Object.fromEntries(foods.map(f => [f.id, f.name_it || f.name]));
   return { mappa, nomeDi, foodIdLegumiSoia };
+}
+
+// Anche la mappa dei nomi deve leggere tutto il catalogo, oltre la prima pagina.
+async function costruisciMappaRuoli(supabase) {
+  const foods=[];
+  for(let offset=0;;offset+=1000){
+    const {data,error}=await supabase.from('foods').select('id, name, name_it').order('id').range(offset,offset+999);
+    if(error)throw new Error('lettura foods: '+error.message);
+    foods.push(...data);
+    if(data.length<1000)break;
+  }
+  return mappaDaAlimenti(foods);
 }
 
 async function caricaTuttiIPiatti(supabase) {
@@ -239,10 +247,11 @@ async function caricaIngredientiDi(supabase, ids) {
         .range(offset, offset + PAGINA - 1);
       if (error) throw new Error(error.message);
       for (const r of data) {
-        (per[r.dish_id] ||= []).push({
-          food_id: r.food_id, grams: r.grams,
-          proteina: ((r.foods && r.foods.protein_100g) || 0) * (r.grams || 0) / 100,
-        });
+        const grammi=Number(r.grams),proteina=Number(r.foods?.protein_100g);
+        if(r.grams==null||!Number.isFinite(grammi)||grammi<=0||r.foods?.protein_100g==null||!Number.isFinite(proteina)||proteina<0){
+          throw new Error('ingredienti non verificabili per il piatto '+r.dish_id);
+        }
+        (per[r.dish_id] ||= []).push({food_id:r.food_id,grams:grammi,proteina:proteina*grammi/100});
       }
       if (data.length < PAGINA) break;
     }
@@ -257,15 +266,7 @@ const RUOLI_A_PROTEINA = new Set(['proteina_principale', 'latticino']);
 const SOGLIA_PROTEINA_G = 10;
 const QUOTA_PROTEINA = 0.25;
 
-(async () => {
-  console.log('Costruzione mappa food_id -> ruolo...');
-  const { mappa: mappaRuoli, nomeDi, foodIdLegumiSoia } = await costruisciMappaRuoli(supabase);
-  console.log(`Mappa pronta: ${mappaRuoli.size} alimenti classificati.`);
-
-  const piatti = await caricaTuttiIPiatti(supabase);
-  console.log(`Piatti totali: ${piatti.length}`);
-  const ingredientiPer = await caricaIngredientiDi(supabase, piatti.map(p => p.id));
-
+function classificaPiatti(piatti,ingredientiPer,{mappa:mappaRuoli,nomeDi,foodIdLegumiSoia}) {
   const aggiornamenti = [];
   const dubbi = [];
 
@@ -394,8 +395,19 @@ const QUOTA_PROTEINA = 0.25;
     aggiornamenti.push({ id: piatto.id, ruolo_primario: ruoloEffettivo, ruoli_coperti: ruoliCoperti });
   }
 
+  return {aggiornamenti,dubbi};
+}
+
+async function main(){
+  require('dotenv').config({quiet:true});
+  const {createClient}=require('@supabase/supabase-js');
+  const supabase=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_KEY||process.env.SUPABASE_KEY);
+  const mappa=await costruisciMappaRuoli(supabase);
+  const piatti=await caricaTuttiIPiatti(supabase);
+  const ingredientiPer=await caricaIngredientiDi(supabase,piatti.map(p=>p.id));
+  const {aggiornamenti,dubbi}=classificaPiatti(piatti,ingredientiPer,mappa);
   console.log(`\nClassificati automaticamente: ${aggiornamenti.length}`);
-  console.log(`Casi dubbi (NON scritti, restano senza ruolo): ${dubbi.length}`);
+  console.log(`Casi dubbi (NON modificati): ${dubbi.length}`);
   const perTipo = {};
   for (const d of dubbi) perTipo[d.tipo] = (perTipo[d.tipo] || 0) + 1;
   console.log('  per tipo:', perTipo);
@@ -423,4 +435,7 @@ const QUOTA_PROTEINA = 0.25;
     if (scritti % 200 === 0) console.log(`  ...${scritti}/${aggiornamenti.length}`);
   }
   console.log(`Scritti ${scritti} piatti.`);
-})();
+}
+
+module.exports={ruoloDaNome,mappaDaAlimenti,costruisciMappaRuoli,caricaTuttiIPiatti,caricaIngredientiDi,classificaPiatti};
+if(require.main===module)main().catch(e=>{console.error(e.message);process.exitCode=1;});

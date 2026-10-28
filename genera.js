@@ -1,4 +1,4 @@
-const {preferenzaFacoltativa,riferimentoVerificabile,verificaVincoli}=require('./vincoli-verificabili');
+const {preferenzaFacoltativa,riferimentoVerificabile,verificaVincoli,leggiVincoliDichiarati}=require('./vincoli-verificabili');
 const { creaPranzoFlessibile } = require('./pranzo-flessibile');
 const { miglioraIngredienti } = require('./migliora-ingredienti');
 const { fattoreTetto, RIFERIMENTO_FRUTTA_SECCA_G, riferimentoFruttaSecca, bilanciaFruttaSecca, riepilogoFruttaSecca } = require('./quantita-frutta-secca');
@@ -1357,8 +1357,7 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
   // food_id  = un alimento singolo. categoria = un gruppo intero.
   // Un riferimento assoluto mancante, sconosciuto o svuotato ferma la richiesta.
 
-  const vincoli=await paginaTutto((da,a)=>supabase.from('user_constraints')
-    .select('id, kind, subject, severity, food_id, categoria').eq('user_id',userId).order('id').range(da,a));
+  const vincoli=await leggiVincoliDichiarati(supabase,userId);
   const {foodIdsPerCategoria,foodIdsCatalogo}=await caricaRiferimento(supabase);
   verificaVincoli(vincoli,foodIdsCatalogo,foodIdsPerCategoria);
 
@@ -2706,7 +2705,8 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       const configurazioneModelli = {
         settimana: settimanaBase, targetProteine: opzioni.modelliPasto === false ? null : obiettivoProteine,
         quote: QUOTE, accompagnaBene,
-        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true, false),
+        valutaFinale:pasti=>valutaGiornataScalata(pasti,obiettivo,obiettivoProteine,true),
+        valuta: pasti => valutaGiornataScalata(pasti, obiettivo, obiettivoProteine, true),
         contesto: (g, meal) => {
           const gi = g.giorno - 1, st = statoGiorni[gi], ctx = contestoGiorno(gi);
           const limite = meal === 'pranzo' ? st.limiteBasePranzo : st.limiteBase;
@@ -2756,15 +2756,33 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
       const rifiniti = miglioraIngredienti({...configurazioneIngredienti, settimana:residuiMigliorati.settimana});
       const nutrientiMigliorati = opzioni.miglioraNutrienti === false ? rifiniti
         : miglioraIngredienti({...configurazioneIngredienti, settimana:rifiniti.settimana, miglioraNutrienti:true});
-      const tempiMigliorati = opzioni.recuperaTempo === false
+      let tempiMigliorati = opzioni.recuperaTempo === false
         ? {settimana:nutrientiMigliorati.settimana,usoGruppi:residuiMigliorati.usoGruppi,modelli:[]}
         : miglioraModelliPasto({...configurazioneModelli,settimana:nutrientiMigliorati.settimana,
           recuperaTempo:true,preferisciGrassi:true,ripetizioneQuantita:opz.ripetizione,
           riferimentoFruttaSecca:riferimentoFruttaSecca(obiettivo),
           valuta:pasti=>valutaGiornataScalata(pasti,obiettivo,obiettivoProteine,true)});
+      // Un cambio di struttura puo' impedire un recupero nutrizionale che
+      // era invece possibile senza modelli. Confronta solo se resta una
+      // carenza, riusando gli stessi filtri, porzioni e budget limitati.
+      let modelliAlternativi=null;
+      const proteineDi=g=>valutaGiornataScalata(g.pasti,obiettivo,obiettivoProteine,true)?.proteine;
+      if(opzioni.modelliPasto!==false&&obiettivoProteine>0&&tempiMigliorati.settimana.some(g=>proteineDi(g)<obiettivoProteine-1e-7)){
+        const q1=miglioraIngredienti({...configurazioneIngredienti,settimana:settimanaBase});
+        const q2=miglioraIngredienti({...configurazioneIngredienti,settimana:q1.settimana});
+        const riferimento=opzioni.miglioraNutrienti===false?q2:miglioraIngredienti({...configurazioneIngredienti,settimana:q2.settimana,miglioraNutrienti:true});
+        if(tempiMigliorati.settimana.some((g,i)=>proteineDi(g)+1e-7<Math.min(obiettivoProteine,proteineDi(riferimento.settimana[i])))){
+          const protetti=miglioraModelliPasto({...configurazioneModelli,settimana:riferimento.settimana,preferisciGrassi:true,
+            valuta:pasti=>valutaGiornataScalata(pasti,obiettivo,obiettivoProteine,true)});
+          tempiMigliorati=opzioni.recuperaTempo===false?protetti:miglioraModelliPasto({...configurazioneModelli,settimana:protetti.settimana,
+            recuperaTempo:true,preferisciGrassi:true,ripetizioneQuantita:opz.ripetizione,riferimentoFruttaSecca:riferimentoFruttaSecca(obiettivo),
+            valuta:pasti=>valutaGiornataScalata(pasti,obiettivo,obiettivoProteine,true)});
+          modelliAlternativi=[...protetti.modelli,...tempiMigliorati.modelli];
+        }
+      }
       modelliPasti.settimana = tempiMigliorati.settimana;
       modelliPasti.usoGruppi = tempiMigliorati.usoGruppi;
-      modelliPasti.modelli = [...new Map([...modelliPasti.modelli,...residuiMigliorati.modelli,...tempiMigliorati.modelli]
+      modelliPasti.modelli = [...new Map((modelliAlternativi||[...modelliPasti.modelli,...residuiMigliorati.modelli,...tempiMigliorati.modelli])
         .map(m=>[`${m.giorno}:${m.meal}`,m])).values()];
       modelliPasti.settimana.forEach((g, i) => { statoGiorni[i].pastiModello = g.pasti; });
       // Frequenze delle portate proteiche a pranzo E cena, una volta per

@@ -20,7 +20,7 @@ function fixture() {
   const unico = dish('unico', 'primo', 500, 55, [P, A, V], { grams: 350, gruppo: 'legumi', fibre: 18 });
   return { week, unico };
 }
-function esegui({ week, pool, minuti = 35, target = 100, kcal = 1600, quote, meal = 'pranzo' }) {
+function esegui({ week, pool, minuti = 35, target = 100, kcal = 1600, quote, meal = 'pranzo', valutaFinale }) {
   const valuta = pasti => {
     const v = { kcal: 0, proteine: 0, sale: 0, saturi: 0, fibra: 0 };
     for (const { p, f } of adattaGiornata(pasti, kcal, target)) {
@@ -30,7 +30,7 @@ function esegui({ week, pool, minuti = 35, target = 100, kcal = 1600, quote, mea
   };
   const result = miglioraModelliPasto({ settimana: week, targetProteine: target, quote: quote || {
     pesce: { min: 1, max: 3 }, legumi: { min: 0, max: 3 }, carne_bianca: { min: 0, max: 3 },
-  }, accompagnaBene, valuta, contesto: (g, m) => ({ kcal, minuti, piatti: m === meal ? pool : [],
+  }, accompagnaBene, valuta, valutaFinale, contesto: (g, m) => ({ kcal, minuti, piatti: m === meal ? pool : [],
     baseAmmessa: () => true, abbinamentoBaseOk: () => true }) });
   return { ...result, valuta };
 }
@@ -210,4 +210,18 @@ test('ripetizioni legacy non autorizzano un nuovo terzo uso di un altro secondo'
    for(const giorno of [4,5])w.push({giorno,pasti:[row('cena',v,{bloccato:true})]});
  }});
  assert.equal(miglioraModelliPasto(config).settimana[0].pasti[0].piatto.id,'troppa-frutta-secca');
+});
+
+// L'ottimizzatore puo' valutare prima le porzioni senza tutte le rifiniture:
+// la proposta deve proteggere anche le proteine effettivamente salvate.
+for(const proteineFinali of [10,120])test('proteine finali della proposta ricontrollate: '+proteineFinali,()=>{
+ const {week,unico}=fixture();
+ const valutaFinale=pasti=>({kcal:1600,kcalOk:true,proteine:pasti.some(r=>r.piatto.id==='unico')?proteineFinali:60,
+   grassi:40,sale:1,saturi:2,fibra:30,fruttaSecca:0,saleMax:5,satMax:18,fibraMin:25});
+ const r=esegui({week,pool:[unico],valutaFinale});
+ assert.equal(r.modelli.length,proteineFinali<60?0:1);
+ if(proteineFinali<60)assert.deepEqual(r.settimana,week);
+});
+test('valutazione finale incompleta non autorizza un cambio di modello',()=>{
+ const {week,unico}=fixture();const r=esegui({week,pool:[unico],valutaFinale:()=>null});assert.deepEqual(r.settimana,week);assert.equal(r.modelli.length,0);
 });

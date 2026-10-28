@@ -154,7 +154,11 @@ passo('14. Modelli dei pasti e sostituzioni coerenti', () => {
 });
 
 passo('15. Numero spuntini scelto: diete, porzioni e conflitti con piatti bloccati', () => lanciaScript('scripts/verifica-spuntini.js'));
-passo('16. Catalogo di lancio: ingredienti, composizione e ricette legacy', () => lanciaScript('scripts/verifica-catalogo-lancio.js'));
+passo('16. Catalogo di lancio: ingredienti, composizione e ricette legacy', () => {
+  lanciaScript('scripts/verifica-catalogo-lancio.js');
+  lanciaScript('test-ruoli-catalogo.js');
+  lanciaScript('scripts/verifica-ruoli-canonici.js');
+});
 
 passo('17. Modifiche del piano: atomicita, salti, ripristino, spesa e concorrenza reale', () => {
   lanciaScript('test-modifiche-piano.js');

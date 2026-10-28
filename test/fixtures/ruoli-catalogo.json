@@ -1,0 +1,1440 @@
+{
+  "origine": "23 differenze osservate nel catalogo reale il 28 ottobre 2026. Solo dati pubblici, nessun dato utente. Soglie e classificazione esistenti invariati.",
+  "dishes": [
+    {
+      "id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "name": "Lenticchie in umido con verdure",
+      "name_en": "Stewed lentils with vegetables",
+      "meal_slot": "secondo",
+      "ha_amido": false,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "321c9301-ed8a-4417-81c3-1aa7a3bc3601",
+      "name": "Frittata di cavolfiore",
+      "name_en": "Cauliflower frittata",
+      "meal_slot": "secondo",
+      "ha_amido": false,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "name": "Parmigiana di melanzane",
+      "name_en": "Baked aubergine parmigiana",
+      "meal_slot": "secondo",
+      "ha_amido": false,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "4de053b4-3d63-4c45-89e0-9cc193bb1b28",
+      "name": "Patate e fagiolini lessi",
+      "name_en": "Boiled potatoes and green beans",
+      "meal_slot": "contorno",
+      "ha_amido": true,
+      "ha_proteina": false,
+      "ruolo_primario": "base_amidacea",
+      "ruoli_coperti": [
+        "base_amidacea"
+      ]
+    },
+    {
+      "id": "6897442b-0df6-439a-93d2-fffcc45850ce",
+      "name": "Patate in tegame al pomodoro",
+      "name_en": "Pan-stewed potatoes with tomato",
+      "meal_slot": "contorno",
+      "ha_amido": true,
+      "ha_proteina": false,
+      "ruolo_primario": "base_amidacea",
+      "ruoli_coperti": [
+        "base_amidacea"
+      ]
+    },
+    {
+      "id": "6da03221-009a-4e78-a520-127849513f7e",
+      "name": "Melanzane ripiene al forno",
+      "name_en": "Baked stuffed aubergines",
+      "meal_slot": "secondo",
+      "ha_amido": true,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+      "name": "Frittata di patate",
+      "name_en": "Potato frittata",
+      "meal_slot": "secondo",
+      "ha_amido": true,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "717cdd9a-654b-4e7f-a7bc-74215dd84f3f",
+      "name": "Finocchi gratinati al forno",
+      "name_en": "Baked gratin fennel",
+      "meal_slot": "contorno",
+      "ha_amido": false,
+      "ha_proteina": false,
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura"
+      ]
+    },
+    {
+      "id": "756dfc24-796e-43d0-afe2-f6258bae08c1",
+      "name": "Zucca in umido con pomodoro e salvia",
+      "name_en": "Stewed pumpkin with tomato and sage",
+      "meal_slot": "contorno",
+      "ha_amido": false,
+      "ha_proteina": false,
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura"
+      ]
+    },
+    {
+      "id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "name": "Involtini di verza ripieni di riso e fagioli",
+      "name_en": "Savoy cabbage rolls with rice and beans",
+      "meal_slot": "secondo",
+      "ha_amido": true,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "name": "Zucca e ceci in umido",
+      "name_en": "Stewed pumpkin and chickpeas",
+      "meal_slot": "secondo",
+      "ha_amido": false,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "878be54a-1e56-4a00-bc43-cc1691ae550c",
+      "name": "Pane senza glutine tostato con marmellata",
+      "name_en": "Toasted gluten-free bread with jam",
+      "meal_slot": "colazione",
+      "ha_amido": true,
+      "ha_proteina": false,
+      "ruolo_primario": "cereale",
+      "ruoli_coperti": [
+        "cereale"
+      ]
+    },
+    {
+      "id": "a25f97bf-7c9c-4d07-8330-ef0226cac052",
+      "name": "Sformato di zucca",
+      "name_en": "Baked pumpkin sformato",
+      "meal_slot": "secondo",
+      "ha_amido": false,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "name": "Verza e fagioli in umido",
+      "name_en": "Stewed savoy cabbage and beans",
+      "meal_slot": "secondo",
+      "ha_amido": false,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "b1a00001-0000-0000-0000-000000000013",
+      "name": "Pasta integrale con tonno e olive",
+      "name_en": "Whole wheat pasta with tuna and olives",
+      "meal_slot": "primo",
+      "ha_amido": true,
+      "ha_proteina": true,
+      "ruolo_primario": "base_amidacea",
+      "ruoli_coperti": [
+        "proteina_principale",
+        "base_amidacea"
+      ]
+    },
+    {
+      "id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "name": "Ceci e patate in umido",
+      "name_en": "Stewed chickpeas and potatoes",
+      "meal_slot": "secondo",
+      "ha_amido": true,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "b5a00001-0000-0000-0000-000000000012",
+      "name": "Frutta secca mista (mandorle e noci)",
+      "name_en": "Mixed nuts (almonds and walnuts)",
+      "meal_slot": "spuntino",
+      "ha_amido": false,
+      "ha_proteina": false,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "bbde6b6d-af1c-4385-ab79-35858f9cca25",
+      "name": "Polpette di lenticchie in padella",
+      "name_en": "Pan-seared lentil patties",
+      "meal_slot": "secondo",
+      "ha_amido": true,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "c6059f08-b918-4137-9e01-d167c0d66e42",
+      "name": "Macedonia con yogurt di soia",
+      "name_en": "Fruit salad with soy yogurt",
+      "meal_slot": "colazione",
+      "ha_amido": false,
+      "ha_proteina": false,
+      "ruolo_primario": "frutta",
+      "ruoli_coperti": [
+        "frutta",
+        "latticino"
+      ]
+    },
+    {
+      "id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4",
+      "name": "Polpette di ceci",
+      "name_en": "Pan-seared chickpea patties",
+      "meal_slot": "secondo",
+      "ha_amido": true,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "e45adac9-002d-497e-88a9-172e175373e6",
+      "name": "Frittata di broccoli",
+      "name_en": "Broccoli frittata",
+      "meal_slot": "secondo",
+      "ha_amido": false,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    },
+    {
+      "id": "ebd4c848-3fd5-42f1-8fb2-2beeb71f7118",
+      "name": "Cavolfiore gratinato al forno",
+      "name_en": "Baked gratin cauliflower",
+      "meal_slot": "contorno",
+      "ha_amido": false,
+      "ha_proteina": false,
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura"
+      ]
+    },
+    {
+      "id": "f32a0ec0-bd0b-431a-8bcb-850d44a659f7",
+      "name": "Piselli e uova alla romana",
+      "name_en": "Roman-style peas and eggs",
+      "meal_slot": "secondo",
+      "ha_amido": false,
+      "ha_proteina": true,
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ]
+    }
+  ],
+  "foods": [
+    {
+      "id": "169094",
+      "name": "Olives, ripe, canned (small-extra large)",
+      "name_it": "Olive"
+    },
+    {
+      "id": "169230",
+      "name": "Garlic, raw",
+      "name_it": "Aglio"
+    },
+    {
+      "id": "170000",
+      "name": "Onions, raw",
+      "name_it": "Cipolle"
+    },
+    {
+      "id": "170028",
+      "name": "Potatoes, white, flesh and skin, raw",
+      "name_it": "Patate bianche"
+    },
+    {
+      "id": "170379",
+      "name": "Broccoli, raw",
+      "name_it": "Broccoli"
+    },
+    {
+      "id": "170393",
+      "name": "Carrots, raw",
+      "name_it": "Carota"
+    },
+    {
+      "id": "170457",
+      "name": "Tomatoes, red, ripe, raw, year round average",
+      "name_it": "Pomodoro"
+    },
+    {
+      "id": "170845",
+      "name": "Cheese, mozzarella, whole milk",
+      "name_it": "Mozzarella"
+    },
+    {
+      "id": "171413",
+      "name": "Oil, olive, salad or cooking",
+      "name_it": "Olio di oliva"
+    },
+    {
+      "id": "171988",
+      "name": "Fish, tuna, white, canned in water, without salt, drained solids",
+      "name_it": "Tonno in scatola"
+    },
+    {
+      "id": "banana_it",
+      "name": "Banana",
+      "name_it": "Banana"
+    },
+    {
+      "id": "basilico_it",
+      "name": "Basilico fresco",
+      "name_it": "Basilico fresco"
+    },
+    {
+      "id": "cavolfiore_it",
+      "name": "Cauliflower",
+      "name_it": "Cavolfiore"
+    },
+    {
+      "id": "cavolo_verza_it",
+      "name": "Cavolo verza",
+      "name_it": "Cavolo verza"
+    },
+    {
+      "id": "ceci_scatola_sciacquati_it",
+      "name": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, drained, rinsed in tap water",
+      "name_it": "Ceci in scatola, scolati e sciacquati"
+    },
+    {
+      "id": "fagioli_cannellini_it",
+      "name": "Fagioli cannellini",
+      "name_it": "Fagioli cannellini"
+    },
+    {
+      "id": "fagiolini_it",
+      "name": "Fagiolini",
+      "name_it": "Fagiolini"
+    },
+    {
+      "id": "farina_ceci_it",
+      "name": "Chickpea flour",
+      "name_it": "Farina di ceci"
+    },
+    {
+      "id": "finocchi_it",
+      "name": "Finocchi",
+      "name_it": "Finocchi"
+    },
+    {
+      "id": "kiwi_it",
+      "name": "Kiwi",
+      "name_it": "Kiwi"
+    },
+    {
+      "id": "lenticchie_cotte_it",
+      "name": "Lentils, boiled, cooked, without salt",
+      "name_it": "Lenticchie cotte"
+    },
+    {
+      "id": "mandorle_it",
+      "name": "Mandorle",
+      "name_it": "Mandorle"
+    },
+    {
+      "id": "marmellata_it",
+      "name": "Marmellata",
+      "name_it": "Marmellata"
+    },
+    {
+      "id": "mela_it",
+      "name": "Mela con buccia",
+      "name_it": "Mela"
+    },
+    {
+      "id": "melanzana_it",
+      "name": "Aubergine",
+      "name_it": "Melanzane"
+    },
+    {
+      "id": "noci_it",
+      "name": "Noci",
+      "name_it": "Noci"
+    },
+    {
+      "id": "pane_senza_glutine_it",
+      "name": "Gluten-free bread",
+      "name_it": "Pane senza glutine"
+    },
+    {
+      "id": "pangrattato_it",
+      "name": "Pangrattato",
+      "name_it": "Pangrattato"
+    },
+    {
+      "id": "parmigiano_it",
+      "name": "Parmesan",
+      "name_it": "Parmigiano"
+    },
+    {
+      "id": "passata_pomodoro_it",
+      "name": "Passata di pomodoro",
+      "name_it": "Passata di pomodoro"
+    },
+    {
+      "id": "pasta_integrale_it",
+      "name": "Pasta integrale",
+      "name_it": "Pasta integrale"
+    },
+    {
+      "id": "piselli_surgelati_it",
+      "name": "Peas, green, frozen, unprepared",
+      "name_it": "Piselli surgelati"
+    },
+    {
+      "id": "prezzemolo_it",
+      "name": "Prezzemolo",
+      "name_it": "Prezzemolo"
+    },
+    {
+      "id": "riso_integrale_cotto_it",
+      "name": "Rice, brown, long-grain, cooked",
+      "name_it": "Riso integrale cotto"
+    },
+    {
+      "id": "rosmarino_it",
+      "name": "Rosmarino fresco",
+      "name_it": "Rosmarino"
+    },
+    {
+      "id": "salvia_it",
+      "name": "Salvia fresca",
+      "name_it": "Salvia"
+    },
+    {
+      "id": "sedano_it",
+      "name": "Sedano",
+      "name_it": "Sedano"
+    },
+    {
+      "id": "uovo_grande_it",
+      "name": "Uovo",
+      "name_it": "Uovo"
+    },
+    {
+      "id": "uva_it",
+      "name": "Uva",
+      "name_it": "Uva"
+    },
+    {
+      "id": "yogurt_soia_it",
+      "name": "Yogurt di soia",
+      "name_it": "Yogurt di soia"
+    },
+    {
+      "id": "zucca_delicata_it",
+      "name": "Zucca delicata",
+      "name_it": "Zucca delicata"
+    }
+  ],
+  "dish_ingredients": [
+    {
+      "dish_id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "food_id": "170000",
+      "grams": "40",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "food_id": "170393",
+      "grams": "50",
+      "protein_100g": 0.93
+    },
+    {
+      "dish_id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "food_id": "lenticchie_cotte_it",
+      "grams": "300",
+      "protein_100g": 9.02
+    },
+    {
+      "dish_id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "food_id": "passata_pomodoro_it",
+      "grams": "80",
+      "protein_100g": 1.5
+    },
+    {
+      "dish_id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "food_id": "rosmarino_it",
+      "grams": "1",
+      "protein_100g": 3.3
+    },
+    {
+      "dish_id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19",
+      "food_id": "sedano_it",
+      "grams": "40",
+      "protein_100g": 0.7
+    },
+    {
+      "dish_id": "321c9301-ed8a-4417-81c3-1aa7a3bc3601",
+      "food_id": "170000",
+      "grams": "20",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "321c9301-ed8a-4417-81c3-1aa7a3bc3601",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "321c9301-ed8a-4417-81c3-1aa7a3bc3601",
+      "food_id": "cavolfiore_it",
+      "grams": "250",
+      "protein_100g": 1.9
+    },
+    {
+      "dish_id": "321c9301-ed8a-4417-81c3-1aa7a3bc3601",
+      "food_id": "parmigiano_it",
+      "grams": "15",
+      "protein_100g": 33
+    },
+    {
+      "dish_id": "321c9301-ed8a-4417-81c3-1aa7a3bc3601",
+      "food_id": "uovo_grande_it",
+      "grams": "150",
+      "protein_100g": 12.56
+    },
+    {
+      "dish_id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "food_id": "170845",
+      "grams": "80",
+      "protein_100g": 22.17
+    },
+    {
+      "dish_id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "food_id": "171413",
+      "grams": "12",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "food_id": "basilico_it",
+      "grams": "3",
+      "protein_100g": 3.15
+    },
+    {
+      "dish_id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "food_id": "melanzana_it",
+      "grams": "320",
+      "protein_100g": 1
+    },
+    {
+      "dish_id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "food_id": "parmigiano_it",
+      "grams": "10",
+      "protein_100g": 33
+    },
+    {
+      "dish_id": "40780324-d1f0-4803-ab46-b145d6fcaf7b",
+      "food_id": "passata_pomodoro_it",
+      "grams": "150",
+      "protein_100g": 1.5
+    },
+    {
+      "dish_id": "4de053b4-3d63-4c45-89e0-9cc193bb1b28",
+      "food_id": "170028",
+      "grams": "200",
+      "protein_100g": 1.68
+    },
+    {
+      "dish_id": "4de053b4-3d63-4c45-89e0-9cc193bb1b28",
+      "food_id": "171413",
+      "grams": "12",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "4de053b4-3d63-4c45-89e0-9cc193bb1b28",
+      "food_id": "fagiolini_it",
+      "grams": "150",
+      "protein_100g": 1.8
+    },
+    {
+      "dish_id": "6897442b-0df6-439a-93d2-fffcc45850ce",
+      "food_id": "169230",
+      "grams": "5",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "6897442b-0df6-439a-93d2-fffcc45850ce",
+      "food_id": "170028",
+      "grams": "300",
+      "protein_100g": 1.68
+    },
+    {
+      "dish_id": "6897442b-0df6-439a-93d2-fffcc45850ce",
+      "food_id": "170457",
+      "grams": "150",
+      "protein_100g": 0.88
+    },
+    {
+      "dish_id": "6897442b-0df6-439a-93d2-fffcc45850ce",
+      "food_id": "171413",
+      "grams": "12",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "6897442b-0df6-439a-93d2-fffcc45850ce",
+      "food_id": "basilico_it",
+      "grams": "5",
+      "protein_100g": 3.15
+    },
+    {
+      "dish_id": "6da03221-009a-4e78-a520-127849513f7e",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "6da03221-009a-4e78-a520-127849513f7e",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "6da03221-009a-4e78-a520-127849513f7e",
+      "food_id": "basilico_it",
+      "grams": "2",
+      "protein_100g": 3.15
+    },
+    {
+      "dish_id": "6da03221-009a-4e78-a520-127849513f7e",
+      "food_id": "melanzana_it",
+      "grams": "350",
+      "protein_100g": 1
+    },
+    {
+      "dish_id": "6da03221-009a-4e78-a520-127849513f7e",
+      "food_id": "pangrattato_it",
+      "grams": "15",
+      "protein_100g": 12.4
+    },
+    {
+      "dish_id": "6da03221-009a-4e78-a520-127849513f7e",
+      "food_id": "parmigiano_it",
+      "grams": "20",
+      "protein_100g": 33
+    },
+    {
+      "dish_id": "6da03221-009a-4e78-a520-127849513f7e",
+      "food_id": "passata_pomodoro_it",
+      "grams": "80",
+      "protein_100g": 1.5
+    },
+    {
+      "dish_id": "6da03221-009a-4e78-a520-127849513f7e",
+      "food_id": "riso_integrale_cotto_it",
+      "grams": "100",
+      "protein_100g": 2.74
+    },
+    {
+      "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+      "food_id": "170000",
+      "grams": "50",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+      "food_id": "170028",
+      "grams": "250",
+      "protein_100g": 1.68
+    },
+    {
+      "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+      "food_id": "171413",
+      "grams": "12",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+      "food_id": "parmigiano_it",
+      "grams": "10",
+      "protein_100g": 33
+    },
+    {
+      "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+      "food_id": "uovo_grande_it",
+      "grams": "150",
+      "protein_100g": 12.56
+    },
+    {
+      "dish_id": "717cdd9a-654b-4e7f-a7bc-74215dd84f3f",
+      "food_id": "171413",
+      "grams": "8",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "717cdd9a-654b-4e7f-a7bc-74215dd84f3f",
+      "food_id": "finocchi_it",
+      "grams": "300",
+      "protein_100g": 1.2
+    },
+    {
+      "dish_id": "717cdd9a-654b-4e7f-a7bc-74215dd84f3f",
+      "food_id": "pangrattato_it",
+      "grams": "10",
+      "protein_100g": 12.4
+    },
+    {
+      "dish_id": "717cdd9a-654b-4e7f-a7bc-74215dd84f3f",
+      "food_id": "parmigiano_it",
+      "grams": "20",
+      "protein_100g": 33
+    },
+    {
+      "dish_id": "756dfc24-796e-43d0-afe2-f6258bae08c1",
+      "food_id": "169230",
+      "grams": "2",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "756dfc24-796e-43d0-afe2-f6258bae08c1",
+      "food_id": "171413",
+      "grams": "8",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "756dfc24-796e-43d0-afe2-f6258bae08c1",
+      "food_id": "passata_pomodoro_it",
+      "grams": "60",
+      "protein_100g": 1.5
+    },
+    {
+      "dish_id": "756dfc24-796e-43d0-afe2-f6258bae08c1",
+      "food_id": "salvia_it",
+      "grams": "1",
+      "protein_100g": 10.6
+    },
+    {
+      "dish_id": "756dfc24-796e-43d0-afe2-f6258bae08c1",
+      "food_id": "zucca_delicata_it",
+      "grams": "280",
+      "protein_100g": 1
+    },
+    {
+      "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "food_id": "170000",
+      "grams": "40",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "food_id": "170393",
+      "grams": "50",
+      "protein_100g": 0.93
+    },
+    {
+      "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "food_id": "cavolo_verza_it",
+      "grams": "320",
+      "protein_100g": 1.83
+    },
+    {
+      "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "food_id": "fagioli_cannellini_it",
+      "grams": "120",
+      "protein_100g": 9.7
+    },
+    {
+      "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "food_id": "passata_pomodoro_it",
+      "grams": "100",
+      "protein_100g": 1.5
+    },
+    {
+      "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+      "food_id": "riso_integrale_cotto_it",
+      "grams": "150",
+      "protein_100g": 2.74
+    },
+    {
+      "dish_id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "food_id": "170000",
+      "grams": "30",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "food_id": "ceci_scatola_sciacquati_it",
+      "grams": "300",
+      "protein_100g": 7
+    },
+    {
+      "dish_id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "food_id": "passata_pomodoro_it",
+      "grams": "80",
+      "protein_100g": 1.5
+    },
+    {
+      "dish_id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "food_id": "rosmarino_it",
+      "grams": "1",
+      "protein_100g": 3.3
+    },
+    {
+      "dish_id": "83f81c90-18d0-4f32-970f-d754fd7aad08",
+      "food_id": "zucca_delicata_it",
+      "grams": "280",
+      "protein_100g": 1
+    },
+    {
+      "dish_id": "878be54a-1e56-4a00-bc43-cc1691ae550c",
+      "food_id": "marmellata_it",
+      "grams": "20",
+      "protein_100g": 0.4
+    },
+    {
+      "dish_id": "878be54a-1e56-4a00-bc43-cc1691ae550c",
+      "food_id": "pane_senza_glutine_it",
+      "grams": "60",
+      "protein_100g": 3.5
+    },
+    {
+      "dish_id": "a25f97bf-7c9c-4d07-8330-ef0226cac052",
+      "food_id": "171413",
+      "grams": "8",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "a25f97bf-7c9c-4d07-8330-ef0226cac052",
+      "food_id": "pangrattato_it",
+      "grams": "10",
+      "protein_100g": 12.4
+    },
+    {
+      "dish_id": "a25f97bf-7c9c-4d07-8330-ef0226cac052",
+      "food_id": "parmigiano_it",
+      "grams": "20",
+      "protein_100g": 33
+    },
+    {
+      "dish_id": "a25f97bf-7c9c-4d07-8330-ef0226cac052",
+      "food_id": "uovo_grande_it",
+      "grams": "100",
+      "protein_100g": 12.56
+    },
+    {
+      "dish_id": "a25f97bf-7c9c-4d07-8330-ef0226cac052",
+      "food_id": "zucca_delicata_it",
+      "grams": "350",
+      "protein_100g": 1
+    },
+    {
+      "dish_id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "food_id": "170000",
+      "grams": "40",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "food_id": "cavolo_verza_it",
+      "grams": "250",
+      "protein_100g": 1.83
+    },
+    {
+      "dish_id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "food_id": "fagioli_cannellini_it",
+      "grams": "250",
+      "protein_100g": 9.7
+    },
+    {
+      "dish_id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "food_id": "passata_pomodoro_it",
+      "grams": "100",
+      "protein_100g": 1.5
+    },
+    {
+      "dish_id": "ad2810df-f481-42e1-96d6-511df9c18416",
+      "food_id": "salvia_it",
+      "grams": "1",
+      "protein_100g": 10.6
+    },
+    {
+      "dish_id": "b1a00001-0000-0000-0000-000000000013",
+      "food_id": "169094",
+      "grams": "25",
+      "protein_100g": 0.84
+    },
+    {
+      "dish_id": "b1a00001-0000-0000-0000-000000000013",
+      "food_id": "171413",
+      "grams": "15",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "b1a00001-0000-0000-0000-000000000013",
+      "food_id": "171988",
+      "grams": "80",
+      "protein_100g": 23.62
+    },
+    {
+      "dish_id": "b1a00001-0000-0000-0000-000000000013",
+      "food_id": "pasta_integrale_it",
+      "grams": "100",
+      "protein_100g": 13.4
+    },
+    {
+      "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "food_id": "170000",
+      "grams": "40",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "food_id": "170028",
+      "grams": "180",
+      "protein_100g": 1.68
+    },
+    {
+      "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "food_id": "ceci_scatola_sciacquati_it",
+      "grams": "320",
+      "protein_100g": 7
+    },
+    {
+      "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "food_id": "passata_pomodoro_it",
+      "grams": "100",
+      "protein_100g": 1.5
+    },
+    {
+      "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+      "food_id": "rosmarino_it",
+      "grams": "1",
+      "protein_100g": 3.3
+    },
+    {
+      "dish_id": "b5a00001-0000-0000-0000-000000000012",
+      "food_id": "mandorle_it",
+      "grams": "15",
+      "protein_100g": 21.15
+    },
+    {
+      "dish_id": "b5a00001-0000-0000-0000-000000000012",
+      "food_id": "noci_it",
+      "grams": "15",
+      "protein_100g": 15.23
+    },
+    {
+      "dish_id": "bbde6b6d-af1c-4385-ab79-35858f9cca25",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "bbde6b6d-af1c-4385-ab79-35858f9cca25",
+      "food_id": "170000",
+      "grams": "30",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "bbde6b6d-af1c-4385-ab79-35858f9cca25",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "bbde6b6d-af1c-4385-ab79-35858f9cca25",
+      "food_id": "farina_ceci_it",
+      "grams": "35",
+      "protein_100g": 22.39
+    },
+    {
+      "dish_id": "bbde6b6d-af1c-4385-ab79-35858f9cca25",
+      "food_id": "lenticchie_cotte_it",
+      "grams": "280",
+      "protein_100g": 9.02
+    },
+    {
+      "dish_id": "bbde6b6d-af1c-4385-ab79-35858f9cca25",
+      "food_id": "prezzemolo_it",
+      "grams": "2",
+      "protein_100g": 3
+    },
+    {
+      "dish_id": "c6059f08-b918-4137-9e01-d167c0d66e42",
+      "food_id": "banana_it",
+      "grams": "80",
+      "protein_100g": 1.09
+    },
+    {
+      "dish_id": "c6059f08-b918-4137-9e01-d167c0d66e42",
+      "food_id": "kiwi_it",
+      "grams": "80",
+      "protein_100g": 1.14
+    },
+    {
+      "dish_id": "c6059f08-b918-4137-9e01-d167c0d66e42",
+      "food_id": "mela_it",
+      "grams": "80",
+      "protein_100g": 0.26
+    },
+    {
+      "dish_id": "c6059f08-b918-4137-9e01-d167c0d66e42",
+      "food_id": "uva_it",
+      "grams": "60",
+      "protein_100g": 0.72
+    },
+    {
+      "dish_id": "c6059f08-b918-4137-9e01-d167c0d66e42",
+      "food_id": "yogurt_soia_it",
+      "grams": "100",
+      "protein_100g": 3.1
+    },
+    {
+      "dish_id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4",
+      "food_id": "170000",
+      "grams": "30",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4",
+      "food_id": "ceci_scatola_sciacquati_it",
+      "grams": "280",
+      "protein_100g": 7
+    },
+    {
+      "dish_id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4",
+      "food_id": "farina_ceci_it",
+      "grams": "30",
+      "protein_100g": 22.39
+    },
+    {
+      "dish_id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4",
+      "food_id": "prezzemolo_it",
+      "grams": "2",
+      "protein_100g": 3
+    },
+    {
+      "dish_id": "e45adac9-002d-497e-88a9-172e175373e6",
+      "food_id": "169230",
+      "grams": "3",
+      "protein_100g": 6.36
+    },
+    {
+      "dish_id": "e45adac9-002d-497e-88a9-172e175373e6",
+      "food_id": "170379",
+      "grams": "250",
+      "protein_100g": 2.82
+    },
+    {
+      "dish_id": "e45adac9-002d-497e-88a9-172e175373e6",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "e45adac9-002d-497e-88a9-172e175373e6",
+      "food_id": "parmigiano_it",
+      "grams": "15",
+      "protein_100g": 33
+    },
+    {
+      "dish_id": "e45adac9-002d-497e-88a9-172e175373e6",
+      "food_id": "uovo_grande_it",
+      "grams": "150",
+      "protein_100g": 12.56
+    },
+    {
+      "dish_id": "ebd4c848-3fd5-42f1-8fb2-2beeb71f7118",
+      "food_id": "171413",
+      "grams": "8",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "ebd4c848-3fd5-42f1-8fb2-2beeb71f7118",
+      "food_id": "cavolfiore_it",
+      "grams": "300",
+      "protein_100g": 1.9
+    },
+    {
+      "dish_id": "ebd4c848-3fd5-42f1-8fb2-2beeb71f7118",
+      "food_id": "pangrattato_it",
+      "grams": "10",
+      "protein_100g": 12.4
+    },
+    {
+      "dish_id": "ebd4c848-3fd5-42f1-8fb2-2beeb71f7118",
+      "food_id": "parmigiano_it",
+      "grams": "20",
+      "protein_100g": 33
+    },
+    {
+      "dish_id": "f32a0ec0-bd0b-431a-8bcb-850d44a659f7",
+      "food_id": "170000",
+      "grams": "30",
+      "protein_100g": 1.1
+    },
+    {
+      "dish_id": "f32a0ec0-bd0b-431a-8bcb-850d44a659f7",
+      "food_id": "171413",
+      "grams": "10",
+      "protein_100g": 0
+    },
+    {
+      "dish_id": "f32a0ec0-bd0b-431a-8bcb-850d44a659f7",
+      "food_id": "piselli_surgelati_it",
+      "grams": "220",
+      "protein_100g": 5.2
+    },
+    {
+      "dish_id": "f32a0ec0-bd0b-431a-8bcb-850d44a659f7",
+      "food_id": "prezzemolo_it",
+      "grams": "2",
+      "protein_100g": 3
+    },
+    {
+      "dish_id": "f32a0ec0-bd0b-431a-8bcb-850d44a659f7",
+      "food_id": "uovo_grande_it",
+      "grams": "100",
+      "protein_100g": 12.56
+    }
+  ],
+  "attesi": [
+    {
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "condimento",
+        "verdura",
+        "proteina_principale"
+      ],
+      "id": "24da2bba-e00c-45ea-82f1-b9ab5d621a19"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "id": "321c9301-ed8a-4417-81c3-1aa7a3bc3601"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "condimento",
+        "latticino",
+        "verdura"
+      ],
+      "id": "40780324-d1f0-4803-ab46-b145d6fcaf7b"
+    },
+    {
+      "ruolo_primario": "base_amidacea",
+      "ruoli_coperti": [
+        "base_amidacea",
+        "verdura"
+      ],
+      "id": "4de053b4-3d63-4c45-89e0-9cc193bb1b28"
+    },
+    {
+      "ruolo_primario": "base_amidacea",
+      "ruoli_coperti": [
+        "base_amidacea",
+        "verdura"
+      ],
+      "id": "6897442b-0df6-439a-93d2-fffcc45850ce"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "condimento",
+        "verdura",
+        "latticino",
+        "base_amidacea"
+      ],
+      "id": "6da03221-009a-4e78-a520-127849513f7e"
+    },
+    {
+      "ruolo_primario": "base_amidacea",
+      "ruoli_coperti": [
+        "verdura",
+        "base_amidacea",
+        "proteina_principale"
+      ],
+      "id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura",
+        "latticino"
+      ],
+      "id": "717cdd9a-654b-4e7f-a7bc-74215dd84f3f"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "condimento",
+        "verdura"
+      ],
+      "id": "756dfc24-796e-43d0-afe2-f6258bae08c1"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "condimento",
+        "verdura",
+        "proteina_principale",
+        "base_amidacea"
+      ],
+      "id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66"
+    },
+    {
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "condimento",
+        "verdura",
+        "proteina_principale"
+      ],
+      "id": "83f81c90-18d0-4f32-970f-d754fd7aad08"
+    },
+    {
+      "ruolo_primario": "base_amidacea",
+      "ruoli_coperti": [
+        "condimento",
+        "base_amidacea"
+      ],
+      "id": "878be54a-1e56-4a00-bc43-cc1691ae550c"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "latticino",
+        "proteina_principale",
+        "verdura"
+      ],
+      "id": "a25f97bf-7c9c-4d07-8330-ef0226cac052"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "condimento",
+        "verdura",
+        "proteina_principale"
+      ],
+      "id": "ad2810df-f481-42e1-96d6-511df9c18416"
+    },
+    {
+      "ruolo_primario": "base_amidacea",
+      "ruoli_coperti": [
+        "condimento",
+        "proteina_principale",
+        "base_amidacea"
+      ],
+      "id": "b1a00001-0000-0000-0000-000000000013"
+    },
+    {
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "condimento",
+        "verdura",
+        "base_amidacea",
+        "proteina_principale"
+      ],
+      "id": "b29d57e7-db25-4cdf-8329-e275de84c7eb"
+    },
+    {
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "condimento",
+        "proteina_principale"
+      ],
+      "id": "b5a00001-0000-0000-0000-000000000012"
+    },
+    {
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "proteina_principale"
+      ],
+      "id": "bbde6b6d-af1c-4385-ab79-35858f9cca25"
+    },
+    {
+      "ruolo_primario": "latticino",
+      "ruoli_coperti": [
+        "frutta",
+        "latticino"
+      ],
+      "id": "c6059f08-b918-4137-9e01-d167c0d66e42"
+    },
+    {
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "proteina_principale"
+      ],
+      "id": "c860e56f-6d76-4154-b1bd-bcd399ae30f4"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura",
+        "proteina_principale"
+      ],
+      "id": "e45adac9-002d-497e-88a9-172e175373e6"
+    },
+    {
+      "ruolo_primario": "verdura",
+      "ruoli_coperti": [
+        "verdura",
+        "latticino"
+      ],
+      "id": "ebd4c848-3fd5-42f1-8fb2-2beeb71f7118"
+    },
+    {
+      "ruolo_primario": "proteina_principale",
+      "ruoli_coperti": [
+        "proteina_principale"
+      ],
+      "id": "f32a0ec0-bd0b-431a-8bcb-850d44a659f7"
+    }
+  ]
+}

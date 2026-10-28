@@ -74,7 +74,7 @@ function nutrienti(righe) {
   const dopo=await generaESalva(cliente(dieta,35,2400,100),ID,2026,opts);
   await verifica(dopo,dieta);assert.ok(!prima.errore,'Piano di confronto non disponibile');
   const a=nutrienti(prima.righe),b=nutrienti(dopo.righe);
-  for(const [giorno,g]of b)assert.ok(g.protein+(g.n+a.get(giorno).n)*.05+.01>=Math.min(100,a.get(giorno).protein),'Proteine peggiorate');
+  for(const [giorno,g]of b)assert.ok(g.protein+(g.n+a.get(giorno).n)*.05+.01>=Math.min(100,a.get(giorno).protein),`Proteine peggiorate: ${dieta}, giorno ${giorno}, ${a.get(giorno).protein} -> ${g.protein}`);
   const frequenze=p=>{
    const chiavi=new Set(),usi={};
    for(const r of p.righe){const d=perId.get(r.dish_id);if(!['pranzo','cena'].includes(r.meal)||!d.gruppo||!(d.ruoli_coperti||[]).includes('proteina_principale'))continue;

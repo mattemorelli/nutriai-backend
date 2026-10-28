@@ -35,7 +35,7 @@ function ripetizioniSecondi(settimana) {
 // Ottimizzazione locale sulla settimana gia' costruita. La ricerca
 // principale rimane disponibile come risultato quando non c'e' un modello
 // migliore. Nessuna ricetta viene modificata e nessun nuovo spuntino aggiunto.
-function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quote, accompagnaBene, preferisciGrassi = false, riferimentoFruttaSecca = null, ripetizioneQuantita = false, recuperaTempo = false }) {
+function miglioraModelliPasto({ settimana, contesto, valuta, valutaFinale, targetProteine, quote, accompagnaBene, preferisciGrassi = false, riferimentoFruttaSecca = null, ripetizioneQuantita = false, recuperaTempo = false }) {
   const nuova = settimana.map(g => ({ ...g, pasti: g.pasti.slice() }));
   const gruppiPrima = contaGruppi(settimana);
   const modelli = [];
@@ -61,6 +61,8 @@ function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quo
     if (!precedenti.length || precedenti.some(p => p.bloccato || p.avanzi || resti.has(p.piatto.id))) continue;
     const altri = g.pasti.filter(p => p.meal !== meal);
     const base = valuta(g.pasti);
+    const finalePrima=valutaFinale?.(g.pasti);
+    if(valutaFinale&&!completo(finalePrima))continue;
     if (!base || (recuperaTempo && !completo(base))) continue;
     const quantitaAttiva = Number.isFinite(riferimentoFruttaSecca);
     if (quantitaAttiva && (!Number.isFinite(base.fruttaSecca) || !Number.isFinite(base.grassi) || base.fruttaSecca <= riferimentoFruttaSecca+.5 && !recuperaTempo)) continue;
@@ -117,6 +119,9 @@ function miglioraModelliPasto({ settimana, contesto, valuta, targetProteine, quo
       if (v.saturi / v.satMax > Math.max(1, base.saturi / base.satMax) + EPS) return;
       if (v.fibra + EPS < Math.min(base.fibra, v.fibraMin)) return;
       if (recuperaTempo && v.fibra/v.fibraMin+EPS<Math.min(1,base.fibra/base.fibraMin)) return;
+      // La prima valutazione puo' escludere il bilanciamento di grassi o
+      // quantita'; la decisione non puo' perdere proteine al salvataggio.
+      if(valutaFinale){const finale=valutaFinale(pasti);if(!completo(finale)||!finale.kcalOk||finale.proteine+EPS<Math.min(targetProteine,finalePrima.proteine))return;}
       const settimanaProposta = nuova.map(d => d === g ? { ...g, pasti } : d);
       if (quantitaAttiva && ripetizioneQuantita && ripetizioniSecondi(settimanaProposta).length>maxRipetizioni) return;
       if (quantitaAttiva && ripetizioneQuantita && [...contaUsi(settimanaProposta)].some(([id,n])=>n>Math.max(2,usiPrima.get(id)||0))) return;
