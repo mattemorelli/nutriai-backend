@@ -18,7 +18,7 @@ function contesto(opzioni = {}) {
     user_cuisine_preferences: [], dish_ingredients: [], dishes: piatti };
   opzioni.modifica?.(dataset, piatti);
   let scritture = 0;
-  const supabase = { rpc: async (nome, args) => {if(opzioni.erroreRpc)return {data:null,error:opzioni.erroreRpc};assert.equal(nome,'quadrio_modifica_piano_v1');scritture++;for(const m of args.p_modifiche)Object.assign(dataset.plan_items.find(r=>r.id===m.id),m.patch);return {data:{ok:true},error:null};}, from(tabella) {
+  const supabase = { rpc: async (nome, args) => {if(nome==='quadrio_contesto_generazione_v1')return {data:{versione:'1'},error:opzioni.erroreContestoRpc||null};assert.deepEqual(args.p_contesto,{versione:'1'});if(opzioni.erroreRpc)return {data:null,error:opzioni.erroreRpc};assert.equal(nome,'quadrio_modifica_piano_v2');scritture++;for(const m of args.p_modifiche)Object.assign(dataset.plan_items.find(r=>r.id===m.id),m.patch);return {data:{ok:true,righe_modificate:args.p_modifiche.length},error:null};}, from(tabella) {
     assert.ok(Object.hasOwn(dataset, tabella));
     const filtri = [];
     const dati = () => dataset[tabella].filter(r => filtri.every(f => f(r)));
@@ -139,3 +139,20 @@ for(const [nome,campo,alto]of [['frutta secca','grammiFruttaSecca',80],['grassi'
  const c=conDueGiorni({modifica:(d,ps)=>{ps[0][campo]=alto;ps[2][campo]=0;}});const prima=JSON.stringify(c.dataset.plan_items);
  await assert.rejects(c.api.spostaGiorno(c.supabase,'utente','riga',2),e=>e.code==='spostamento_non_compatibile');assert.equal(c.scritture(),0);assert.equal(JSON.stringify(c.dataset.plan_items),prima);
 });
+
+for(const [nome,esegui] of [
+ ['sostituzione',c=>c.api.applicaSostituzione(c.supabase,'utente','riga','altro-unico',350)],
+ ['spostamento',c=>c.api.spostaGiorno(c.supabase,'utente','riga',2)],
+ ['salto',c=>c.api.saltaPasto(c.supabase,'utente','riga')],
+ ['ripristino',c=>c.api.saltaPasto(c.supabase,'utente','riga',true)],
+]) {
+ test(nome+': contesto illeggibile ferma la modifica',async()=>{
+  const c=conDueGiorni({erroreContestoRpc:{message:'rete interrotta'}});if(nome==='ripristino')c.dataset.plan_items[0].stato='saltato';if(nome==='sostituzione')c.dataset.dish_ingredients.push({dish_id:'altro-unico',grams:350,foods:{kcal_100g:500/3.5,protein_100g:40/3.5,fibre_100g:6/3.5,sat_fat_100g:2/3.5,salt_100g:1/3.5}});const prima=JSON.stringify(c.dataset.plan_items);
+  await assert.rejects(esegui(c),/lettura contesto/);assert.equal(c.scritture(),0);assert.equal(JSON.stringify(c.dataset.plan_items),prima);
+ });
+ test(nome+': nuove scelte impediscono una scrittura basata sul vecchio profilo',async()=>{
+  const c=conDueGiorni({erroreRpc:{code:'PT412',message:'contesto cambiato'}});if(nome==='ripristino')c.dataset.plan_items[0].stato='saltato';if(nome==='sostituzione')c.dataset.dish_ingredients.push({dish_id:'altro-unico',grams:350,foods:{kcal_100g:500/3.5,protein_100g:40/3.5,fibre_100g:6/3.5,sat_fat_100g:2/3.5,salt_100g:1/3.5}});const prima=JSON.stringify(c.dataset.plan_items);
+  await assert.rejects(esegui(c),e=>e.code==='scelte_modificate'&&e.status===409);assert.equal(c.scritture(),0);
+  assert.equal(JSON.stringify(c.dataset.plan_items),prima);
+ });
+}

@@ -1,3 +1,4 @@
+const {cambiaBlocco}=require('./blocca-piano');
 const {preferenzaFacoltativa,erroreVincoliNonVerificabili,verificaVincoli,leggiVincoliDichiarati}=require('./vincoli-verificabili');
 const { riepilogoIngredienti } = require('./ingredienti-piano');
 console.log('[server] avviato', new Date().toISOString());
@@ -1509,47 +1510,8 @@ app.get('/insegne', richiedeAuth, async (req, res) => {
 app.post('/blocca', richiedeAuth, async (req, res) => {
   try {
     if (!(await isPro(req.utente.id))) return rispondiServePro(res, 'piatto_tenuto');
-
-    const { plan_item_id, bloccato, day_of_week } = req.body || {};
-
-    if (day_of_week) {
-      // blocca l'intera giornata
-      const { data: piano, error: ePiano } = await supabase
-        .from('plans').select('id')
-        .eq('user_id', req.utente.id)
-        .order('generated_at', { ascending: false }).limit(1).maybeSingle();
-
-      if (ePiano) return res.status(500).json({ errore: 'lettura plans: ' + ePiano.message });
-      if (!piano) return res.status(404).json({ errore: 'Nessun piano da bloccare' });
-
-      const { error } = await supabase
-        .from('plan_items')
-        .update({ bloccato: Boolean(bloccato) })
-        .eq('plan_id', piano.id)
-        .eq('day_of_week', day_of_week);
-
-      if (error) return res.status(500).json({ errore: error.message });
-      return res.json({ ok: true });
-    }
-
-    const { data: riga, error: eRiga } = await supabase
-      .from('plan_items')
-      .select('id, plans!inner(user_id)')
-      .eq('id', plan_item_id).maybeSingle();
-
-    if (eRiga) return res.status(500).json({ errore: 'lettura plan_items: ' + eRiga.message });
-    if (!riga || riga.plans.user_id !== req.utente.id) {
-      return res.status(403).json({ errore: 'Non autorizzato' });
-    }
-
-    const { error } = await supabase
-      .from('plan_items').update({ bloccato: Boolean(bloccato) }).eq('id', plan_item_id);
-
-    if (error) return res.status(500).json({ errore: error.message });
-    res.json({ ok: true });
-  } catch (e) {
-    res.status(500).json({ errore: e.message });
-  }
+    res.json(await cambiaBlocco(supabase,req.utente.id,req.body||{}));
+  }catch(e){res.status(e.status||500).json({errore:e.code||e.message,messaggio:e.message});}
 });
 
 // Peso attuale e andamento delle ultime settimane, per la carta compatta

@@ -1,3 +1,4 @@
+const {caricaContestoGenerazione:caricaContestoModifiche}=require('./salvataggio-generazione');
 const { preservaQuantitaGiornaliere } = require('./quantita-modifiche');
 const { contaGruppi, preservaRuoliDelPasto } = require('./modelli-pasto');
 const { ammessoNelContesto, giornataPreservata, tempoPastoPreservato } = require('./vincoli-swap');
@@ -30,15 +31,19 @@ function verificaModificabile(item, righe, { salto = false } = {}) {
     throw errorePiano('avanzi_collegati', 'This dish is linked to leftovers. Change those meals first.');
   }
 }
-async function salvaModifiche(supabase, userId, planId, attese, modifiche) {
-  const { error } = await supabase.rpc('quadrio_modifica_piano_v1', {
-    p_user_id: userId, p_plan_id: planId, p_attese: attese, p_modifiche: modifiche,
+async function salvaModifiche(supabase, userId, planId, attese, modifiche, contesto) {
+  if(!contesto||typeof contesto.versione!=='string'||!/^\d+$/.test(contesto.versione))throw errorePiano('contesto_modifica_mancante','Your choices could not be checked. Refresh the week and try again.',409);
+  const { data,error } = await supabase.rpc('quadrio_modifica_piano_v2', {
+    p_user_id: userId, p_plan_id: planId, p_attese: attese, p_modifiche: modifiche, p_contesto:contesto,
   });
   if (error) {
-    if (error.code === '40001' || error.code === 'PT409') throw errorePiano('piano_modificato', 'The plan changed while you were editing. Refresh it and try again.', 409);
+    if(error.code==='PT412')throw errorePiano('scelte_modificate','Your profile or choices changed. Refresh the week and try again.',409);
+    if(['57014','55P03'].includes(error.code))throw errorePiano('salvataggio_generazione_temporaneo','Saving is taking too long. Try again.',503);
+    if (error.code === '40001' || error.code === '40P01' || error.code === 'PT409') throw errorePiano('piano_modificato', 'The plan changed while you were editing. Refresh it and try again.', 409);
     if (error.code === '42501') throw errorePiano('non_autorizzato', 'You cannot edit this plan.', 403);
     throw new Error('salvataggio piano: ' + error.message);
   }
+  if(!data?.ok||data.righe_modificate!==modifiche.length)throw new Error('salvataggio piano non confermato');
 }
 function gruppiDi(righe, perId) {
   return contaGruppi(Array.from({ length: 7 }, (_, i) => ({
@@ -87,4 +92,4 @@ function riepilogoNutrizionale(righe, target) {
     return {giorno:i+1,previsto:somma(giorno),incluso:tot,piatti_saltati:giorno.length-incluse.length,avvisi};
   });
 }
-module.exports={preservaQuantitaGiornaliere,origineAvanzo,leggiRighePiano,salvaModifiche,errorePiano,verificaModificabile,puoScambiare,settimanaPreservata,riepilogoNutrizionale};
+module.exports={caricaContestoModifiche,preservaQuantitaGiornaliere,origineAvanzo,leggiRighePiano,salvaModifiche,errorePiano,verificaModificabile,puoScambiare,settimanaPreservata,riepilogoNutrizionale};

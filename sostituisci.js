@@ -1,5 +1,5 @@
 const { caricaPiatti, caricaPiattiPerId, FAMIGLIE_PER_CUCINA, GENERICI, caricaVincoli, caricaEsiti, accompagnaBene, sostitutoSenzaGlutineNonRichiesto, limitiDi, QUOTE } = require('./genera');
-const { preservaQuantitaGiornaliere, origineAvanzo, leggiRighePiano, salvaModifiche, errorePiano, verificaModificabile, puoScambiare, settimanaPreservata } = require('./modifiche-piano');
+const { preservaQuantitaGiornaliere, origineAvanzo, leggiRighePiano, salvaModifiche, caricaContestoModifiche, errorePiano, verificaModificabile, puoScambiare, settimanaPreservata } = require('./modifiche-piano');
 const { preservaRuoliDelPasto } = require('./modelli-pasto');
 const { tempoDi, limiteTempo, ammessoNelContesto, tempoPastoPreservato, porzioneProposta, validaPorzione, giornataPreservata, nutrientiPorzione } = require('./vincoli-swap');
 
@@ -167,6 +167,7 @@ async function trovaProposte(supabase, userId, itemId) {
 
 // Applica la sostituzione scelta dall'utente, ricalcolando i valori nutrizionali.
 async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portionG) {
+  const contesto=await caricaContestoModifiche(supabase,userId);
   const { item, profilo, gemelliDishIds, kcalTarget, target, righeGiornata, righePiano } = await proposte(supabase, userId, itemId);
 
   verificaModificabile(item, righePiano);
@@ -247,7 +248,7 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
       stato: 'sostituito',
       sostituito_da_dish_id: item.dish_id,
       modificato_il: new Date().toISOString(),
-    }}]);
+    }}],contesto);
 
   return { ok: true, item_id: itemId, nuovo_dish_id: nuovoDishId };
 }
@@ -255,6 +256,7 @@ async function applicaSostituzione(supabase, userId, itemId, nuovoDishId, portio
 // Scambia questa riga con quella dello stesso pasto/slot in un altro giorno.
 async function spostaGiorno(supabase, userId, itemId, giornoDestinazione) {
   if (!Number.isInteger(giornoDestinazione)||giornoDestinazione<1||giornoDestinazione>7) throw errorePiano('giorno_non_valido','Choose a day from Monday to Sunday.',400);
+  const contesto=await caricaContestoModifiche(supabase,userId);
   const {item,profilo,target,righePiano} = await proposte(supabase,userId,itemId);
   if (giornoDestinazione===item.day_of_week) throw errorePiano('stesso_giorno','This dish is already on that day.',400);
   verificaModificabile(item,righePiano);
@@ -275,13 +277,14 @@ async function spostaGiorno(supabase, userId, itemId, giornoDestinazione) {
   await salvaModifiche(supabase,userId,item.plan_id,righePiano,[
     {id:item.id,patch:{day_of_week:giornoDestinazione,stato:'spostato',spostato_da_giorno:item.day_of_week,modificato_il:ora}},
     {id:gemella.id,patch:{day_of_week:item.day_of_week,stato:'spostato',spostato_da_giorno:giornoDestinazione,modificato_il:ora}},
-  ]);
+  ],contesto);
   return {ok:true,scambiato:true,con_item:gemella.id};
 }
 
 // Il salto e' una scelta esplicita: non gonfia automaticamente gli altri
 // pasti. La rilettura del piano mostra i totali e gli avvisi aggiornati.
 async function saltaPasto(supabase,userId,itemId,annulla=false){
+  const contesto=await caricaContestoModifiche(supabase,userId);
   const {item,profilo,righePiano}=await proposte(supabase,userId,itemId);
   if(annulla ? item.stato!=='saltato' : item.stato==='saltato')return {ok:true,item_id:itemId,stato:item.stato};
   verificaModificabile(item,righePiano,{salto:true});
@@ -308,7 +311,7 @@ async function saltaPasto(supabase,userId,itemId,annulla=false){
     const minuti=pasto.every(r=>perId.has(r.dish_id))?pasto.reduce((s,r)=>s+(r.avanzi?0:tempoDi(perId.get(r.dish_id))),0):null;
     patch={stato:'saltato',modificato_il:new Date().toISOString(),ripristino_salto:{stato:item.stato||'previsto',modificato_il:item.modificato_il??null,minuti_pasto:minuti}};
   }
-  await salvaModifiche(supabase,userId,item.plan_id,righePiano,[{id:item.id,patch}]);
+  await salvaModifiche(supabase,userId,item.plan_id,righePiano,[{id:item.id,patch}],contesto);
   return {ok:true,item_id:itemId,stato:patch.stato};
 }
 

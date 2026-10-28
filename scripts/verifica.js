@@ -162,6 +162,7 @@ passo('16. Catalogo di lancio: ingredienti, composizione e ricette legacy', () =
 
 passo('17. Modifiche del piano: atomicita, salti, ripristino, spesa e concorrenza reale', () => {
   lanciaScript('test-modifiche-piano.js');
+  lanciaScript('test-blocca-piano.js');
   lanciaScript('test-spesa-modifiche.js');
   lanciaScript('scripts/verifica-modifiche-piano-db.js');
 });
