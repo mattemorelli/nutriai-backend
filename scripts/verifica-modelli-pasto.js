@@ -58,6 +58,7 @@ function nutrienti(righe) {
   }
   for(const b of bloccati)assert.ok(p.righe.some(r=>r.day_of_week===b.day_of_week&&r.meal===b.meal&&r.slot===b.slot&&r.dish_id===b.dish_id&&r.bloccato),'Piatto bloccato perso');
   for(const [giorno,g]of nutrienti(p.righe))assert.ok(Math.abs(g.kcal-2400)<=240+g.n*.5,'Calorie fuori target');
+  for(let g=1;g<=7;g++)for(const meal of ['pranzo','cena'])assert.ok(p.righe.filter(r=>r.day_of_week===g&&r.meal===meal&&perId.get(r.dish_id).amidoReale).length<=1,'Due basi amidacee nello stesso pasto');
   for(const m of p.modelli_pasti||[]){
    const ps=p.righe.filter(r=>r.day_of_week===m.giorno&&r.meal===m.meal).map(r=>perId.get(r.dish_id));
    assert.ok(ps.every(d=>Array.isArray(d.ruoli_coperti)&&d.ruoli_coperti.length),'Ricetta con composizione non definita nel nuovo modello');

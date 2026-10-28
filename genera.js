@@ -1,3 +1,4 @@
+const { creaPranzoFlessibile } = require('./pranzo-flessibile');
 const { miglioraIngredienti } = require('./migliora-ingredienti');
 const { fattoreTetto, RIFERIMENTO_FRUTTA_SECCA_G, riferimentoFruttaSecca, bilanciaFruttaSecca, riepilogoFruttaSecca } = require('./quantita-frutta-secca');
 const { riepilogoIngredienti } = require('./ingredienti-piano');
@@ -1320,7 +1321,11 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
   }
 
   const nPrimi = contaDisponibili(primi, false);
-  if (nPrimi < 7) return { ok: false, messaggio: `servono 7 primi distinti, ne ha ${nPrimi}` };
+  // Il recupero puo' costruire il pranzo anche con un secondo: il conto
+  // resta ottimistico, senza imporre sette primi a una struttura che non li usa.
+  if (!opz.pranzoFlessibile && nPrimi < 7) return { ok: false, messaggio: `servono 7 primi distinti, ne ha ${nPrimi}` };
+  const nPrincipaliPranzo = nPrimi + nSecondi;
+  if (opz.pranzoFlessibile && nPrincipaliPranzo < 7) return { ok: false, messaggio: `servono 7 principali distinti a pranzo, ne ha ${nPrincipaliPranzo}` };
 
   const nContorni = contaDisponibili(contorni, false);
   if (nContorni < 14) return { ok: false, messaggio: `servono almeno 14 contorni distinti (cena+pranzo), ne ha ${nContorni}` };
@@ -2157,6 +2162,11 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         return concatenaLivelli([proprio, generico, neutro], rng, compagniDiPasto(gi, 'pranzo'));
       }
 
+      const { candidatiPrincipalePranzo, assegnaPrincipalePranzo } = creaPranzoFlessibile({
+        statoGiorni, candidatiPrimo, candidatiSecondo, assegnaSlot, assegnaSecondoPranzoScelto,
+        capacitaEnergetica: numeroSpuntini === 0 ? s => s.piatto.kcal * limitiDi({slot:s.slot,piatto:s.piatto},obiettivo)[1] : null,
+      });
+
       function candidatiContorno(gi, ruolo, profiloGiorno, paeseGiorno, paeseOk, limiteOggi, piattoAbbinato, altroContorno) {
         const g = gi + 1;
         const trasportabileSeServe = ruolo === 'pranzo' ? (c) => (!pranzoFuoriIl(g) || c.trasportabile) : () => true;
@@ -2433,9 +2443,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
         const pronti = [];
         if (st.richiedeSecondoPranzo && st.secondoPranzo === undefined) pronti.push(['secondoPranzo', () => candidatiSecondo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteBasePranzo, 'pranzo')]);
-        if (st.primo === undefined) pronti.push(['primo', () => candidatiPrimo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteBasePranzo)]);
+        if (st.primo === undefined) {
+          if (opz.pranzoFlessibile && !st.richiedeSecondoPranzo) pronti.push(['principalePranzo', () => candidatiPrincipalePranzo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteBasePranzo)]);
+          else pronti.push(['primo', () => candidatiPrimo(gi, profiloGiorno, paeseGiorno, genericoOggi, paeseOk, limiteBasePranzo)]);
+        }
         if (st.contornoCena === undefined) pronti.push(['contornoCena', () => candidatiContorno(gi, 'cena', profiloGiorno, paeseGiorno, paeseOk, limiteOggi, st.secondo || st.primoCena, st.contornoPranzo)]);
-        if (st.primo !== undefined && st.contornoPranzo === undefined) pronti.push(['contornoPranzo', () => candidatiContorno(gi, 'pranzo', profiloGiorno, paeseGiorno, paeseOk, limiteBasePranzo, st.primo || st.secondoPranzo, st.contornoCena)]);
+        if ((st.primo || st.secondoPranzo) && st.contornoPranzo === undefined) pronti.push(['contornoPranzo', () => candidatiContorno(gi, 'pranzo', profiloGiorno, paeseGiorno, paeseOk, limiteBasePranzo, st.primo || st.secondoPranzo, st.contornoCena)]);
         if (st.colazione === undefined) pronti.push(['colazione', () => candidatiColazione(gi, profiloGiorno, paeseOkLeggero, cappaColazione)]);
         if (st.spuntino === undefined) pronti.push(['spuntino', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino2, cappaSpuntino)]);
         if (st.spuntino2 === undefined) pronti.push(['spuntino2', () => candidatiSpuntino(gi, profiloGiorno, paeseOkLeggero, st.spuntino, cappaSpuntino)]);
@@ -2443,7 +2456,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         if (numeroSpuntini === 3 && st.spuntino3 === undefined && st.spuntino !== undefined && st.spuntino2 !== undefined) pronti.push(['spuntino3', () => candidatiSpuntino3(gi, profiloGiorno, paeseOkLeggero, cappaSpuntino)]);
         if (st.contornoCena !== undefined && st.base === undefined) {
           const principaleCena = st.secondo || st.primoCena;
-          const cenaHaAmido = principaleCena?.amidoReale || (st.contornoCena && st.contornoCena.amidoReale);
+          const cenaHaAmido = st.secondo?.amidoReale || st.primoCena?.amidoReale || st.contornoCena?.amidoReale;
           if (!cenaHaAmido) pronti.push(['base', () => candidatiBase(gi, paeseOk, tipiAccompagnamentoDaSecondo(principaleCena))]);
           else st.base = null;
         }
@@ -2458,6 +2471,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         }
 
         const applicaPerSlot = {
+          principalePranzo: (p) => assegnaPrincipalePranzo(gi, p),
           secondoPranzo: (p) => assegnaSecondoPranzoScelto(gi, p),
           primo: (p) => assegnaSlot(gi, 'primo', p),
           contornoCena: (p) => assegnaSlot(gi, 'contornoCena', p),
@@ -2517,6 +2531,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
         const st = statoGiorni[gi];
         const ctx = contestoGiorno(gi);
         const prova = (nomeSlot, candidati, applica) => {
+          // Il frame gia' attivo esplorera' le alternative al ritorno indietro:
+          // annidarne un altro qui farebbe oscillare lo stesso recupero.
+          if (opz.pranzoFlessibile && pila.some(f => f.giorno === gi + 1 && f.nomeSlot === nomeSlot)) return false;
           if (!candidati.length) return false;
           const frame = creaFrame(ctx.g, nomeSlot, candidati, applica);
           pila.push(frame);
@@ -2527,6 +2544,25 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           const val = valutaGiornataScalata(pastiDi(gi), obiettivo, obiettivoProteine);
           return val && val.kcal < obiettivo && !val.kcalOk;
         };
+
+        // Una portata bloccata che gia' copre verdura rende il contorno
+        // facoltativo (null), ma non deve impedire di aggiungerlo quando
+        // le porzioni massime delle altre portate non coprono l'energia.
+        if (opz.pranzoFlessibile) {
+          const opzionali = [
+            ['contornoPranzo', 'pranzo', st.primo || st.secondoPranzo, st.contornoCena, st.limiteBasePranzo],
+            ['contornoCena', 'cena', st.secondo || st.primoCena, st.contornoPranzo, st.limiteBase],
+          ];
+          for (const [nome, meal, principale, altro, limite] of opzionali) {
+            if (!ancoraCorto()) return;
+            if (st[nome] !== null || !principale) continue;
+            const candidati = candidatiContorno(gi, meal, ctx.profiloGiorno, st.paeseGiorno, ctx.paeseOk, limite, principale, altro);
+            prova(nome + 'Extra', candidati, p => {
+              const annulla = assegnaSlot(gi, nome, p);
+              return () => { annulla(); st[nome] = null; };
+            });
+          }
+        }
 
         if (!ancoraCorto()) return;
         if (st.basePranzo === undefined) {
@@ -2571,6 +2607,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
           return val && !val.proteinOk;
         };
         const prova = (nomeSlot, candidati, applica) => {
+          // Il frame gia' attivo esplorera' le alternative al ritorno indietro:
+          // annidarne un altro qui farebbe oscillare lo stesso recupero.
+          if (opz.pranzoFlessibile && pila.some(f => f.giorno === gi + 1 && f.nomeSlot === nomeSlot)) return false;
           if (!candidati.length) return false;
           const frame = creaFrame(gi + 1, nomeSlot, candidati, applica);
           pila.push(frame);
@@ -2966,6 +3005,18 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
     } else {
       console.log(`[scala] ultimo gradino ${gradinoFinale.gradino}, tentativo ${tentativo + 1}/3 (soglia ${gradinoFinale.soglia}, senza tetto di tempo): esaurito per tutti i profili - ${r.diagnosticaProfili.join(' | ') || 'nessun profilo'}`);
       diagnosticaCompleta.push(`gradino ${gradinoFinale.gradino} (soglia ${gradinoFinale.soglia}): ${r.diagnosticaProfili.join(', ') || 'nessun profilo'}`);
+    }
+  }
+
+  // Recupero strutturale soltanto dopo il percorso storico: una settimana
+  // gia' riuscita conserva esattamente le stesse scelte e lo stesso seed.
+  if (!esito && (haVincoloGlutine || Object.keys(bloccatiPerGiorno).length > 0 || [1, 2, 3, 4, 5, 6, 7].some(pranzoFuoriIl))) {
+    for (let tentativo = 0; !esito && tentativo < 3; tentativo++) {
+      const r = provaGradino({ ...gradinoFinale.opz, pranzoFlessibile: true }, gradinoFinale.soglia, Infinity, tentativo);
+      if (r.ok) {
+        console.log(`[scala] recupero pranzo flessibile, tentativo ${tentativo + 1}/3: RIUSCITO`);
+        esito = r; gradinoRaggiunto = gradinoFinale.gradino;
+      } else diagnosticaCompleta.push(`recupero pranzo flessibile: ${r.diagnosticaProfili.join(', ') || 'nessun profilo'}`);
     }
   }
 
