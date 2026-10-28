@@ -1,0 +1,1811 @@
+{
+  "origine": "Subset del catalogo reale congelato il 27 ottobre 2026; nessun dato utente. ID e ruoli conservati.",
+  "tabelle": {
+    "dishes": [
+      {
+        "id": "03876a15-3217-4c85-9faa-c87d08fce0f1",
+        "name": "Tofu saltato con broccoli",
+        "name_en": "Pan-fried tofu with broccoli",
+        "meal_slot": "secondo",
+        "cucina": "europea",
+        "profilo": "mediterraneo",
+        "famiglia": "mediterranea",
+        "ha_amido": false,
+        "ha_proteina": true,
+        "prep_min": 20,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "8.6",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "mediterraneo_generico",
+        "ruolo_primario": "verdura",
+        "ruoli_coperti": [
+          "verdura",
+          "proteina_principale"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Strizza il tofu sotto un peso e tagliato a cubi.",
+          "Sbollenta i broccoli 3 minuti.",
+          "Rosola il tofu 8 minuti.",
+          "Unisci broccoli e aglio."
+        ]
+      },
+      {
+        "id": "09624782-535f-445a-836c-a34338a2b427",
+        "name": "Pasta integrale",
+        "name_en": "Wholemeal pasta",
+        "meal_slot": "contorno",
+        "cucina": "europea",
+        "profilo": "neutro",
+        "famiglia": "neutra",
+        "ha_amido": true,
+        "ha_proteina": false,
+        "prep_min": 15,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "9.8",
+        "salsa_industriale": false,
+        "base_amidacea": true,
+        "trasportabile": true,
+        "contiene_glutine": true,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "italia",
+        "ruolo_primario": "base_amidacea",
+        "ruoli_coperti": [
+          "base_amidacea"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Porta a bollore abbondante acqua salata.",
+          "Cuoci la pasta un minuto meno del tempo indicato.",
+          "Tieni da parte un mestolo di acqua di cottura e scola."
+        ]
+      },
+      {
+        "id": "1c7fce71-8b53-4e58-83aa-3ac4d12e7317",
+        "name": "Lenticchie in umido veloci",
+        "name_en": "Quick stewed lentils",
+        "meal_slot": "secondo",
+        "cucina": "europea",
+        "profilo": "mediterraneo",
+        "famiglia": "mediterranea",
+        "ha_amido": false,
+        "ha_proteina": true,
+        "prep_min": 22,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "8.3",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "mediterraneo_generico",
+        "ruolo_primario": "proteina_principale",
+        "ruoli_coperti": [
+          "verdura",
+          "proteina_principale"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Soffriggi cipolla e carota.",
+          "Aggiungi le lenticchie e i pomodori.",
+          "Cuoci 10 minuti schiacciandone una parte."
+        ]
+      },
+      {
+        "id": "22222222-0001-0001-0001-000000000001",
+        "name": "Riso con verdure",
+        "name_en": "Rice with vegetables",
+        "meal_slot": "primo",
+        "cucina": "europea",
+        "profilo": "neutro",
+        "famiglia": "neutra",
+        "ha_amido": true,
+        "ha_proteina": false,
+        "prep_min": 25,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "8.5",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "mediterraneo_generico",
+        "ruolo_primario": "base_amidacea",
+        "ruoli_coperti": [
+          "base_amidacea",
+          "verdura"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Trita finemente una cipolla e falla appassire in una pentola con 2 cucchiai di olio per quattro minuti.",
+          "Aggiungi 80g di riso a persona e tostalo per due minuti, mescolando continuamente.",
+          "Unisci due carote a cubetti e inizia a versare brodo caldo un mestolo alla volta, mescolando e aspettando che venga assorbito, per circa diciotto minuti.",
+          "A fine cottura, manteca con un filo d'olio a crudo, mescolando energicamente per un minuto perché il riso diventi cremoso."
+        ]
+      },
+      {
+        "id": "2ba80bbb-b009-4fbf-ac95-91a7ef12ec3c",
+        "name": "Scaloppine di pollo al limone",
+        "name_en": "Chicken scaloppine with lemon",
+        "meal_slot": "secondo",
+        "cucina": "europea",
+        "profilo": "mediterraneo",
+        "famiglia": "mediterranea",
+        "ha_amido": false,
+        "ha_proteina": true,
+        "prep_min": 9,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "8",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": false,
+        "contiene_glutine": true,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "italia",
+        "ruolo_primario": "proteina_principale",
+        "ruoli_coperti": [
+          "proteina_principale"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Taglia il petto di pollo a fettine sottili e battile leggermente, così cuociono in modo uniforme.",
+          "Infarina leggermente le fettine su entrambi i lati.",
+          "Scalda l'olio in padella a fuoco alto.",
+          "Cuoci le scaloppine 2 minuti per lato, finché sono dorate e non restano tracce rosa.",
+          "Aggiungi il succo di limone e lascia restringere la salsa un minuto.",
+          "Servi subito con la salsa al limone."
+        ]
+      },
+      {
+        "id": "43cb8d0c-4fbd-4874-ac50-9e9b371a1f1f",
+        "name": "Patate lesse",
+        "name_en": "Boiled potatoes",
+        "meal_slot": "contorno",
+        "cucina": "europea",
+        "profilo": "neutro",
+        "famiglia": "neutra",
+        "ha_amido": true,
+        "ha_proteina": false,
+        "prep_min": 25,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "9.6",
+        "salsa_industriale": false,
+        "base_amidacea": true,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "mediterraneo_generico",
+        "ruolo_primario": "base_amidacea",
+        "ruoli_coperti": [
+          "base_amidacea"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Lava le patate lasciando la buccia e tagliale a pezzi di 3 cm.",
+          "Partile da acqua fredda salata e porta a bollore.",
+          "Sobbolli 18 minuti finché il coltello entra senza resistenza.",
+          "Scola e lascia evaporare il vapore un minuto."
+        ]
+      },
+      {
+        "id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+        "name": "Frittata di patate",
+        "name_en": "Potato frittata",
+        "meal_slot": "secondo",
+        "cucina": "europea",
+        "profilo": "mediterraneo",
+        "famiglia": "mediterranea",
+        "ha_amido": true,
+        "ha_proteina": true,
+        "prep_min": 32,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "6.9",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": true,
+        "contiene_frutta_secca": false,
+        "paese": "italia",
+        "ruolo_primario": "proteina_principale",
+        "ruoli_coperti": [
+          "verdura",
+          "proteina_principale"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Taglia le patate a fette sottili e falle rosolare in padella con l'olio.",
+          "Aggiungi la cipolla e cuoci finché le patate sono morbide.",
+          "Sbatti le uova con il parmigiano e versale sulle patate.",
+          "Cuoci piano da entrambi i lati, finché il centro non è più liquido."
+        ]
+      },
+      {
+        "id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "name": "Involtini di verza ripieni di riso e fagioli",
+        "name_en": "Savoy cabbage rolls with rice and beans",
+        "meal_slot": "secondo",
+        "cucina": "europea",
+        "profilo": "mediterraneo",
+        "famiglia": "mediterranea",
+        "ha_amido": true,
+        "ha_proteina": true,
+        "prep_min": 56,
+        "occasione": "quotidiano",
+        "tecnica": "composta",
+        "health_score": "8",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "italia",
+        "ruolo_primario": "proteina_principale",
+        "ruoli_coperti": [
+          "verdura",
+          "proteina_principale"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Stacca le foglie di verza e scottale in acqua bollente 2 minuti.",
+          "Mescola riso, fagioli schiacciati, carota e cipolla per il ripieno.",
+          "Avvolgi il ripieno in ogni foglia e disponi gli involtini in una pirofila con la passata.",
+          "Cuoci coperto a 180°C per 25 minuti, finché le foglie sono morbide."
+        ]
+      },
+      {
+        "id": "93f5f274-c625-4e6c-af34-ec0bc074c7e8",
+        "name": "Scaloppine di pollo al limone (senza glutine)",
+        "name_en": "Chicken scaloppine with lemon (gluten-free)",
+        "meal_slot": "secondo",
+        "cucina": "europea",
+        "profilo": "mediterraneo",
+        "famiglia": "mediterranea",
+        "ha_amido": false,
+        "ha_proteina": true,
+        "prep_min": 9,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "8",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": false,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "italia",
+        "ruolo_primario": "proteina_principale",
+        "ruoli_coperti": [
+          "proteina_principale"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Taglia il petto di pollo a fettine sottili e battile leggermente, così cuociono in modo uniforme.",
+          "Infarina leggermente le fettine su entrambi i lati con farina di riso.",
+          "Scalda l'olio in padella a fuoco alto.",
+          "Cuoci le scaloppine 2 minuti per lato, finché sono dorate e non restano tracce rosa.",
+          "Aggiungi il succo di limone e lascia restringere la salsa un minuto.",
+          "Servi subito con la salsa al limone: la farina di riso non cambia il sapore, solo la rende adatta a chi evita il glutine."
+        ]
+      },
+      {
+        "id": "950107bb-00a2-4b6b-9983-b01e4f8c779e",
+        "name": "Pane senza glutine",
+        "name_en": "Gluten-free bread",
+        "meal_slot": "contorno",
+        "cucina": "europea",
+        "profilo": "neutro",
+        "famiglia": "neutra",
+        "ha_amido": true,
+        "ha_proteina": false,
+        "prep_min": 1,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "7",
+        "salsa_industriale": false,
+        "base_amidacea": true,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "italia",
+        "ruolo_primario": "base_amidacea",
+        "ruoli_coperti": [
+          "base_amidacea"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Taglia il pane senza glutine a fette."
+        ]
+      },
+      {
+        "id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+        "name": "Ceci e patate in umido",
+        "name_en": "Stewed chickpeas and potatoes",
+        "meal_slot": "secondo",
+        "cucina": "europea",
+        "profilo": "mediterraneo",
+        "famiglia": "mediterranea",
+        "ha_amido": true,
+        "ha_proteina": true,
+        "prep_min": 38,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "7.6",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "italia",
+        "ruolo_primario": "proteina_principale",
+        "ruoli_coperti": [
+          "verdura",
+          "proteina_principale"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Taglia le patate a tocchetti e la cipolla a dadini.",
+          "Soffriggi la cipolla, poi aggiungi le patate e rosola 5 minuti.",
+          "Unisci passata, aglio, rosmarino e un po' d'acqua, cuoci 15 minuti.",
+          "Aggiungi i ceci scolati e sciacquati e cuoci altri 8 minuti."
+        ]
+      },
+      {
+        "id": "c0000002-0000-0000-0000-000000000005",
+        "name": "Broccoli al vapore",
+        "name_en": "Steamed Broccoli",
+        "meal_slot": "contorno",
+        "cucina": "europea",
+        "profilo": "neutro",
+        "famiglia": "neutra",
+        "ha_amido": false,
+        "ha_proteina": false,
+        "prep_min": 10,
+        "occasione": "quotidiano",
+        "tecnica": "semplice",
+        "health_score": "8.3",
+        "salsa_industriale": false,
+        "base_amidacea": false,
+        "trasportabile": true,
+        "contiene_glutine": false,
+        "contiene_lattosio": false,
+        "contiene_frutta_secca": false,
+        "paese": "mediterraneo_generico",
+        "ruolo_primario": "verdura",
+        "ruoli_coperti": [
+          "verdura"
+        ],
+        "mercati": [
+          "it"
+        ],
+        "steps": [
+          "Cuoci i broccoli al vapore otto minuti.",
+          "Condisci con olio a crudo."
+        ]
+      }
+    ],
+    "dish_ingredients": [
+      {
+        "dish_id": "03876a15-3217-4c85-9faa-c87d08fce0f1",
+        "food_id": "169230",
+        "grams": "5",
+        "foods": {
+          "name": "Garlic, raw",
+          "stato": "crudo",
+          "name_it": "Aglio",
+          "fat_100g": 0.5,
+          "kcal_100g": 149,
+          "salt_100g": 0.043,
+          "fibre_100g": 2.1,
+          "protein_100g": 6.36,
+          "sat_fat_100g": 0.089,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "03876a15-3217-4c85-9faa-c87d08fce0f1",
+        "food_id": "170379",
+        "grams": "180",
+        "foods": {
+          "name": "Broccoli, raw",
+          "stato": "crudo",
+          "name_it": "Broccoli",
+          "fat_100g": 0.37,
+          "kcal_100g": 34,
+          "salt_100g": 0.083,
+          "fibre_100g": 2.6,
+          "protein_100g": 2.82,
+          "sat_fat_100g": 0.114,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "03876a15-3217-4c85-9faa-c87d08fce0f1",
+        "food_id": "171413",
+        "grams": "12",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      },
+      {
+        "dish_id": "03876a15-3217-4c85-9faa-c87d08fce0f1",
+        "food_id": "tofu_it",
+        "grams": "160",
+        "foods": {
+          "name": "Tofu",
+          "stato": "crudo",
+          "name_it": "Tofu",
+          "fat_100g": 4.8,
+          "kcal_100g": 76,
+          "salt_100g": 0.007,
+          "fibre_100g": 0.7,
+          "protein_100g": 8.1,
+          "sat_fat_100g": 0.7,
+          "categoria_impatto": "tofu"
+        }
+      },
+      {
+        "dish_id": "09624782-535f-445a-836c-a34338a2b427",
+        "food_id": "pasta_integrale_it",
+        "grams": "80",
+        "foods": {
+          "name": "Pasta integrale",
+          "stato": "crudo",
+          "name_it": "Pasta integrale",
+          "fat_100g": 2.5,
+          "kcal_100g": 348,
+          "salt_100g": 0.006,
+          "fibre_100g": 8.3,
+          "protein_100g": 13.4,
+          "sat_fat_100g": 0.5,
+          "categoria_impatto": "pane_pasta"
+        }
+      },
+      {
+        "dish_id": "1c7fce71-8b53-4e58-83aa-3ac4d12e7317",
+        "food_id": "169230",
+        "grams": "5",
+        "foods": {
+          "name": "Garlic, raw",
+          "stato": "crudo",
+          "name_it": "Aglio",
+          "fat_100g": 0.5,
+          "kcal_100g": 149,
+          "salt_100g": 0.043,
+          "fibre_100g": 2.1,
+          "protein_100g": 6.36,
+          "sat_fat_100g": 0.089,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "1c7fce71-8b53-4e58-83aa-3ac4d12e7317",
+        "food_id": "170000",
+        "grams": "50",
+        "foods": {
+          "name": "Onions, raw",
+          "stato": "crudo",
+          "name_it": "Cipolle",
+          "fat_100g": 0.1,
+          "kcal_100g": 40,
+          "salt_100g": 0.01,
+          "fibre_100g": 1.7,
+          "protein_100g": 1.1,
+          "sat_fat_100g": 0.042,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "1c7fce71-8b53-4e58-83aa-3ac4d12e7317",
+        "food_id": "170393",
+        "grams": "80",
+        "foods": {
+          "name": "Carrots, raw",
+          "stato": "crudo",
+          "name_it": "Carota",
+          "fat_100g": 0.24,
+          "kcal_100g": 41,
+          "salt_100g": 0.173,
+          "fibre_100g": 2.8,
+          "protein_100g": 0.93,
+          "sat_fat_100g": 0.032,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "1c7fce71-8b53-4e58-83aa-3ac4d12e7317",
+        "food_id": "170457",
+        "grams": "120",
+        "foods": {
+          "name": "Tomatoes, red, ripe, raw, year round average",
+          "stato": "crudo",
+          "name_it": "Pomodoro",
+          "fat_100g": 0.2,
+          "kcal_100g": 18,
+          "salt_100g": 0.013,
+          "fibre_100g": 1.2,
+          "protein_100g": 0.88,
+          "sat_fat_100g": 0.028,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "1c7fce71-8b53-4e58-83aa-3ac4d12e7317",
+        "food_id": "171413",
+        "grams": "12",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      },
+      {
+        "dish_id": "1c7fce71-8b53-4e58-83aa-3ac4d12e7317",
+        "food_id": "lenticchie_cotte_it",
+        "grams": "180",
+        "foods": {
+          "name": "Lentils, boiled, cooked, without salt",
+          "stato": "cotto",
+          "name_it": "Lenticchie cotte",
+          "fat_100g": 0.38,
+          "kcal_100g": 116,
+          "salt_100g": 0.005,
+          "fibre_100g": 7.9,
+          "protein_100g": 9.02,
+          "sat_fat_100g": 0.056,
+          "categoria_impatto": null
+        }
+      },
+      {
+        "dish_id": "22222222-0001-0001-0001-000000000001",
+        "food_id": "168877",
+        "grams": "120",
+        "foods": {
+          "name": "Rice, white, long-grain, regular, raw, enriched",
+          "stato": "crudo",
+          "name_it": "Riso bianco",
+          "fat_100g": 0.66,
+          "kcal_100g": 365,
+          "salt_100g": 0.013,
+          "fibre_100g": 1.3,
+          "protein_100g": 7.13,
+          "sat_fat_100g": 0.18,
+          "categoria_impatto": "riso"
+        }
+      },
+      {
+        "dish_id": "22222222-0001-0001-0001-000000000001",
+        "food_id": "170000",
+        "grams": "100",
+        "foods": {
+          "name": "Onions, raw",
+          "stato": "crudo",
+          "name_it": "Cipolle",
+          "fat_100g": 0.1,
+          "kcal_100g": 40,
+          "salt_100g": 0.01,
+          "fibre_100g": 1.7,
+          "protein_100g": 1.1,
+          "sat_fat_100g": 0.042,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "22222222-0001-0001-0001-000000000001",
+        "food_id": "170393",
+        "grams": "100",
+        "foods": {
+          "name": "Carrots, raw",
+          "stato": "crudo",
+          "name_it": "Carota",
+          "fat_100g": 0.24,
+          "kcal_100g": 41,
+          "salt_100g": 0.173,
+          "fibre_100g": 2.8,
+          "protein_100g": 0.93,
+          "sat_fat_100g": 0.032,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "22222222-0001-0001-0001-000000000001",
+        "food_id": "171413",
+        "grams": "15",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      },
+      {
+        "dish_id": "2ba80bbb-b009-4fbf-ac95-91a7ef12ec3c",
+        "food_id": "171077",
+        "grams": "150",
+        "foods": {
+          "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+          "stato": "crudo",
+          "name_it": "Petto di pollo",
+          "fat_100g": 2.62,
+          "kcal_100g": 120,
+          "salt_100g": 0.112,
+          "fibre_100g": 0,
+          "protein_100g": 22.5,
+          "sat_fat_100g": 0.563,
+          "categoria_impatto": "pollame"
+        }
+      },
+      {
+        "dish_id": "2ba80bbb-b009-4fbf-ac95-91a7ef12ec3c",
+        "food_id": "171413",
+        "grams": "10",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      },
+      {
+        "dish_id": "2ba80bbb-b009-4fbf-ac95-91a7ef12ec3c",
+        "food_id": "farina_00_it",
+        "grams": "10",
+        "foods": {
+          "name": "Farina 00",
+          "stato": "crudo",
+          "name_it": "Farina 00",
+          "fat_100g": 1,
+          "kcal_100g": 364,
+          "salt_100g": 0.002,
+          "fibre_100g": 2.7,
+          "protein_100g": 10.3,
+          "sat_fat_100g": 0.2,
+          "categoria_impatto": "pane_pasta"
+        }
+      },
+      {
+        "dish_id": "2ba80bbb-b009-4fbf-ac95-91a7ef12ec3c",
+        "food_id": "succo_limone_it",
+        "grams": "15",
+        "foods": {
+          "name": "Lemon juice, raw",
+          "stato": "crudo",
+          "name_it": "Succo di limone",
+          "fat_100g": 0.24,
+          "kcal_100g": 22,
+          "salt_100g": 0.0025,
+          "fibre_100g": 0.3,
+          "protein_100g": 0.35,
+          "sat_fat_100g": 0.03,
+          "categoria_impatto": null
+        }
+      },
+      {
+        "dish_id": "43cb8d0c-4fbd-4874-ac50-9e9b371a1f1f",
+        "food_id": "170028",
+        "grams": "250",
+        "foods": {
+          "name": "Potatoes, white, flesh and skin, raw",
+          "stato": "crudo",
+          "name_it": "Patate bianche",
+          "fat_100g": 0.1,
+          "kcal_100g": 69,
+          "salt_100g": 0.04,
+          "fibre_100g": 2.4,
+          "protein_100g": 1.68,
+          "sat_fat_100g": 0.026,
+          "categoria_impatto": "patate"
+        }
+      },
+      {
+        "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+        "food_id": "170000",
+        "grams": "50",
+        "foods": {
+          "name": "Onions, raw",
+          "stato": "crudo",
+          "name_it": "Cipolle",
+          "fat_100g": 0.1,
+          "kcal_100g": 40,
+          "salt_100g": 0.01,
+          "fibre_100g": 1.7,
+          "protein_100g": 1.1,
+          "sat_fat_100g": 0.042,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+        "food_id": "170028",
+        "grams": "250",
+        "foods": {
+          "name": "Potatoes, white, flesh and skin, raw",
+          "stato": "crudo",
+          "name_it": "Patate bianche",
+          "fat_100g": 0.1,
+          "kcal_100g": 69,
+          "salt_100g": 0.04,
+          "fibre_100g": 2.4,
+          "protein_100g": 1.68,
+          "sat_fat_100g": 0.026,
+          "categoria_impatto": "patate"
+        }
+      },
+      {
+        "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+        "food_id": "171413",
+        "grams": "12",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      },
+      {
+        "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+        "food_id": "parmigiano_it",
+        "grams": "10",
+        "foods": {
+          "name": "Parmesan",
+          "stato": "crudo",
+          "name_it": "Parmigiano",
+          "fat_100g": 28.6,
+          "kcal_100g": 392,
+          "salt_100g": 1.6,
+          "fibre_100g": 0,
+          "protein_100g": 33,
+          "sat_fat_100g": 19,
+          "categoria_impatto": null
+        }
+      },
+      {
+        "dish_id": "6f18108c-9cc6-4c35-b144-6c71fe64f0b6",
+        "food_id": "uovo_grande_it",
+        "grams": "150",
+        "foods": {
+          "name": "Uovo",
+          "stato": "crudo",
+          "name_it": "Uovo",
+          "fat_100g": 9.51,
+          "kcal_100g": 143,
+          "salt_100g": 0.355,
+          "fibre_100g": 0,
+          "protein_100g": 12.56,
+          "sat_fat_100g": 3.13,
+          "categoria_impatto": "uova"
+        }
+      },
+      {
+        "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "food_id": "169230",
+        "grams": "3",
+        "foods": {
+          "name": "Garlic, raw",
+          "stato": "crudo",
+          "name_it": "Aglio",
+          "fat_100g": 0.5,
+          "kcal_100g": 149,
+          "salt_100g": 0.043,
+          "fibre_100g": 2.1,
+          "protein_100g": 6.36,
+          "sat_fat_100g": 0.089,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "food_id": "170000",
+        "grams": "40",
+        "foods": {
+          "name": "Onions, raw",
+          "stato": "crudo",
+          "name_it": "Cipolle",
+          "fat_100g": 0.1,
+          "kcal_100g": 40,
+          "salt_100g": 0.01,
+          "fibre_100g": 1.7,
+          "protein_100g": 1.1,
+          "sat_fat_100g": 0.042,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "food_id": "170393",
+        "grams": "50",
+        "foods": {
+          "name": "Carrots, raw",
+          "stato": "crudo",
+          "name_it": "Carota",
+          "fat_100g": 0.24,
+          "kcal_100g": 41,
+          "salt_100g": 0.173,
+          "fibre_100g": 2.8,
+          "protein_100g": 0.93,
+          "sat_fat_100g": 0.032,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "food_id": "171413",
+        "grams": "10",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      },
+      {
+        "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "food_id": "cavolo_verza_it",
+        "grams": "320",
+        "foods": {
+          "name": "Cavolo verza",
+          "stato": "crudo",
+          "name_it": "Cavolo verza",
+          "fat_100g": 0.1,
+          "kcal_100g": 27,
+          "salt_100g": 0.028,
+          "fibre_100g": 2.5,
+          "protein_100g": 1.83,
+          "sat_fat_100g": 0.02,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "food_id": "fagioli_cannellini_it",
+        "grams": "120",
+        "foods": {
+          "name": "Fagioli cannellini",
+          "stato": "cotto",
+          "name_it": "Fagioli cannellini",
+          "fat_100g": 0.4,
+          "kcal_100g": 139,
+          "salt_100g": 0.001,
+          "fibre_100g": 10.5,
+          "protein_100g": 9.7,
+          "sat_fat_100g": 0.1,
+          "categoria_impatto": "legumi"
+        }
+      },
+      {
+        "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "food_id": "passata_pomodoro_it",
+        "grams": "100",
+        "foods": {
+          "name": "Passata di pomodoro",
+          "stato": "crudo",
+          "name_it": "Passata di pomodoro",
+          "fat_100g": 0.2,
+          "kcal_100g": 24,
+          "salt_100g": 0.01,
+          "fibre_100g": 1.2,
+          "protein_100g": 1.5,
+          "sat_fat_100g": 0.03,
+          "categoria_impatto": "cereali"
+        }
+      },
+      {
+        "dish_id": "81690e67-d20a-43c4-8ce9-8f6c35c59c66",
+        "food_id": "riso_integrale_cotto_it",
+        "grams": "150",
+        "foods": {
+          "name": "Rice, brown, long-grain, cooked",
+          "stato": "cotto",
+          "name_it": "Riso integrale cotto",
+          "fat_100g": 0.97,
+          "kcal_100g": 123,
+          "salt_100g": 0.002,
+          "fibre_100g": 1.6,
+          "protein_100g": 2.74,
+          "sat_fat_100g": 0.2,
+          "categoria_impatto": null
+        }
+      },
+      {
+        "dish_id": "93f5f274-c625-4e6c-af34-ec0bc074c7e8",
+        "food_id": "171077",
+        "grams": "150",
+        "foods": {
+          "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+          "stato": "crudo",
+          "name_it": "Petto di pollo",
+          "fat_100g": 2.62,
+          "kcal_100g": 120,
+          "salt_100g": 0.112,
+          "fibre_100g": 0,
+          "protein_100g": 22.5,
+          "sat_fat_100g": 0.563,
+          "categoria_impatto": "pollame"
+        }
+      },
+      {
+        "dish_id": "93f5f274-c625-4e6c-af34-ec0bc074c7e8",
+        "food_id": "171413",
+        "grams": "10",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      },
+      {
+        "dish_id": "93f5f274-c625-4e6c-af34-ec0bc074c7e8",
+        "food_id": "farina_riso_it",
+        "grams": "10",
+        "foods": {
+          "name": "Farina di riso",
+          "stato": "crudo",
+          "name_it": "Farina di riso",
+          "fat_100g": 1.4,
+          "kcal_100g": 366,
+          "salt_100g": 0,
+          "fibre_100g": 2.4,
+          "protein_100g": 5.95,
+          "sat_fat_100g": 0.4,
+          "categoria_impatto": "riso"
+        }
+      },
+      {
+        "dish_id": "93f5f274-c625-4e6c-af34-ec0bc074c7e8",
+        "food_id": "succo_limone_it",
+        "grams": "15",
+        "foods": {
+          "name": "Lemon juice, raw",
+          "stato": "crudo",
+          "name_it": "Succo di limone",
+          "fat_100g": 0.24,
+          "kcal_100g": 22,
+          "salt_100g": 0.0025,
+          "fibre_100g": 0.3,
+          "protein_100g": 0.35,
+          "sat_fat_100g": 0.03,
+          "categoria_impatto": null
+        }
+      },
+      {
+        "dish_id": "950107bb-00a2-4b6b-9983-b01e4f8c779e",
+        "food_id": "pane_senza_glutine_it",
+        "grams": "60",
+        "foods": {
+          "name": "Gluten-free bread",
+          "stato": "crudo",
+          "name_it": "Pane senza glutine",
+          "fat_100g": 3.5,
+          "kcal_100g": 260,
+          "salt_100g": 1.1,
+          "fibre_100g": 3.5,
+          "protein_100g": 3.5,
+          "sat_fat_100g": 0.6,
+          "categoria_impatto": "pane_pasta"
+        }
+      },
+      {
+        "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+        "food_id": "169230",
+        "grams": "3",
+        "foods": {
+          "name": "Garlic, raw",
+          "stato": "crudo",
+          "name_it": "Aglio",
+          "fat_100g": 0.5,
+          "kcal_100g": 149,
+          "salt_100g": 0.043,
+          "fibre_100g": 2.1,
+          "protein_100g": 6.36,
+          "sat_fat_100g": 0.089,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+        "food_id": "170000",
+        "grams": "40",
+        "foods": {
+          "name": "Onions, raw",
+          "stato": "crudo",
+          "name_it": "Cipolle",
+          "fat_100g": 0.1,
+          "kcal_100g": 40,
+          "salt_100g": 0.01,
+          "fibre_100g": 1.7,
+          "protein_100g": 1.1,
+          "sat_fat_100g": 0.042,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+        "food_id": "170028",
+        "grams": "180",
+        "foods": {
+          "name": "Potatoes, white, flesh and skin, raw",
+          "stato": "crudo",
+          "name_it": "Patate bianche",
+          "fat_100g": 0.1,
+          "kcal_100g": 69,
+          "salt_100g": 0.04,
+          "fibre_100g": 2.4,
+          "protein_100g": 1.68,
+          "sat_fat_100g": 0.026,
+          "categoria_impatto": "patate"
+        }
+      },
+      {
+        "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+        "food_id": "171413",
+        "grams": "10",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      },
+      {
+        "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+        "food_id": "ceci_scatola_sciacquati_it",
+        "grams": "320",
+        "foods": {
+          "name": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, drained, rinsed in tap water",
+          "stato": "crudo",
+          "name_it": "Ceci in scatola, scolati e sciacquati",
+          "fat_100g": 2.5,
+          "kcal_100g": 138,
+          "salt_100g": 0.211,
+          "fibre_100g": 6.3,
+          "protein_100g": 7,
+          "sat_fat_100g": 0.2,
+          "categoria_impatto": "legumi"
+        }
+      },
+      {
+        "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+        "food_id": "passata_pomodoro_it",
+        "grams": "100",
+        "foods": {
+          "name": "Passata di pomodoro",
+          "stato": "crudo",
+          "name_it": "Passata di pomodoro",
+          "fat_100g": 0.2,
+          "kcal_100g": 24,
+          "salt_100g": 0.01,
+          "fibre_100g": 1.2,
+          "protein_100g": 1.5,
+          "sat_fat_100g": 0.03,
+          "categoria_impatto": "cereali"
+        }
+      },
+      {
+        "dish_id": "b29d57e7-db25-4cdf-8329-e275de84c7eb",
+        "food_id": "rosmarino_it",
+        "grams": "1",
+        "foods": {
+          "name": "Rosmarino fresco",
+          "stato": "crudo",
+          "name_it": "Rosmarino",
+          "fat_100g": 5.9,
+          "kcal_100g": 131,
+          "salt_100g": 0.026,
+          "fibre_100g": 14.1,
+          "protein_100g": 3.3,
+          "sat_fat_100g": 3.3,
+          "categoria_impatto": "spezie"
+        }
+      },
+      {
+        "dish_id": "c0000002-0000-0000-0000-000000000005",
+        "food_id": "170379",
+        "grams": "200",
+        "foods": {
+          "name": "Broccoli, raw",
+          "stato": "crudo",
+          "name_it": "Broccoli",
+          "fat_100g": 0.37,
+          "kcal_100g": 34,
+          "salt_100g": 0.083,
+          "fibre_100g": 2.6,
+          "protein_100g": 2.82,
+          "sat_fat_100g": 0.114,
+          "categoria_impatto": "verdura"
+        }
+      },
+      {
+        "dish_id": "c0000002-0000-0000-0000-000000000005",
+        "food_id": "171413",
+        "grams": "10",
+        "foods": {
+          "name": "Oil, olive, salad or cooking",
+          "stato": "crudo",
+          "name_it": "Olio di oliva",
+          "fat_100g": 100,
+          "kcal_100g": 884,
+          "salt_100g": 0.005,
+          "fibre_100g": 0,
+          "protein_100g": 0,
+          "sat_fat_100g": 13.808,
+          "categoria_impatto": "olio"
+        }
+      }
+    ],
+    "categorie_alimenti": [
+      {
+        "food_id": "170028",
+        "categoria": "patate"
+      },
+      {
+        "food_id": "171077",
+        "categoria": "carne_bianca"
+      },
+      {
+        "food_id": "fagioli_cannellini_it",
+        "categoria": "legumi"
+      },
+      {
+        "food_id": "farina_00_it",
+        "categoria": "glutine"
+      },
+      {
+        "food_id": "lenticchie_cotte_it",
+        "categoria": "legumi"
+      },
+      {
+        "food_id": "pane_senza_glutine_it",
+        "categoria": "pane"
+      },
+      {
+        "food_id": "parmigiano_it",
+        "categoria": "latticini"
+      },
+      {
+        "food_id": "parmigiano_it",
+        "categoria": "lattosio"
+      },
+      {
+        "food_id": "pasta_integrale_it",
+        "categoria": "glutine"
+      },
+      {
+        "food_id": "tofu_it",
+        "categoria": "soia"
+      },
+      {
+        "food_id": "uovo_grande_it",
+        "categoria": "uova"
+      }
+    ],
+    "tag_nutrizionali": [
+      {
+        "food_id": "170379",
+        "tag": "fonte_vitamina_c"
+      },
+      {
+        "food_id": "170393",
+        "tag": "caroteni"
+      },
+      {
+        "food_id": "170457",
+        "tag": "caroteni"
+      },
+      {
+        "food_id": "fagioli_cannellini_it",
+        "tag": "ferro_vegetale"
+      },
+      {
+        "food_id": "lenticchie_cotte_it",
+        "tag": "ferro_vegetale"
+      },
+      {
+        "food_id": "passata_pomodoro_it",
+        "tag": "caroteni"
+      },
+      {
+        "food_id": "tofu_it",
+        "tag": "ferro_vegetale"
+      }
+    ],
+    "alias_categoria": [
+      {
+        "alias": "affettati",
+        "codice": "carne_processata"
+      },
+      {
+        "alias": "agnello",
+        "codice": "carne_rossa"
+      },
+      {
+        "alias": "almond",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "arachidi",
+        "codice": "arachidi"
+      },
+      {
+        "alias": "bacon",
+        "codice": "maiale"
+      },
+      {
+        "alias": "beans",
+        "codice": "legumi"
+      },
+      {
+        "alias": "beef",
+        "codice": "carne_rossa"
+      },
+      {
+        "alias": "calamari",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "carne bianca",
+        "codice": "carne_bianca"
+      },
+      {
+        "alias": "carne conservata",
+        "codice": "carne_processata"
+      },
+      {
+        "alias": "carne processata",
+        "codice": "carne_processata"
+      },
+      {
+        "alias": "carne rossa",
+        "codice": "carne_rossa"
+      },
+      {
+        "alias": "ceci",
+        "codice": "legumi"
+      },
+      {
+        "alias": "celiac",
+        "codice": "glutine"
+      },
+      {
+        "alias": "celiachia",
+        "codice": "glutine"
+      },
+      {
+        "alias": "cheese",
+        "codice": "latticini"
+      },
+      {
+        "alias": "chicken",
+        "codice": "carne_bianca"
+      },
+      {
+        "alias": "chickpeas",
+        "codice": "legumi"
+      },
+      {
+        "alias": "clams",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "cod",
+        "codice": "pesce"
+      },
+      {
+        "alias": "cozze",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "crostacei",
+        "codice": "crostacei"
+      },
+      {
+        "alias": "cured meat",
+        "codice": "carne_processata"
+      },
+      {
+        "alias": "dairy",
+        "codice": "latticini"
+      },
+      {
+        "alias": "deli meat",
+        "codice": "carne_processata"
+      },
+      {
+        "alias": "edamame",
+        "codice": "soia"
+      },
+      {
+        "alias": "egg",
+        "codice": "uova"
+      },
+      {
+        "alias": "eggs",
+        "codice": "uova"
+      },
+      {
+        "alias": "fagioli",
+        "codice": "legumi"
+      },
+      {
+        "alias": "fish",
+        "codice": "pesce"
+      },
+      {
+        "alias": "formaggio",
+        "codice": "latticini"
+      },
+      {
+        "alias": "frumento",
+        "codice": "glutine"
+      },
+      {
+        "alias": "frutta a guscio",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "frutta guscio",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "gamberi",
+        "codice": "crostacei"
+      },
+      {
+        "alias": "gluten",
+        "codice": "glutine"
+      },
+      {
+        "alias": "glutine",
+        "codice": "glutine"
+      },
+      {
+        "alias": "hazelnut",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "insaccati",
+        "codice": "carne_processata"
+      },
+      {
+        "alias": "lactose",
+        "codice": "lattosio"
+      },
+      {
+        "alias": "lamb",
+        "codice": "carne_rossa"
+      },
+      {
+        "alias": "latticini",
+        "codice": "latticini"
+      },
+      {
+        "alias": "lattosio",
+        "codice": "lattosio"
+      },
+      {
+        "alias": "legumes",
+        "codice": "legumi"
+      },
+      {
+        "alias": "legumi",
+        "codice": "legumi"
+      },
+      {
+        "alias": "lenticchie",
+        "codice": "legumi"
+      },
+      {
+        "alias": "lentils",
+        "codice": "legumi"
+      },
+      {
+        "alias": "maiale",
+        "codice": "maiale"
+      },
+      {
+        "alias": "mandorle",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "manzo",
+        "codice": "carne_rossa"
+      },
+      {
+        "alias": "merluzzo",
+        "codice": "pesce"
+      },
+      {
+        "alias": "milk",
+        "codice": "lattosio"
+      },
+      {
+        "alias": "molluschi",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "molluscs",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "mozzarella",
+        "codice": "latticini"
+      },
+      {
+        "alias": "mussels",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "nocciole",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "noci",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "nuts",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "octopus",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "pancetta",
+        "codice": "maiale"
+      },
+      {
+        "alias": "peanut",
+        "codice": "arachidi"
+      },
+      {
+        "alias": "peanuts",
+        "codice": "arachidi"
+      },
+      {
+        "alias": "pesce",
+        "codice": "pesce"
+      },
+      {
+        "alias": "pollo",
+        "codice": "carne_bianca"
+      },
+      {
+        "alias": "polpo",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "pork",
+        "codice": "maiale"
+      },
+      {
+        "alias": "poultry",
+        "codice": "carne_bianca"
+      },
+      {
+        "alias": "prawn",
+        "codice": "crostacei"
+      },
+      {
+        "alias": "processed meat",
+        "codice": "carne_processata"
+      },
+      {
+        "alias": "prosciutto",
+        "codice": "maiale"
+      },
+      {
+        "alias": "red meat",
+        "codice": "carne_rossa"
+      },
+      {
+        "alias": "ricotta",
+        "codice": "latticini"
+      },
+      {
+        "alias": "salame",
+        "codice": "maiale"
+      },
+      {
+        "alias": "salmon",
+        "codice": "pesce"
+      },
+      {
+        "alias": "salmone",
+        "codice": "pesce"
+      },
+      {
+        "alias": "salumi",
+        "codice": "carne_processata"
+      },
+      {
+        "alias": "shellfish",
+        "codice": "crostacei"
+      },
+      {
+        "alias": "shrimp",
+        "codice": "crostacei"
+      },
+      {
+        "alias": "soia",
+        "codice": "soia"
+      },
+      {
+        "alias": "soy",
+        "codice": "soia"
+      },
+      {
+        "alias": "squid",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "tacchino",
+        "codice": "carne_bianca"
+      },
+      {
+        "alias": "tofu",
+        "codice": "soia"
+      },
+      {
+        "alias": "tonno",
+        "codice": "pesce"
+      },
+      {
+        "alias": "tree nuts",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "tuna",
+        "codice": "pesce"
+      },
+      {
+        "alias": "turkey",
+        "codice": "carne_bianca"
+      },
+      {
+        "alias": "uova",
+        "codice": "uova"
+      },
+      {
+        "alias": "uovo",
+        "codice": "uova"
+      },
+      {
+        "alias": "vongole",
+        "codice": "molluschi"
+      },
+      {
+        "alias": "walnut",
+        "codice": "frutta_guscio"
+      },
+      {
+        "alias": "wheat",
+        "codice": "glutine"
+      },
+      {
+        "alias": "white meat",
+        "codice": "carne_bianca"
+      },
+      {
+        "alias": "yogurt",
+        "codice": "latticini"
+      }
+    ],
+    "foods": [
+      {
+        "id": "168877",
+        "name": "Rice, white, long-grain, regular, raw, enriched",
+        "name_it": "Riso bianco"
+      },
+      {
+        "id": "169230",
+        "name": "Garlic, raw",
+        "name_it": "Aglio"
+      },
+      {
+        "id": "170000",
+        "name": "Onions, raw",
+        "name_it": "Cipolle"
+      },
+      {
+        "id": "170028",
+        "name": "Potatoes, white, flesh and skin, raw",
+        "name_it": "Patate bianche"
+      },
+      {
+        "id": "170379",
+        "name": "Broccoli, raw",
+        "name_it": "Broccoli"
+      },
+      {
+        "id": "170393",
+        "name": "Carrots, raw",
+        "name_it": "Carota"
+      },
+      {
+        "id": "170457",
+        "name": "Tomatoes, red, ripe, raw, year round average",
+        "name_it": "Pomodoro"
+      },
+      {
+        "id": "171077",
+        "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+        "name_it": "Petto di pollo"
+      },
+      {
+        "id": "171413",
+        "name": "Oil, olive, salad or cooking",
+        "name_it": "Olio di oliva"
+      },
+      {
+        "id": "cavolo_verza_it",
+        "name": "Cavolo verza",
+        "name_it": "Cavolo verza"
+      },
+      {
+        "id": "ceci_scatola_sciacquati_it",
+        "name": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, drained, rinsed in tap water",
+        "name_it": "Ceci in scatola, scolati e sciacquati"
+      },
+      {
+        "id": "fagioli_cannellini_it",
+        "name": "Fagioli cannellini",
+        "name_it": "Fagioli cannellini"
+      },
+      {
+        "id": "farina_00_it",
+        "name": "Farina 00",
+        "name_it": "Farina 00"
+      },
+      {
+        "id": "farina_riso_it",
+        "name": "Farina di riso",
+        "name_it": "Farina di riso"
+      },
+      {
+        "id": "lenticchie_cotte_it",
+        "name": "Lentils, boiled, cooked, without salt",
+        "name_it": "Lenticchie cotte"
+      },
+      {
+        "id": "pane_senza_glutine_it",
+        "name": "Gluten-free bread",
+        "name_it": "Pane senza glutine"
+      },
+      {
+        "id": "parmigiano_it",
+        "name": "Parmesan",
+        "name_it": "Parmigiano"
+      },
+      {
+        "id": "passata_pomodoro_it",
+        "name": "Passata di pomodoro",
+        "name_it": "Passata di pomodoro"
+      },
+      {
+        "id": "pasta_integrale_it",
+        "name": "Pasta integrale",
+        "name_it": "Pasta integrale"
+      },
+      {
+        "id": "riso_integrale_cotto_it",
+        "name": "Rice, brown, long-grain, cooked",
+        "name_it": "Riso integrale cotto"
+      },
+      {
+        "id": "rosmarino_it",
+        "name": "Rosmarino fresco",
+        "name_it": "Rosmarino"
+      },
+      {
+        "id": "succo_limone_it",
+        "name": "Lemon juice, raw",
+        "name_it": "Succo di limone"
+      },
+      {
+        "id": "tofu_it",
+        "name": "Tofu",
+        "name_it": "Tofu"
+      },
+      {
+        "id": "uovo_grande_it",
+        "name": "Uovo",
+        "name_it": "Uovo"
+      }
+    ]
+  }
+}

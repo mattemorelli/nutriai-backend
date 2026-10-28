@@ -1042,17 +1042,10 @@ function arricchisciPiattiDaCache(piattiGrezzi, cache) {
     return { vitaminaCStato, ferroVegetale, caroteni };
   }
 
-  // Amido riconosciuto dagli ingredienti (categoria 'amido' in
-  // categorie_alimenti: pasta, riso, couscous, orzo, farro, miglio, grano
-  // saraceno, polenta, patate, pane), non dal flag ha_amido salvato sul
-  // piatto ne' dal nome - quel flag puo' essere sbagliato o mancante (vedi
-  // audit/analisi-generatore.md, problema E: contorni di couscous/orzo senza
-  // il flag, mai riconosciuti come doppio amido). Sostituisce ha_amido in
-  // ogni punto del codice che decide su base dell'amido (accompagnaBene,
-  // l'accompagnamento pane/patate a cena).
-  function amidoDaIngredienti(ingredienti) {
-    return ingredienti.some(i => (categorieDi[i.food_id] || new Set()).has('amido'));
-  }
+  // La presenza di una componente amidacea viene dai ruoli canonici
+  // del piatto (regola 9). categorie_alimenti contiene vincoli allergenici
+  // e non e' una tassonomia completa: la categoria 'amido' non esisteva,
+  // facendo risultare false tutte le ricette, anche pasta/riso/pane.
 
   // Tipo di amido d'accompagnamento (vedi tipoAmidoDiAccompagnamento piu'
   // sotto, CORREZIONE 2026-10-22): dalle categorie vere 'pane'/'patate' su
@@ -1087,7 +1080,7 @@ function arricchisciPiattiDaCache(piattiGrezzi, cache) {
       ...valori[p.id],
       gruppo: gruppoDa(valori[p.id].ingredienti, categorieDi),
       principale: ingredientePrincipale(valori[p.id].ingredienti),
-      amidoReale: amidoDaIngredienti(valori[p.id].ingredienti),
+      amidoReale: copreRuolo(p, 'base_amidacea'),
       tipoAmido: tipoAmidoDaIngredienti(valori[p.id].ingredienti),
       grammiFruttaSecca: grammiFruttaSeccaDi(valori[p.id].ingredienti),
       ...riassuntoNutrizionale(valori[p.id].ingredienti),
