@@ -97,4 +97,4 @@ async function verificaMatrice(args=process.argv.slice(2)){
  return riepilogo;
 }
 if(require.main===module)verificaMatrice().catch(e=>{console.error(e.message);process.exitCode=1;});
-module.exports={leggiMinRiuscite,verificaNutrientiGiornata,verificaMatrice};
+module.exports={client,leggiMinRiuscite,verificaNutrientiGiornata,verificaMatrice};

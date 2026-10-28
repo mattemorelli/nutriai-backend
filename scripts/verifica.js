@@ -132,6 +132,7 @@ passo('11. Fabbisogno e profilo: errori di lettura distinti da dati assenti', ()
   lanciaScript('test-fabbisogno.js');
   lanciaScript('test-errori-profilo.js');
   lanciaScript('test-aggiornamento-fabbisogno.js');
+  lanciaScript('scripts/verifica-fabbisogno-db.js');
 });
 passo('12. Sicurezza input: eta, peso, altezza e BMI-obiettivo', () => lanciaScript('test-sicurezza-input.js'));
 passo('13. Recupero proteico: vincoli, piatti bloccati e contatori', () => {
@@ -141,6 +142,7 @@ passo('13. Recupero proteico: vincoli, piatti bloccati e contatori', () => {
 
 passo('14. Modelli dei pasti e sostituzioni coerenti', () => {
   lanciaScript('test-modelli-pasto.js');
+  lanciaScript('test-recupero-tempi.js');
   lanciaScript('test-sostituisci-modelli.js');
   lanciaScript('scripts/verifica-modelli-pasto.js');
   lanciaScript('scripts/verifica-pin-pranzi.js');
@@ -158,6 +160,8 @@ passo('17. Modifiche del piano: atomicita, salti, ripristino, spesa e concorrenz
 passo('18. Quantita giornaliere degli ingredienti e bilanciamento dei grassi', () => {
   lanciaScript('test-ingredienti-grassi.js');
   lanciaScript('test-quantita-giornaliere.js');
+  lanciaScript('test-miglioramento-nutrienti.js');
+  lanciaScript('scripts/verifica-miglioramento-nutrienti.js');
   lanciaScript('test-quantita-modifiche.js');
 });
 
