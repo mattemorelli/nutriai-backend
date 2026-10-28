@@ -1,3 +1,4 @@
+const {preferenzaFacoltativa,riferimentoVerificabile,verificaVincoli}=require('./vincoli-verificabili');
 const { creaPranzoFlessibile } = require('./pranzo-flessibile');
 const { miglioraIngredienti } = require('./migliora-ingredienti');
 const { fattoreTetto, RIFERIMENTO_FRUTTA_SECCA_G, riferimentoFruttaSecca, bilanciaFruttaSecca, riepilogoFruttaSecca } = require('./quantita-frutta-secca');
@@ -921,7 +922,7 @@ async function caricaRiferimento(supabase) {
   if (cachePromessaInCorso) return cachePromessaInCorso;
 
   cachePromessaInCorso = (async () => {
-    const [dishesCrudi, tagRighe, catRighe] = await Promise.all([
+    const [dishesCrudi, tagRighe, catRighe, foodsRighe] = await Promise.all([
       // Il mercato (MERCATO_ATTIVO) resta un cancello assoluto applicato qui,
       // non un filtro da ripetere in memoria a ogni chiamata - nessun
       // chiamante deve mai vedere un piatto fuori mercato, nemmeno un piatto
@@ -934,6 +935,7 @@ async function caricaRiferimento(supabase) {
         .range(da, a)),
       paginaTutto((da, a) => supabase.from('tag_nutrizionali').select('food_id, tag').order('food_id').order('tag').range(da, a)),
       paginaTutto((da, a) => supabase.from('categorie_alimenti').select('food_id, categoria').order('food_id').order('categoria').range(da, a)),
+      paginaTutto((da,a)=>supabase.from('foods').select('id').order('id').range(da,a)),
     ]);
 
     const tagDi = {};
@@ -962,7 +964,7 @@ async function caricaRiferimento(supabase) {
       for (const r of righe) (ingredientiPerDish[r.dish_id] ||= []).push(r);
     }
 
-    return { scadenza: Date.now() + DURATA_CACHE_MS, dishesCrudi, ingredientiPerDish, tagDi, categorieDi, foodIdsPerCategoria };
+    return { scadenza: Date.now() + DURATA_CACHE_MS, dishesCrudi, ingredientiPerDish, tagDi, categorieDi, foodIdsPerCategoria, foodIdsCatalogo:new Set(foodsRighe.map(f=>f.id)) };
   })();
 
   try {
@@ -1353,13 +1355,12 @@ function analizzaCapienza(profiloSettimana, catalogo, ctx) {
 async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
   // --- Vincoli dell'utente: riferimenti risolti, non piu' testo da indovinare ---
   // food_id  = un alimento singolo. categoria = un gruppo intero.
-  // Nessuno dei due = vincolo non risolto: non esclude nulla, e lo diciamo.
+  // Un riferimento assoluto mancante, sconosciuto o svuotato ferma la richiesta.
 
-  const { data: vincoli, error: eVincoli } = await supabase
-    .from('user_constraints')
-    .select('kind, subject, severity, food_id, categoria')
-    .eq('user_id', userId);
-  if (eVincoli) throw new Error('lettura user_constraints: ' + eVincoli.message);
+  const vincoli=await paginaTutto((da,a)=>supabase.from('user_constraints')
+    .select('id, kind, subject, severity, food_id, categoria').eq('user_id',userId).order('id').range(da,a));
+  const {foodIdsPerCategoria,foodIdsCatalogo}=await caricaRiferimento(supabase);
+  verificaVincoli(vincoli,foodIdsCatalogo,foodIdsPerCategoria);
 
   const foodIdVietati = new Set();    // allergie, intolleranze, dieta: non cedono mai
   const foodIdSgraditi = new Set();   // preferenze: cedono al gradino 4b, dichiarandolo
@@ -1369,10 +1370,11 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
 
   // Prudente per costruzione: e' una preferenza solo se lo dice sia kind che
   // severity. Qualunque altra combinazione, o un campo mancante, resta assoluta.
-  const ePreferenza = (v) => v.kind === 'non_gradito' && v.severity === 'preferibile';
+  const ePreferenza = preferenzaFacoltativa;
 
   for (const v of vincoli || []) {
     const molle = ePreferenza(v);
+    if(!riferimentoVerificabile(v,foodIdsCatalogo,foodIdsPerCategoria)){nonRisolti.push(v.subject||'(vuoto)');continue;}
     if (v.food_id) { (molle ? foodIdSgraditi : foodIdVietati).add(v.food_id); continue; }
     if (v.categoria) {
       const dove = molle ? categorieSgradite : categorieDaEspandere;
@@ -1385,7 +1387,6 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
   // Dalla cache di riferimento (vedi caricaRiferimento sopra), non piu' da
   // una query per ogni chiamata: stessa espansione categoria -> food_id,
   // letta in memoria.
-  const { foodIdsPerCategoria } = await caricaRiferimento(supabase);
   const espandi = (codici, destinazione) => {
     for (const codice of codici) {
       for (const fid of (foodIdsPerCategoria[codice] || [])) destinazione.add(fid);
@@ -1400,7 +1401,7 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
 
   if (nonRisolti.length) {
     console.warn(
-      `ATTENZIONE: ${nonRisolti.length} vincolo/i non risolto/i, non escludono nulla: ${nonRisolti.join(', ')}`
+      `ATTENZIONE: ${nonRisolti.length} preferenza/e facoltativa/e non verificabili`
     );
   }
 
@@ -3018,7 +3019,9 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
   // Recupero strutturale soltanto dopo il percorso storico: una settimana
   // gia' riuscita conserva esattamente le stesse scelte e lo stesso seed.
-  if (!esito && (haVincoloGlutine || Object.keys(bloccatiPerGiorno).length > 0 || [1, 2, 3, 4, 5, 6, 7].some(pranzoFuoriIl))) {
+  // Anche senza spuntini puo' servire un secondo a pranzo per raggiungere
+  // l'energia senza superare le porzioni; vale anche mangiando a casa.
+  if (!esito && (numeroSpuntini === 0 || haVincoloGlutine || Object.keys(bloccatiPerGiorno).length > 0 || [1, 2, 3, 4, 5, 6, 7].some(pranzoFuoriIl))) {
     for (let tentativo = 0; !esito && tentativo < 3; tentativo++) {
       const r = provaGradino({ ...gradinoFinale.opz, pranzoFlessibile: true }, gradinoFinale.soglia, Infinity, tentativo);
       if (r.ok) {

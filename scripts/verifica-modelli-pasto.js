@@ -11,7 +11,7 @@ const DIETE = ['onnivoro', 'pescetariano', 'vegetariano', 'vegano'];
 
 function query(data) {
   const risultato = { data, error: null };
-  const q = { select: () => q, eq: () => q, order: () => q, limit: () => q,
+  const q = { select: () => q, eq: () => q, order: () => q, limit: () => q, range: () => q,
     maybeSingle: () => Promise.resolve(risultato),
     then: (resolve, reject) => Promise.resolve(risultato).then(resolve, reject),
   };

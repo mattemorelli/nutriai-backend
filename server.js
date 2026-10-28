@@ -1,3 +1,4 @@
+const {preferenzaFacoltativa,erroreVincoliNonVerificabili,verificaVincoli}=require('./vincoli-verificabili');
 const { riepilogoIngredienti } = require('./ingredienti-piano');
 console.log('[server] avviato', new Date().toISOString());
 const { calcolaESalvaTarget, preparaTarget, salvaTarget, salvaAggiornamentoFabbisogno } = require('./fabbisogno');
@@ -133,9 +134,11 @@ async function risolviERighe(dichiarati, utenteId, supabase) {
     } else if (risolto.tipo === 'categoria') {
       righe.push({ ...base, food_id: null, categoria: risolto.codice });
     } else {
+      if(!preferenzaFacoltativa(base))throw erroreVincoliNonVerificabili();
       righe.push({ ...base, food_id: null, categoria: null });
     }
   }
+  verificaVincoli(righe,new Set(catalogo.foods.map(f=>f.id)),Object.fromEntries([...catalogo.foodIdPerCategoria].map(([k,ids])=>[k,new Set(ids)])));
   return righe;
 }
 
@@ -684,6 +687,10 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
     if (!pastiCasaDerivati) return res.status(400).json({ errore: 'pasti_casa_non_valido' });
   }
 
+  if ('constraints' in b && (!Array.isArray(b.constraints) || b.constraints.length>40 || b.constraints.some(c=>!c||typeof c!=='object'||typeof c.subject!=='string'||!c.subject.trim()||c.subject.trim().length>80))) {
+    return res.status(400).json({errore:'vincoli_non_validi'});
+  }
+
   // I vincoli, se ci sono, si validano PRIMA di scrivere qualunque cosa:
   // kind obbligatorio, e se anche uno solo e' sanitario senza consenso,
   // l'intero onboarding si ferma qui - non parte nessuna scrittura.
@@ -706,6 +713,11 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
       }
     }
   }
+
+  let vincoliDaSalvare=[];
+  try {
+    if(b.constraints?.length)vincoliDaSalvare=await risolviERighe(b.constraints,utenteId,supabase);
+  }catch(e){return res.status(e.status||500).json({errore:e.code||e.message,messaggio:e.message});}
 
   const oggi = oggiLocale();
 
@@ -760,15 +772,10 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
       }, { onConflict: 'user_id,measured_on' });
     if (e2) throw new Error(`peso: ${e2.message}`);
 
-    // 4. vincoli alimentari (facoltativi)
-    if (Array.isArray(b.constraints) && b.constraints.length) {
-      const dichiarati = b.constraints.filter(c => c && c.subject).slice(0, 40);
-      // gia' validato sopra: kind sempre uno dei KIND_VALIDI
-      const righe = await risolviERighe(dichiarati, utenteId, supabase);
-      if (righe.length) {
-        const { error: e4 } = await supabase.from('user_constraints').insert(righe);
-        if (e4) throw new Error(`vincoli: ${e4.message}`);
-      }
+    // Risolti e validati prima di qualunque modifica del profilo.
+    if(vincoliDaSalvare.length){
+      const {error:e4}=await supabase.from('user_constraints').insert(vincoliDaSalvare);
+      if(e4)throw new Error('vincoli: '+e4.message);
     }
 
     // 5. preferenze cucina (l'ordine dell'array e' il rank)
@@ -823,7 +830,7 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
       : { ok: true, kcal: target.kcal, tdee: target.tdee_predetto, ...piano });
   } catch (err) {
     console.error('ERRORE /onboarding:', err);
-    res.status(500).json({ errore: err.message });
+    res.status(err.status||500).json({errore:err.code||err.message,...(err.code?{messaggio:err.message}:{})});
   }
 });
 
@@ -992,13 +999,13 @@ app.post('/vincoli', richiedeAuth, async (req, res) => {
   // Un subject puo' risolvere a piu' alimenti (es. "olive" -> 2 righe): il
   // client riceve l'elenco completo, non una riga sola, e lo sa gestire
   // (vedi aggiungiVincolo in Profilo.js).
-  const righe = await risolviERighe([{ kind, subject: testo, severity: s }], req.utente.id, supabase);
-  const { data, error } = await supabase
-    .from('user_constraints')
-    .insert(righe)
-    .select('id, kind, subject, severity');
-  if (error) return res.status(500).json({ errore: error.message });
-  res.json(data);
+  try{
+    const righe=await risolviERighe([{kind,subject:testo,severity:s}],req.utente.id,supabase);
+    const {data,error}=await supabase.from('user_constraints').insert(righe).select('id, kind, subject, severity');
+    if(error)throw new Error(error.message);
+    res.json(data);
+  }catch(e){res.status(e.status||500).json({errore:e.code||e.message,...(e.code?{messaggio:e.message}:{})});}
+
 });
 
 app.delete('/vincoli/:id', richiedeAuth, async (req, res) => {
@@ -1097,7 +1104,7 @@ app.post('/genera-piano', richiedeAuth, async (req, res) => {
     res.json({ ok: true, ...piano });
   } catch (err) {
     console.error('ERRORE /genera-piano:', err);
-    res.status(err.status || 500).json({ errore: err.message });
+    res.status(err.status || 500).json({ errore: err.code||err.message,...(err.code?{messaggio:err.message}:{}) });
   }
 });
 

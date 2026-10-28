@@ -14,7 +14,7 @@ const OBIETTIVI = [[1600, 75], [2400, 95], [3200, 110]];
 
 function query(data) {
   const risultato = { data, error: null };
-  const q = { select: () => q, eq: () => q, order: () => q, limit: () => q,
+  const q = { select: () => q, eq: () => q, order: () => q, limit: () => q, range: () => q,
     maybeSingle: () => Promise.resolve(risultato),
     then: (resolve, reject) => Promise.resolve(risultato).then(resolve, reject),
   };

@@ -33,7 +33,7 @@ function clienteFinto(reale, profiloSintetico, vincoliSintetici) {
   return {
     from(tabella) {
       if (tabella === 'users') return { select() { return this; }, eq() { return this; }, maybeSingle: async () => ({ data: profiloSintetico, error: null }) };
-      if (tabella === 'user_constraints') return { select() { return this; }, eq: async () => ({ data: vincoliSintetici, error: null }) };
+      if (tabella === 'user_constraints') { const q={select:()=>q,eq:()=>q,order:()=>q,range:()=>q,then:(a,b)=>Promise.resolve({data:vincoliSintetici,error:null}).then(a,b)};return q;}
       return reale.from(tabella);
     },
   };

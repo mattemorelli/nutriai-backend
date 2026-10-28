@@ -117,7 +117,12 @@ function lanciaScript(comando) {
 
 passo('1. node --check sui file del backend', lanciaNodeCheck);
 passo('2. Flag allergeni (contiene_glutine/lattosio/frutta_secca) coerenti con gli ingredienti', () => lanciaScript('verifica-flag-allergeni.js'));
-passo('3. Risoluzione allergeni: ogni vincolo esclude la categoria intera', () => lanciaScript('verifica-risoluzione-allergeni.js'));
+passo('3. Risoluzione allergeni: ogni vincolo esclude la categoria intera', () => {
+  lanciaScript('verifica-risoluzione-allergeni.js');
+  lanciaScript('test-vincoli-verificabili.js');
+  lanciaScript('test-paginazione-vincoli.js');
+  lanciaScript('test-risoluzione-vincoli-scrittura.js');
+});
 passo('4. Controllo permanente pane/patate', () => lanciaScript('verifica-tipo-amido.js'));
 passo('5. Ricette Cook: azioni/fuoco/quote validi su tutto il database', () => lanciaScript('scripts/verifica-ricette.js --db'));
 passo('6. Matrice ridotta (12 combinazioni dieta+allergie)', () => lanciaScript('scripts/verifica-matrice-ridotta.js'));

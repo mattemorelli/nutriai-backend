@@ -58,6 +58,8 @@ function contesto(percorso, opzioni = {}) {
     app:{post:(_,auth,fn)=>{handler=fn;}},richiedeAuth:()=>{},supabase,console,
     ...fabbisogno,...validazione,...validazioneTarget,
     GOAL_VALIDI:['dimagrimento','mantenimento','massa'],DIET_VALIDI:['onnivoro','vegetariano','vegano','pescetariano'],
+    KIND_VALIDI:['allergia','intolleranza','non_gradito'],eSanitario:k=>['allergia','intolleranza'].includes(k),consensoAttivo:async()=>true,
+    risolviERighe:opzioni.risolviERighe||(()=>Promise.resolve([])),
     oggiLocale:()=>new Date().toISOString().slice(0,10),
     generaESalva:async()=>{generazioni++;return {plan_id:'sintetico'};},
   });
@@ -106,4 +108,13 @@ for(const route of ['/peso','/profilo'])for(const code of ['PT409','40001','XX00
  const c=contesto(route,{erroreRpc:code}),prima=structuredClone(c.dati);
  const r=await c.chiama(route==='/peso'?{weight_kg:85}:{goal:'massa',diet:'vegano'});
  assert.equal(r.statusCode,code==='XX000'?500:409);assert.deepEqual(c.dati,prima);assert.equal(c.scritture.length,0);
+});
+
+test('onboarding: esclusione irrisolta rifiutata prima di modificare profilo o peso',async()=>{
+ const c=contesto('/onboarding',{risolviERighe:async()=>{throw require('./vincoli-verificabili').erroreVincoliNonVerificabili();}}),prima=structuredClone(c.dati);
+ const r=await c.chiama({...onboarding,constraints:[{kind:'allergia',subject:'voce non riconosciuta',severity:'assoluto'}]});
+ assert.equal(r.statusCode,422);assert.equal(r.body.errore,'vincoli_non_verificabili');assert.equal(c.scritture.length,0);assert.deepEqual(c.dati,prima);
+});
+for(const constraints of [null,'glutine',[null],[{kind:'allergia'}],Array.from({length:41},()=>({kind:'allergia',subject:'glutine'}))])test('onboarding: vincoli malformati o troppi non vengono ignorati',async()=>{
+ const c=contesto('/onboarding'),r=await c.chiama({...onboarding,constraints});assert.equal(r.statusCode,400);assert.equal(c.scritture.length,0);
 });
