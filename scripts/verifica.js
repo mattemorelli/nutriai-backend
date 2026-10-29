@@ -210,7 +210,10 @@ passo('21. Generazione atomica: input cambiati, rollback e salvataggi concorrent
   lanciaScript('scripts/verifica-generazione-db.js');
 });
 
-passo('22. Preferenze personali private e catalogo pubblico in sola lettura', () => lanciaScript('scripts/verifica-permessi-generatore.js'));
+passo('22. Preferenze personali private e catalogo pubblico in sola lettura', () => {
+  lanciaScript('scripts/verifica-permessi-generatore.js');
+  lanciaScript('scripts/verifica-proprieta-rls.js');
+});
 
 const falliti = risultati.filter((r) => !r.ok);
 console.log(`\n${'='.repeat(60)}`);
