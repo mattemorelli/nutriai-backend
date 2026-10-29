@@ -1,3 +1,4 @@
+const {validaScelte}=require('./validazione-scelte');
 const {salvaDatiOnboarding}=require('./onboarding');
 const {cambiaBlocco}=require('./blocca-piano');
 const {preferenzaFacoltativa,erroreVincoliNonVerificabili,verificaVincoli,leggiVincoliDichiarati}=require('./vincoli-verificabili');
@@ -642,7 +643,9 @@ app.get('/tu', richiedeAuth, async (req, res) => {
 // Salva le risposte, calcola il fabbisogno, genera il primo piano
 app.post('/onboarding', richiedeAuth, async (req, res) => {
   const utenteId = req.utente.id;
-  const b = req.body || {};
+  let b = req.body || {};
+  try {b={...b,...validaScelte(b)};}catch(e){return res.status(400).json({errore:e.code,messaggio:e.message});}
+  if('cook_days' in b && !('pasti_casa' in b) && (!Array.isArray(b.cook_days)||!b.cook_days.length||!b.cook_days.every(d=>Number.isInteger(d)&&d>=1&&d<=7)))return res.status(400).json({errore:'scelte_non_valide',messaggio:'Choose valid cooking days.'});
 
   // --- validazione ---
   const errori = [];
@@ -802,7 +805,8 @@ const DIET_VALIDI = ['onnivoro', 'vegetariano', 'vegano', 'pescetariano'];
 // cambia un campo alla volta: si aggiornano solo le chiavi presenti nel corpo.
 app.post('/profilo', richiedeAuth, async (req, res) => {
   const b = req.body || {};
-  const aggiornamento = {};
+  let aggiornamento;
+  try {aggiornamento=validaScelte(b);}catch(e){return res.status(400).json({errore:e.code,messaggio:e.message});}
 
   if ('goal' in b) {
     if (!GOAL_VALIDI.includes(b.goal)) return res.status(400).json({ errore: 'obiettivo non valido' });

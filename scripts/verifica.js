@@ -144,7 +144,10 @@ passo('11. Fabbisogno e profilo: errori di lettura distinti da dati assenti', ()
   lanciaScript('test-aggiornamento-fabbisogno.js');
   lanciaScript('scripts/verifica-fabbisogno-db.js');
 });
-passo('12. Sicurezza input: eta, peso, altezza e BMI-obiettivo', () => lanciaScript('test-sicurezza-input.js'));
+passo('12. Sicurezza input: eta, peso, altezza, BMI e scelte dichiarate', () => {
+  lanciaScript('test-sicurezza-input.js');
+  lanciaScript('test-validazione-scelte.js');
+});
 passo('13. Recupero proteico: vincoli, piatti bloccati e contatori', () => {
   lanciaScript('test-recupero-proteico.js');
   lanciaScript('scripts/verifica-recupero-proteico.js');

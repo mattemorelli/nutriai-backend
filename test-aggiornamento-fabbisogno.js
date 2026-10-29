@@ -60,7 +60,7 @@ function contesto(percorso, opzioni = {}) {
   assert.ok(da>=0&&a>da);
   vm.runInNewContext(sorgente.slice(da,a),{
     app:{post:(_,auth,fn)=>{handler=fn;}},richiedeAuth:()=>{},supabase,console,
-    ...fabbisogno,...validazione,...validazioneTarget,...require('./onboarding'),
+    ...fabbisogno,...validazione,...validazioneTarget,...require('./onboarding'),...require('./validazione-scelte'),
     GOAL_VALIDI:['dimagrimento','mantenimento','massa'],DIET_VALIDI:['onnivoro','vegetariano','vegano','pescetariano'],
     KIND_VALIDI:['allergia','intolleranza','non_gradito'],eSanitario:k=>['allergia','intolleranza'].includes(k),consensoAttivo:async()=>true,
     risolviERighe:opzioni.risolviERighe||(()=>Promise.resolve([])),
@@ -128,3 +128,8 @@ for(const [code,status] of [['PT409',409],['PT403',403],['57014',503],['XX000',5
  assert.equal(r.statusCode,status);assert.deepEqual(c.dati,prima);assert.equal(c.scritture.length,0);assert.equal(c.generazioni(),0);
 });
 test('onboarding: preferenze duplicate rifiutate prima delle scritture',async()=>{const c=contesto('/onboarding'),r=await c.chiama({...onboarding,cuisines:['europea','europea']});assert.equal(r.statusCode,400);assert.equal(c.scritture.length,0);});
+
+for(const route of ['/onboarding','/profilo'])for(const bad of [{diet:'vegan'},{diet:null},{evening_minutes:0},{evening_minutes:'abc'},{evening_minutes:15.5},{household_size:1.5},{household_size:true},{lunch_away:'false'},{paesi:'italia'}])test(route+': scelta dichiarata invalida '+JSON.stringify(bad)+' non viene sostituita da un default',async()=>{
+ const c=contesto(route),prima=structuredClone(c.dati),r=await c.chiama(route==='/onboarding'?{...onboarding,...bad}:bad);assert.equal(r.statusCode,400);assert.equal(r.body.errore,'scelte_non_valide');assert.deepEqual(c.dati,prima);assert.equal(c.scritture.length,0);
+});
+test('profilo: lunch_away cambia davvero il dato e annulla la vecchia griglia',async()=>{const c=contesto('/profilo',{profilo:{lunch_away:true,pasti_casa:{1:{pranzo:false,cena:true}}}}),r=await c.chiama({lunch_away:false});assert.equal(r.statusCode,200);assert.equal(c.dati.users[0].lunch_away,false);assert.equal(c.dati.users[0].pasti_casa,null);});
