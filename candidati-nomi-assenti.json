@@ -1,0 +1,758 @@
+[
+ {
+  "id": "a30774c0-4bcb-4e83-9e64-7cfd412820d1",
+  "nome": "Calamari alla griglia con limone",
+  "nome_en": "Grilled squid with lemon",
+  "parola": "calamari"
+ },
+ {
+  "id": "b6a00001-0000-0000-0000-000000000002",
+  "nome": "Pesche allo sciroppo (versione fresca)",
+  "nome_en": "Peaches in syrup (fresh version)",
+  "parola": "sciroppo"
+ },
+ {
+  "id": "c0000004-0000-0000-0000-000000000003",
+  "nome": "Mela cotta con cannella",
+  "nome_en": "Cinnamon Stewed Apple",
+  "parola": "cannella"
+ },
+ {
+  "id": "15846fb8-b7ce-42aa-98fe-8cead95898eb",
+  "nome": "Tofu saltato con bok choy",
+  "nome_en": "Stir-fried tofu with bok choy",
+  "parola": "choy"
+ },
+ {
+  "id": "78e4b9b1-0340-48ed-b59f-4b151fafc380",
+  "nome": "Salmone e cavolo cinese al vapore",
+  "nome_en": "Steamed salmon with cabbage",
+  "parola": "cinese"
+ },
+ {
+  "id": "dddddddd-0000-0000-0000-000000000001",
+  "nome": "Insalata mista",
+  "nome_en": "Mixed salad",
+  "parola": "mista"
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000011",
+  "nome": "Riso con cavoletti e pancetta",
+  "nome_en": "Rice with Brussels sprouts and pancetta",
+  "parola": "pancetta"
+ },
+ {
+  "id": "b3a00001-0000-0000-0000-000000000006",
+  "nome": "Zucca al forno con rosmarino",
+  "nome_en": "Roasted Squash with Rosemary",
+  "parola": "rosmarino"
+ },
+ {
+  "id": "44eb91d4-2608-4dc6-8b3f-b10ce338eb43",
+  "nome": "Frittata di erbe e formaggio di capra",
+  "nome_en": "Herb and goat cheese omelette",
+  "parola": "capra"
+ },
+ {
+  "id": "f3000001-0000-0000-0000-000000000007",
+  "nome": "Insalata di carote e arance",
+  "nome_en": "Carrot and Orange Salad",
+  "parola": "arance"
+ },
+ {
+  "id": "58a4c742-66e5-4f05-a9cb-13a292f0ca76",
+  "nome": "Fagioli giganti al pomodoro",
+  "nome_en": "Giant beans in tomato",
+  "parola": "giganti"
+ },
+ {
+  "id": "5fd19b10-fc02-4696-8ab7-13743a12bb64",
+  "nome": "Merluzzo con purè di sedano rapa",
+  "nome_en": "Cod with celeriac mash",
+  "parola": "sedano"
+ },
+ {
+  "id": "5fd19b10-fc02-4696-8ab7-13743a12bb64",
+  "nome": "Merluzzo con purè di sedano rapa",
+  "nome_en": "Cod with celeriac mash",
+  "parola": "rapa"
+ },
+ {
+  "id": "a9000001-0000-0000-0000-000000000006",
+  "nome": "Gamberi in salsa piccante alla Sichuan",
+  "nome_en": "Shrimp in Sichuan Spicy Sauce",
+  "parola": "piccante"
+ },
+ {
+  "id": "34646e46-6f82-47d7-acc7-264674676246",
+  "nome": "Branzino al burro nocciola",
+  "nome_en": "Sea bass with brown butter",
+  "parola": "nocciola"
+ },
+ {
+  "id": "d854990e-bc45-4f75-955c-9b8306623c71",
+  "nome": "Zuppa di pesce spagnola",
+  "nome_en": "Spanish fish soup",
+  "parola": "pesce"
+ },
+ {
+  "id": "b2000002-0000-0000-0000-000000000004",
+  "nome": "Muffin integrali ai mirtilli",
+  "nome_en": "Whole Wheat Blueberry Muffins",
+  "parola": "muffin"
+ },
+ {
+  "id": "b3a00001-0000-0000-0000-000000000005",
+  "nome": "Bieta saltata",
+  "nome_en": "Pan-tossed Swiss Chard",
+  "parola": "bieta"
+ },
+ {
+  "id": "b6000002-0000-0000-0000-000000000009",
+  "nome": "Tuna noodle casserole (versione leggera)",
+  "nome_en": "Tuna noodle casserole (light version)",
+  "parola": "noodle"
+ },
+ {
+  "id": "0ffe4795-29de-4425-a8c9-bffc9391938c",
+  "nome": "Pane di segale con marmellata di prugne",
+  "nome_en": "Rye bread with plum jam",
+  "parola": "prugne"
+ },
+ {
+  "id": "b3a00001-0000-0000-0000-000000000010",
+  "nome": "Bieta e patate",
+  "nome_en": "Chard and potatoes",
+  "parola": "bieta"
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000014",
+  "nome": "Grano saraceno con astice (proxy gamberi)",
+  "nome_en": "Buckwheat with Lobster (substitute shrimp)",
+  "parola": "gamberi"
+ },
+ {
+  "id": "f2ccbab3-2058-4106-b1c8-46c73004bddb",
+  "nome": "Bastoncini di cetriolo e carota con formaggio fresco",
+  "nome_en": "Cucumber and carrot sticks with fresh cheese",
+  "parola": "bastoncini"
+ },
+ {
+  "id": "4c613cab-d6ec-48bb-b392-f81d8467e676",
+  "nome": "Fave e piselli al basilico con pomodoro",
+  "nome_en": "Broad beans and peas with basil and tomato",
+  "parola": "pomodoro"
+ },
+ {
+  "id": "7d2d1de6-2ace-4605-afe7-38189b77f405",
+  "nome": "Cetrioli alla panna acida ed erbe",
+  "nome_en": "Cucumbers with cream and herbs",
+  "parola": "panna"
+ },
+ {
+  "id": "7d2d1de6-2ace-4605-afe7-38189b77f405",
+  "nome": "Cetrioli alla panna acida ed erbe",
+  "nome_en": "Cucumbers with cream and herbs",
+  "parola": "acida"
+ },
+ {
+  "id": "d0f20058-2e5c-4653-af4a-411231f0fa78",
+  "nome": "Bok choy e tofu al vapore",
+  "nome_en": "Steamed tofu with bok choy",
+  "parola": "choy"
+ },
+ {
+  "id": "ba000002-0000-0000-0000-000000000005",
+  "nome": "Wild rice con verdure del Minnesota",
+  "nome_en": "Wild rice with Minnesota vegetables",
+  "parola": "wild"
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000001",
+  "nome": "Avena salata con verdure",
+  "nome_en": "Savory Oatmeal with Vegetables",
+  "parola": "salata"
+ },
+ {
+  "id": "8d57b79e-34d4-40e6-80a3-581f86bc4dac",
+  "nome": "Pollo alle erbe con cavolfiore",
+  "nome_en": "Herb chicken with cauliflower",
+  "parola": "cavolfiore"
+ },
+ {
+  "id": "2f64e569-94d4-42b6-bdfc-731bd6c9dae6",
+  "nome": "Branzino all'acqua pazza",
+  "nome_en": "Sea bass in acqua pazza",
+  "parola": "acqua"
+ },
+ {
+  "id": "46d10620-3e46-484e-8914-093c555c77bd",
+  "nome": "Tostada con queso fresco y miel",
+  "nome_en": "Toast with fresh cheese and honey",
+  "parola": "queso"
+ },
+ {
+  "id": "0f33a6cc-609b-49db-99ab-6336eae0e768",
+  "nome": "Yogur con plátano",
+  "nome_en": "Yogurt with banana",
+  "parola": "platano"
+ },
+ {
+  "id": "189915c7-23e3-4151-bff0-729fb5eba906",
+  "nome": "Porridge con plátano y canela",
+  "nome_en": "Porridge with banana and cinnamon",
+  "parola": "platano"
+ },
+ {
+  "id": "9bdd14db-a373-4259-9ce5-aec3bb50bc6a",
+  "nome": "Iogurte natural com mel",
+  "nome_en": "Natural yogurt with honey",
+  "parola": "natural"
+ },
+ {
+  "id": "6493e1d5-65ba-4f1c-bf8b-b5e56e3bbc36",
+  "nome": "Salmone e bok choy al vapore",
+  "nome_en": "Steamed salmon with bok choy",
+  "parola": "choy"
+ },
+ {
+  "id": "24fb9124-88d2-49d7-88a5-c8421ad3d428",
+  "nome": "Salmone teriyaki veloce",
+  "nome_en": "Quick teriyaki salmon",
+  "parola": "teriyaki"
+ },
+ {
+  "id": "b6000002-0000-0000-0000-000000000010",
+  "nome": "Green bean casserole leggera (Ringraziamento)",
+  "nome_en": "Light green bean casserole (Thanksgiving)",
+  "parola": "green"
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000001",
+  "nome": "Pad Thai con gamberi e tofu",
+  "nome_en": "Pad Thai with Shrimp and Tofu",
+  "parola": "thai"
+ },
+ {
+  "id": "a3900001-0000-0000-0000-000000000009",
+  "nome": "Zucchine e menta",
+  "nome_en": "Zucchini and mint",
+  "parola": "menta"
+ },
+ {
+  "id": "a746c9a1-8bfd-461a-a049-6d8e3687d84c",
+  "nome": "Radikia salata",
+  "nome_en": "Chicory salad with lemon",
+  "parola": "salata"
+ },
+ {
+  "id": "d4b79439-8a4d-4df9-890f-3459723dc443",
+  "nome": "Salmone e asparagi al forno",
+  "nome_en": "Baked salmon with asparagus",
+  "parola": "asparagi"
+ },
+ {
+  "id": "6cb9274e-1d49-4337-a25c-16ebcd22b2a5",
+  "nome": "Rote-Bete-Salat (insalata di barbabietola alla tedesca)",
+  "nome_en": "Rote-Bete-Salat (German beetroot salad)",
+  "parola": "salat"
+ },
+ {
+  "id": "bd000001-0000-0000-0000-000000000193",
+  "nome": "Fagioli neri come spuntino salato",
+  "nome_en": "Black beans as savory snack",
+  "parola": "salato"
+ },
+ {
+  "id": "6849c2df-64a6-4774-acc5-17f8e739758c",
+  "nome": "Sgombro alla senape leggero",
+  "nome_en": "Light mustard mackerel",
+  "parola": "senape"
+ },
+ {
+  "id": "d72f76b8-f68c-4b1c-8d8d-44da039b0ffb",
+  "nome": "Zuppa di verdure alla francese",
+  "nome_en": "French vegetable soup",
+  "parola": "francese"
+ },
+ {
+  "id": "a0990620-7e75-4158-b414-391883f6a88a",
+  "nome": "Carote glassate al miele all'inglese",
+  "nome_en": "English honey-glazed carrots",
+  "parola": "glassate"
+ },
+ {
+  "id": "ae000001-0000-0000-0000-000000000011",
+  "nome": "Farofa (farina di manioca tostata)",
+  "nome_en": "Farofa (toasted cassava flour)",
+  "parola": "farina"
+ },
+ {
+  "id": "03a570ac-cdc7-4507-81ea-556f63bbcd17",
+  "nome": "Tostada con queso y nueces",
+  "nome_en": "Toast with cheese and walnuts",
+  "parola": "queso"
+ },
+ {
+  "id": "a3900001-0000-0000-0000-000000000010",
+  "nome": "Carote e cumino",
+  "nome_en": "Carrots and cumin",
+  "parola": "cumino"
+ },
+ {
+  "id": "a2900001-0000-0000-0000-000000000012",
+  "nome": "Pecorino con fave (proxy lenticchie)",
+  "nome_en": "Pecorino with Lentils",
+  "parola": "fave"
+ },
+ {
+  "id": "8c1cfbf9-68b3-4a0d-b1cf-0d5c8548d074",
+  "nome": "Uova con asparagi alla spagnola",
+  "nome_en": "Spanish eggs with green vegetables",
+  "parola": "asparagi"
+ },
+ {
+  "id": "4a8e9326-a949-4585-8097-ff41f69af50c",
+  "nome": "Insalata di lenticchie e capra",
+  "nome_en": "Lentil and goat cheese salad",
+  "parola": "capra"
+ },
+ {
+  "id": "fed04bbd-d163-4c10-b8da-643ab0ebd814",
+  "nome": "Fava, purea di piselli spezzati",
+  "nome_en": "Fava split pea purée",
+  "parola": "fava"
+ },
+ {
+  "id": "a72417f4-86e3-45c9-871d-fdd5d9e22aa2",
+  "nome": "Tonno fresco alla siciliana",
+  "nome_en": "Sicilian-style fresh tuna",
+  "parola": "siciliana"
+ },
+ {
+  "id": "a7dbb99a-c9ce-4bc7-a437-eec23eea498d",
+  "nome": "Pane tostato con marmellata d'arance",
+  "nome_en": "Toast with orange marmalade",
+  "parola": "arance"
+ },
+ {
+  "id": "85e5ecfa-f2c7-4f03-9ada-8bc932e5b0fa",
+  "nome": "Lupini con finocchi, arancia e aceto",
+  "nome_en": "Lupini beans with fennel, orange and vinegar",
+  "parola": "finocchi"
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000012",
+  "nome": "Pollo al forno con paprika (baked chicken with peppers)",
+  "nome_en": "Baked chicken with peppers and onions",
+  "parola": "paprika"
+ },
+ {
+  "id": "14e14c1d-494a-453d-ae20-f708471918b8",
+  "nome": "Spätzle al burro e formaggio",
+  "nome_en": "Spätzle with butter and cheese",
+  "parola": "formaggio"
+ },
+ {
+  "id": "290dd7e9-353e-4a51-b9de-03d03c9cb299",
+  "nome": "Carote al limone e prezzemolo",
+  "nome_en": "Carrots with lemon and herbs",
+  "parola": "prezzemolo"
+ },
+ {
+  "id": "a84bdc9d-0073-48d8-b4c6-270c4dbc5315",
+  "nome": "Carote glassate al timo",
+  "nome_en": "Thyme-glazed carrots",
+  "parola": "glassate"
+ },
+ {
+  "id": "581de25a-3970-4025-ba18-4a8c3e0d7246",
+  "nome": "Purea di sedano rapa",
+  "nome_en": "Celery purée",
+  "parola": "rapa"
+ },
+ {
+  "id": "c0bca247-a7ad-4fdc-92cf-9e8ce3207307",
+  "nome": "Curry rapido di lenticchie rosse al cocco e lime",
+  "nome_en": "Quick red lentil, coconut and lime curry",
+  "parola": "curry"
+ },
+ {
+  "id": "b3a00001-0000-0000-0000-000000000008",
+  "nome": "Verdure miste al vapore",
+  "nome_en": "Steamed Mixed Vegetables",
+  "parola": "miste"
+ },
+ {
+  "id": "b7000001-0000-0000-0000-000000000007",
+  "nome": "Ceviche di pesce bianco",
+  "nome_en": "White fish ceviche",
+  "parola": "pesce"
+ },
+ {
+  "id": "d5000001-0000-0000-0000-000000000098",
+  "nome": "Muffin integrale con frutti di bosco",
+  "nome_en": "Whole wheat muffins with berries",
+  "parola": "muffin"
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000007",
+  "nome": "Cornbread (pane di mais del Sud)",
+  "nome_en": "Cornbread (Southern corn bread)",
+  "parola": "pane"
+ },
+ {
+  "id": "a3900001-0000-0000-0000-000000000008",
+  "nome": "Insalata di finocchi e arance",
+  "nome_en": "Fennel and orange salad",
+  "parola": "arance"
+ },
+ {
+  "id": "a5900001-0000-0000-0000-000000000011",
+  "nome": "Ananas e cocco (proxy noci)",
+  "nome_en": "Pineapple and coconut (proxy nuts)",
+  "parola": "cocco"
+ },
+ {
+  "id": "a5900001-0000-0000-0000-000000000011",
+  "nome": "Ananas e cocco (proxy noci)",
+  "nome_en": "Pineapple and coconut (proxy nuts)",
+  "parola": "noci"
+ },
+ {
+  "id": "69f80bbd-ae77-4348-822c-310bd9285ca9",
+  "nome": "Gamberi aglio e prezzemolo",
+  "nome_en": "Garlic shrimp",
+  "parola": "prezzemolo"
+ },
+ {
+  "id": "ab000001-0000-0000-0000-000000000009",
+  "nome": "Insalata di zucca kabocha alla coreana",
+  "nome_en": "Korean-style kabocha squash salad",
+  "parola": "coreana"
+ },
+ {
+  "id": "b3000002-0000-0000-0000-000000000009",
+  "nome": "Dolmades leggeri (involtini di foglie di vite)",
+  "nome_en": "Lemon rice with herbs, dolmades style",
+  "parola": "foglie"
+ },
+ {
+  "id": "e0d04f92-2280-4eaf-9704-027b1f50d34e",
+  "nome": "Bevanda vegetale con fiocchi di mais senza glutine",
+  "nome_en": "Plant milk with gluten-free corn flakes",
+  "parola": "vegetale"
+ },
+ {
+  "id": "a4000001-0000-0000-0000-000000000076",
+  "nome": "Anacardi e verdure croccanti",
+  "nome_en": "Cashews and crispy vegetables",
+  "parola": "croccanti"
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000011",
+  "nome": "Okra soup (zuppa di gombo del Sud)",
+  "nome_en": "Okra soup (Southern gumbo soup)",
+  "parola": "okra"
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000011",
+  "nome": "Okra soup (zuppa di gombo del Sud)",
+  "nome_en": "Okra soup (Southern gumbo soup)",
+  "parola": "gombo"
+ },
+ {
+  "id": "310ef84b-6b94-4af1-961f-79802457ede1",
+  "nome": "Uvas y queso",
+  "nome_en": "Grapes and cheese",
+  "parola": "queso"
+ },
+ {
+  "id": "fddcf63e-745e-4058-9dda-3312be4ba586",
+  "nome": "Tortilla francesa con hierbas",
+  "nome_en": "French omelette with herbs",
+  "parola": "francesa"
+ },
+ {
+  "id": "1554fdce-ebd7-444e-8e73-1133892af496",
+  "nome": "Almôndegas de peru com tomate",
+  "nome_en": "Turkey meatballs in tomato",
+  "parola": "peru"
+ },
+ {
+  "id": "d5195935-542c-47a8-a381-fc5cda783188",
+  "nome": "Peru grelhado com piri piri",
+  "nome_en": "Grilled turkey with piri piri",
+  "parola": "peru"
+ },
+ {
+  "id": "b1a00001-0000-0000-0000-000000000003",
+  "nome": "Couscous con verdure miste",
+  "nome_en": "Couscous with Mixed Vegetables",
+  "parola": "miste"
+ },
+ {
+  "id": "eb1c96c7-1350-4b0a-9bb9-78429bbd0044",
+  "nome": "Sumo de laranja natural",
+  "nome_en": "Fresh orange juice",
+  "parola": "natural"
+ },
+ {
+  "id": "dcc16f54-ec31-4fa0-86d1-7f77562cacdb",
+  "nome": "Sumo de maçã natural",
+  "nome_en": "Fresh apple juice",
+  "parola": "natural"
+ },
+ {
+  "id": "b6d7fce8-3d7b-4c07-b88a-bb6bf3eaa8a3",
+  "nome": "Pollo e cavolfiore al forno",
+  "nome_en": "Baked chicken with cauliflower",
+  "parola": "cavolfiore"
+ },
+ {
+  "id": "41cb5049-ee3e-457b-8bd3-606d15a497d0",
+  "nome": "Pane nero con salmone affumicato e erba cipollina",
+  "nome_en": "Dark bread with smoked salmon and chives",
+  "parola": "nero"
+ },
+ {
+  "id": "b5a00001-0000-0000-0000-000000000012",
+  "nome": "Frutta secca mista (mandorle e noci)",
+  "nome_en": "Mixed nuts (almonds and walnuts)",
+  "parola": "mista"
+ },
+ {
+  "id": "bc3d93d1-6228-475c-ab97-8628223cb912",
+  "nome": "Fasolia salata",
+  "nome_en": "White bean salad",
+  "parola": "salata"
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000006",
+  "nome": "Japchae (noodle saltati coreani)",
+  "nome_en": "Japchae (Korean stir-fried noodles)",
+  "parola": "coreani"
+ },
+ {
+  "id": "13ce76e1-5ba4-4734-af57-fe6cdefd9b20",
+  "nome": "Sovracoscia di pollo al forno con patate e rosmarino",
+  "nome_en": "Baked chicken thigh with potatoes",
+  "parola": "rosmarino"
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000008",
+  "nome": "Pad Thai vegetariano con tofu",
+  "nome_en": "Vegetarian Pad Thai with tofu",
+  "parola": "thai"
+ },
+ {
+  "id": "a8000001-0000-0000-0000-000000000008",
+  "nome": "Edamame al sale marino",
+  "nome_en": "Edamame with Sea Salt",
+  "parola": "marino"
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000033",
+  "nome": "Zuppa di lenticchie americana",
+  "nome_en": "American lentil soup",
+  "parola": "americana"
+ },
+ {
+  "id": "ab000001-0000-0000-0000-000000000002",
+  "nome": "Gaji namul (melanzane coreane al vapore)",
+  "nome_en": "Gaji namul (Korean steamed eggplant)",
+  "parola": "coreane"
+ },
+ {
+  "id": "d6000001-0000-0000-0000-000000000103",
+  "nome": "Carote baby con hummus",
+  "nome_en": "Baby carrots with hummus",
+  "parola": "baby"
+ },
+ {
+  "id": "9a3beb33-76d9-4aed-becc-8773030922f1",
+  "nome": "Cavolo riccio croccante al forno",
+  "nome_en": "Crispy baked kale",
+  "parola": "croccante"
+ },
+ {
+  "id": "7011fbde-cd9e-4e96-860b-f06e58edeac5",
+  "nome": "Purè di piselli spezzati",
+  "nome_en": "Split pea purée",
+  "parola": "spezzati"
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000001",
+  "nome": "Quinoa con verdure miste",
+  "nome_en": "Quinoa with mixed vegetables",
+  "parola": "miste"
+ },
+ {
+  "id": "c9000001-0000-0000-0000-000000000246",
+  "nome": "Insalata verde mista",
+  "nome_en": "Mixed Green Salad",
+  "parola": "mista"
+ },
+ {
+  "id": "fe51cad8-5beb-4cfc-8a69-12974154ddc7",
+  "nome": "Uova e asparagi in padella",
+  "nome_en": "Eggs with green vegetables",
+  "parola": "asparagi"
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000010",
+  "nome": "Baked mac and cheese (versione più leggera)",
+  "nome_en": "Baked mac and cheese (lighter version)",
+  "parola": "cheese"
+ },
+ {
+  "id": "1c11cd91-a85b-4c72-aa73-2612fa2686ae",
+  "nome": "Schwarzbrot con formaggio e cetriolo",
+  "nome_en": "Schwarzbrot (German dark bread) with cheese and cucumber",
+  "parola": "formaggio"
+ },
+ {
+  "id": "b0000001-0000-0000-0000-000000000006",
+  "nome": "Anzac cookies (versione con meno zucchero)",
+  "nome_en": "Anzac cookies (reduced sugar version)",
+  "parola": "zucchero"
+ },
+ {
+  "id": "ae000001-0000-0000-0000-000000000006",
+  "nome": "Moqueca di pesce (zuppa brasiliana al cocco)",
+  "nome_en": "Moqueca (Brazilian Coconut Fish Stew)",
+  "parola": "pesce"
+ },
+ {
+  "id": "b0000001-0000-0000-0000-000000000007",
+  "nome": "Fish and chips al forno (non fritto)",
+  "nome_en": "Baked fish and chips (non-fried)",
+  "parola": "fish"
+ },
+ {
+  "id": "ab000001-0000-0000-0000-000000000004",
+  "nome": "Musaengchae (insalata di daikon piccante)",
+  "nome_en": "Musaengchae (Spicy daikon radish salad)",
+  "parola": "piccante"
+ },
+ {
+  "id": "5460708e-b1f8-4480-b89a-0d162ad9fa66",
+  "nome": "Pease pudding (purè di piselli spezzati all'inglese)",
+  "nome_en": "Pease pudding (English split pea purée)",
+  "parola": "pease"
+ },
+ {
+  "id": "5460708e-b1f8-4480-b89a-0d162ad9fa66",
+  "nome": "Pease pudding (purè di piselli spezzati all'inglese)",
+  "nome_en": "Pease pudding (English split pea purée)",
+  "parola": "spezzati"
+ },
+ {
+  "id": "75970136-a55f-4d8f-91f3-b43a54e0a61b",
+  "nome": "Mushy peas (piselli schiacciati all'inglese)",
+  "nome_en": "Mushy peas",
+  "parola": "peas"
+ },
+ {
+  "id": "b3000002-0000-0000-0000-000000000001",
+  "nome": "Ratatouille (stufato di verdure francese)",
+  "nome_en": "Ratatouille (French vegetable stew)",
+  "parola": "francese"
+ },
+ {
+  "id": "b7000002-0000-0000-0000-000000000009",
+  "nome": "Salmone selvaggio dell'Alaska alla griglia",
+  "nome_en": "Grilled wild salmon with lemon",
+  "parola": "selvaggio"
+ },
+ {
+  "id": "b7000002-0000-0000-0000-000000000009",
+  "nome": "Salmone selvaggio dell'Alaska alla griglia",
+  "nome_en": "Grilled wild salmon with lemon",
+  "parola": "dell"
+ },
+ {
+  "id": "b7000002-0000-0000-0000-000000000009",
+  "nome": "Salmone selvaggio dell'Alaska alla griglia",
+  "nome_en": "Grilled wild salmon with lemon",
+  "parola": "alaska"
+ },
+ {
+  "id": "27dde633-5cbf-4e72-b559-06be7fe16129",
+  "nome": "Lenticchie alla francese",
+  "nome_en": "French-style lentils",
+  "parola": "francese"
+ },
+ {
+  "id": "45f88727-8ea7-45b4-9c5e-8e727377fb31",
+  "nome": "Finocchi gratinati leggeri",
+  "nome_en": "Light fennel gratin",
+  "parola": "finocchi"
+ },
+ {
+  "id": "6462adf8-d390-41db-a633-bf3287ec0ef3",
+  "nome": "Panino con uovo e senape",
+  "nome_en": "Egg sandwich with mustard",
+  "parola": "panino"
+ },
+ {
+  "id": "9337a40d-eec3-4542-b030-9b33fbc5ce55",
+  "nome": "Insalata di sedano rapa e mele",
+  "nome_en": "Celeriac and apple salad",
+  "parola": "rapa"
+ },
+ {
+  "id": "5ff928b1-ab1a-4c61-b834-0dcc39a51c54",
+  "nome": "Grüne-Bohnen-Salat (insalata di fagiolini alla tedesca)",
+  "nome_en": "Grüne-Bohnen-Salat (German green bean salad)",
+  "parola": "salat"
+ },
+ {
+  "id": "38aae902-bab8-42d7-9935-f8c131988fb3",
+  "nome": "Carote glassate al miele",
+  "nome_en": "Honey-glazed carrots",
+  "parola": "glassate"
+ },
+ {
+  "id": "a9000001-0000-0000-0000-000000000004",
+  "nome": "Pollo al limone cinese (senza frittura)",
+  "nome_en": "Chinese Lemon Chicken (no deep frying)",
+  "parola": "cinese"
+ },
+ {
+  "id": "b9000003-0000-0000-0000-000000000009",
+  "nome": "Shepherd's pie (pasticcio di carne e patate inglese, versione magra)",
+  "nome_en": "Cottage pie with lamb",
+  "parola": "carne"
+ },
+ {
+  "id": "c3000001-0000-0000-0000-000000000075",
+  "nome": "Sgombro con kale e salsa di soia (stile asiatico)",
+  "nome_en": "Mackerel with kale and soy sauce (Asian style)",
+  "parola": "sgombro"
+ },
+ {
+  "id": "ab000001-0000-0000-0000-000000000007",
+  "nome": "Broccoli saltati alla coreana (namul)",
+  "nome_en": "Korean-style Pan-tossed Broccoli (Namul)",
+  "parola": "coreana"
+ },
+ {
+  "id": "ba000002-0000-0000-0000-000000000003",
+  "nome": "Pork tenderloin sandwich dell'Indiana (al forno)",
+  "nome_en": "Pork tenderloin sandwich from Indiana (oven-baked)",
+  "parola": "dell"
+ },
+ {
+  "id": "bc226114-b59e-40af-926a-e5892a3691ce",
+  "nome": "Piselli alla francese",
+  "nome_en": "Peas à la française",
+  "parola": "francese"
+ },
+ {
+  "id": "bce9f7dc-dae4-4bde-86a8-179e764300d8",
+  "nome": "Zuppa di piselli spezzati e patate",
+  "nome_en": "Split pea and potato soup",
+  "parola": "spezzati"
+ }
+]

@@ -1,0 +1,7076 @@
+[
+ {
+  "id": "78add8ac-c4f5-4bb6-9765-fd6d80606979",
+  "name": "Ensalada criolla",
+  "name_en": "Ensalada criolla",
+  "meal_slot": "contorno",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "757e738c-3ae5-4ce1-a26f-8dd35b2a9a7a",
+  "name": "Zucchine grigliate al chimichurri",
+  "name_en": "Griddled courgettes with chimichurri",
+  "meal_slot": "contorno",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "85e9f258-21f1-4bce-86f0-1f38011949f1",
+  "name": "Zucca arrosto all'origano e aceto",
+  "name_en": "Roast squash with oregano and vinegar",
+  "meal_slot": "contorno",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "b7000001-0000-0000-0000-000000000002",
+  "name": "Yuca al forno con chimichurri",
+  "name_en": "Roasted Yuca with Chimichurri",
+  "meal_slot": "contorno",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000118",
+  "name": "Mais con zucchine e chimichurri",
+  "name_en": "Corn with Zucchini and Chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000094",
+  "name": "Platano con avocado e chimichurri",
+  "name_en": "Plantain with avocado and chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000108",
+  "name": "Platano con pomodoro e chimichurri",
+  "name_en": "Plantain with tomato and chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000107",
+  "name": "Quinoa rossa con peperoni e chimichurri",
+  "name_en": "Red quinoa with bell peppers and chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000099",
+  "name": "Quinoa rossa con cipolla e chimichurri",
+  "name_en": "Red quinoa with onion and chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000125",
+  "name": "Quinoa rossa con pomodoro e chimichurri",
+  "name_en": "Red Quinoa with Tomato and Chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000124",
+  "name": "Quinoa rossa con zucchine e chimichurri",
+  "name_en": "Red Quinoa with Zucchini and Chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000126",
+  "name": "Riso con avocado e chimichurri",
+  "name_en": "Rice with Avocado and Chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000128",
+  "name": "Riso con zucchine e chimichurri",
+  "name_en": "Rice with Zucchini and Chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000129",
+  "name": "Yuca con cipolla e chimichurri",
+  "name_en": "Yuca (cassava) with Onion and Chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000133",
+  "name": "Yuca con avocado e chimichurri",
+  "name_en": "Yuca with avocado and chimichurri",
+  "meal_slot": "primo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ae000001-0000-0000-0000-000000000003",
+  "name": "Empanadas al forno con manzo",
+  "name_en": "Baked Empanadas with beef",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ae000001-0000-0000-0000-000000000004",
+  "name": "Empanadas al forno con pollo",
+  "name_en": "Baked Empanadas with chicken",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000137",
+  "name": "Fagioli con pomodoro e chimichurri",
+  "name_en": "Beans with tomato and chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "a5f76c8b-5723-44ce-a09a-00512ea8262b",
+  "name": "Manzo e broccoli in padella",
+  "name_en": "Beef and broccoli",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000167",
+  "name": "Manzo con cipolla e coriandolo",
+  "name_en": "Beef with onion and cilantro",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "a16132cf-ee8c-4ab0-bc4b-cf258b1514a4",
+  "name": "Fagioli neri e portobello grigliati con chimichurri al coriandolo",
+  "name_en": "Black beans and grilled portobello with coriander chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "54bf0096-1774-4767-b98a-d3fe3b2af8ef",
+  "name": "Fave all'origano e aceto con carote e cipolla rossa",
+  "name_en": "Broad beans with oregano, vinegar, carrots and red onion",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000155",
+  "name": "Pollo con cipolla e chimichurri",
+  "name_en": "Chicken with Onion and Chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000138",
+  "name": "Pollo con pomodoro e chimichurri",
+  "name_en": "Chicken with tomato and chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "d2000001-0000-0000-0000-000000000034",
+  "name": "Pollo con pomodoro e erbe fresche",
+  "name_en": "Chicken with Tomato and Fresh Herbs",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000162",
+  "name": "Pollo con zucchine e chimichurri",
+  "name_en": "Chicken with zucchini and chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "5a68e9c6-f05a-456c-881f-168eea30d54e",
+  "name": "Ceci e melanzane grigliate con salsa criolla",
+  "name_en": "Chickpeas and grilled aubergine with salsa criolla",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000146",
+  "name": "Merluzzo con peperoni e chimichurri",
+  "name_en": "Cod with Bell Peppers and Chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "b2dddfb5-78f9-442e-8f48-d3f18acb0da1",
+  "name": "Merluzzo e peperoni al chimichurri",
+  "name_en": "Cod with peppers and chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000161",
+  "name": "Merluzzo con pomodoro e chimichurri",
+  "name_en": "Cod with tomato and chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ae000001-0000-0000-0000-000000000001",
+  "name": "Feijoada (fagioli neri con carne)",
+  "name_en": "Feijoada (Black Beans with Beef)",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "7325e6c6-f113-4941-9ea7-f97479eeca31",
+  "name": "Tofu grigliato al chimichurri con peperoni arrostiti",
+  "name_en": "Griddled tofu with chimichurri and roasted peppers",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "89569912-6758-4ea3-9fc7-e0e390dc24a4",
+  "name": "Manzo alla griglia con rucola",
+  "name_en": "Grilled beef with arugula",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "d2000001-0000-0000-0000-000000000003",
+  "name": "Tacchino macinato con broccoli e erbe fresche",
+  "name_en": "Ground turkey with broccoli and fresh herbs",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "9af613f7-6c46-497c-b5a1-686bb340b88d",
+  "name": "Guiso rapido di lenticchie con zucca e peperoni",
+  "name_en": "Quick lentil stew with squash and peppers",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "d2000001-0000-0000-0000-000000000008",
+  "name": "Salmone con pomodoro e erbe fresche",
+  "name_en": "Salmon with tomato and fresh herbs",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d2000001-0000-0000-0000-000000000029",
+  "name": "Gamberi con broccoli e erbe fresche",
+  "name_en": "Shrimp with Broccoli and Fresh Herbs",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d2000001-0000-0000-0000-000000000035",
+  "name": "Gamberi con cavolo e erbe fresche",
+  "name_en": "Shrimp with Cabbage and Fresh Herbs",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d2000001-0000-0000-0000-000000000036",
+  "name": "Gamberi con carote e erbe fresche",
+  "name_en": "Shrimp with Carrots and Fresh Herbs",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d2000001-0000-0000-0000-000000000002",
+  "name": "Petto di tacchino con cavolo e erbe fresche",
+  "name_en": "Turkey breast with cabbage and fresh herbs",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d2000001-0000-0000-0000-000000000037",
+  "name": "Petto di tacchino con carote e erbe fresche",
+  "name_en": "Turkey Breast with Carrots and Fresh Herbs",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "da786665-485e-4c54-92ba-31debfd51647",
+  "name": "Tacchino e fagioli al chimichurri",
+  "name_en": "Turkey with beans and chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "a5353eca-b07b-4664-b1bc-ef708362b4de",
+  "name": "Porotos bianchi alla zucca con chimichurri",
+  "name_en": "White beans with squash and chimichurri",
+  "meal_slot": "secondo",
+  "paese": "argentina",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000030",
+  "name": "Riso venere con zucchine e salsa di soia",
+  "name_en": "Black rice with zucchini and soy sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "cd7ccd7b-e5af-4381-953d-554a442d283d",
+  "name": "Riso integrale saltato con verdure, lime e zenzero",
+  "name_en": "Brown rice stir-fry with vegetables, lime and ginger",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "7add16a1-0440-4264-afed-685ded3d5333",
+  "name": "Vermicelli di riso freddi con erbe, lime e arachidi",
+  "name_en": "Cold rice vermicelli with herbs, lime and peanuts",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000015",
+  "name": "Riso jasmine con broccoli e salsa di soia",
+  "name_en": "Jasmine rice with broccoli and soy sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000021",
+  "name": "Riso jasmine con zucchine e salsa di soia",
+  "name_en": "Jasmine rice with zucchini and soy sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000014",
+  "name": "Noodle con zucchine e salsa di soia",
+  "name_en": "Noodles with Zucchini and Soy Sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "afcce836-f933-4c66-b5d1-e03ba6347565",
+  "name": "Riso saltato all'ananas, anacardi e lime",
+  "name_en": "Pineapple fried rice with cashews and lime",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000003",
+  "name": "Ramen con pollo e uovo",
+  "name_en": "Ramen with chicken and egg",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000032",
+  "name": "Spaghetti di riso con daikon e salsa di soia",
+  "name_en": "Rice noodles with daikon and soy sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "8a4cd652-2f2d-4617-bb7a-2c521668554a",
+  "name": "Spaghetti di riso al cocco leggero, lime e fagiolini",
+  "name_en": "Rice noodles with light coconut, lime and green beans",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000020",
+  "name": "Spaghetti di riso con funghi e salsa di soia",
+  "name_en": "Rice noodles with mushrooms and soy sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000009",
+  "name": "Riso con bok choy e salsa di soia",
+  "name_en": "Rice with Bok Choy and Soy Sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000024",
+  "name": "Riso con carote e salsa di soia",
+  "name_en": "Rice with carrots and soy sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "8d1e8045-4d16-4f16-80d4-47d279e17d7e",
+  "name": "Soba al lime, sesamo e cetriolo",
+  "name_en": "Soba noodles with lime, sesame and cucumber",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "6997918e-3078-4e0a-8d9f-166726164ca6",
+  "name": "Riso jasmine al vapore con zenzero, lime ed erbe fresche",
+  "name_en": "Steamed jasmine rice with ginger, lime and fresh herbs",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "ac000001-0000-0000-0000-000000000002",
+  "name": "Poke bowl al tonno",
+  "name_en": "Tuna poke bowl",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ac000001-0000-0000-0000-000000000006",
+  "name": "Poke bowl vegetariano al tofu",
+  "name_en": "Vegetarian tofu poke bowl",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ad000001-0000-0000-0000-000000000002",
+  "name": "Goi cuon vegetariani al tofu",
+  "name_en": "Vegetarian Tofu Spring Rolls",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000013",
+  "name": "Riso venere con broccoli e salsa di soia",
+  "name_en": "Venere Rice with Broccoli and Soy Sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000002",
+  "name": "Riso venere con carote e salsa di soia",
+  "name_en": "Venere rice with carrots and soy sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000005",
+  "name": "Riso venere con funghi e salsa di soia",
+  "name_en": "Venere rice with mushrooms and soy sauce",
+  "meal_slot": "primo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d64479dd-ddf1-434a-9876-d4dde62562c2",
+  "name": "Pollo e melanzane in padella",
+  "name_en": "Chicken with eggplant",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "98f7d379-c2ee-4450-88ef-0c36df46e1b3",
+  "name": "Ceci al cocco, zucca e lime",
+  "name_en": "Chickpeas with coconut, squash and lime",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "a9000001-0000-0000-0000-000000000004",
+  "name": "Pollo al limone cinese (senza frittura)",
+  "name_en": "Chinese Lemon Chicken (no deep frying)",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "589a3183-896c-423d-927d-37d7432cdbe7",
+  "name": "Tempeh al cocco e lime con fagiolini",
+  "name_en": "Coconut and lime tempeh with green beans",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000059",
+  "name": "Merluzzo con daikon e salsa di soia",
+  "name_en": "Cod with Daikon and Soy Sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "52b592c6-091c-43a8-9367-5e06f51b4f96",
+  "name": "Merluzzo saltato con lime e coriandolo",
+  "name_en": "Cod with lime and coriander",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "8624267d-9c39-486f-8af6-66421f85466d",
+  "name": "Uova e cavolo saltati",
+  "name_en": "Egg and cabbage stir-fry",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "e9ea17ac-bdbd-4ab0-b85c-17b88b4fc537",
+  "name": "Edamame allo zenzero e lime con cavolo e carote",
+  "name_en": "Ginger and lime edamame with cabbage and carrot",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "d1378fd8-878c-4857-b744-c0d6a13d7d6e",
+  "name": "Pollo saltato con zenzero",
+  "name_en": "Ginger chicken stir-fry",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "1d37411d-a9dd-480d-bcd6-7103e4f87fd4",
+  "name": "Pollo e broccoli allo zenzero",
+  "name_en": "Ginger chicken with broccoli",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "78ee77c6-c11b-4fc7-9f22-899723713ad7",
+  "name": "Tacchino saltato con zenzero",
+  "name_en": "Ginger turkey stir-fry",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "c84eac23-dc5e-40a0-9f06-2bb7788f24ed",
+  "name": "Tacchino e broccoli allo zenzero",
+  "name_en": "Ginger turkey with broccoli",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "1f8d0c69-f8e6-48ff-87a2-e6a84820c38f",
+  "name": "Tofu al lime e citronella con fagiolini",
+  "name_en": "Lemongrass and lime tofu with green beans",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "fed257bf-41e7-4172-8f9c-4e6c320f93f4",
+  "name": "Fagioli mung al lime, zenzero e coriandolo",
+  "name_en": "Mung beans with lime, ginger and coriander",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "c0bca247-a7ad-4fdc-92cf-9e8ce3207307",
+  "name": "Curry rapido di lenticchie rosse al cocco e lime",
+  "name_en": "Quick red lentil, coconut and lime curry",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000044",
+  "name": "Salmone con carote e salsa di soia",
+  "name_en": "Salmon with carrots and soy sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000050",
+  "name": "Salmone con funghi e salsa di soia",
+  "name_en": "Salmon with Mushrooms and Soy Sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "024bf004-eb92-4f8c-b881-ecbea1a8673c",
+  "name": "Gamberi al sesamo",
+  "name_en": "Sesame shrimp",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "8dbb5ecb-ef63-4c6d-904e-516d37012c48",
+  "name": "Tonno scottato al sesamo",
+  "name_en": "Sesame-crusted seared tuna",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000054",
+  "name": "Gamberi con carote e salsa di soia",
+  "name_en": "Shrimp with Carrots and Soy Sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "7e658a9c-1062-4c50-8989-c54f5e8f3058",
+  "name": "Soia gialla saltata al lime con peperoni e anacardi",
+  "name_en": "Stir-fried soybeans with peppers, lime and cashews",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "64f0253f-0be9-4caa-bef8-f2e438c800d0",
+  "name": "Tempeh saltato con verdure",
+  "name_en": "Stir-fried tempeh with vegetables",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "f91da470-2abd-42f6-8065-c2bd8b6d1dee",
+  "name": "Tofu e funghi saltati",
+  "name_en": "Stir-fried tofu with mushrooms",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000051",
+  "name": "Tempeh con broccoli e salsa di soia",
+  "name_en": "Tempeh with Broccoli and Soy Sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000037",
+  "name": "Tofu con zucchine e salsa di soia",
+  "name_en": "Tofu with Zucchini and Soy Sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000060",
+  "name": "Trota con bok choy e salsa di soia",
+  "name_en": "Trout with Bok Choy and Soy Sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000046",
+  "name": "Trota con funghi e salsa di soia",
+  "name_en": "Trout with mushrooms and soy sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000048",
+  "name": "Trota con zucchine e salsa di soia",
+  "name_en": "Trout with zucchini and soy sauce",
+  "meal_slot": "secondo",
+  "paese": "asia_generico",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "b0000001-0000-0000-0000-000000000008",
+  "name": "Toast con Vegemite e avocado (bis autentico)",
+  "name_en": "Toast with Vegemite and avocado (authentic version)",
+  "meal_slot": "colazione",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b0000001-0000-0000-0000-000000000004",
+  "name": "Zuppa di zucca e macadamia",
+  "name_en": "Pumpkin and macadamia soup",
+  "meal_slot": "primo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000219",
+  "name": "Barramundi con rucola e macadamia",
+  "name_en": "Barramundi with arugula and macadamia",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000212",
+  "name": "Barramundi con rucola e pomodoro",
+  "name_en": "Barramundi with arugula and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000231",
+  "name": "Barramundi con barbabietole e lime",
+  "name_en": "Barramundi with beets and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000199",
+  "name": "Barramundi con carote e lime",
+  "name_en": "Barramundi with Carrots and Lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000223",
+  "name": "Barramundi con carote e pomodoro",
+  "name_en": "Barramundi with carrots and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000220",
+  "name": "Barramundi con zucchine e lime",
+  "name_en": "Barramundi with zucchini and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000215",
+  "name": "Pollo con rucola e macadamia",
+  "name_en": "Chicken with arugula and macadamia",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000230",
+  "name": "Pollo con rucola e pomodoro",
+  "name_en": "Chicken with arugula and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000239",
+  "name": "Pollo con barbabietole e lime",
+  "name_en": "Chicken with beetroot and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000203",
+  "name": "Pollo con broccoli e macadamia",
+  "name_en": "Chicken with broccoli and macadamia",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000225",
+  "name": "Pollo con broccoli e pomodoro",
+  "name_en": "Chicken with broccoli and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000227",
+  "name": "Pollo con carote e lime",
+  "name_en": "Chicken with carrots and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000202",
+  "name": "Pollo con carote e pomodoro",
+  "name_en": "Chicken with carrots and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000234",
+  "name": "Pollo con zucchine e lime",
+  "name_en": "Chicken with zucchini and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000217",
+  "name": "Pollo con zucchine e pomodoro",
+  "name_en": "Chicken with zucchini and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000228",
+  "name": "Merluzzo con rucola e macadamia",
+  "name_en": "Cod with arugula and macadamia",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000213",
+  "name": "Merluzzo con barbabietole e lime",
+  "name_en": "Cod with beetroot and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000206",
+  "name": "Merluzzo con broccoli e lime",
+  "name_en": "Cod with broccoli and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000210",
+  "name": "Merluzzo con broccoli e macadamia",
+  "name_en": "Cod with broccoli and macadamia",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000235",
+  "name": "Merluzzo con broccoli e pomodoro",
+  "name_en": "Cod with broccoli and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000221",
+  "name": "Merluzzo con carote e lime",
+  "name_en": "Cod with carrots and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000207",
+  "name": "Merluzzo con zucchine e macadamia",
+  "name_en": "Cod with zucchini and macadamia",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000218",
+  "name": "Merluzzo con zucchine e pomodoro",
+  "name_en": "Cod with zucchini and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000201",
+  "name": "Canguro con barbabietole e lime",
+  "name_en": "Kangaroo with Beetroot and Lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000216",
+  "name": "Canguro con broccoli e pomodoro",
+  "name_en": "Kangaroo with broccoli and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000240",
+  "name": "Canguro con carote e lime",
+  "name_en": "Kangaroo with carrots and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000237",
+  "name": "Canguro con carote e pomodoro",
+  "name_en": "Kangaroo with carrots and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000200",
+  "name": "Canguro con zucchine e macadamia",
+  "name_en": "Kangaroo with Zucchini and Macadamia",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000198",
+  "name": "Canguro con zucchine e pomodoro",
+  "name_en": "Kangaroo with Zucchini and Tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000208",
+  "name": "Agnello con barbabietole e pomodoro",
+  "name_en": "Lamb with beets and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000211",
+  "name": "Agnello con broccoli e lime",
+  "name_en": "Lamb with broccoli and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000224",
+  "name": "Agnello con broccoli e pomodoro",
+  "name_en": "Lamb with broccoli and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000226",
+  "name": "Agnello con carote e macadamia",
+  "name_en": "Lamb with carrots and macadamia",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000197",
+  "name": "Gamberi con rucola e lime",
+  "name_en": "Prawns with Arugula and Lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000204",
+  "name": "Salmone con rucola e lime",
+  "name_en": "Salmon with arugula and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000232",
+  "name": "Salmone con rucola e pomodoro",
+  "name_en": "Salmon with arugula and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000222",
+  "name": "Salmone con barbabietole e lime",
+  "name_en": "Salmon with beets and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000238",
+  "name": "Salmone con broccoli e lime",
+  "name_en": "Salmon with broccoli and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000233",
+  "name": "Salmone con broccoli e pomodoro",
+  "name_en": "Salmon with broccoli and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000229",
+  "name": "Salmone con zucchine e lime",
+  "name_en": "Salmon with zucchini and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000209",
+  "name": "Gamberi con rucola e pomodoro",
+  "name_en": "Shrimp with arugula and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000205",
+  "name": "Gamberi con broccoli e lime",
+  "name_en": "Shrimp with broccoli and lime",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "bf000001-0000-0000-0000-000000000236",
+  "name": "Gamberi con carote e pomodoro",
+  "name_en": "Shrimp with carrots and tomato",
+  "meal_slot": "secondo",
+  "paese": "australia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ae000001-0000-0000-0000-000000000006",
+  "name": "Moqueca di pesce (zuppa brasiliana al cocco)",
+  "name_en": "Moqueca (Brazilian Coconut Fish Stew)",
+  "meal_slot": "secondo",
+  "paese": "brasile",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "475aadde-0026-4a94-b78a-d7c322010614",
+  "name": "Borlotti al forno con melanzane e origano",
+  "name_en": "Baked borlotti with aubergine and oregano",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "4c613cab-d6ec-48bb-b392-f81d8467e676",
+  "name": "Fave e piselli al basilico con pomodoro",
+  "name_en": "Broad beans and peas with basil and tomato",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "4c4b34f7-92a2-40fe-ae5a-2926954bb9d2",
+  "name": "Fagioli di Spagna al kümmel con cavolo cappuccio",
+  "name_en": "Butter beans with caraway and white cabbage",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "c8210a90-3fe2-4d1c-9db8-be0fa1780783",
+  "name": "Ceci all'aceto con barbabietola e aneto",
+  "name_en": "Chickpeas with beetroot, vinegar and dill",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "647d83a2-fa42-4114-95a5-553c5d2cbbb2",
+  "name": "Cannellini all'aglio e salvia con cavolo nero",
+  "name_en": "Garlic and sage cannellini with cavolo nero",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "ef4cf3da-43e5-4914-8abd-2181a45c7dde",
+  "name": "Tofu alle erbe con peperoni e olive",
+  "name_en": "Herb tofu with peppers and olives",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "16606be5-062b-4052-bb3b-72422bedb2f1",
+  "name": "Tofu al rafano ed erba cipollina con cetriolo",
+  "name_en": "Horseradish tofu with chives and cucumber",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "ff0f5f1e-f403-4a23-885c-e2c0b7de147d",
+  "name": "Lupini con broccoli, aglio e peperoncino",
+  "name_en": "Lupini beans with broccoli, garlic and chilli",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "9c6bb32d-71a2-464d-8d27-9cfb9c8db5ce",
+  "name": "Lenticchie alla senape con porri e aneto",
+  "name_en": "Mustard lentils with leeks and dill",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "99334d9b-2e23-4b79-8d86-4760bbdc4806",
+  "name": "Tempeh alla senape con cavolini di Bruxelles",
+  "name_en": "Mustard tempeh with Brussels sprouts",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "35a43858-a2cd-4564-9741-1bf05336ea8a",
+  "name": "Fagioli rossi all'aceto di mele con cavolo rosso e mela",
+  "name_en": "Red beans with cider vinegar, red cabbage and apple",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "aaf3aa46-991b-42dc-8093-472e6e91e438",
+  "name": "Ceci al rosmarino con pomodorini e spinaci",
+  "name_en": "Rosemary chickpeas with cherry tomatoes and spinach",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "47633f24-5e65-43e0-a79f-b491cad67669",
+  "name": "Piselli spezzati all'aneto con carote e senape",
+  "name_en": "Split peas with dill, carrots and mustard",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "020a0997-a168-4bdf-8e91-a7b2879bd987",
+  "name": "Lenticchie al timo con zucchine e limone",
+  "name_en": "Thyme lentils with courgettes and lemon",
+  "meal_slot": "secondo",
+  "paese": "centro_nord_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000027",
+  "name": "Riso venere con daikon e hoisin",
+  "name_en": "Black rice with daikon and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000002",
+  "name": "Riso alla cantonese con pollo e uova",
+  "name_en": "Cantonese-style rice with chicken and eggs",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000007",
+  "name": "Riso alla cantonese con gamberi",
+  "name_en": "Cantonese-style rice with shrimp",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000006",
+  "name": "Noodle con daikon e hoisin",
+  "name_en": "Noodles with daikon and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000034",
+  "name": "Spaghetti di riso con bok choy e hoisin",
+  "name_en": "Rice noodles with bok choy and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000035",
+  "name": "Spaghetti di riso con broccoli e hoisin",
+  "name_en": "Rice noodles with broccoli and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000016",
+  "name": "Spaghetti di riso con carote e hoisin",
+  "name_en": "Rice noodles with carrots and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000028",
+  "name": "Spaghetti di riso con funghi e hoisin",
+  "name_en": "Rice noodles with mushrooms and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000023",
+  "name": "Riso con bok choy e hoisin",
+  "name_en": "Rice with bok choy and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000004",
+  "name": "Riso con broccoli e hoisin",
+  "name_en": "Rice with broccoli and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000017",
+  "name": "Riso venere con zucchine e hoisin",
+  "name_en": "Venere rice with zucchini and hoisin",
+  "meal_slot": "primo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000042",
+  "name": "Pollo con broccoli e hoisin",
+  "name_en": "Chicken with broccoli and hoisin",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000043",
+  "name": "Merluzzo con broccoli e hoisin",
+  "name_en": "Cod with broccoli and hoisin",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000063",
+  "name": "Merluzzo con carote e hoisin",
+  "name_en": "Cod with Carrots and Hoisin",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000064",
+  "name": "Salmone con carote e hoisin",
+  "name_en": "Salmon with Carrots and Hoisin",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "99d75ed6-d227-42f7-9116-aee56d733353",
+  "name": "Merluzzo al vapore con zenzero",
+  "name_en": "Steamed cod with ginger",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "ad000001-0000-0000-0000-000000000003",
+  "name": "Gyoza di maiale al vapore",
+  "name_en": "Steamed Pork Gyoza",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "6493e1d5-65ba-4f1c-bf8b-b5e56e3bbc36",
+  "name": "Salmone e bok choy al vapore",
+  "name_en": "Steamed salmon with bok choy",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "d0f20058-2e5c-4653-af4a-411231f0fa78",
+  "name": "Bok choy e tofu al vapore",
+  "name_en": "Steamed tofu with bok choy",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "15846fb8-b7ce-42aa-98fe-8cead95898eb",
+  "name": "Tofu saltato con bok choy",
+  "name_en": "Stir-fried tofu with bok choy",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "67a1904f-1268-4da7-9522-59d71f4cc6a1",
+  "name": "Tempeh e cavolo cinese",
+  "name_en": "Tempeh with napa cabbage",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000066",
+  "name": "Tofu con daikon e hoisin",
+  "name_en": "Tofu with daikon and hoisin",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ad000001-0000-0000-0000-000000000004",
+  "name": "Gyoza vegetariani al vapore",
+  "name_en": "Vegetarian Steamed Gyoza",
+  "meal_slot": "secondo",
+  "paese": "cina",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000006",
+  "name": "Japchae (noodle saltati coreani)",
+  "name_en": "Japchae (Korean stir-fried noodles)",
+  "meal_slot": "primo",
+  "paese": "corea",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000010",
+  "name": "Bibimbap vegetariano con tofu",
+  "name_en": "Vegetarian Bibimbap with Tofu",
+  "meal_slot": "primo",
+  "paese": "corea",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9f45531-19d6-4984-a277-558b9fc20b6d",
+  "name": "Tartine con avocado e limone",
+  "name_en": "Avocado tartine with lemon",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "cc90f582-5fb4-484e-a745-8cd83c299a24",
+  "name": "Uova in cocotte con erbe",
+  "name_en": "Baked eggs with herbs",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "b1dfe60e-0dfa-408a-a233-6d9410233e91",
+  "name": "Uova in cocotte con pomodoro",
+  "name_en": "Baked eggs with tomato",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "fc10545c-89af-4db7-a78d-a6b2b633af68",
+  "name": "Uovo sodo con pane e pomodoro",
+  "name_en": "Boiled egg with bread and tomato",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4d035df5-8f9e-4785-9179-e7ebf6128f85",
+  "name": "Frittata di zucchine",
+  "name_en": "Courgette omelette",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "251a301f-15cb-4d0b-bfc4-d5e54b0624ee",
+  "name": "Fromage blanc con fragole",
+  "name_en": "Fromage blanc with strawberries",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "60d9da45-41c2-420a-970a-186bb26331af",
+  "name": "Omelette alle erbe",
+  "name_en": "Herb omelette",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d45e95ae-3506-494e-b64d-a3a4081fda89",
+  "name": "Muesli con latte e albicocche secche",
+  "name_en": "Muesli with milk and dried apricots",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "79563d0a-a357-4a55-91ba-bd8c8f63fe2f",
+  "name": "Porridge di avena con mela e cannella",
+  "name_en": "Oat porridge with apple and cinnamon",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "de73a074-0f74-4e99-a39f-4d21654d9d95",
+  "name": "Porridge di avena alle prugne",
+  "name_en": "Oat porridge with prunes",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "defe47ba-1030-43d2-92bb-e04d82ce0aa1",
+  "name": "Porridge con fichi secchi e nocciole",
+  "name_en": "Porridge with dried figs and hazelnuts",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e16aadc1-9ee6-48eb-a88b-85d66eac19b9",
+  "name": "Pane di segale con avocado e pomodoro",
+  "name_en": "Rye bread with avocado and tomato",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f1c5e057-0f34-4642-97cb-e0fc00364698",
+  "name": "Pane di segale con ricotta e miele",
+  "name_en": "Rye bread with ricotta and honey",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "986bf13f-e56b-4ab7-b59c-7ced596eb5cf",
+  "name": "Uova strapazzate con erba cipollina",
+  "name_en": "Scrambled eggs with chives",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "081300da-deaf-4e96-874b-48fb30b211cd",
+  "name": "Tartine con ricotta e fichi",
+  "name_en": "Tartine with ricotta and figs",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d54824f7-a4e9-45b7-822c-bab9c808b43e",
+  "name": "Pane tostato con caprino e pomodoro",
+  "name_en": "Toast with goat cheese and tomato",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "0c8af837-a37c-40d0-98bd-1fdf0b279ba0",
+  "name": "Tartine integrale con caprino ed erba cipollina",
+  "name_en": "Wholemeal tartine with goat cheese and chives",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "37ed8f7b-c945-4233-a21d-1cdca1f20950",
+  "name": "Pane integrale con burro di mandorle e banana",
+  "name_en": "Wholemeal toast with almond butter and banana",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "a28328b6-29e0-4737-a209-0afe507b654c",
+  "name": "Pane integrale con avocado e uovo",
+  "name_en": "Wholemeal toast with avocado and egg",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b461f15f-ab9b-4e86-a53a-37142854e329",
+  "name": "Yogurt con pesche e mandorle tostate",
+  "name_en": "Yogurt with peaches and toasted almonds",
+  "meal_slot": "colazione",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "3ecc527b-1568-4646-afde-b9afc8114f55",
+  "name": "Melanzane al forno con timo",
+  "name_en": "Baked aubergine with thyme",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5ea04862-c3f0-4306-b714-673d8b51239c",
+  "name": "Barbabietole con senape e erbe",
+  "name_en": "Beetroot with mustard and herbs",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "669604d1-4cfb-42d3-a21f-3789fc7997cb",
+  "name": "Porri brasati al limone",
+  "name_en": "Braised leeks with lemon",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "3c06a9c1-4612-468d-895c-c77037ceffe2",
+  "name": "Lattuga brasata ai piselli",
+  "name_en": "Braised lettuce with peas",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c3b6273c-c906-4f68-925e-1a5800d76360",
+  "name": "Insalata di cavolo e mele",
+  "name_en": "Cabbage and apple salad",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "581de25a-3970-4025-ba18-4a8c3e0d7246",
+  "name": "Purea di sedano rapa",
+  "name_en": "Celery purée",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "7d2d1de6-2ace-4605-afe7-38189b77f405",
+  "name": "Cetrioli alla panna acida ed erbe",
+  "name_en": "Cucumbers with cream and herbs",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "cbf7d298-b261-4ad3-b5d3-d98adcc37a39",
+  "name": "Insalata di finocchio e arancia",
+  "name_en": "Fennel and orange salad",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a6134710-a9b9-4df9-82aa-0306479e3df5",
+  "name": "Fagiolini alla vinaigrette",
+  "name_en": "Green beans vinaigrette",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "3d665b11-cb1b-4c79-b595-27149113e6ba",
+  "name": "Insalata verde alla vinaigrette",
+  "name_en": "Green salad with vinaigrette",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "0dac47a3-fcd2-48aa-a00a-091c710d81dd",
+  "name": "Zucchine grigliate alle erbe",
+  "name_en": "Grilled courgettes with herbs",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d523873c-5069-47bd-9c84-a79dca84f189",
+  "name": "Riso pilaf alle erbe",
+  "name_en": "Herb pilaf rice",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "fac3242e-aa3e-4d3f-b6dd-9751252e0899",
+  "name": "Insalata di pomodori alle erbe",
+  "name_en": "Herb tomato salad",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "51e95c67-f83f-42d9-b31c-0e9ec28b6fcc",
+  "name": "Lenticchie con carote e alloro",
+  "name_en": "Lentils with carrots and bay",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "45f88727-8ea7-45b4-9c5e-8e727377fb31",
+  "name": "Finocchi gratinati leggeri",
+  "name_en": "Light fennel gratin",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c4c1e0c5-d4c0-4589-8f04-c2dc4aa86299",
+  "name": "Cavolfiore arrosto alla senape",
+  "name_en": "Mustard roasted cauliflower",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "3259a038-2fe0-433d-967a-a3b50a57d8d4",
+  "name": "Purè di patate all olio",
+  "name_en": "Olive oil mashed potatoes",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "bc226114-b59e-40af-926a-e5892a3691ce",
+  "name": "Piselli alla francese",
+  "name_en": "Peas à la française",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "6885c297-62b6-47ca-b34d-9026ec9adc10",
+  "name": "Pomodori provenzali al forno",
+  "name_en": "Provencal baked tomatoes",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f65d5f0d-a312-45df-95e8-191ceff62fd0",
+  "name": "Zucchine alla provenzale",
+  "name_en": "Provencal courgettes",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "f177bf10-be25-473c-b5a8-454c12c95ee4",
+  "name": "Ratatouille veloce",
+  "name_en": "Quick ratatouille",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "b3000002-0000-0000-0000-000000000001",
+  "name": "Ratatouille (stufato di verdure francese)",
+  "name_en": "Ratatouille (French vegetable stew)",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "def63345-8065-4bb3-9791-d91813ad6a6a",
+  "name": "Cavolini di Bruxelles arrosto",
+  "name_en": "Roast Brussels sprouts",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "80756124-980f-458b-9b42-ee923ef6c47f",
+  "name": "Carote e pastinaca arrosto",
+  "name_en": "Roast carrots and parsnips",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "20628eb9-8b48-4ecb-a6e8-3b2f4fce602d",
+  "name": "Peperoni arrostiti all olio",
+  "name_en": "Roast peppers in oil",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4eeb1b91-4541-4ab3-b48f-b17a19546d98",
+  "name": "Patate al forno con rosmarino",
+  "name_en": "Rosemary roast potatoes",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "7adbbd98-aec8-4eda-ad6e-1e265d8eecb6",
+  "name": "Ceci saltati al rosmarino",
+  "name_en": "Rosemary sautéed chickpeas",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "447239c3-29f7-47f1-a800-4e083058ffdb",
+  "name": "Funghi trifolati al prezzemolo",
+  "name_en": "Sautéed mushrooms with parsley",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a99cbe8a-cac2-4ebc-a4e8-4bbd6116ee97",
+  "name": "Spinaci saltati all aglio",
+  "name_en": "Sautéed spinach with garlic",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a84bdc9d-0073-48d8-b4c6-270c4dbc5315",
+  "name": "Carote glassate al timo",
+  "name_en": "Thyme-glazed carrots",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "75a53758-3e9a-4ceb-a40b-dc8a854115d7",
+  "name": "Fagioli bianchi alle erbe",
+  "name_en": "White beans with herbs",
+  "meal_slot": "contorno",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "b0000001-0000-0000-0000-000000000010",
+  "name": "Crumble di mele australiano (versione leggera)",
+  "name_en": "Australian apple crumble (light version)",
+  "meal_slot": "dolce",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b8000002-0000-0000-0000-000000000005",
+  "name": "Bananas Foster (versione con meno zucchero)",
+  "name_en": "Bananas Foster (lighter version)",
+  "meal_slot": "dolce",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b7000002-0000-0000-0000-000000000010",
+  "name": "Torta di pesche della Georgia (versione leggera)",
+  "name_en": "Georgia Peach Cake (Light Version)",
+  "meal_slot": "dolce",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d94b676e-ef56-4a53-babb-4a48efb29784",
+  "name": "Zuppa di fagioli e verdure",
+  "name_en": "Bean and vegetable soup",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "7f1c6a4e-aad0-4168-b371-45299bab7c49",
+  "name": "Velluta di broccoli e limone",
+  "name_en": "Broccoli and lemon velouté",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b4ef71ce-a884-4f1c-b939-9e5b8428d050",
+  "name": "Velluta di carote e cumino",
+  "name_en": "Carrot and cumin velouté",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "5ba846b0-24af-4aed-b78f-ee6e43771db3",
+  "name": "Velluta di cavolfiore",
+  "name_en": "Cauliflower velouté",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "9337a40d-eec3-4542-b030-9b33fbc5ce55",
+  "name": "Insalata di sedano rapa e mele",
+  "name_en": "Celeriac and apple salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "4bc5b850-0fbf-48ff-ac41-51dc71866fe6",
+  "name": "Zuppa di ceci e rosmarino",
+  "name_en": "Chickpea and rosemary soup",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "6d412f1d-a4d7-4631-9843-9984a4bc7377",
+  "name": "Insalata di ceci e pomodori",
+  "name_en": "Chickpea and tomato salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "66e5429b-aa60-442a-bea6-5b8b39f4ea5e",
+  "name": "Zuppa di zucchine e erbe",
+  "name_en": "Courgette and herb soup",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "5a03617b-1141-48a5-abc4-64bfdd01b381",
+  "name": "Insalata di cetrioli e yogurt alle erbe",
+  "name_en": "Cucumber salad with herb yogurt",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ae56879c-3043-4293-91c1-b96e7354086a",
+  "name": "Insalata di finocchio, mela e noci",
+  "name_en": "Fennel, apple and walnut salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c333a60e-5639-4773-a7e1-bc1721a54f39",
+  "name": "Insalata di fagiolini e mandorle",
+  "name_en": "Green bean and almond salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "7e65efa0-d0eb-4179-9773-b64ac0bce637",
+  "name": "Velluta di porri e patate",
+  "name_en": "Leek and potato velouté",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "25e97200-578c-42b4-87fa-c20b1843116a",
+  "name": "Zuppa di lenticchie e carote",
+  "name_en": "Lentil and carrot soup",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "e820732b-f23b-4abf-bd57-42c99f2b3ff3",
+  "name": "Insalata di lenticchie e pomodorini",
+  "name_en": "Lentil and cherry tomato salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4a8e9326-a949-4585-8097-ff41f69af50c",
+  "name": "Insalata di lenticchie e capra",
+  "name_en": "Lentil and goat cheese salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "714f3cb2-a0c6-4efc-a7d7-5dfd37452b30",
+  "name": "Zuppa di cipolle leggera al vino bianco",
+  "name_en": "Light onion soup with white wine",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "3d2179de-46e5-4f1d-b0d2-228c9321f633",
+  "name": "Insalata di patate alla senape",
+  "name_en": "Mustard potato salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "8d344383-45fe-4ea0-9100-7f0496372503",
+  "name": "Velluta di piselli e porri",
+  "name_en": "Pea and leek velouté",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "525d7b05-50b8-4912-b1b9-4df5eed24f23",
+  "name": "Zuppa di piselli e menta",
+  "name_en": "Pea and mint soup",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "8ac728f7-153d-4308-bfc6-0e4aad1e4e1a",
+  "name": "Insalata di patate e fagiolini",
+  "name_en": "Potato and green bean salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f4ec63db-51ab-4016-8517-0960a5088842",
+  "name": "Velluta di zucca e timo",
+  "name_en": "Pumpkin and thyme velouté",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "249ff39d-73a0-43d6-a2bd-5e0dea19652b",
+  "name": "Lenticchie di Puy alla senape",
+  "name_en": "Puy lentils with mustard",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "90a7290a-b59b-432d-9575-32e63ff5f23d",
+  "name": "Insalata di quinoa e verdure",
+  "name_en": "Quinoa and vegetable salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b4a575c2-f45e-4454-8875-91a66e5e7ffd",
+  "name": "Salade nicoise",
+  "name_en": "Salade nicoise",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "5f280323-b0e7-48a1-88a2-4dde98a8b4ba",
+  "name": "Soupe au pistou",
+  "name_en": "Soupe au pistou",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "49e8b0ef-df20-47a0-9793-03995521f0d8",
+  "name": "Zuppa di pomodoro e finocchio",
+  "name_en": "Tomato and fennel soup",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "8f60d6b2-48bc-4e6f-8d77-99c8f9d2594c",
+  "name": "Pomodori ripieni di tonno",
+  "name_en": "Tuna-stuffed tomatoes",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "1888caed-4694-497b-a8f3-69787e6fc1dd",
+  "name": "Insalata di fagioli bianchi e tonno",
+  "name_en": "White bean and tuna salad",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "2ed8574c-35bb-429d-881d-46fd695fb574",
+  "name": "Velluta di fagioli bianchi",
+  "name_en": "White bean velouté",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "62d21177-8218-4073-802e-094e68cea58f",
+  "name": "Zuppa di verdure invernali",
+  "name_en": "Winter vegetable soup",
+  "meal_slot": "primo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e5f01826-bfb9-4730-a3f2-ef161e8e1695",
+  "name": "Poulet basquaise",
+  "name_en": "Basque chicken",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "3a644703-786f-4954-b1ec-8a50cd6448d8",
+  "name": "Fricassea di borlotti e porri all'estragone",
+  "name_en": "Borlotti and leek fricassée with tarragon",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "dc347440-c194-45d7-a1c8-e4324a2ffb20",
+  "name": "Ceci brasati con pomodoro ed erbe",
+  "name_en": "Braised chickpeas with tomato",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "5e43dd03-8656-474b-9e1b-fd9543a25a26",
+  "name": "Gratin di cavolfiore e fave con crema di anacardi",
+  "name_en": "Cauliflower and broad bean gratin with cashew cream",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "546872f1-8455-4376-96b8-0e95ac39c4a3",
+  "name": "Petto di pollo alle erbe di Provenza",
+  "name_en": "Chicken with herbes de Provence",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "3a31e117-6a4f-4036-80c5-3ec1cb632bcd",
+  "name": "Pollo alla senape e dragoncello",
+  "name_en": "Chicken with mustard",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "5fd19b10-fc02-4696-8ab7-13743a12bb64",
+  "name": "Merluzzo con purè di sedano rapa",
+  "name_en": "Cod with celeriac mash",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "e715cd88-e58f-4dcd-ae66-1f67ed322a0a",
+  "name": "Merluzzo con porri e limone",
+  "name_en": "Cod with leeks and lemon",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "44eb91d4-2608-4dc6-8b3f-b10ce338eb43",
+  "name": "Frittata di erbe e formaggio di capra",
+  "name_en": "Herb and goat cheese omelette",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "a1d190d5-4327-463f-90af-d9b5376c1dda",
+  "name": "Lenticchie e funghi alla forestière",
+  "name_en": "Lentils and mushrooms forestière",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "af33e7f5-4903-4245-8a88-3e7137a9ff19",
+  "name": "Lenticchie con uovo in camicia",
+  "name_en": "Lentils with poached egg",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "fc956cc6-dbb8-4edc-a624-99c494a53132",
+  "name": "Sgombro alla senape",
+  "name_en": "Mackerel with mustard",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "934f1bf8-dc2d-4497-bad3-fe7f006ae38f",
+  "name": "Cozze al vino bianco",
+  "name_en": "Mussels in white wine",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "285d7f3a-5636-4b44-8739-3d7a46464559",
+  "name": "Ceci alla normanda con mela e sidro",
+  "name_en": "Normandy-style chickpeas with apple and cider",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "2b1165a3-426c-4bfe-b709-e93649110111",
+  "name": "Agnello alle erbe in padella",
+  "name_en": "Pan-seared lamb with herbs",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "f7a12ea1-3cbe-4f1a-96f4-5e4c349c6d1b",
+  "name": "Lonza di maiale alle mele",
+  "name_en": "Pork loin with apples",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "18bcc1bd-f6f8-4945-8948-13474ea1ed4e",
+  "name": "Bourguignon rapido di funghi e fagioli rossi",
+  "name_en": "Quick mushroom and red bean bourguignon",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "bda46f72-2403-4123-9347-429a7cb0dcaa",
+  "name": "Coniglio alla senape",
+  "name_en": "Rabbit with mustard",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "de7cb299-7332-45a4-98a1-87af702ebb18",
+  "name": "Salade niçoise",
+  "name_en": "Salade niçoise",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "9d351dea-3b4f-4d20-87f5-a92573e9e097",
+  "name": "Orata al cartoccio con finocchio",
+  "name_en": "Sea bream en papillote with fennel",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "c56d9226-2a22-4cfa-a1e9-cef276db3363",
+  "name": "Blanquette di tofu e funghi",
+  "name_en": "Tofu and mushroom blanquette",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "50ce5661-7065-40b9-849c-f33d73848c92",
+  "name": "Trota alle mandorle",
+  "name_en": "Trout with almonds",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "d347104c-bd36-42aa-a955-56cbcc659b56",
+  "name": "Tacchino alle erbe e limone",
+  "name_en": "Turkey with herbs and lemon",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "5dbf9708-3eb1-4ae0-bb4d-888289fca6ed",
+  "name": "Vitello al limone e capperi",
+  "name_en": "Veal with lemon and capers",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "ec8bb8f3-ab1d-48ab-84bc-bfd9969e9680",
+  "name": "Cannellini alla senape e vino bianco",
+  "name_en": "White beans with mustard and white wine",
+  "meal_slot": "secondo",
+  "paese": "francia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "b9000003-0000-0000-0000-000000000005",
+  "name": "Kartoffelsuppe (zuppa di patate tedesca)",
+  "name_en": "Kartoffelsuppe (German potato soup)",
+  "meal_slot": "primo",
+  "paese": "germania",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000002",
+  "name": "Segale con funghi porcini",
+  "name_en": "Rye with porcini mushrooms",
+  "meal_slot": "primo",
+  "paese": "germania",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000003-0000-0000-0000-000000000001",
+  "name": "Sauerbraten (brasato di manzo tedesco, versione leggera)",
+  "name_en": "Braised beef in vinegar, sauerbraten style",
+  "meal_slot": "secondo",
+  "paese": "germania",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ac000001-0000-0000-0000-000000000004",
+  "name": "Katsudon (ciotola di riso con maiale al forno e uovo)",
+  "name_en": "Katsudon (rice bowl with baked pork and egg)",
+  "meal_slot": "primo",
+  "paese": "giappone",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000033",
+  "name": "Noodle con broccoli e teriyaki",
+  "name_en": "Noodles with broccoli and teriyaki",
+  "meal_slot": "primo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000022",
+  "name": "Spaghetti di riso con carote e teriyaki",
+  "name_en": "Rice noodles with carrots and teriyaki",
+  "meal_slot": "primo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000010",
+  "name": "Riso con carote e teriyaki",
+  "name_en": "Rice with Carrots and Teriyaki",
+  "meal_slot": "primo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000011",
+  "name": "Zuppa udon con pollo",
+  "name_en": "Udon Soup with Chicken",
+  "meal_slot": "primo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000007",
+  "name": "Riso venere con funghi e teriyaki",
+  "name_en": "Venere Rice with Mushrooms and Teriyaki",
+  "meal_slot": "primo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ac000001-0000-0000-0000-000000000007",
+  "name": "Tonkatsu di pollo al forno (chicken katsu)",
+  "name_en": "Chicken katsu (chicken tonkatsu)",
+  "meal_slot": "secondo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ac000001-0000-0000-0000-000000000003",
+  "name": "Tonkatsu al forno con insalata di cavolo",
+  "name_en": "Menchi katsu with cabbage salad",
+  "meal_slot": "secondo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ac000001-0000-0000-0000-000000000005",
+  "name": "Okonomiyaki (pancake di cavolo giapponese)",
+  "name_en": "Okonomiyaki (Japanese cabbage pancake)",
+  "meal_slot": "secondo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "8d7c2c1b-e102-4eb5-b721-2d7faa71d0dc",
+  "name": "Salmone al miso in padella",
+  "name_en": "Pan-seared miso salmon",
+  "meal_slot": "secondo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "53e31eca-bc48-457c-81fa-0b83476e9111",
+  "name": "Zuppa veloce di miso con tofu",
+  "name_en": "Quick miso soup with tofu",
+  "meal_slot": "secondo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "24fb9124-88d2-49d7-88a5-c8421ad3d428",
+  "name": "Salmone teriyaki veloce",
+  "name_en": "Quick teriyaki salmon",
+  "meal_slot": "secondo",
+  "paese": "giappone",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "32b3d52e-62ba-4ca9-8bbd-15884e0fb3d5",
+  "name": "Uova sode con feta e origano",
+  "name_en": "Boiled eggs with feta and oregano",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "32f5a6c2-9f90-4f56-a164-a368a6e1502a",
+  "name": "Uova sode con pomodoro e olive",
+  "name_en": "Boiled eggs with tomato and olives",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "9a487e14-6fb3-4727-bb42-9c4730fd8918",
+  "name": "Pane con caprino e olive",
+  "name_en": "Bread with goat cheese and olives",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "c25ea48f-eb70-472e-bee6-ba60096696f4",
+  "name": "Pane con tahini e miele",
+  "name_en": "Bread with tahini and honey",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "bca00a7b-e01d-4a95-b2bd-9bd8b7a383f3",
+  "name": "Tostada greca con miele e sesamo",
+  "name_en": "Greek toast with honey and sesame",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "001fbf7e-0fb3-464e-ae9a-cc6ebedff881",
+  "name": "Yogurt greco con mela e cannella",
+  "name_en": "Greek yogurt with apple and cinnamon",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "4601ef30-52a5-4bbf-934c-ee902842e4ea",
+  "name": "Paximadia con pomodoro e feta",
+  "name_en": "Paximadia with tomato and feta",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a5b76a5d-205b-494a-b866-2f445aefc54a",
+  "name": "Porridge con fichi e mandorle",
+  "name_en": "Porridge with figs and almonds",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ba1e92e3-b86e-48b5-926f-70d4d3132286",
+  "name": "Uova strapazzate con feta",
+  "name_en": "Scrambled eggs with feta",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "1967e750-bd02-445f-af92-7202290285da",
+  "name": "Frittata con spinaci e feta",
+  "name_en": "Spinach and feta omelette",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "7d6a3992-2d9e-4ca1-ade5-a2ac958fe325",
+  "name": "Strapatsada, uova con pomodoro",
+  "name_en": "Strapatsada scrambled eggs with tomato",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "73dd9215-5a5f-4208-ad2b-5effb225b487",
+  "name": "Frittata di pomodori e origano",
+  "name_en": "Tomato and oregano omelette",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "73a49e6e-a25e-40db-8b9e-6f1894062518",
+  "name": "Pane integrale con feta e pomodoro",
+  "name_en": "Wholemeal bread with feta and tomato",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "235ffafb-2efb-4374-9578-c15e0d3e7cc3",
+  "name": "Pane integrale con miele e tahini",
+  "name_en": "Wholemeal bread with honey and tahini",
+  "meal_slot": "colazione",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "b6e8b1b3-a966-4825-97d4-7a1eefc9f9d5",
+  "name": "Carciofi al limone",
+  "name_en": "Artichokes with lemon",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "7e3827ff-cac7-4297-9383-abf3d5659aa4",
+  "name": "Insalata di cavolo e carota",
+  "name_en": "Cabbage and carrot salad",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "3b889a41-c3f1-4599-b091-35c88ebcd474",
+  "name": "Fagiolini al pomodoro",
+  "name_en": "Green beans in tomato",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4e271407-e5d1-4548-a04f-0d8e480622a6",
+  "name": "Horta, verdure lessate al limone",
+  "name_en": "Horta boiled greens with lemon",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e1a00a3f-96c2-46e7-b5a7-6b48729a09d0",
+  "name": "Patate al limone e origano",
+  "name_en": "Lemon oregano potatoes",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e2fff718-b470-4188-8402-a0b6acbaef82",
+  "name": "Insalata di lattuga e aneto",
+  "name_en": "Lettuce and dill salad",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "8ec3de75-aa02-4817-ab06-949d9e3c1dc9",
+  "name": "Melanzane arrosto con aglio",
+  "name_en": "Roast aubergine with garlic",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "38eb17e4-0f1b-4dd2-bfba-03da17890696",
+  "name": "Peperoni arrostiti con feta",
+  "name_en": "Roast peppers with feta",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "21856798-96da-40e5-be0e-8e3c96c391af",
+  "name": "Spinaci saltati al limone",
+  "name_en": "Sautéed spinach with lemon",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "750972e8-a1a8-4e7d-bd00-f402ea2dfb29",
+  "name": "Tzatziki",
+  "name_en": "Tzatziki",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "23bc3443-a47f-46eb-bcf5-1924a0ccf1fd",
+  "name": "Purè di fagioli bianchi all aglio",
+  "name_en": "White bean purée with garlic",
+  "meal_slot": "contorno",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "3f6f76e4-4e0c-476b-916d-9194f7de8fdb",
+  "name": "Briam di verdure al forno",
+  "name_en": "Baked briam vegetables",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "1f48e838-a72d-4180-9bed-39a5b18be114",
+  "name": "Insalata di orzo e verdure",
+  "name_en": "Barley and vegetable salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "52929a22-75e6-41a6-b2f3-c4f457065eed",
+  "name": "Insalata di ceci e feta",
+  "name_en": "Chickpea and feta salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "040d2457-025f-4f37-b68d-940da0c4c99d",
+  "name": "Insalata di cetrioli e yogurt",
+  "name_en": "Cucumber yogurt salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b7be5e4b-96da-41ae-986e-607ab0bd448b",
+  "name": "Fakes, zuppa di lenticchie",
+  "name_en": "Fakes lentil soup",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f1000001-0000-0000-0000-000000000007",
+  "name": "Farro con pomodorini e feta",
+  "name_en": "Farro with cherry tomatoes and feta",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "3175fc7e-34a6-4c5a-baa0-e28a47203a90",
+  "name": "Fasolada, zuppa di fagioli",
+  "name_en": "Fasolada bean soup",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "fed04bbd-d163-4c10-b8da-643ab0ebd814",
+  "name": "Fava, purea di piselli spezzati",
+  "name_en": "Fava split pea purée",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "1446364c-b6fa-43fa-8504-6265f821393a",
+  "name": "Insalata di lenticchie alla greca",
+  "name_en": "Greek lentil salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "81e0c352-4a60-4584-beb5-31cd04f835a0",
+  "name": "Insalata di patate alla greca",
+  "name_en": "Greek potato salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "22d328e8-2061-48e9-9131-a1fcba33486e",
+  "name": "Insalata greca",
+  "name_en": "Greek salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "eb30c3bd-3347-4970-8271-363d0ed2bd65",
+  "name": "Zuppa di verdure alla greca",
+  "name_en": "Greek vegetable soup",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4af6ba20-d1d1-47bc-a760-eb0c4a392339",
+  "name": "Insalata di bulgur alle erbe",
+  "name_en": "Herb bulgur salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f095ec1e-4abd-43e3-ac38-ec6eab3b2c0c",
+  "name": "Melitzanosalata, crema di melanzane",
+  "name_en": "Melitzanosalata",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "8a1399f1-e909-453a-9f00-a49d171d9be9",
+  "name": "Revithosoupa, zuppa di ceci",
+  "name_en": "Revithosoupa chickpea soup",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "c515b6b3-3968-424a-a817-3e37f171edcc",
+  "name": "Zuppa avgolemono di riso",
+  "name_en": "Rice avgolemono soup",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "0352e920-1da1-424d-ad01-883719d7fc41",
+  "name": "Insalata di rucola, feta e pomodorini",
+  "name_en": "Rocket, feta and cherry tomato salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ab8af230-7d8e-4731-a10d-6ba01a2d7510",
+  "name": "Zuppa di spinaci e riso al limone",
+  "name_en": "Spinach and rice soup with lemon",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "bd682e86-5e25-4922-a997-d5331db09d9c",
+  "name": "Insalata di pomodori e feta",
+  "name_en": "Tomato and feta salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "7f0cc7b3-e89c-4567-a652-e81beeb7aa10",
+  "name": "Zuppa di pomodoro e riso",
+  "name_en": "Tomato and rice soup",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "10d90640-57ee-4785-8c58-1d3e763a8399",
+  "name": "Insalata di fagioli bianchi e cipolla",
+  "name_en": "White bean and onion salad",
+  "meal_slot": "primo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ad8f73dd-333f-4fe2-9066-556ef6d652fc",
+  "name": "Ceci al forno con limone e origano",
+  "name_en": "Baked chickpeas with lemon and oregano",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "17e0dadb-e119-4739-8fec-0a74381e80ae",
+  "name": "Uova al forno con spinaci e feta",
+  "name_en": "Baked eggs with spinach and feta",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "2e6dd720-a260-4173-8433-d341be18eedd",
+  "name": "Gigantes al forno con aneto",
+  "name_en": "Baked giant beans with dill",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f6fbaa47-5b48-49ef-927f-4385782dccf4",
+  "name": "Sardine al forno con pomodoro",
+  "name_en": "Baked sardines with tomato",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "546e40ab-6368-46dc-b1ea-ce05369a6f45",
+  "name": "Orata al forno con origano e limone",
+  "name_en": "Baked sea bream with oregano",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "3faae03a-4e02-4706-a35d-3fbccdcbe850",
+  "name": "Souvlaki di pollo al limone",
+  "name_en": "Chicken souvlaki with lemon",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "5f15aeef-97ad-4725-9e32-0a41d7468f25",
+  "name": "Polpette di ceci alle erbe",
+  "name_en": "Chickpea patties with herbs",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "63956a81-3c91-44c5-8af1-de11da5b1349",
+  "name": "Melanzane ripiene di ceci",
+  "name_en": "Chickpea-stuffed aubergines",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "38eac293-18d1-4b7d-829c-47a9bed7d24e",
+  "name": "Ceci con spinaci e pomodoro",
+  "name_en": "Chickpeas with spinach and tomato",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "15ac9b60-b017-4923-a1e2-8eca74aec673",
+  "name": "Merluzzo con pomodoro e olive",
+  "name_en": "Cod with tomato and olives",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e599dc28-9e45-4026-872c-681b72ce5e5e",
+  "name": "Frittata di zucchine e feta",
+  "name_en": "Courgette and feta omelette",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "1dbbc611-16b7-4ee6-bba6-fd8b51c2d298",
+  "name": "Uova con pomodoro e feta",
+  "name_en": "Eggs with tomato and feta",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "58a4c742-66e5-4f05-a9cb-13a292f0ca76",
+  "name": "Fagioli giganti al pomodoro",
+  "name_en": "Giant beans in tomato",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "33362751-1d8b-49ab-9d46-e1adc98738b8",
+  "name": "Pollo alla greca con patate e limone",
+  "name_en": "Greek lemon chicken with potatoes",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "2142175c-e675-458e-876d-dcea9fc4556d",
+  "name": "Lenticchie greche con cipolla e alloro",
+  "name_en": "Greek lentils with onion and bay",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b3000002-0000-0000-0000-000000000005",
+  "name": "Moussaka greca (versione alleggerita)",
+  "name_en": "Greek Moussaka (lighter version)",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 4,
+  "n_en": 10
+ },
+ {
+  "id": "7736aa8f-44b1-4f7e-8101-ce211214f2c6",
+  "name": "Frittata greca con feta e erbe",
+  "name_en": "Greek omelette with feta",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "60307913-8abc-4d26-8dc2-997c96695493",
+  "name": "Sardine alla griglia con limone",
+  "name_en": "Grilled sardines with lemon",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a30774c0-4bcb-4e83-9e64-7cfd412820d1",
+  "name": "Calamari alla griglia con limone",
+  "name_en": "Grilled squid with lemon",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "f0a8e0ae-922a-4b70-a934-714b86c8127d",
+  "name": "Polpette di agnello alla menta",
+  "name_en": "Lamb meatballs with mint",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e73057e4-4ec7-4b5a-9aa1-bfae1af128e6",
+  "name": "Polpette di lenticchie alle erbe",
+  "name_en": "Lentil patties with herbs",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "7bcce992-dd61-414d-9729-2e638c036315",
+  "name": "Lenticchie con spinaci e limone",
+  "name_en": "Lentils with spinach and lemon",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a16f21d4-a56c-4c7f-9a9a-2ebad145eefc",
+  "name": "Polpo con patate e origano",
+  "name_en": "Octopus with potatoes and oregano",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c58dafd5-b24e-4307-be38-15928f6c2bdc",
+  "name": "Pollo al limone e origano in padella",
+  "name_en": "Pan chicken with lemon and oregano",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "97ee368b-2fef-4818-8b99-fbc530f94beb",
+  "name": "Spiedini di maiale al limone",
+  "name_en": "Pork skewers with lemon",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "72c68f66-da7a-4887-a20c-f24f064572b7",
+  "name": "Maiale al limone con origano",
+  "name_en": "Pork with lemon and oregano",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "66537ed8-22b1-4a8a-b1fd-5decd7218a1c",
+  "name": "Gamberi con feta e pomodoro",
+  "name_en": "Prawns with feta and tomato",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e677710d-078d-4442-bf15-44cb0cdf2c51",
+  "name": "Gamberi al limone e aglio",
+  "name_en": "Prawns with lemon and garlic",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "55bbbc8d-ad37-43a8-a78f-59a85e3988cb",
+  "name": "Branzino al cartoccio con olive",
+  "name_en": "Sea bass en papillote with olives",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "0e5f9d90-f0fe-4730-ad1a-2a7631fb4174",
+  "name": "Orata alla plancha con origano",
+  "name_en": "Sea bream a la plancha",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "8967ec33-595b-4c6f-9f5c-20f4b9c6f1a2",
+  "name": "Spanakorizo con spinaci e riso",
+  "name_en": "Spinach and rice",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b62a9c1b-95a6-4248-8c51-4ada6248ac35",
+  "name": "Calamari ripieni di riso ed erbe",
+  "name_en": "Squid stuffed with rice and herbs",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f842d79a-6237-4add-97d7-27f5804fc145",
+  "name": "Bifteki di tacchino alle erbe",
+  "name_en": "Turkey bifteki with herbs",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "6ebd1060-7f76-45a5-b94e-9709123dc86a",
+  "name": "Souvlaki di tacchino",
+  "name_en": "Turkey souvlaki",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "6a8c8385-9dc7-4696-b122-a040a0e595fa",
+  "name": "Tacchino con yogurt e limone",
+  "name_en": "Turkey with yogurt and lemon",
+  "meal_slot": "secondo",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f010bc9b-89ef-4955-bb09-e56b49256c57",
+  "name": "Paximadia con pomodoro",
+  "name_en": "Rusk with tomato",
+  "meal_slot": "spuntino",
+  "paese": "grecia",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "1c6cc988-b2a1-44f3-8786-de630e7e34cc",
+  "name": "Crema di riso con frutta",
+  "name_en": "Rice cream with fruit",
+  "meal_slot": "colazione",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4de053b4-3d63-4c45-89e0-9cc193bb1b28",
+  "name": "Patate e fagiolini lessi",
+  "name_en": "Boiled potatoes and green beans",
+  "meal_slot": "contorno",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "6897442b-0df6-439a-93d2-fffcc45850ce",
+  "name": "Patate in tegame al pomodoro",
+  "name_en": "Pan-stewed potatoes with tomato",
+  "meal_slot": "contorno",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5838689e-bf1d-4cee-a001-ceabaf80d6f1",
+  "name": "Patate al forno al rosmarino",
+  "name_en": "Roasted potatoes with rosemary",
+  "meal_slot": "contorno",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ae6cec5d-7cab-4030-b956-cdd0bc49e8c4",
+  "name": "Patate schiacciate all'olio e prezzemolo",
+  "name_en": "Smashed potatoes with olive oil and parsley",
+  "meal_slot": "contorno",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "09624782-535f-445a-836c-a34338a2b427",
+  "name": "Pasta integrale",
+  "name_en": "Wholemeal pasta",
+  "meal_slot": "contorno",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000010",
+  "name": "Baked mac and cheese (versione più leggera)",
+  "name_en": "Baked mac and cheese (lighter version)",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000004",
+  "name": "Bibimbap con manzo e verdure",
+  "name_en": "Bibimbap with beef and vegetables",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000025",
+  "name": "Riso jasmine con daikon e gochujang",
+  "name_en": "Jasmine rice with daikon and gochujang",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000011",
+  "name": "Noodle con funghi e gochujang",
+  "name_en": "Noodles with Mushrooms and Gochujang",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e1111111-0000-0000-0000-000000000005",
+  "name": "Pasta con broccoli e peperoncino",
+  "name_en": "Pasta with Broccoli and Chili",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f1000001-0000-0000-0000-000000000006",
+  "name": "Pasta con melanzane e peperoni",
+  "name_en": "Pasta with Eggplant and Peppers",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e1111111-0000-0000-0000-000000000003",
+  "name": "Pasta con melanzane e pomodoro",
+  "name_en": "Pasta with Eggplant and Tomato",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000009",
+  "name": "Pasta con polpo e pomodoro",
+  "name_en": "Pasta with octopus and tomato",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "33333333-0001-0001-0001-000000000001",
+  "name": "Pasta al pomodoro e parmigiano",
+  "name_en": "Pasta with tomato and parmesan",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "55555555-0001-0001-0001-000000000001",
+  "name": "Pasta con tonno e pomodoro",
+  "name_en": "Pasta with tuna and tomato",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "f1000001-0000-0000-0000-000000000004",
+  "name": "Pasta con zucchine e mandorle",
+  "name_en": "Pasta with zucchini and almonds",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000019",
+  "name": "Spaghetti di riso con bok choy e gochujang",
+  "name_en": "Rice noodles with bok choy and gochujang",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000003-0000-0000-0000-000000000006",
+  "name": "Maultaschen vegetariani (ravioli tedeschi con spinaci)",
+  "name_en": "Vegetarian Maultaschen (German ravioli with spinach)",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000008",
+  "name": "Pad Thai vegetariano con tofu",
+  "name_en": "Vegetarian Pad Thai with tofu",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000008",
+  "name": "Riso venere con carote e gochujang",
+  "name_en": "Venere Rice with Carrots and Gochujang",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000012",
+  "name": "Riso venere con daikon e gochujang",
+  "name_en": "Venere Rice with Daikon and Gochujang",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a2000001-0000-0000-0000-000000000003",
+  "name": "Riso venere con funghi e gochujang",
+  "name_en": "Venere rice with mushrooms and gochujang",
+  "meal_slot": "primo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "33fd4b58-0cb4-4695-a423-657371896880",
+  "name": "Orata al forno con pomodorini",
+  "name_en": "Baked bream with tomatoes",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "9ffec7b2-e67d-4434-91d5-83b7b8506431",
+  "name": "Orata e verdure al forno",
+  "name_en": "Baked bream with vegetables",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "6e54ba5c-88d9-49a5-b84a-a7b06f2bac09",
+  "name": "Polpette di lenticchie al forno con farina di ceci",
+  "name_en": "Baked lentil patties with chickpea flour",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "8bb74269-17fc-4e3a-9676-0944eefdfdf3",
+  "name": "Sgombro e patate al forno",
+  "name_en": "Baked mackerel with potatoes",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "79e3717f-7c58-4b0b-ab72-9da12a5b3e9a",
+  "name": "Pollo alla cacciatora",
+  "name_en": "Chicken cacciatora",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000040",
+  "name": "Pollo con broccoli e gochujang",
+  "name_en": "Chicken with Broccoli and Gochujang",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "5a7b2d90-c4b0-4c1e-85e1-8676c9412e37",
+  "name": "Insalata di ceci e verdure",
+  "name_en": "Chickpea and vegetable salad",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "874c343d-ca14-4d9e-bdd9-c95f002c7666",
+  "name": "Merluzzo al cartoccio con pomodorini e olive",
+  "name_en": "Cod baked in parchment with cherry tomatoes and olives",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ffaeafc7-a2fa-4d78-8ca9-93c8ec7a4c1a",
+  "name": "Merluzzo e pomodorini in padella",
+  "name_en": "Cod with cherry tomatoes",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "2738af3f-62ed-46fa-930f-885b985d2a0c",
+  "name": "Uova in purgatorio",
+  "name_en": "Eggs in tomato sauce",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "312671e9-5d2e-4997-a763-d717c8517725",
+  "name": "Insalata di pollo e cetrioli alla coreana",
+  "name_en": "Korean chicken and cucumber salad",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "6380c5a2-dbb1-464e-b127-7502580541fa",
+  "name": "Pollo e cetrioli alla coreana",
+  "name_en": "Korean chicken with cucumber",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "a9000001-0000-0000-0000-000000000001",
+  "name": "Mapo tofu (versione leggera)",
+  "name_en": "Mapo tofu (light version)",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "b8000002-0000-0000-0000-000000000008",
+  "name": "Enchiladas verdi del New Mexico (versione al forno)",
+  "name_en": "New Mexico Green Enchiladas (baked version)",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "c0013da8-5988-4dbf-9b3b-e6be89ffe149",
+  "name": "Sgombro al limone in padella",
+  "name_en": "Pan-cooked mackerel with lemon",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "066def34-6d5d-473c-a4a7-b5c65c6b1d4f",
+  "name": "Sarde in padella con finocchietto",
+  "name_en": "Pan-cooked sardines with fennel",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "d458356c-24b6-4175-b4d4-b0677ca05fe8",
+  "name": "Branzino al limone in padella",
+  "name_en": "Pan-cooked sea bass with lemon",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "0ff0a47d-4ba2-4f93-afc8-dd120f57ead1",
+  "name": "Maiale saltato con cavolo",
+  "name_en": "Pork and cabbage stir-fry",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "ba000002-0000-0000-0000-000000000003",
+  "name": "Pork tenderloin sandwich dell'Indiana (al forno)",
+  "name_en": "Pork tenderloin sandwich from Indiana (oven-baked)",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "be1f3dbc-88b4-420e-8d41-8827fd93a4ce",
+  "name": "Baccalà con patate",
+  "name_en": "Salt cod with potatoes",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "53299885-d661-410b-836f-615f4ab3891d",
+  "name": "Branzino e zucchine in padella",
+  "name_en": "Sea bass with zucchini",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000057",
+  "name": "Tempeh con zucchine e gochujang",
+  "name_en": "Tempeh with Zucchini and Gochujang",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 8
+ },
+ {
+  "id": "a619fb6c-d6cd-469f-a1ee-9f0bb30b819e",
+  "name": "Tofu e melanzane in padella",
+  "name_en": "Tofu with eggplant",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "a3000001-0000-0000-0000-000000000067",
+  "name": "Trota con daikon e gochujang",
+  "name_en": "Trout with daikon and gochujang",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "0a141969-42b0-4997-9d3d-ed96e0f9252d",
+  "name": "Tacchino e melanzane in padella",
+  "name_en": "Turkey with eggplant",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "a2977fa2-197b-49e1-a2db-47544245a32d",
+  "name": "Scaloppine al limone",
+  "name_en": "Veal scaloppine with lemon",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "73c7002a-06e5-4b00-851c-896758095572",
+  "name": "Vitello al limone",
+  "name_en": "Veal with lemon",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "48c9f7e6-654b-45a7-bff2-3ee7d5bd9eaf",
+  "name": "Vitello ai funghi",
+  "name_en": "Veal with mushrooms",
+  "meal_slot": "secondo",
+  "paese": "italia",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "b7000001-0000-0000-0000-000000000001",
+  "name": "Arepas con formaggio fresco",
+  "name_en": "Arepas with Fresh Cheese",
+  "meal_slot": "colazione",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000127",
+  "name": "Mais con avocado e coriandolo",
+  "name_en": "Corn with Avocado and Cilantro",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000114",
+  "name": "Mais con avocado e lime",
+  "name_en": "Corn with avocado and lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000102",
+  "name": "Mais con cipolla e coriandolo",
+  "name_en": "Corn with onion and cilantro",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000104",
+  "name": "Mais con cipolla e lime",
+  "name_en": "Corn with onion and lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000119",
+  "name": "Mais con peperoni e lime",
+  "name_en": "Corn with Peppers and Lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000101",
+  "name": "Platano con peperoni e lime",
+  "name_en": "Plantain with bell peppers and lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000109",
+  "name": "Platano con cipolla e lime",
+  "name_en": "Plantain with onion and lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000123",
+  "name": "Platano con peperoni e coriandolo",
+  "name_en": "Plantain with Peppers and Cilantro",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000103",
+  "name": "Platano con pomodoro e coriandolo",
+  "name_en": "Plantain with tomato and cilantro",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000113",
+  "name": "Quinoa rossa con avocado e lime",
+  "name_en": "Red quinoa with avocado and lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000106",
+  "name": "Quinoa rossa con cipolla e lime",
+  "name_en": "Red quinoa with onion and lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000122",
+  "name": "Quinoa rossa con pomodoro e lime",
+  "name_en": "Red Quinoa with Tomato and Lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000097",
+  "name": "Quinoa rossa con zucchine e lime",
+  "name_en": "Red quinoa with zucchini and lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000096",
+  "name": "Riso con avocado e coriandolo",
+  "name_en": "Rice with avocado and cilantro",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000115",
+  "name": "Riso con pomodoro e coriandolo",
+  "name_en": "Rice with tomato and cilantro",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000121",
+  "name": "Yuca con cipolla e lime",
+  "name_en": "Yuca with Onion and Lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000120",
+  "name": "Yuca con peperoni e coriandolo",
+  "name_en": "Yuca with Peppers and Cilantro",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000116",
+  "name": "Yuca con peperoni e lime",
+  "name_en": "Yuca with Peppers and Lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000111",
+  "name": "Yuca con pomodoro e lime",
+  "name_en": "Yuca with tomato and lime",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000117",
+  "name": "Yuca con zucchine e coriandolo",
+  "name_en": "Yuca with Zucchini and Cilantro",
+  "meal_slot": "primo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000154",
+  "name": "Fagioli con cipolla e lime",
+  "name_en": "Beans with Onion and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000141",
+  "name": "Fagioli con zucchine e coriandolo",
+  "name_en": "Beans with zucchini and cilantro",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000170",
+  "name": "Fagioli con zucchine e lime",
+  "name_en": "Beans with Zucchini and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000149",
+  "name": "Fagioli neri con avocado e lime",
+  "name_en": "Black Beans with Avocado and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000139",
+  "name": "Fagioli neri con peperoni e coriandolo",
+  "name_en": "Black beans with peppers and cilantro",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000136",
+  "name": "Fagioli neri con peperoni e lime",
+  "name_en": "Black beans with peppers and lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000134",
+  "name": "Fagioli neri con pomodoro e coriandolo",
+  "name_en": "Black beans with tomato and coriander",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000148",
+  "name": "Fagioli neri con pomodoro e lime",
+  "name_en": "Black Beans with Tomato and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000163",
+  "name": "Fagioli neri con zucchine e coriandolo",
+  "name_en": "Black beans with zucchini and cilantro",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000142",
+  "name": "Fagioli neri con zucchine e lime",
+  "name_en": "Black beans with zucchini and lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000160",
+  "name": "Pollo con cipolla e coriandolo",
+  "name_en": "Chicken with onion and cilantro",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000153",
+  "name": "Pollo con zucchine e coriandolo",
+  "name_en": "Chicken with Zucchini and Coriander",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000135",
+  "name": "Merluzzo con avocado e coriandolo",
+  "name_en": "Cod with avocado and coriander",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000150",
+  "name": "Merluzzo con peperoni e coriandolo",
+  "name_en": "Cod with Bell Peppers and Cilantro",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "4d6406af-2e58-441f-a684-fed95a9370e4",
+  "name": "Merluzzo al lime con cipolla",
+  "name_en": "Cod with lime and onion",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000168",
+  "name": "Merluzzo con zucchine e lime",
+  "name_en": "Cod with Zucchini and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "169ba978-bcaf-4ead-973c-3ef7ca43e238",
+  "name": "Pollo al lime e coriandolo",
+  "name_en": "Lime coriander chicken",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000147",
+  "name": "Gamberi con avocado e lime",
+  "name_en": "Shrimp with Avocado and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000159",
+  "name": "Gamberi con cipolla e coriandolo",
+  "name_en": "Shrimp with Onion and Coriander",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000157",
+  "name": "Gamberi con cipolla e lime",
+  "name_en": "Shrimp with Onion and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "205c30ce-50d7-4de5-89d5-d259e768bece",
+  "name": "Tofu al lime e coriandolo",
+  "name_en": "Tofu with lime and coriander",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000169",
+  "name": "Tonno con avocado e lime",
+  "name_en": "Tuna with Avocado and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "795bda09-c46f-47b5-ac2b-f8acc984962f",
+  "name": "Tonno al lime con cipolla rossa",
+  "name_en": "Tuna with lime and red onion",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000152",
+  "name": "Tonno con cipolla e coriandolo",
+  "name_en": "Tuna with Onion and Coriander",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000165",
+  "name": "Tonno con peperoni e coriandolo",
+  "name_en": "Tuna with peppers and cilantro",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000156",
+  "name": "Tonno con zucchine e lime",
+  "name_en": "Tuna with Zucchini and Lime",
+  "meal_slot": "secondo",
+  "paese": "latino_generico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "43cb8d0c-4fbd-4874-ac50-9e9b371a1f1f",
+  "name": "Patate lesse",
+  "name_en": "Boiled potatoes",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 5
+ },
+ {
+  "id": "65e3b8ed-d956-4944-bdc7-f5d98051d2a2",
+  "name": "Riso integrale",
+  "name_en": "Brown rice",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "f3000001-0000-0000-0000-000000000007",
+  "name": "Insalata di carote e arance",
+  "name_en": "Carrot and Orange Salad",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "dddddddd-0000-0000-0000-000000000001",
+  "name": "Insalata mista",
+  "name_en": "Mixed salad",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "f7126097-76f3-4155-a0f1-cc2faf3119b5",
+  "name": "Orzo perlato",
+  "name_en": "Pearl barley",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "2d0adf98-0670-486e-985d-ddc3b11bc6b9",
+  "name": "Farro perlato",
+  "name_en": "Pearled farro",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4fa7119f-5dfc-4f76-b0f5-c232c2a069bc",
+  "name": "Quinoa",
+  "name_en": "Quinoa",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "3831a467-9568-4f68-9a3d-0dd610a80ab3",
+  "name": "Pane integrale",
+  "name_en": "Wholemeal bread",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5c26e1c4-ebd3-4777-841a-21c6d4dd66f2",
+  "name": "Couscous integrale",
+  "name_en": "Wholemeal couscous",
+  "meal_slot": "contorno",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "f6000001-0000-0000-0000-000000000004",
+  "name": "Mele al forno con noci",
+  "name_en": "Baked apples with walnuts",
+  "meal_slot": "dolce",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f6000001-0000-0000-0000-000000000002",
+  "name": "Banana con cioccolato fondente fuso",
+  "name_en": "Banana with melted dark chocolate",
+  "meal_slot": "dolce",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000002",
+  "name": "Orzo con funghi e piselli",
+  "name_en": "Barley with mushrooms and peas",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000010",
+  "name": "Orzo con cavolo rapa",
+  "name_en": "Barley with Rutabaga",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000020",
+  "name": "Orzo con taccole",
+  "name_en": "Barley with snap peas",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1a00001-0000-0000-0000-000000000006",
+  "name": "Riso basmati con verdure",
+  "name_en": "Basmati rice with vegetables",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e1111111-0000-0000-0000-000000000004",
+  "name": "Lenticchie in umido con carote",
+  "name_en": "Braised Lentils with Carrots",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1a00001-0000-0000-0000-000000000018",
+  "name": "Grano saraceno con carciofi",
+  "name_en": "Buckwheat with artichokes",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1a00001-0000-0000-0000-000000000002",
+  "name": "Grano saraceno con funghi",
+  "name_en": "Buckwheat with mushrooms",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1a00001-0000-0000-0000-000000000010",
+  "name": "Grano saraceno con zucca",
+  "name_en": "Buckwheat with pumpkin",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000003-0000-0000-0000-000000000012",
+  "name": "Caldo verde (zuppa di cavolo portoghese)",
+  "name_en": "Caldo Verde (Portuguese cabbage soup)",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1a00001-0000-0000-0000-000000000003",
+  "name": "Couscous con verdure miste",
+  "name_en": "Couscous with Mixed Vegetables",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "44444444-0001-0001-0001-000000000001",
+  "name": "Uova con patate e verdura",
+  "name_en": "Eggs with potatoes and vegetables",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000013",
+  "name": "Farro con sedano e carote",
+  "name_en": "Farro with celery and carrots",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000005",
+  "name": "Farro con radicchio e noci",
+  "name_en": "Farro with radicchio and walnuts",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f1000001-0000-0000-0000-000000000001",
+  "name": "Farro con zucca e funghi",
+  "name_en": "Farro with squash and mushrooms",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e1111111-0000-0000-0000-000000000001",
+  "name": "Farro con verdure e carciofi",
+  "name_en": "Farro with Vegetables and Artichokes",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "f1000001-0000-0000-0000-000000000005",
+  "name": "Lenticchie con pomodoro",
+  "name_en": "Lentils with Tomato",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1a00001-0000-0000-0000-000000000012",
+  "name": "Miglio con cavolo verza",
+  "name_en": "Millet with savoy cabbage",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1a00001-0000-0000-0000-000000000001",
+  "name": "Miglio con verdure",
+  "name_en": "Millet with vegetables",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f1000001-0000-0000-0000-000000000002",
+  "name": "Ceci e patate al forno",
+  "name_en": "Oven-Baked Chickpeas and Potatoes",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000010",
+  "name": "Quinoa con ceci e verdure",
+  "name_en": "Quinoa with chickpeas and vegetables",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000001",
+  "name": "Quinoa con verdure miste",
+  "name_en": "Quinoa with mixed vegetables",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f1000001-0000-0000-0000-000000000003",
+  "name": "Riso con carciofi",
+  "name_en": "Rice with artichokes",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000011",
+  "name": "Riso con cavoletti e pancetta",
+  "name_en": "Rice with Brussels sprouts and pancetta",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "66666666-0001-0001-0001-000000000001",
+  "name": "Riso con carote e cipolla",
+  "name_en": "Rice with carrots and onion",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "a1900001-0000-0000-0000-000000000007",
+  "name": "Riso con finocchi e arancia",
+  "name_en": "Rice with fennel and orange",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000015",
+  "name": "Riso con topinambur",
+  "name_en": "Rice with Jerusalem Artichoke",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e1111111-0000-0000-0000-000000000002",
+  "name": "Riso con zucca e funghi",
+  "name_en": "Rice with Pumpkin and Mushrooms",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f1000001-0000-0000-0000-000000000008",
+  "name": "Riso con spinaci e parmigiano",
+  "name_en": "Rice with spinach and Parmesan",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "22222222-0001-0001-0001-000000000001",
+  "name": "Riso con verdure",
+  "name_en": "Rice with vegetables",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 4
+ },
+ {
+  "id": "b3000002-0000-0000-0000-000000000008",
+  "name": "Salmorejo (crema fredda di pomodoro spagnola)",
+  "name_en": "Salmorejo (Spanish cold tomato cream)",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000001",
+  "name": "Avena salata con verdure",
+  "name_en": "Savory Oatmeal with Vegetables",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c1000001-0000-0000-0000-000000000016",
+  "name": "Farro con pastinaca",
+  "name_en": "Spelt with Parsnip",
+  "meal_slot": "primo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e2222222-0000-0000-0000-000000000002",
+  "name": "Trota al forno con asparagi",
+  "name_en": "Baked Trout with Asparagus",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "584e1323-3315-4db9-87c5-5e57dd0c4765",
+  "name": "Borlotti con peperoni arrostiti, aneto e senape",
+  "name_en": "Borlotti beans with roasted peppers, dill and mustard",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "fd453211-c2cf-4ab4-bc0f-eda592f03d3f",
+  "name": "Fave e piselli alla menta con aceto bianco",
+  "name_en": "Broad beans and peas with mint and white wine vinegar",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "e63b3c63-6e30-483b-b1c4-52a0c26bd687",
+  "name": "Cannellini all'aceto rosso con cipolla e pomodorini",
+  "name_en": "Cannellini beans with red wine vinegar, onion and cherry tomatoes",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "bbb81e98-489c-4a2a-a821-9239c68e3a26",
+  "name": "Pollo e carciofi in padella",
+  "name_en": "Chicken with artichokes",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "072c19c7-f72b-4d60-ac47-3378c2ff9ed8",
+  "name": "Pollo e funghi in padella",
+  "name_en": "Chicken with mushrooms",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "7a7fdbe0-9e8e-4d6d-88de-e27a69d5b686",
+  "name": "Ceci e spinaci in padella",
+  "name_en": "Chickpeas with spinach",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "29902941-37b1-4ad2-8eac-e2e6e371fb74",
+  "name": "Tofu all'aceto di mele con erba cipollina e mela",
+  "name_en": "Cider-glazed tofu with chives and apple",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "1376803e-3490-44de-a3be-6b05360ff0ce",
+  "name": "Merluzzo e finocchi in padella",
+  "name_en": "Cod with fennel",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "33a16ffd-8333-4672-90e4-75718b384269",
+  "name": "Merluzzo con cavolo nero",
+  "name_en": "Cod with kale",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "2945e33c-a52f-42e4-b11a-846aa53a46c3",
+  "name": "Insalata di uova e verdure",
+  "name_en": "Egg and vegetable salad",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "4d4581d4-1903-453a-a460-941ba99f4b3b",
+  "name": "Uova e peperoni in padella",
+  "name_en": "Eggs with peppers",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "69f80bbd-ae77-4348-822c-310bd9285ca9",
+  "name": "Gamberi aglio e prezzemolo",
+  "name_en": "Garlic shrimp",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "49049b50-9e12-4f3f-96be-40144163943b",
+  "name": "Salmone alla piastra con rucola",
+  "name_en": "Griddled salmon with arugula",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "95167b59-8550-4b85-95b9-0b3d34a437ea",
+  "name": "Pollo alla griglia con rosmarino",
+  "name_en": "Grilled chicken with rosemary",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "8d57b79e-34d4-40e6-80a3-581f86bc4dac",
+  "name": "Pollo alle erbe con cavolfiore",
+  "name_en": "Herb chicken with cauliflower",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "f27a67f4-1547-4455-8e6d-07b33f2ed596",
+  "name": "Pollo al limone e spinaci",
+  "name_en": "Lemon chicken with spinach",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "85e5ecfa-f2c7-4f03-9ada-8bc932e5b0fa",
+  "name": "Lupini con finocchi, arancia e aceto",
+  "name_en": "Lupini beans with fennel, orange and vinegar",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "81fd1437-0752-45d0-ac30-599c699859e9",
+  "name": "Lenticchie alla senape con carote e prezzemolo",
+  "name_en": "Mustard lentils with carrots and parsley",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "759d8f87-e0f8-4ed1-8ac5-eba765226014",
+  "name": "Tempeh alle erbe in padella",
+  "name_en": "Pan-fried tempeh with herbs",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "03876a15-3217-4c85-9faa-c87d08fce0f1",
+  "name": "Tofu saltato con broccoli",
+  "name_en": "Pan-fried tofu with broccoli",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "a070a043-a86b-4f04-a723-19f3e89cf47b",
+  "name": "Merluzzo in padella al limone",
+  "name_en": "Pan-seared cod with lemon",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "e61a45ed-8bab-4bfb-a367-c6fe0f635e8d",
+  "name": "Sardine gratinate veloci",
+  "name_en": "Quick gratinated sardines",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "1c7fce71-8b53-4e58-83aa-3ac4d12e7317",
+  "name": "Lenticchie in umido veloci",
+  "name_en": "Quick stewed lentils",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "7ec6212f-a46a-4361-a375-4cf5fab03e67",
+  "name": "Ceci arrostiti al timo con zucca e balsamico",
+  "name_en": "Roasted chickpeas with thyme, squash and balsamic",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 5
+ },
+ {
+  "id": "77777777-0001-0002-0001-000000000002",
+  "name": "Salmone con cavolfiore",
+  "name_en": "Salmon with cauliflower",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "b7e7d64c-3767-4ea1-8435-db3a760d2e14",
+  "name": "Salmone e finocchi in padella",
+  "name_en": "Salmon with fennel",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "44444444-0001-0002-0001-000000000002",
+  "name": "Salmone con due contorni",
+  "name_en": "Salmon with two sides",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 8
+ },
+ {
+  "id": "0ef5df81-a692-4f0c-b2b2-b4976236c57f",
+  "name": "Sardine e finocchi in padella",
+  "name_en": "Sardines with fennel",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "3cd21c4e-760a-423d-b81d-1fd9704bbec5",
+  "name": "Sardine e pomodori in padella",
+  "name_en": "Sardines with tomatoes",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "e2222222-0000-0000-0000-000000000001",
+  "name": "Gamberi con zucchine",
+  "name_en": "Shrimp with Zucchini",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "8aff5843-2bf3-4f78-acc3-49d05945d35d",
+  "name": "Spinaci e uova in padella",
+  "name_en": "Spinach and eggs",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "2bff380e-430e-4315-b04e-39cef7d60997",
+  "name": "Insalata di tonno e fagioli",
+  "name_en": "Tuna and bean salad",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 7
+ },
+ {
+  "id": "7b13a60b-59b2-49ba-8abe-dd5c6444b399",
+  "name": "Tonno e fagioli con rucola",
+  "name_en": "Tuna and beans with arugula",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "e2222222-0000-0000-0000-000000000004",
+  "name": "Petto di tacchino con cavolo",
+  "name_en": "Turkey Breast with Cabbage",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "53fa0f8f-8079-4ba0-b64a-9ba3aa3f18d9",
+  "name": "Petto di tacchino al timo",
+  "name_en": "Turkey breast with thyme",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 4,
+  "n_en": 7
+ },
+ {
+  "id": "82196ad1-441e-451d-9326-e2603423016f",
+  "name": "Tacchino e carciofi in padella",
+  "name_en": "Turkey with artichokes",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "f7eaa72a-08b3-4124-b0a6-11519288465a",
+  "name": "Tacchino ai funghi",
+  "name_en": "Turkey with mushrooms",
+  "meal_slot": "secondo",
+  "paese": "mediterraneo_generico",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "af000001-0000-0000-0000-000000000001",
+  "name": "Patacones al forno (platano schiacciato)",
+  "name_en": "Patacones (Fried Plantain Slices)",
+  "meal_slot": "contorno",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000112",
+  "name": "Mais con avocado e jalapeno",
+  "name_en": "Corn with avocado and jalapeno",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000131",
+  "name": "Mais con cipolla e jalapeno",
+  "name_en": "Corn with Onion and Jalapeno",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000130",
+  "name": "Mais con pomodoro e jalapeno",
+  "name_en": "Corn with Tomato and Jalapeno",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000098",
+  "name": "Platano con cipolla e jalapeno",
+  "name_en": "Plantain with onion and jalapeño",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000110",
+  "name": "Platano con pomodoro e jalapeno",
+  "name_en": "Plantain with tomato and jalapeno",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000100",
+  "name": "Riso con peperoni e jalapeno",
+  "name_en": "Rice with bell peppers and jalapeno",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000132",
+  "name": "Riso con cipolla e jalapeno",
+  "name_en": "Rice with onion and jalapeno",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000095",
+  "name": "Riso con pomodoro e jalapeno",
+  "name_en": "Rice with tomato and jalapeño",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b9000001-0000-0000-0000-000000000105",
+  "name": "Yuca con cipolla e jalapeno",
+  "name_en": "Yuca with onion and jalapeno",
+  "meal_slot": "primo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000005",
+  "name": "Enchiladas di pollo al forno (versione leggera)",
+  "name_en": "Baked Chicken Enchiladas (light version)",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000143",
+  "name": "Fagioli con avocado e jalapeno",
+  "name_en": "Beans with avocado and jalapeno",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000004",
+  "name": "Fajitas di manzo",
+  "name_en": "Beef fajitas",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000158",
+  "name": "Fagioli neri con cipolla e jalapeno",
+  "name_en": "Black Beans with Onion and Jalapeño",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000140",
+  "name": "Fagioli neri con pomodoro e jalapeno",
+  "name_en": "Black beans with tomato and jalapeno",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000003",
+  "name": "Fajitas di pollo",
+  "name_en": "Chicken fajitas",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000145",
+  "name": "Pollo con avocado e jalapeno",
+  "name_en": "Chicken with Avocado and Jalapeño",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000144",
+  "name": "Pollo con peperoni e jalapeno",
+  "name_en": "Chicken with Bell Peppers and Jalapeño",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000151",
+  "name": "Merluzzo con cipolla e jalapeno",
+  "name_en": "Cod with Onion and Jalapeño",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000171",
+  "name": "Merluzzo con zucchine e jalapeno",
+  "name_en": "Cod with Zucchini and Jalapeno",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "ba000001-0000-0000-0000-000000000173",
+  "name": "Tonno con cipolla e jalapeno",
+  "name_en": "Tuna with Onion and Jalapeno",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "f0000001-0000-0000-0000-000000000003",
+  "name": "Tacos di tacchino con guacamole",
+  "name_en": "Turkey Tacos with Guacamole",
+  "meal_slot": "secondo",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000013",
+  "name": "Nachos al forno con fagioli neri (versione leggera)",
+  "name_en": "Baked nachos with black beans (lighter version)",
+  "meal_slot": "spuntino",
+  "paese": "messico",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4b92e446-0ae5-4a47-947d-57619a1e5056",
+  "name": "Torrada com abacate e ovo",
+  "name_en": "Avocado toast with egg",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d822798a-33a1-4743-ac13-607f734a4d10",
+  "name": "Rabanadas com canela",
+  "name_en": "Cinnamon French toast",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4f03845f-19b2-4240-bedb-c5eec4f8a27c",
+  "name": "Sandes de fiambre e queijo",
+  "name_en": "Ham and cheese sandwich",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "cae68457-5012-4cb3-b0c6-b1a491b4aff4",
+  "name": "Torrada com manteiga de amendoim e banana",
+  "name_en": "Peanut butter banana toast",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "73277141-c00e-4c26-89eb-648473da71c6",
+  "name": "Ovo escalfado em torrada",
+  "name_en": "Poached egg on toast",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5349a658-5c5c-42f3-ad33-809037487088",
+  "name": "Ovos mexidos com queijo",
+  "name_en": "Scrambled eggs with cheese",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "89d0589f-c6cd-425a-a08e-61519fb34c07",
+  "name": "Torrada com queijo fresco",
+  "name_en": "Toast with fresh cheese",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "fb36c4be-d212-4f55-847b-97f5f4cc70e1",
+  "name": "Torrada com requeijão e mel",
+  "name_en": "Toast with fresh ricotta and honey",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "fa987194-b4ee-4e32-bd84-816822f5e2f6",
+  "name": "Sandes de atum",
+  "name_en": "Tuna sandwich",
+  "meal_slot": "colazione",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c337ec95-64ce-4e75-b7b1-be775f7dd13c",
+  "name": "Sopa de feijão e couve",
+  "name_en": "Bean and cabbage soup",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "25b2d71b-0e19-4ecb-b42d-3806dedd9368",
+  "name": "Salada de feijão frade",
+  "name_en": "Black-eyed pea salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "64357e17-6f7e-453d-9610-b890ea8d1e76",
+  "name": "Salada de couve e cenoura",
+  "name_en": "Cabbage and carrot salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "074f7d80-ffa6-464b-b8ff-d04845a7989a",
+  "name": "Caldo verde",
+  "name_en": "Caldo verde",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 4
+ },
+ {
+  "id": "494163df-5d7a-4fe1-8371-42457f04b8e6",
+  "name": "Creme de cenoura e coentros",
+  "name_en": "Carrot and coriander cream",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "284c2b46-dbe8-4e4c-8d04-aaa709447469",
+  "name": "Creme de couve-flor",
+  "name_en": "Cauliflower cream",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "69e7efcf-1d6d-4ee3-9040-69060f3b08b9",
+  "name": "Sopa de grão com espinafres",
+  "name_en": "Chickpea and spinach soup",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e28bf7a2-8c44-412a-adeb-cf3d12b35ee5",
+  "name": "Salada de grão e atum",
+  "name_en": "Chickpea and tuna salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5b11d6aa-6e83-4d4a-bf8b-30de23cdd666",
+  "name": "Sopa de courgette e batata",
+  "name_en": "Courgette and potato soup",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a91daf8d-2a8a-4479-85ec-c49abf6809f8",
+  "name": "Salada de ovo e legumes",
+  "name_en": "Egg and vegetable salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "7fa158a2-efc0-42db-9492-1f9ac3514c76",
+  "name": "Salada de feijão verde e batata",
+  "name_en": "Green bean and potato salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "80bdceb3-3ba8-4346-b6ec-34b255b87132",
+  "name": "Sopa de lentilhas",
+  "name_en": "Lentil soup",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "11dab821-829b-424f-9d7f-48afb48486a1",
+  "name": "Salada de polvo",
+  "name_en": "Octopus salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "dbdce8ad-cfef-4a47-9556-443474b8dedb",
+  "name": "Salada de laranja e azeitona",
+  "name_en": "Orange and olive salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "08c047f0-0983-468d-8cbf-cc82598abd59",
+  "name": "Creme de ervilhas e hortelã",
+  "name_en": "Pea and mint cream",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "78fcc3f8-3d34-4437-9aa6-d296e57c4ec9",
+  "name": "Sopa de peixe portuguesa",
+  "name_en": "Portuguese fish soup",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e7d52cfd-6b0b-4cff-bd56-885f07ff357c",
+  "name": "Sopa de legumes portuguesa",
+  "name_en": "Portuguese vegetable soup",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "bdbe1baa-5280-49bf-b097-8a7d2273088a",
+  "name": "Creme de abóbora com coentros",
+  "name_en": "Pumpkin cream with coriander",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "1fc196ac-ddca-4f4c-9cec-a371142a306b",
+  "name": "Salada de arroz e atum",
+  "name_en": "Rice and tuna salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1f90c96-ca6f-4fe6-b429-27cdf5bb6f54",
+  "name": "Salada de pimentos assados",
+  "name_en": "Roast pepper salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "351e8c9b-3c5f-4673-989e-24918f185b45",
+  "name": "Salada de bacalhau desfiado",
+  "name_en": "Shredded cod salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b34922fa-d0bb-44dd-9cc6-7f1c14423712",
+  "name": "Salada de tomate e cebola",
+  "name_en": "Tomato and onion salad",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "0124835f-8701-41ad-b338-dcd42baf7733",
+  "name": "Sopa de tomate com ovo",
+  "name_en": "Tomato soup with egg",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d7cd2042-a91f-45b7-bf80-747c70e4a72a",
+  "name": "Sopa de agrião",
+  "name_en": "Watercress soup",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "0349f3bf-2eab-4a97-9a85-14ccca9fad75",
+  "name": "Sopa de feijão branco",
+  "name_en": "White bean soup",
+  "meal_slot": "primo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a9104644-cec3-4e69-a363-5f2bee2a8245",
+  "name": "Feijão preto com legumes",
+  "name_en": "Black beans with vegetables",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "6c24d251-04ca-4b3a-b502-167da56de429",
+  "name": "Peito de frango com coentros",
+  "name_en": "Chicken breast with coriander",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e58f1e89-2118-427b-b398-53ca587f2c56",
+  "name": "Grão com espinafres",
+  "name_en": "Chickpeas with spinach",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "6197a836-946f-4d28-bb48-a4bc92e87418",
+  "name": "Ameijoas à Bulhão Pato",
+  "name_en": "Clams Bulhão Pato",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "688c41bf-1572-451f-92df-7ca348cf8c7f",
+  "name": "Bacalhau com grão",
+  "name_en": "Cod with chickpeas",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "44c2f1b4-a9e2-428e-97aa-07fcd5a12677",
+  "name": "Ovos com grão e espinafres",
+  "name_en": "Eggs with chickpeas and spinach",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a4bafb75-ecee-4e34-a52b-c5ef23a5953a",
+  "name": "Carapau grelhado",
+  "name_en": "Grilled mackerel",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "42886f63-b146-499c-9506-12759e3808e2",
+  "name": "Sardinhas assadas",
+  "name_en": "Grilled sardines",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "08a3f504-3578-48e8-b506-10b37051a6e1",
+  "name": "Dourada grelhada com coentros",
+  "name_en": "Grilled sea bream with coriander",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "6807d826-6b76-40e4-b75b-2fd3c7493115",
+  "name": "Lulas grelhadas com coentros",
+  "name_en": "Grilled squid with coriander",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d8e05744-578d-45ec-91aa-35151f11c4f8",
+  "name": "Atum grelhado com cebola",
+  "name_en": "Grilled tuna with onion",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d5195935-542c-47a8-a381-fc5cda783188",
+  "name": "Peru grelhado com piri piri",
+  "name_en": "Grilled turkey with piri piri",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "8d3ae122-6125-4251-9b1d-5ae16dbc29c1",
+  "name": "Bacalhau à Brás leggero",
+  "name_en": "Light bacalhau à Brás",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d2a50c1f-8aac-4773-bc8f-154d33043b22",
+  "name": "Bacalhau à Gomes de Sá leggero",
+  "name_en": "Light bacalhau Gomes de Sá",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "edaa23ac-3474-4751-9aab-842e7a54078f",
+  "name": "Bacalhau com natas leggero",
+  "name_en": "Light cod with cream",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b0df0dbc-4786-4bc8-9aba-2f2b71fc3079",
+  "name": "Porco à alentejana leggero",
+  "name_en": "Light pork alentejana",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a0da6aca-4008-4680-b916-7033f9b79a4b",
+  "name": "Polvo à lagareiro",
+  "name_en": "Octopus lagareiro style",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a3b7553c-aa03-4e51-9dcd-a593f06b785d",
+  "name": "Frango piri piri",
+  "name_en": "Piri piri chicken",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "151f9d66-83b9-4bb2-90da-c91fbf322619",
+  "name": "Pescada cozida com legumes",
+  "name_en": "Poached hake with vegetables",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5c7ec8d2-58d7-4d71-8144-6858d23dd2c4",
+  "name": "Camarão com alho e coentros",
+  "name_en": "Prawns with garlic and coriander",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "92aa21c7-689c-4fe8-bdb8-2bfdaf5730a0",
+  "name": "Bacalhau assado com legumes",
+  "name_en": "Roast cod with vegetables",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "c7d9051e-1d78-4d5f-89fa-938574c3ee54",
+  "name": "Ovos mexidos com bacalhau",
+  "name_en": "Scrambled eggs with cod",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d8d4bad0-8a10-492a-9699-c9d458a85048",
+  "name": "Salada de atum e feijão frade",
+  "name_en": "Tuna and black-eyed pea salad",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "1554fdce-ebd7-444e-8e73-1133892af496",
+  "name": "Almôndegas de peru com tomate",
+  "name_en": "Turkey meatballs in tomato",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f831f94c-1e7e-4c0d-a1ee-a96d3a18a0ce",
+  "name": "Feijoada de legumes",
+  "name_en": "Vegetable feijoada",
+  "meal_slot": "secondo",
+  "paese": "portogallo",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b0000001-0000-0000-0000-000000000007",
+  "name": "Fish and chips al forno (non fritto)",
+  "name_en": "Baked fish and chips (non-fried)",
+  "meal_slot": "secondo",
+  "paese": "regno_unito",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "b9000003-0000-0000-0000-000000000009",
+  "name": "Shepherd's pie (pasticcio di carne e patate inglese, versione magra)",
+  "name_en": "Cottage pie with lamb",
+  "meal_slot": "secondo",
+  "paese": "regno_unito",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "15fa65c7-8406-4f19-b0b2-b766c79b8fc0",
+  "name": "Huevo cocido con pan y aceite",
+  "name_en": "Boiled egg with bread and oil",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "2463b4e6-f72d-4f37-9a80-f6643818ad1d",
+  "name": "Huevo cocido con tomate y aceite",
+  "name_en": "Boiled egg with tomato and oil",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "470339ab-9af5-46dd-93ca-1649f848f7f6",
+  "name": "Pan con tomate y anchoas",
+  "name_en": "Bread with tomato and anchovies",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "9cfa4ce5-e421-465f-97c4-35180d36c138",
+  "name": "Revuelto de calabacín",
+  "name_en": "Courgette scramble",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "cc42f3de-b149-4cfd-bcc8-cfa97d10d607",
+  "name": "Huevos con pimiento y cebolla",
+  "name_en": "Eggs with pepper and onion",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "fddcf63e-745e-4058-9dda-3312be4ba586",
+  "name": "Tortilla francesa con hierbas",
+  "name_en": "French omelette with herbs",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b994297e-a8cc-4628-8c0a-ad10ba6a83d4",
+  "name": "Tortilla de un huevo con espinacas",
+  "name_en": "One-egg tortilla with spinach",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "dc6df41d-dbfa-4b9e-8046-6dab686fa8fd",
+  "name": "Pan con tomate",
+  "name_en": "Pan con tomate",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "7773d4eb-e8af-415d-a029-c4fb00da382c",
+  "name": "Huevo pochado con espinacas",
+  "name_en": "Poached egg with spinach",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "694a5bd1-9a28-4770-8609-2f80ba518707",
+  "name": "Porridge con manzana y canela",
+  "name_en": "Porridge with apple and cinnamon",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "da3f5291-e079-4f61-b60b-4efed0099657",
+  "name": "Porridge con manzana y nueces",
+  "name_en": "Porridge with apple and walnuts",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "189915c7-23e3-4151-bff0-729fb5eba906",
+  "name": "Porridge con plátano y canela",
+  "name_en": "Porridge with banana and cinnamon",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "2665f686-dabb-459b-8a12-6711788b6ad2",
+  "name": "Porridge con higos secos",
+  "name_en": "Porridge with dried figs",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "5d00dc11-4046-48a4-ac51-d7e1cc52bcfc",
+  "name": "Huevos revueltos con pimiento",
+  "name_en": "Scrambled eggs with pepper",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5e3c870c-4576-433a-b4d3-deca76b955fa",
+  "name": "Huevos revueltos con tomate",
+  "name_en": "Scrambled eggs with tomato",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "63057ecd-fd23-46ad-9830-f6ee48b9faf0",
+  "name": "Tostada con aguacate y tomate",
+  "name_en": "Toast with avocado and tomato",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "03a570ac-cdc7-4507-81ea-556f63bbcd17",
+  "name": "Tostada con queso y nueces",
+  "name_en": "Toast with cheese and walnuts",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "2fcad2a2-b3ba-4cc8-8c9b-f8d9ec2faebe",
+  "name": "Tostada con requesón y miel",
+  "name_en": "Toast with curd cheese and honey",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "46d10620-3e46-484e-8914-093c555c77bd",
+  "name": "Tostada con queso fresco y miel",
+  "name_en": "Toast with fresh cheese and honey",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "9c356cd0-d07e-4a0e-abfb-5ce2b1488b3e",
+  "name": "Tostada con jamón y aceite",
+  "name_en": "Toast with ham and oil",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "f4010e43-54db-4431-b5e3-fba237f92a4b",
+  "name": "Tostada con sardinas y limón",
+  "name_en": "Toast with sardines and lemon",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "b4bd0a0b-6cd1-4e0a-aa78-8bf2a84d8513",
+  "name": "Tostada con sardinas y tomate",
+  "name_en": "Toast with sardines and tomato",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "3e95a93c-fc63-42f1-97d9-58435d5bc48b",
+  "name": "Tostada con tomate y aguacate",
+  "name_en": "Toast with tomato and avocado",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "61b8357b-7079-411d-a922-183bdf46fdbc",
+  "name": "Tostada con tomate y jamón",
+  "name_en": "Tostada with tomato and ham",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "02b64481-3d11-4be9-bebf-461037c6b36b",
+  "name": "Pan integral con atún",
+  "name_en": "Wholemeal bread with tuna",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "b518b0b9-abb3-4761-aca6-db57ee6fdf44",
+  "name": "Tostada integral con aguacate",
+  "name_en": "Wholemeal toast with avocado",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "62c5c6a9-a4bc-4cba-998c-21185b01bb61",
+  "name": "Tostada integral con atún y tomate",
+  "name_en": "Wholemeal toast with tuna and tomato",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "b3bb276e-325e-41e9-8bd5-4582e1ce0c20",
+  "name": "Yogur con manzana y canela",
+  "name_en": "Yogurt with apple and cinnamon",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "906a9c30-feb2-43ea-aab6-abc03033e6f3",
+  "name": "Yogur con fresas y almendras",
+  "name_en": "Yogurt with strawberries and almonds",
+  "meal_slot": "colazione",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "c34d3485-37fc-4802-b550-9013c96fb0b4",
+  "name": "Alcachofas con ajo y limón",
+  "name_en": "Artichokes with garlic and lemon",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "bab00ab4-047e-4aa0-9f67-924951cbd072",
+  "name": "Calabacín al horno con tomillo",
+  "name_en": "Baked courgette with thyme",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "92d55916-68ea-4e60-a355-cccb06c5c4d1",
+  "name": "Setas al horno con ajo",
+  "name_en": "Baked mushrooms with garlic",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e48eb03c-42e5-47c0-a0fd-cb505b5c4629",
+  "name": "Habas con jamón ligero",
+  "name_en": "Broad beans with ham",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "43fc1b87-4e45-42a7-a19b-aa56b4911cbe",
+  "name": "Ensalada de col y zanahoria",
+  "name_en": "Cabbage and carrot salad",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "d90157de-a6e5-43ab-8036-3185e8145469",
+  "name": "Coliflor con pimentón",
+  "name_en": "Cauliflower with paprika",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "7687f0ac-e46e-40c3-bd97-716620da8bc5",
+  "name": "Acelgas con garbanzos",
+  "name_en": "Chard with chickpeas",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "9d857e2b-a0db-49c5-ac31-6df3a8f71ae7",
+  "name": "Zanahorias aliñadas con comino",
+  "name_en": "Cumin-dressed carrots",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "9e6981d8-d940-42aa-84f2-385266207a3d",
+  "name": "Pepino aliñado con cebolla",
+  "name_en": "Dressed cucumber with onion",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "6cfc8961-b4ec-4ad4-a773-585288413e85",
+  "name": "Tomates aliñados con orégano",
+  "name_en": "Dressed tomatoes with oregano",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "bcfd6210-c07a-45fc-be76-65aef9190508",
+  "name": "Champiñones al ajillo con perejil",
+  "name_en": "Garlic mushrooms with parsley",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "9305a9d5-dfb2-4b32-96d4-4f0be462872f",
+  "name": "Ensalada de judías verdes y patata",
+  "name_en": "Green bean and potato salad",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "bdd575d4-d3e4-4adb-ae90-8e6177337b0d",
+  "name": "Judías verdes con tomate",
+  "name_en": "Green beans with tomato",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "920375fc-1d34-4c7e-a9f2-aaa2b92a89bc",
+  "name": "Berenjenas a la plancha con miel",
+  "name_en": "Grilled aubergine with honey",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d8dbdcff-91c1-4ccb-8428-ac70de8fea44",
+  "name": "Espárragos verdes a la plancha",
+  "name_en": "Grilled green asparagus",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "9198f8eb-ccf4-4d4b-959c-614992ac6559",
+  "name": "Puerros a la vinagreta",
+  "name_en": "Leeks vinaigrette",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f7d24106-b523-48f3-9b79-38a1d8cf02f7",
+  "name": "Ensalada de naranja y aceituna",
+  "name_en": "Orange and olive salad",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "07facfb1-5d5d-47fe-bdd6-c373c989ebf8",
+  "name": "Pimientos de Padrón",
+  "name_en": "Padrón peppers",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "eb1270e0-ae31-4031-b62d-cbe7165d3eca",
+  "name": "Patatas al horno con pimentón",
+  "name_en": "Paprika baked potatoes",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "3bceaae1-8407-4b18-9ebb-dc024429e94b",
+  "name": "Ensalada de pimientos asados",
+  "name_en": "Roast pepper salad",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a05471c2-2810-4c86-8b16-d03dd5d30b57",
+  "name": "Calabaza asada con romero",
+  "name_en": "Roast pumpkin with rosemary",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "b58ed276-31ed-4970-803a-13ee92ce8fa6",
+  "name": "Ensalada mixta española",
+  "name_en": "Spanish mixed salad",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "4b5ea725-f431-46e0-afef-a9017bf46d04",
+  "name": "Espinacas con pasas y piñones",
+  "name_en": "Spinach with raisins and pine nuts",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b6e19d46-d243-4d18-977b-2445733f6cb0",
+  "name": "Brócoli al vapor con ajo",
+  "name_en": "Steamed broccoli with garlic",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "9ba2ee59-4a8b-4a4e-acea-4b8288b767e5",
+  "name": "Menestra de verduras",
+  "name_en": "Vegetable menestra",
+  "meal_slot": "contorno",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b3000002-0000-0000-0000-000000000004",
+  "name": "Gazpacho andaluso",
+  "name_en": "Andalusian Gazpacho",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "1d57f653-82c5-46d3-9d74-56dc5fb7110e",
+  "name": "Ensalada de remolacha y naranja",
+  "name_en": "Beetroot and orange salad",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "601235f4-9ee8-4731-8cdc-815bcd1bcd01",
+  "name": "Crema de zanahoria y comino",
+  "name_en": "Carrot and cumin cream",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b234eab9-64aa-4b2b-aff8-772866536d2e",
+  "name": "Sopa de ajo castellana",
+  "name_en": "Castilian garlic soup",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "74a98ad5-16b4-4cc9-a60e-bb80c601ddb4",
+  "name": "Sopa de verduras castellana",
+  "name_en": "Castilian vegetable soup",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "aaffcde9-799a-4a95-91b8-f804ca1ebe39",
+  "name": "Crema de coliflor al ajo",
+  "name_en": "Cauliflower and garlic cream",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5eb06166-864c-4bac-a378-c39f1715307e",
+  "name": "Ensalada de garbanzos y pimiento",
+  "name_en": "Chickpea and pepper salad",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "09749e7f-c604-4e26-afb7-11484a28dffa",
+  "name": "Crema de calabacín",
+  "name_en": "Courgette cream soup",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "8715fb1a-80a8-4922-b923-29979a43249a",
+  "name": "Gazpacho verde de pepino",
+  "name_en": "Green cucumber gazpacho",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "2554e5c7-e893-452b-8915-adad09f5ebc0",
+  "name": "Crema de puerros y patata",
+  "name_en": "Leek and potato cream",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "bb5286e2-e9d5-42d2-9475-342486f413f2",
+  "name": "Ensalada de lentejas y verduras",
+  "name_en": "Lentil and vegetable salad",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "495be277-4d99-47ae-895f-e609b1343766",
+  "name": "Sopa de pescado ligera",
+  "name_en": "Light fish soup",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b3000002-0000-0000-0000-000000000002",
+  "name": "Paella valenciana con pollo e coniglio",
+  "name_en": "Paella Valenciana with Chicken and Rabbit",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e5c9f28e-2089-4f32-97bf-4780b368a9a9",
+  "name": "Ensalada de pasta con verduras",
+  "name_en": "Pasta salad with vegetables",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "50beea44-f4ae-4a0b-8b70-23f8b2a64b67",
+  "name": "Crema de guisantes a la menta",
+  "name_en": "Pea and mint cream",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "728468aa-2370-4ec2-8b0f-109a6986831d",
+  "name": "Crema de calabaza y pimentón",
+  "name_en": "Pumpkin and paprika cream",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e79a4894-aa4c-4a8f-9592-bbb89fc53342",
+  "name": "Ensalada de arroz y verduras",
+  "name_en": "Rice and vegetable salad",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "3b6b86e4-2181-4345-8ad1-9c4cfb99e622",
+  "name": "Salmorejo cordobés",
+  "name_en": "Salmorejo",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b3000002-0000-0000-0000-000000000003",
+  "name": "Paella di frutti di mare",
+  "name_en": "Seafood Paella",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "9226c01a-07dd-45cf-8aa7-a2ea6899b7ad",
+  "name": "Ensalada de espinacas y naranja",
+  "name_en": "Spinach and orange salad",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d84d4c13-e859-47d2-9083-afd9c9bb1f3c",
+  "name": "Ensalada de tomate, atún y huevo",
+  "name_en": "Tomato, tuna and egg salad",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "8a2c1ddf-4680-4bbe-8ba4-70b23cdf8d9a",
+  "name": "Gazpacho de sandía",
+  "name_en": "Watermelon gazpacho",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "cebed831-dfc7-47d1-80d0-342b1c36487e",
+  "name": "Ensalada de judías blancas y atún",
+  "name_en": "White bean and tuna salad",
+  "meal_slot": "primo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ba4f8008-5201-4d00-9ecc-aec574dfd525",
+  "name": "Chipirones con cebolla",
+  "name_en": "Baby squid with onion",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4a30ed74-b0d6-402c-a8fc-4d3369f3c8c9",
+  "name": "Huevos al plato con pisto",
+  "name_en": "Baked eggs with pisto",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "3e9112d8-2f0d-474d-9d5c-032de40d6c78",
+  "name": "Salmón al horno con limón",
+  "name_en": "Baked salmon with lemon",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b3df32d4-abbb-427a-b34a-2affb1cb35c4",
+  "name": "Dorada al horno con patatas",
+  "name_en": "Baked sea bream with potatoes",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "48221e35-0f9c-4f1e-b7d9-db3d157c1c62",
+  "name": "Ternera a la plancha con cebolla",
+  "name_en": "Beef a la plancha with onion",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "89fc53dd-5336-4cbe-bc5d-cdc4cabf58d2",
+  "name": "Huevos rotos con verduras",
+  "name_en": "Broken eggs with vegetables",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "3029e5be-3117-4588-aad3-de56572e46a8",
+  "name": "Pollo al limón con pimentón",
+  "name_en": "Chicken with lemon and paprika",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "461c3a8a-2e7f-41e3-93e1-8a7232761f5f",
+  "name": "Garbanzos con espinacas y comino",
+  "name_en": "Chickpeas with spinach and cumin",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d6edd966-e5db-4e84-802d-03b99bec6c64",
+  "name": "Tortilla de calabacín",
+  "name_en": "Courgette tortilla",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "baf5381f-28fc-4ce6-a0b7-8fcdc24f8b81",
+  "name": "Pollo al ajillo con pimiento",
+  "name_en": "Garlic chicken with pepper",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "e121c2a0-48ff-4d9d-8f10-a8f4a0ae5f5d",
+  "name": "Gambas al ajillo con guindilla",
+  "name_en": "Garlic prawns with chilli",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "dc50852a-229b-4ac5-8f0c-835af9d0ce17",
+  "name": "Merluza a la plancha con ajo",
+  "name_en": "Hake a la plancha with garlic",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "400d8c8c-252f-4600-b3a2-e6bc1d17d87b",
+  "name": "Lentejas con verduras",
+  "name_en": "Lentils with vegetables",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4f75daea-c10e-4377-9193-50c8b6d48a84",
+  "name": "Bacalao al pil pil ligero",
+  "name_en": "Light cod pil pil",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "32050326-b464-46ff-85a3-8963d30e30e2",
+  "name": "Revuelto de setas y ajetes",
+  "name_en": "Mushroom and garlic scramble",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "0b988897-6c3b-4e06-a5d3-b068fc11d5b0",
+  "name": "Cerdo al ajillo con pimentón",
+  "name_en": "Pork with garlic and paprika",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "03fe0961-fab9-4105-b0a6-dce08c40bb02",
+  "name": "Sardinas a la plancha",
+  "name_en": "Sardines a la plancha",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "93f5f3ed-72cb-4301-8d05-dd12c5e85487",
+  "name": "Tortilla de espinacas y cebolla",
+  "name_en": "Spinach and onion tortilla",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "2e18a70c-f3ba-4b15-8d71-ae76d385e762",
+  "name": "Calamares a la plancha",
+  "name_en": "Squid a la plancha",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d27b9b16-1dbc-4600-8b9b-2286255a8ec9",
+  "name": "Mejillones al vapor con limón",
+  "name_en": "Steamed mussels with lemon",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "4760a0ef-d726-4a15-85d3-2a3a9ee8ce0a",
+  "name": "Atún a la plancha con cebolla",
+  "name_en": "Tuna a la plancha with onion",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "71d8dd02-75dd-42e3-8595-f2f41e575b4f",
+  "name": "Pavo a la plancha con ajo",
+  "name_en": "Turkey a la plancha with garlic",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "1c956cbc-f2fc-48f2-bb76-6d2f9be29b0a",
+  "name": "Albóndigas de pavo en tomate",
+  "name_en": "Turkey meatballs in tomato",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "a9c4f29f-d3e0-4052-8b24-bbbbbed9c1da",
+  "name": "Berenjenas rellenas de verduras",
+  "name_en": "Vegetable-stuffed aubergines",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "de6098d2-a26b-455d-8d58-2df5d7fce3df",
+  "name": "Alubias blancas con verduras",
+  "name_en": "White beans with vegetables",
+  "meal_slot": "secondo",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d6373c7a-889b-4f66-b5af-d76723d741e5",
+  "name": "Garbanzos tostados",
+  "name_en": "Roasted chickpeas",
+  "meal_slot": "spuntino",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 2
+ },
+ {
+  "id": "0de2beb0-723b-4520-b2aa-c70af12e4d73",
+  "name": "Pan con tomate pequeño",
+  "name_en": "Small pan con tomate",
+  "meal_slot": "spuntino",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "44f89225-84f3-401f-8c71-21fcb5b418b8",
+  "name": "Atún con tomate",
+  "name_en": "Tuna with tomato",
+  "meal_slot": "spuntino",
+  "paese": "spagna",
+  "n_it": 3,
+  "n_en": 1
+ },
+ {
+  "id": "f0000001-0000-0000-0000-000000000010",
+  "name": "Pancake integrali con frutta",
+  "name_en": "Whole Grain Pancakes with Fruit",
+  "meal_slot": "colazione",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f0000001-0000-0000-0000-000000000011",
+  "name": "Waffle integrali con frutti di bosco",
+  "name_en": "Whole Grain Waffles with Berries",
+  "meal_slot": "colazione",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b2000002-0000-0000-0000-000000000004",
+  "name": "Muffin integrali ai mirtilli",
+  "name_en": "Whole Wheat Blueberry Muffins",
+  "meal_slot": "colazione",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b2000002-0000-0000-0000-000000000003",
+  "name": "French toast integrale",
+  "name_en": "Whole wheat French toast",
+  "meal_slot": "colazione",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f0000001-0000-0000-0000-000000000013",
+  "name": "Insalata di cavolo e mela (coleslaw alternativo)",
+  "name_en": "Cabbage and apple salad (alternative coleslaw)",
+  "meal_slot": "contorno",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b6000002-0000-0000-0000-000000000010",
+  "name": "Green bean casserole leggera (Ringraziamento)",
+  "name_en": "Light green bean casserole (Thanksgiving)",
+  "meal_slot": "contorno",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "f0000001-0000-0000-0000-000000000005",
+  "name": "Patatine al forno (non fritte)",
+  "name_en": "Oven-Baked Potato Wedges (not fried)",
+  "meal_slot": "contorno",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b6000002-0000-0000-0000-000000000012",
+  "name": "Stuffing integrale (ripieno del Ringraziamento)",
+  "name_en": "Whole wheat Stuffing (Thanksgiving dressing)",
+  "meal_slot": "contorno",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b8000002-0000-0000-0000-000000000004",
+  "name": "Beignet al forno (versione non fritta)",
+  "name_en": "Baked Beignet (non-fried version)",
+  "meal_slot": "dolce",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b2000002-0000-0000-0000-000000000007",
+  "name": "Banana bread integrale (versione leggera)",
+  "name_en": "Whole Wheat Banana Bread (Light Version)",
+  "meal_slot": "dolce",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1000002-0000-0000-0000-000000000005",
+  "name": "Gumbo di pollo e gamberi (versione leggera)",
+  "name_en": "Chicken and Shrimp Gumbo (Light Version)",
+  "meal_slot": "primo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b1000002-0000-0000-0000-000000000002",
+  "name": "Jambalaya di pollo e gamberi",
+  "name_en": "Chicken and shrimp jambalaya",
+  "meal_slot": "primo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000008",
+  "name": "Hoppin' John (riso e piselli dall'occhio nero)",
+  "name_en": "Hoppin' John (rice and black-eyed peas)",
+  "meal_slot": "primo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000011",
+  "name": "Okra soup (zuppa di gombo del Sud)",
+  "name_en": "Okra soup (Southern gumbo soup)",
+  "meal_slot": "primo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d3000001-0000-0000-0000-000000000079",
+  "name": "Riso con tacchino macinato e carote",
+  "name_en": "Rice with ground turkey and carrots",
+  "meal_slot": "primo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "d3000001-0000-0000-0000-000000000062",
+  "name": "Patate al forno con pollo e avocado",
+  "name_en": "Roasted potatoes with chicken and avocado",
+  "meal_slot": "primo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ba000002-0000-0000-0000-000000000002",
+  "name": "Tater tot hotdish (Minnesota, versione leggera)",
+  "name_en": "Tater Tot Hotdish (Minnesota, light version)",
+  "meal_slot": "primo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "5826e917-42ec-4cd2-8c79-390415873dd3",
+  "name": "Insalata di pollo e avocado",
+  "name_en": "Chicken and avocado salad",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "4d1312c8-18a6-43ed-9a15-de901ac78afd",
+  "name": "Bowl di quinoa e pollo",
+  "name_en": "Chicken quinoa bowl",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000001",
+  "name": "Chili con carne (Tex-Mex)",
+  "name_en": "Chili Con Carne (Tex-Mex)",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "f0000001-0000-0000-0000-000000000004",
+  "name": "Chili con tacchino e fagioli",
+  "name_en": "Chili with Turkey and Beans",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "b6000002-0000-0000-0000-000000000008",
+  "name": "Kalua pork hawaiano (versione al forno)",
+  "name_en": "Kalua-style slow-roast beef with cabbage",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "b7000002-0000-0000-0000-000000000004",
+  "name": "Nashville hot chicken al forno (versione non fritta)",
+  "name_en": "Nashville hot chicken baked (non-fried version)",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "f0000001-0000-0000-0000-000000000007",
+  "name": "Bocconcini di pollo al forno (non fritti)",
+  "name_en": "Oven-Baked Chicken Bites (not fried)",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "56290972-cdd8-449f-b6d3-90530b606f84",
+  "name": "Chili di tacchino veloce",
+  "name_en": "Quick turkey chili",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "5f8dca88-8b68-44d4-8a5e-c2a533997335",
+  "name": "Insalata di salmone e cetrioli",
+  "name_en": "Salmon and cucumber salad",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "46be7a92-7f62-4599-b996-dcfc33b56832",
+  "name": "Insalata di gamberi e avocado",
+  "name_en": "Shrimp and avocado salad",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "b1000002-0000-0000-0000-000000000004",
+  "name": "Shrimp and grits (gamberi con polenta)",
+  "name_en": "Shrimp and grits",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 9
+ },
+ {
+  "id": "b6000002-0000-0000-0000-000000000001",
+  "name": "Texas brisket al forno (versione magra)",
+  "name_en": "Texas brisket oven-roasted (lean version)",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "37255a46-78db-47f6-94c3-d12f0b4215f0",
+  "name": "Insalata di tonno e cetrioli",
+  "name_en": "Tuna and cucumber salad",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 6
+ },
+ {
+  "id": "b4000002-0000-0000-0000-000000000002",
+  "name": "Chili di tacchino (versione più magra)",
+  "name_en": "Turkey Chili (leaner version)",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "b6000002-0000-0000-0000-000000000014",
+  "name": "Sloppy joe di tacchino (versione magra)",
+  "name_en": "Turkey sloppy joe (lean version)",
+  "meal_slot": "secondo",
+  "paese": "stati_uniti",
+  "n_it": 3,
+  "n_en": 10
+ },
+ {
+  "id": "ad000001-0000-0000-0000-000000000006",
+  "name": "Zuppa Tom Yum al pollo",
+  "name_en": "Tom Yum Soup with Chicken",
+  "meal_slot": "primo",
+  "paese": "thailandia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "ad000001-0000-0000-0000-000000000005",
+  "name": "Zuppa Tom Yum ai gamberi",
+  "name_en": "Tom Yum Soup with Shrimp",
+  "meal_slot": "primo",
+  "paese": "thailandia",
+  "n_it": 3,
+  "n_en": 3
+ },
+ {
+  "id": "aa000001-0000-0000-0000-000000000005",
+  "name": "Pho con pollo (zuppa vietnamita)",
+  "name_en": "Pho with chicken (Vietnamese soup)",
+  "meal_slot": "primo",
+  "paese": "vietnam",
+  "n_it": 3,
+  "n_en": 3
+ }
+]
