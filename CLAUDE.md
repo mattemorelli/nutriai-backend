@@ -156,3 +156,8 @@ jacket potato, kedgeree, porridge, piatti gallesi e scozzesi) — 8 colazioni, 1
 18 secondi, 10 contorni, tutti con health_score >= 7. Target dei paesi coperti da un
 generico (15/10/10/5) raggiunto.
 Da fare: nessun paese pianificato al momento.
+
+## Priorità attuale (aggiornata il 29 ottobre 2026)
+- Si lavora su: G2 del generatore (struttura dei pasti, porzioni realistiche, limiti per ingrediente) e sulla domanda "Cosa hai in cucina" (attrezzi).
+- Fuori perimetro finché Matteo non dice altrimenti: concorrenza, modifiche simultanee, code di generazione, messaggi di errore per casi rari, App Store, pagamenti.
+- Prima si misura, poi si decide, poi si scrive. Le decisioni di disegno le prende Matteo: chi esegue si ferma e chiede quando un numero non torna.
