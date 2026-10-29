@@ -1573,7 +1573,7 @@ app.post('/calibra', richiedeAuth, async (req, res) => {
     const esito = await calibra(supabase, req.utente.id);
     res.json(esito);
   } catch (e) {
-    res.status(500).json({ errore: e.message });
+    res.status(e.status||500).json({ errore: e.code||e.message, ...(e.code?{messaggio:e.message}:{}) });
   }
 });
 
