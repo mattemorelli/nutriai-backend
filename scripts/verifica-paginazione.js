@@ -28,13 +28,13 @@ const RADICE = path.join(__dirname, '..');
 // sicurezza, solo falsi allarmi.
 const TABELLE_A_RISCHIO = [
   'dishes', 'dish_ingredients', 'plan_items', 'prodotti', 'ricetta_passi',
-  'foods', 'categorie_alimenti', 'tag_nutrizionali', 'alias_categoria', 'user_constraints',
+  'foods', 'categorie_alimenti', 'tag_nutrizionali', 'alias_categoria', 'user_constraints', 'recipe_snapshots',
 ];
 
 const FILE_DI_PRODUZIONE = [
   'server.js', 'genera.js', 'fabbisogno.js', 'calibra.js', 'sostituisci.js',
   'spesa.js', 'modifiche-piano.js', 'voto.js', 'tu.js', 'auth-middleware.js',
-  'vincoli-verificabili.js', 'classifica-ruoli-piatti.js', 'salvataggio-generazione.js',
+  'vincoli-verificabili.js', 'classifica-ruoli-piatti.js', 'salvataggio-generazione.js', 'ricette-salvate.js', 'piatti-piano.js',
 ];
 
 const VERBI_SCRITTURA = ['.insert(', '.update(', '.delete(', '.upsert('];

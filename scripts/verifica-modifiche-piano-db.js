@@ -12,7 +12,7 @@ const db = new Client({connectionString:process.env.DATABASE_URL,connectionTimeo
 let userId, pianoId, secondaConnessione, autenticato=false; let verifiche=0;
 const ok = nome=>{verifiche++;console.log('OK '+nome);};
 async function snapshot(){const r=await admin.from('plan_items').select('*').eq('plan_id',pianoId).order('id');if(r.error)throw r.error;return r.data;}
-async function rpc(attese, modifiche, utente=userId,client=admin,contesto){const c=contesto||(await admin.rpc('quadrio_contesto_generazione_v2',{p_user_id:userId})).data;return client.rpc('quadrio_modifica_piano_v3',{p_user_id:utente,p_plan_id:pianoId,p_attese:attese,p_modifiche:modifiche,p_contesto:c});}
+async function rpc(attese, modifiche, utente=userId,client=admin,contesto){const c=contesto||(await admin.rpc('quadrio_contesto_generazione_v2',{p_user_id:userId})).data;return client.rpc('quadrio_modifica_piano_v4',{p_user_id:utente,p_plan_id:pianoId,p_attese:attese,p_modifiche:modifiche,p_contesto:c});}
 async function main(){
  try{
   await db.connect();
@@ -45,7 +45,7 @@ async function main(){
   const accesso=await pubblico.auth.signInWithPassword({email,password});assert.ifError(accesso.error);autenticato=true;
   const utenteRpc=await rpc(dopo,modifiche,userId,pubblico);assert.equal(utenteRpc.error?.code,'42501');
   const letturaPrivata=await pubblico.from('plan_items').select('id').eq('plan_id',pianoId);assert.ok(letturaPrivata.error);ok('utente autenticato passa dal backend per leggere e modificare i piani');
-  const permessi=(await db.query("select p.prosecdef, has_function_privilege('authenticated',p.oid,'EXECUTE') as autenticato,has_function_privilege('service_role',p.oid,'EXECUTE') as server from pg_proc p where p.oid='public.quadrio_modifica_piano_v3(uuid,uuid,jsonb,jsonb,jsonb)'::regprocedure")).rows[0];
+  const permessi=(await db.query("select p.prosecdef, has_function_privilege('authenticated',p.oid,'EXECUTE') as autenticato,has_function_privilege('service_role',p.oid,'EXECUTE') as server from pg_proc p where p.oid='public.quadrio_modifica_piano_v4(uuid,uuid,jsonb,jsonb,jsonb)'::regprocedure")).rows[0];
   assert.equal(permessi.prosecdef,false);assert.equal(permessi.autenticato,false);assert.equal(permessi.server,true);ok('security invoker e permesso riservato al server');
   const ripristino={stato:'sostituito',modificato_il:'2026-10-26T10:00:00Z'};
   let r=await rpc(dopo,[{id:ids[0],patch:{stato:'saltato',ripristino_salto:ripristino}}]);assert.ifError(r.error);dopo=await snapshot();assert.deepEqual(dopo.find(r=>r.id===ids[0]).ripristino_salto,ripristino);ok('provenienza precedente al salto persistita');
@@ -55,9 +55,9 @@ async function main(){
   secondaConnessione=new Client({connectionString:process.env.DATABASE_URL,connectionTimeoutMillis:15000});await secondaConnessione.connect();
   const ctxConcorrente=(await admin.rpc('quadrio_contesto_generazione_v2',{p_user_id:userId})).data;
   await db.query('BEGIN');await db.query("SET LOCAL statement_timeout='5s'");
-  await db.query('select public.quadrio_modifica_piano_v3($1,$2,$3::jsonb,$4::jsonb,$5::jsonb)',[userId,pianoId,JSON.stringify(dopo),JSON.stringify([{id:ids[0],patch:{day_of_week:3}}]),JSON.stringify(ctxConcorrente)]);
+  await db.query('select public.quadrio_modifica_piano_v4($1,$2,$3::jsonb,$4::jsonb,$5::jsonb)',[userId,pianoId,JSON.stringify(dopo),JSON.stringify([{id:ids[0],patch:{day_of_week:3}}]),JSON.stringify(ctxConcorrente)]);
   await secondaConnessione.query("SET statement_timeout='5s'");
-  const concorrente=secondaConnessione.query('select public.quadrio_modifica_piano_v3($1,$2,$3::jsonb,$4::jsonb,$5::jsonb)',[userId,pianoId,JSON.stringify(dopo),JSON.stringify([{id:ids[1],patch:{day_of_week:4}}]),JSON.stringify(ctxConcorrente)]).then(()=>null,e=>e);
+  const concorrente=secondaConnessione.query('select public.quadrio_modifica_piano_v4($1,$2,$3::jsonb,$4::jsonb,$5::jsonb)',[userId,pianoId,JSON.stringify(dopo),JSON.stringify([{id:ids[1],patch:{day_of_week:4}}]),JSON.stringify(ctxConcorrente)]).then(()=>null,e=>e);
   await new Promise(resolve=>setTimeout(resolve,100));await db.query('COMMIT');
   assert.equal((await concorrente)?.code,'PT409');const finale=await snapshot();assert.equal(finale.find(r=>r.id===ids[0]).day_of_week,3);assert.equal(finale.find(r=>r.id===ids[1]).day_of_week,1);ok('concorrenza reale: una modifica riuscita, la vecchia rifiutata');
   // Scelte personali cambiate a righe del piano identiche: il confronto
@@ -93,7 +93,7 @@ async function main(){
   // e' ancora nella sua transazione: dopo il commit deve vedere la nuova versione.
   const ctxAttesa=(await admin.rpc('quadrio_contesto_generazione_v2',{p_user_id:userId})).data;
   await db.query('BEGIN');await db.query("update users set evening_minutes=30 where id=$1",[userId]);
-  const inAttesa=secondaConnessione.query('select public.quadrio_modifica_piano_v3($1,$2,$3::jsonb,$4::jsonb,$5::jsonb)',[userId,pianoId,JSON.stringify(bulk),JSON.stringify(pin),JSON.stringify(ctxAttesa)]).then(()=>null,e=>e);
+  const inAttesa=secondaConnessione.query('select public.quadrio_modifica_piano_v4($1,$2,$3::jsonb,$4::jsonb,$5::jsonb)',[userId,pianoId,JSON.stringify(bulk),JSON.stringify(pin),JSON.stringify(ctxAttesa)]).then(()=>null,e=>e);
   await new Promise(r=>setTimeout(r,100));await db.query('COMMIT');
   assert.equal((await inAttesa)?.code,'PT412');assert.deepEqual(await snapshot(),bulk);ok('preferenza concorrente rilevata anche dopo attesa sul lock');
   console.log(`${verifiche} controlli database superati.`);

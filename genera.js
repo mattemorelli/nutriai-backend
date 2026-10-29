@@ -1,5 +1,6 @@
 const {caricaContestoCatalogo,ultimoCatalogo}=require('./contesto-catalogo');
-const {caricaContestoGenerazione,salvaGenerazione}=require('./salvataggio-generazione');
+const {numeroSpuntiniRichiesto}=require('./richiesta-generazione');
+const {caricaContestoGenerazione,salvaGenerazione,verificaContestoAtteso}=require('./salvataggio-generazione');
 const {preferenzaFacoltativa,riferimentoVerificabile,verificaVincoli,leggiVincoliDichiarati}=require('./vincoli-verificabili');
 const { creaPranzoFlessibile } = require('./pranzo-flessibile');
 const { miglioraIngredienti } = require('./migliora-ingredienti');
@@ -1419,8 +1420,16 @@ async function caricaVincoli(supabase, userId, dieta = 'onnivoro') {
     return true;
   };
 
-  const ammesso = senzaNessunoDi(foodIdVietati);   // assoluto
-  const gradito = senzaNessunoDi(foodIdSgraditi);  // preferenza
+  // La copia storica conserva anche le categorie note al salvataggio.
+  // Nuove allergie e dieta si controllano sull'unione dei riferimenti
+  // attuali e storici: rimuovere un'etichetta dal catalogo non rende
+  // improvvisamente adatta una ricetta che l'utente aveva gia' salvato.
+  const categorieDieta=new Set((CATEGORIE_DIETA[dieta]||[]).flatMap(c=>[c,...(CONTENUTE_IN[c]||[])]));
+  const vietateStoriche=new Set([...categorieDaEspandere,...categorieDieta]);
+  const categorieAssenti=(p,vietate)=>!(p.categorieSalvate && [...p.categorieSalvate].some(c=>vietate.has(c)));
+  const senzaVietati=senzaNessunoDi(foodIdVietati),senzaSgraditi=senzaNessunoDi(foodIdSgraditi);
+  const ammesso=p=>senzaVietati(p)&&categorieAssenti(p,vietateStoriche);
+  const gradito=p=>senzaSgraditi(p)&&categorieAssenti(p,categorieSgradite);
 
   console.log(
     `Vincoli: ${foodIdVietati.size} alimenti vietati, ${foodIdSgraditi.size} sgraditi (dieta: ${dieta}), ${nonRisolti.length} non risolti`
@@ -1477,10 +1486,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // Nessun chiamante esistente passa opzioni, quindi il default (true)
   // mantiene il comportamento di sempre.
   const salva = opzioni.salva !== false;
-  const numeroSpuntini = opzioni.numeroSpuntini ?? null;
-  if (numeroSpuntini !== null && (!Number.isInteger(numeroSpuntini) || numeroSpuntini < 0 || numeroSpuntini > 3)) {
-    throw Object.assign(new Error('numero_spuntini_non_valido'), { status: 400 });
-  }
+  const numeroSpuntini = numeroSpuntiniRichiesto(opzioni.numeroSpuntini);
   // Nessun chiamante esistente passa questa opzione (stesso principio di
   // "salva" sopra): di default si tengono i piatti bloccati della
   // settimana precedente, come oggi. Il foglio "nuova settimana" (You)
@@ -1493,6 +1499,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   const seed = (seedIniziale != null ? Number(seedIniziale) : Math.floor(Math.random() * 4294967296)) >>> 0;
 
   const contestoGenerazione=salva?await caricaContestoGenerazione(supabase,userId):null;
+  if(salva)verificaContestoAtteso(contestoGenerazione,opzioni.contestoAtteso);
 
   // Dopo il contesto, le cinque letture indipendenti partono insieme.
   // Gli errori vengono controllati negli stessi punti del flusso normale.
@@ -3180,6 +3187,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 }
 
 module.exports = {
+  arricchisciPiattiDaCache,
   adattaGiornata, limitiDi, righePiano,
   generaESalva, caricaPiatti, caricaPiattiPerId, gruppoDa, gruppoDaRegex, ancoraProteica, GRUPPO_DA_CATEGORIA,
   GRUPPI, QUOTE, trovaCategoria, normalizza, CONTENUTE_IN,

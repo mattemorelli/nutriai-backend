@@ -13,7 +13,7 @@ test('errore di lettura non consente una generazione senza protezione',async()=>
 test('unica chiamata salva intestazione, portate e contesto, senza scritture separate',async()=>{
  const chiamate=[],piano={seed:2026},righe=[{day_of_week:1}],contesto={versione:'1',catalogo_id:'00000000-0000-4000-8000-000000000099',catalogo_versione:'1'};
  const client={rpc:async(n,a)=>{chiamate.push([n,a]);return{data:{id:'piano',righe:1},error:null};},from:()=>assert.fail('Scrittura separata vietata')};
- const r=await salvaGenerazione(client,'u',contesto,piano,righe);assert.equal(r.id,'piano');assert.deepEqual(chiamate,[['quadrio_salva_generazione_v2',{p_user_id:'u',p_contesto:contesto,p_piano:piano,p_righe:righe}]]);
+ const r=await salvaGenerazione(client,'u',contesto,piano,righe);assert.equal(r.id,'piano');assert.deepEqual(chiamate,[['quadrio_salva_generazione_v3',{p_user_id:'u',p_contesto:contesto,p_piano:piano,p_righe:righe}]]);
 });
 for(const code of ['PT409','40001','40P01'])test('conflitto riconoscibile e riprovabile: '+code,async()=>{
  await assert.rejects(salvaGenerazione({rpc:async()=>({error:{code,message:'conflitto'}})},'u',{}, {},[]),e=>e.status===409&&e.code==='contesto_generazione_modificato');

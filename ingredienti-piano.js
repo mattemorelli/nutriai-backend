@@ -1,3 +1,4 @@
+const {chiaveRicetta}=require('./ricette-salvate');
 const { riepilogoFruttaSecca } = require('./quantita-frutta-secca');
 const { riepilogoGrassi } = require('./bilancia-grassi');
 
@@ -11,7 +12,7 @@ function riepilogoIngredienti(righe, piattiPerId, kcalTarget) {
     if (!giorni.has(giorno)) giorni.set(giorno, { ingredienti:new Map(), mancanti:0, nutrientiCompleti:true, kcal:0, grassi:0, fruttaSecca:0, quantitaCompleta:true });
     const g = giorni.get(giorno);
     if (r.stato === 'saltato') continue;
-    const p = piattiPerId.get(r.dish_id), porzione = Number(r.portion_g);
+    const p = piattiPerId.get(chiaveRicetta(r)), porzione = Number(r.portion_g);
     if (!p || !Number.isFinite(p.grams) || p.grams <= 0 || !Number.isFinite(porzione) || porzione <= 0
       || !p.ingredienti?.length || p.ingredienti.some(i=>!i.food_id || !Number.isFinite(i.grams) || i.grams < 0)
       || Math.abs(p.ingredienti.reduce((s,i)=>s+i.grams,0)-p.grams)>1e-6) {

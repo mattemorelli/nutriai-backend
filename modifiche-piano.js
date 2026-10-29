@@ -1,3 +1,4 @@
+const {chiaveRicetta}=require('./ricette-salvate');
 const {erroreCatalogoModificato}=require('./contesto-catalogo');
 const {caricaContestoGenerazione:caricaContestoModifiche}=require('./salvataggio-generazione');
 const { preservaQuantitaGiornaliere } = require('./quantita-modifiche');
@@ -19,7 +20,7 @@ async function leggiRighePiano(supabase, planId) {
   }
 }
 function origineAvanzo(righe,riga) {
-  return righe.filter(r=>!r.avanzi&&r.dish_id===riga.dish_id&&r.day_of_week<riga.day_of_week)
+  return righe.filter(r=>!r.avanzi&&chiaveRicetta(r)===chiaveRicetta(riga)&&r.day_of_week<riga.day_of_week)
     .sort((a,b)=>b.day_of_week-a.day_of_week)[0]||null;
 }
 function usaAvanzi(righe,riga) {
@@ -34,7 +35,7 @@ function verificaModificabile(item, righe, { salto = false } = {}) {
 }
 async function salvaModifiche(supabase, userId, planId, attese, modifiche, contesto) {
   if(!contesto||typeof contesto.versione!=='string'||!/^\d+$/.test(contesto.versione))throw errorePiano('contesto_modifica_mancante','Your choices could not be checked. Refresh the week and try again.',409);
-  const { data,error } = await supabase.rpc('quadrio_modifica_piano_v3', {
+  const { data,error } = await supabase.rpc('quadrio_modifica_piano_v4', {
     p_user_id: userId, p_plan_id: planId, p_attese: attese, p_modifiche: modifiche, p_contesto:contesto,
   });
   if (error) {
@@ -49,32 +50,32 @@ async function salvaModifiche(supabase, userId, planId, attese, modifiche, conte
 }
 function gruppiDi(righe, perId) {
   return contaGruppi(Array.from({ length: 7 }, (_, i) => ({
-    pasti: righe.filter(r=>attiva(r)&&r.day_of_week===i+1).map(r=>({meal:r.meal,piatto:perId.get(r.dish_id)})),
+    pasti: righe.filter(r=>attiva(r)&&r.day_of_week===i+1).map(r=>({meal:r.meal,piatto:perId.get(chiaveRicetta(r))})),
   })));
 }
 function settimanaPreservata(prima, dopo, perId, quote) {
-  if ([...prima, ...dopo].some(r=>!perId.has(r.dish_id))) return false;
+  if ([...prima, ...dopo].some(r=>!perId.has(chiaveRicetta(r)))) return false;
   const a = gruppiDi(prima, perId), b = gruppiDi(dopo, perId);
   for (const [g, q] of Object.entries(quote)) {
     if ((b[g]||0)>Math.max(q.max,a[g]||0) || (b[g]||0)<Math.min(q.min,a[g]||0)) return false;
   }
-  const salse = rs=>new Set(rs.filter(attiva).filter(r=>perId.get(r.dish_id).salsa_industriale).map(r=>r.dish_id)).size;
+  const salse = rs=>new Set(rs.filter(attiva).filter(r=>perId.get(chiaveRicetta(r)).salsa_industriale).map(r=>r.dish_id)).size;
   return salse(dopo)<=Math.max(1,salse(prima));
 }
 function puoScambiare(item, gemella, righe, perId, profilo, esiti, target, quote, accompagnaBene) {
-  const a = perId.get(item.dish_id), b = perId.get(gemella.dish_id);
+  const a = perId.get(chiaveRicetta(item)), b = perId.get(chiaveRicetta(gemella));
   if (!a || !b || item.meal!==gemella.meal || item.slot!==gemella.slot || a.meal_slot!==item.slot || b.meal_slot!==gemella.slot) return false;
   const dopo = righe.map(r=>r.id===item.id?{...r,day_of_week:gemella.day_of_week}:r.id===gemella.id?{...r,day_of_week:item.day_of_week}:r);
   for (const [vecchia, nuova] of [[item,gemella],[gemella,item]]) {
     const giornoPrima = righe.filter(attiva);
     if (!giornataPreservata(vecchia,giornoPrima,target,nuova)) return false;
     const ricevente = {...nuova,day_of_week:vecchia.day_of_week};
-    const piatto = perId.get(nuova.dish_id);
+    const piatto = perId.get(chiaveRicetta(nuova));
     if (!ammessoNelContesto(piatto,ricevente,profilo,esiti)) return false;
-    const altri = righe.filter(r=>attiva(r)&&r.day_of_week===vecchia.day_of_week&&r.meal===vecchia.meal&&r.id!==vecchia.id).map(r=>perId.get(r.dish_id));
-    if (altri.some(p=>!p)||!preservaRuoliDelPasto(perId.get(vecchia.dish_id),piatto,altri)||altri.some(p=>!accompagnaBene(piatto,p))) return false;
-    if (!tempoPastoPreservato(perId.get(vecchia.dish_id),piatto,altri,ricevente,profilo,esiti)) return false;
-    const duplicati = rs=>rs.filter(r=>attiva(r)&&r.day_of_week===vecchia.day_of_week&&perId.get(r.dish_id)?.principale===piatto.principale).length;
+    const altri = righe.filter(r=>attiva(r)&&r.day_of_week===vecchia.day_of_week&&r.meal===vecchia.meal&&r.id!==vecchia.id).map(r=>perId.get(chiaveRicetta(r)));
+    if (altri.some(p=>!p)||!preservaRuoliDelPasto(perId.get(chiaveRicetta(vecchia)),piatto,altri)||altri.some(p=>!accompagnaBene(piatto,p))) return false;
+    if (!tempoPastoPreservato(perId.get(chiaveRicetta(vecchia)),piatto,altri,ricevente,profilo,esiti)) return false;
+    const duplicati = rs=>rs.filter(r=>attiva(r)&&r.day_of_week===vecchia.day_of_week&&perId.get(chiaveRicetta(r))?.principale===piatto.principale).length;
     if (piatto.principale && duplicati(dopo)>Math.max(1,duplicati(righe))) return false;
   }
   return settimanaPreservata(righe,dopo,perId,quote)

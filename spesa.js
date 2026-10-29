@@ -1,3 +1,4 @@
+const {chiaveRicetta,caricaRicetteSalvate}=require('./ricette-salvate');
 const { lettera, puntiCarbonio, motiviConfronto, haImballaggioRiciclabile } = require('./voto');
 const { vociInStagione } = require('./stagionalita');
 const { leggiRighePiano } = require('./modifiche-piano');
@@ -202,17 +203,19 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
   let id = planId;
   let weekStart = null;
   if (!id) {
-    const { data: p } = await supabase
+    const { data: p, error: ePiano } = await supabase
       .from('plans').select('id, week_start')
       .eq('user_id', userId)
       .order('generated_at', { ascending: false })
       .limit(1).maybeSingle();
+    if (ePiano) throw new Error('lettura plans: '+ePiano.message);
     if (!p) throw new Error('Nessun piano trovato');
     id = p.id;
     weekStart = p.week_start || null;
   } else {
-    const { data: p } = await supabase
+    const { data: p, error: ePiano } = await supabase
       .from('plans').select('id, user_id, week_start').eq('id', id).single();
+    if (ePiano) throw new Error('lettura plans: '+ePiano.message);
     if (!p || p.user_id !== userId) throw new Error('Non autorizzato');
     weekStart = p.week_start || null;
   }
@@ -233,26 +236,31 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
 
   // ingredienti di tutti i piatti coinvolti (sempre l'intera settimana:
   // servono anche per il calcolo "settimana intera" che non si filtra mai)
-  const dishIds = [...new Set(attive.map(r => r.dish_id))];
-  const ing = await paginaTutto((da,a)=>supabase.from('dish_ingredients')
+  const salvate=await caricaRicetteSalvate(supabase,attive);
+  const dishIds = [...new Set(attive.filter(r=>!r.recipe_snapshot_id).map(r => r.dish_id))];
+  const ing = dishIds.length ? await paginaTutto((da,a)=>supabase.from('dish_ingredients')
     .select('dish_id, food_id, grams, foods (name, name_en, name_it, unita, peso_pezzo_g, reparto, green_score, categoria_impatto)')
-    .in('dish_id',dishIds).order('dish_id').order('food_id').range(da,a));
+    .in('dish_id',dishIds).order('dish_id').order('food_id').range(da,a)) : [];
   if(dishIds.some(id=>!ing.some(r=>r.dish_id===id))||ing.some(r=>!r.foods||!(Number(r.grams)>0)))throw new Error('Ingredienti della spesa non verificabili');
 
   // nomi dei piatti, per sapere dove finisce ogni ingrediente
-  const { data: piatti } = await supabase
-    .from('dishes')
-    .select('id, name, name_en')
-    .in('id', dishIds);
+  const {data:piatti,error:eNomi}=dishIds.length ? await supabase.from('dishes').select('id,name,name_en').in('id',dishIds) : {data:[]};
+  if(eNomi)throw new Error('lettura dishes: '+eNomi.message);
   const nomiPiatto = {};
   for (const p of (piatti || [])) {
     nomiPiatto[p.id] = p.name_en || p.name;
   }
 
+  for(const r of ing)r.ricetta_key=r.dish_id;
+  for(const [key,ricetta] of salvate){
+    nomiPiatto[key]=ricetta.piatto.name_en || ricetta.piatto.name;
+    ing.push(...ricetta.ingredienti.map(i=>({...i,ricetta_key:key})));
+  }
+
   // grammi totali della ricetta base, per scalare sulla porzione
   const baseDi = {};
   for (const r of ing || []) {
-    baseDi[r.dish_id] = (baseDi[r.dish_id] || 0) + Number(r.grams || 0);
+    baseDi[r.ricetta_key] = (baseDi[r.ricetta_key] || 0) + Number(r.grams || 0);
   }
 
   // somma per alimento, dato un sottoinsieme di righe attive (tutta la
@@ -260,10 +268,10 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
   function sommaPerAlimento(righeAttive) {
     const totali = {};
     for (const riga of righeAttive) {
-      const base = baseDi[riga.dish_id] || 0;
+      const base = baseDi[chiaveRicetta(riga)] || 0;
       const scala = (base > 0 ? Number(riga.portion_g || base) / base : 1) * numeroPersone;
 
-      for (const r of (ing || []).filter(x => x.dish_id === riga.dish_id)) {
+      for (const r of (ing || []).filter(x => x.ricetta_key === chiaveRicetta(riga))) {
         const f = r.foods || {};
         if (!totali[r.food_id]) {
           totali[r.food_id] = {
@@ -280,7 +288,7 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
           };
         }
         totali[r.food_id].grammi += Number(r.grams || 0) * scala;
-        if (nomiPiatto[riga.dish_id]) totali[r.food_id].per.add(nomiPiatto[riga.dish_id]);
+        if (nomiPiatto[chiaveRicetta(riga)]) totali[r.food_id].per.add(nomiPiatto[chiaveRicetta(riga)]);
         if (riga.day_of_week != null) totali[r.food_id].giorni.add(riga.day_of_week);
       }
     }
@@ -293,9 +301,9 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
   // da sola quando il piano cambia). Da qui in poi il resto della funzione
   // non sa e non deve sapere quale delle due un food_id viene: e' lo stesso
   // motivo per cui non entra nella lista, non importa per quanto tempo.
-  const [{ data: inCasa }, { data: inCasaSettimana }] = await Promise.all([
-    supabase.from('pantry_items').select('food_id').eq('user_id', userId),
-    supabase.from('scorte_settimana').select('food_id').eq('user_id', userId).eq('plan_id', id),
+  const [inCasa, inCasaSettimana] = await Promise.all([
+    paginaTutto((da,a)=>supabase.from('pantry_items').select('food_id').eq('user_id',userId).order('food_id').range(da,a)),
+    paginaTutto((da,a)=>supabase.from('scorte_settimana').select('food_id').eq('user_id',userId).eq('plan_id',id).order('food_id').range(da,a)),
   ]);
   const posseduti = new Set([
     ...(inCasa || []).map(r => r.food_id),
@@ -303,9 +311,10 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
   ]);
 
   // Impatto assoluto per categoria: serve a dire quali voci pesano di più.
-  const { data: categorie } = await supabase
+  const { data: categorie, error: eImpatto } = await supabase
     .from('impatto_categorie')
     .select('categoria, co2_kg_per_kg, nota');
+  if(eImpatto)throw new Error('lettura impatto_categorie: '+eImpatto.message);
 
   const impattoDi = {};
   for (const c of categorie || []) {
@@ -430,10 +439,10 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
     const candidabili = righeBase.filter(r => !r.bloccato);
     let peggioreRiga = null, peggioreCo2 = 0;
     for (const r of candidabili) {
-      const base = baseDi[r.dish_id] || 0;
+      const base = baseDi[chiaveRicetta(r)] || 0;
       const scala = (base > 0 ? Number(r.portion_g || base) / base : 1) * numeroPersone;
       let co2 = 0;
-      for (const ri of (ing || []).filter(x => x.dish_id === r.dish_id)) {
+      for (const ri of (ing || []).filter(x => x.ricetta_key === chiaveRicetta(r))) {
         const cat = ri.foods && ri.foods.categoria_impatto;
         if (cat && impattoDi[cat]) co2 += impattoDi[cat].co2 * (Number(ri.grams || 0) * scala / 1000);
       }
@@ -453,7 +462,7 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
           if (guadagno > 0) {
             scambio = {
               item_id: peggioreRiga.id,
-              piatto: (risposta && risposta.originale) || nomiPiatto[peggioreRiga.dish_id] || null,
+              piatto: (risposta && risposta.originale) || nomiPiatto[chiaveRicetta(peggioreRiga)] || null,
               proposta: { dish_id: migliore.dish_id, nome: migliore.nome, portion_g: migliore.portion_g },
               guadagno_perc: guadagno,
             };
@@ -521,8 +530,10 @@ async function listaSpesa(supabase, userId, planId, giornoSolo = null) {
 // Ingredienti di un piatto, scalati sulla porzione effettiva - stessa
 // matematica di listaSpesa() (grammi base della ricetta -> fattore di
 // scala sulla porzione), ma per un piatto solo, non per l'intera settimana.
-async function ingredientiPiatto(supabase, dishId, portionG) {
-  const { data: ing, error } = await supabase
+async function ingredientiPiatto(supabase, dishId, portionG, riga=null) {
+  if(riga && riga.dish_id!==dishId)throw new Error('Ricetta salvata non verificabile');
+  const salvata=riga?.recipe_snapshot_id ? (await caricaRicetteSalvate(supabase,[riga])).get(chiaveRicetta(riga)) : null;
+  const { data: ing, error } = salvata ? {data:salvata.ingredienti} : await supabase
     .from('dish_ingredients')
     .select('food_id, grams, foods (name, name_en)')
     .eq('dish_id', dishId);

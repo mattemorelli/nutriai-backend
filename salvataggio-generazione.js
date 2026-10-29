@@ -10,8 +10,14 @@ async function caricaContestoGenerazione(supabase,userId){
  if(registrato.catalogo_versione!==data.catalogo_versione)throw erroreCatalogoModificato();
  return data;
 }
+function verificaContestoAtteso(attuale,atteso){
+ if(atteso==null)return;
+ if(typeof atteso.versione!=='string'||!/^\d+$/.test(atteso.versione)||!catalogoValido(atteso))throw new Error('contesto generazione non disponibile');
+ if(attuale.catalogo_id!==atteso.catalogo_id||attuale.catalogo_versione!==atteso.catalogo_versione)throw erroreCatalogoModificato();
+ if(attuale.versione!==atteso.versione)throw erroreContestoModificato();
+}
 async function salvaGenerazione(supabase,userId,contesto,piano,righe){
- const {data,error}=await supabase.rpc('quadrio_salva_generazione_v2',{
+ const {data,error}=await supabase.rpc('quadrio_salva_generazione_v3',{
   p_user_id:userId,p_contesto:contesto,p_piano:piano,p_righe:righe,
  });
  if(error){
@@ -23,4 +29,4 @@ async function salvaGenerazione(supabase,userId,contesto,piano,righe){
  if(!data||typeof data.id!=='string'||data.righe!==righe.length)throw new Error('salvataggio generazione non confermato');
  return data;
 }
-module.exports={caricaContestoGenerazione,salvaGenerazione,erroreContestoModificato};
+module.exports={caricaContestoGenerazione,salvaGenerazione,erroreContestoModificato,verificaContestoAtteso};

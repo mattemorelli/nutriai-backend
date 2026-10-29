@@ -14,7 +14,7 @@ function contesto(opzioni={}){
   const q={select:()=>q,order:()=>q,limit:n=>{fine=n;return q;},range:(a,b)=>{inizio=a;fine=b+1;return q;},eq:(k,v)=>{filtri.push(r=>r[k]===v);return q;},in:(k,vs)=>{filtri.push(r=>vs.includes(r[k]));return q;},
    single:async()=>{const r=esito();return {...r,data:r.data?.[0]};},maybeSingle:async()=>{const r=esito();return {...r,data:r.data?.[0]};},then:(a,b)=>Promise.resolve(esito()).then(a,b)};return q;}};
  const m={exports:{}};vm.runInNewContext(fs.readFileSync(require.resolve('./spesa'),'utf8'),{module:m,console,require:n=>{
-  if(n==='./modifiche-piano')return require(n);
+  if(n==='./modifiche-piano'||n==='./ricette-salvate')return require(n);
   if(n==='./voto')return {lettera:()=>'',puntiCarbonio:()=>0};
   if(n==='./stagionalita')return {vociInStagione:()=>[]};
   if(n==='./sostituisci')return {trovaProposte:async()=>({proposte:[]})};throw Error(n);
@@ -30,5 +30,10 @@ test('spesa: anteprima di un giorno include anche il suo avanzo',async()=>{const
 test('spesa: scambio di giorni conserva il totale settimanale e aggiorna il giorno',async()=>{
  const c=contesto();c.dati.plan_items[0].day_of_week=2;c.dati.plan_items[1].day_of_week=1;assert.equal(grammi(await c.lista()),600);assert.equal(grammi(await c.lista(2)),200);
 });
-for(const errore of ['plan_items','users','dish_ingredients'])test(`spesa: errore ${errore} non diventa una lista apparentemente valida`,async()=>{const c=contesto({errore});await assert.rejects(c.lista());});
+for(const errore of ['plans','plan_items','users','dishes','dish_ingredients','pantry_items','scorte_settimana','impatto_categorie'])test(`spesa: errore ${errore} non diventa una lista apparentemente valida`,async()=>{const c=contesto({errore});await assert.rejects(c.lista());});
 test('spesa: ingredienti assenti interrompono il calcolo',async()=>{const c=contesto({modifica:d=>{d.dish_ingredients=[];}});await assert.rejects(c.lista(),/non verificabili/);});
+for(const tabella of ['pantry_items','scorte_settimana'])test('spesa: posseduto oltre mille righe in '+tabella+' non torna da comprare',async()=>{
+ // Righe esclusivamente in memoria: non vengono scritti alimenti o scorte.
+ const c=contesto({modifica:d=>{d[tabella]=Array.from({length:1000},(_,i)=>({user_id:'utente',plan_id:'piano',food_id:'fixture-memoria-'+i}));d[tabella].push({user_id:'utente',plan_id:'piano',food_id:'169736'});}});
+ assert.equal(grammi(await c.lista()),0);
+});

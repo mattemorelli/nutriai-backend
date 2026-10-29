@@ -1,3 +1,4 @@
+const {chiaveRicetta}=require('./ricette-salvate');
 const { riferimentoFruttaSecca } = require('./quantita-frutta-secca');
 const { RIFERIMENTO_GRASSI } = require('./bilancia-grassi');
 
@@ -11,7 +12,7 @@ function preservaQuantitaGiornaliere(prima, dopo, perId, target, giorni) {
     const tot={kcal:0,grassi:0,fruttaSecca:0};
     for(const r of righe) {
       if(r.day_of_week!==giorno || r.stato==='saltato')continue;
-      const p=perId.get(r.dish_id),grammi=Number(r.portion_g);
+      const p=perId.get(chiaveRicetta(r)),grammi=Number(r.portion_g);
       if(!p || !(Number.isFinite(grammi)&&grammi>0&&Number.isFinite(p.grams)&&p.grams>0)
         || p.grassiCompleti===false || ['kcal','fat','grammiFruttaSecca'].some(k=>!Number.isFinite(p[k])||p[k]<0)) return null;
       const f=grammi/p.grams;tot.kcal+=p.kcal*f;tot.grassi+=p.fat*f;tot.fruttaSecca+=p.grammiFruttaSecca*f;

@@ -8,7 +8,8 @@ const { riepilogoIngredienti } = require('./ingredienti-piano');
 console.log('[server] avviato', new Date().toISOString());
 const { preparaTarget, salvaTarget, salvaAggiornamentoFabbisogno } = require('./fabbisogno');
 const { allenamenti, massaGrassa } = require('./validazione-fabbisogno');
-const { generaESalva, risolviSubject, caricaCatalogoPerRisoluzione } = require('./genera');
+const { risolviSubject, caricaCatalogoPerRisoluzione } = require('./genera');
+const {generaESalvaSeparato:generaESalva}=require('./generazione-coda');
 const { calibra } = require('./calibra');
 const { riepilogoNutrizionale } = require('./modifiche-piano');
 const { trovaProposte, applicaSostituzione, spostaGiorno, saltaPasto } = require('./sostituisci');
@@ -249,6 +250,8 @@ async function paginaTutto(costruisciQuery) {
   return righe;
 }
 
+const {chiaveRicetta,caricaRicetteSalvate,calcolaIngredienti} = require('./ricette-salvate');
+
 async function calcolaPiatto(dishId) {
   const { data: ingredienti, error } = await supabase
     .from('dish_ingredients')
@@ -257,26 +260,7 @@ async function calcolaPiatto(dishId) {
 
   if (error) throw error;
 
-  // grams: peso totale della ricetta base (dish_ingredients), non scalato -
-  // serve a risalire al fattore di scala di un plan_item (portion_g/grams),
-  // lo stesso che genera.js/sostituisci.js applicano gia' a protein_g ecc.
-  const tot = { kcal: 0, protein: 0, carb: 0, sugar: 0, fat: 0, satFat: 0, fibre: 0, salt: 0, grams: 0, ingredienti: [], grammiFruttaSecca: 0 };
-  for (const riga of ingredienti) {
-    const f = riga.foods || {};
-    const fattore = riga.grams / 100;
-    tot.kcal    += (f.kcal_100g    || 0) * fattore;
-    tot.protein += (f.protein_100g || 0) * fattore;
-    tot.carb    += (f.carb_100g    || 0) * fattore;
-    tot.sugar   += (f.sugar_100g   || 0) * fattore;
-    tot.fat     += (f.fat_100g     || 0) * fattore;
-    tot.satFat  += (f.sat_fat_100g || 0) * fattore;
-    tot.fibre   += (f.fibre_100g   || 0) * fattore;
-    tot.salt    += (f.salt_100g    || 0) * fattore;
-    tot.grams   += Number(riga.grams);
-    if (f.categoria_impatto === 'frutta_secca') tot.grammiFruttaSecca += Number(riga.grams);
-    tot.ingredienti.push({ food_id:riga.food_id, nome:f.name, nome_it:f.name_it, stato:f.stato, grams:Number(riga.grams), kcal_100g:f.kcal_100g, fat_100g:f.fat_100g });
-  }
-  return tot;
+  return calcolaIngredienti(ingredienti);
 }
 
 // ---------- CATALOGO PIATTI (pubblico) ----------
@@ -377,7 +361,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
 
     const { data: piano, error: errPiano } = await supabase
       .from('plans')
-      .select('id, user_id, week_start, generated_at, corpus_version, giorno_gratis, energy_target_id')
+      .select('id, user_id, week_start, generated_at, corpus_version, giorno_gratis, energy_target_id, catalogo_origine')
       .eq('id', planId)
       .single();
 
@@ -404,7 +388,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
     const { data: righe, error: errItems } = await supabase
       .from('plan_items')
       .select(`
-        id, day_of_week, meal, slot, dish_id, portion_g, avanzi, bloccato, stato,
+        id, day_of_week, meal, slot, dish_id, recipe_snapshot_id, portion_g, avanzi, bloccato, stato,
         kcal, protein_g, sat_fat_g, fibre_g, salt_g,
         dishes ( name, name_en, prep_min, steps, steps_en, health_score )
       `)
@@ -422,16 +406,19 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
     // genera.js/sostituisci.js usano gia' per protein_g, sat_fat_g, ecc. Una
     // cache per dish_id evita di ricalcolare lo stesso piatto piu' volte -
     // gli avanzi ricompaiono spesso nella stessa settimana.
+    const ricetteSalvate = await caricaRicetteSalvate(supabase,righe);
     const cachePiatti = new Map();
-    async function valoriPiatto(dishId) {
-      if (!cachePiatti.has(dishId)) cachePiatti.set(dishId, await calcolaPiatto(dishId));
-      return cachePiatti.get(dishId);
+    async function valoriPiatto(riga) {
+      const key=chiaveRicetta(riga), salvata=ricetteSalvate.get(key);
+      if (!cachePiatti.has(key)) cachePiatti.set(key,salvata ? calcolaIngredienti(salvata.ingredienti) : await calcolaPiatto(riga.dish_id));
+      return cachePiatti.get(key);
     }
 
     const perGiorno = {};
     for (const r of righe) {
-      const d = r.dishes || {};
-      const vals = await valoriPiatto(r.dish_id);
+      const salvata=ricetteSalvate.get(chiaveRicetta(r));
+      const d = salvata?.piatto || r.dishes || {};
+      const vals = await valoriPiatto(r);
       // null (non 0) quando il piatto non ha ingredienti calcolabili - un
       // dish_ingredients vuoto per quel dish_id. 0.0 g finto per "dato
       // mancante" sarebbe indistinguibile da un valore vero basso.
@@ -447,6 +434,9 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
         piatto_en: d.name_en,
         passaggi: d.steps || [],
         passaggi_en: d.steps_en || null,
+        origine_ricetta: salvata ? 'salvata' : 'catalogo_attuale',
+        passaggi_strutturati: salvata?.passi || null,
+        preparazione_anticipo: salvata?.info || null,
         prep_min: d.prep_min,
         // I valori arrivano da plan_items: sono gia' scalati sul fabbisogno.
         porzione_g: r.portion_g,
@@ -521,6 +511,7 @@ app.get('/piano/:planId', richiedeAuth, async (req, res) => {
       week_start: piano.week_start,
       generated_at: piano.generated_at,
       corpus_version: piano.corpus_version,
+      catalogo_origine: piano.catalogo_origine || null,
       dati: giorniRisposta,
       giorni: giorniRisposta,
       obiettivi: obiettivi || null,
@@ -1261,7 +1252,7 @@ app.get('/piatto/:planItemId', richiedeAuth, async (req, res) => {
     const { planItemId } = req.params;
     const { data: item, error: errItem } = await supabase
       .from('plan_items')
-      .select('id, plan_id, dish_id, portion_g')
+      .select('id, plan_id, dish_id, portion_g, recipe_snapshot_id')
       .eq('id', planItemId)
       .single();
     if (errItem || !item) return res.status(404).json({ errore: 'Piatto non trovato' });
@@ -1275,7 +1266,7 @@ app.get('/piatto/:planItemId', richiedeAuth, async (req, res) => {
       return rispondiServePro(res, 'giorno_bloccato');
     }
 
-    const ingredienti = await ingredientiPiatto(supabase, item.dish_id, item.portion_g);
+    const ingredienti = await ingredientiPiatto(supabase, item.dish_id, item.portion_g, item);
     res.json({ ingredienti });
   } catch (e) {
     console.error('[piatto]', e.message);

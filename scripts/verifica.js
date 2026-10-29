@@ -202,6 +202,8 @@ passo('20. Librerie HTTP e dipendenze di produzione senza vulnerabilita note', (
 });
 
 passo('21. Generazione atomica: input cambiati, rollback e salvataggi concorrenti', () => {
+  lanciaScript('test-ricette-salvate.js');
+  lanciaScript('test-generazione-coda.js');
   lanciaScript('test-salvataggio-generazione.js');
   lanciaScript('test-contesto-catalogo.js');
   lanciaScript('scripts/verifica-catalogo-contesto-db.js');
