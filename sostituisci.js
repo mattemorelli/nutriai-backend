@@ -29,17 +29,20 @@ async function proposte(supabase, userId, itemId) {
   if (ePiano) throw new Error('lettura plans: ' + ePiano.message);
   if (!piano || piano.user_id !== userId) throw new Error('Non autorizzato');
 
-  // 3. il profilo dell'utente (serve per tempo e dieta)
-  const { data: profilo, error: eProfilo } = await supabase
-    .from('users')
-    .select('evening_minutes, diet, paesi, pasti_casa, lunch_away')
-    .eq('id', userId)
-    .maybeSingle();
+  // Profilo, righe e target sono indipendenti dopo il controllo del proprietario.
+  let qTarget=supabase.from('energy_targets').select('kcal, protein_g_min').eq('user_id',userId);
+  qTarget=piano.energy_target_id?qTarget.eq('id',piano.energy_target_id):qTarget.order('computed_at',{ascending:false}).limit(1);
+  const letture=await Promise.allSettled([
+    supabase.from('users').select('evening_minutes, diet, paesi, pasti_casa, lunch_away').eq('id',userId).maybeSingle(),
+    leggiRighePiano(supabase,item.plan_id),qTarget.maybeSingle(),
+  ]);
+  const leggi=i=>{const r=letture[i];if(r.status==='rejected')throw r.reason;return r.value;};
+  const {data:profilo,error:eProfilo}=leggi(0);
   if (eProfilo) throw new Error('lettura users: ' + eProfilo.message);
   if (!profilo) throw new Error('Profilo non disponibile');
 
   // 4. i piatti già usati nella settimana
-  const righe = await leggiRighePiano(supabase, item.plan_id);
+  const righe = leggi(1);
   const corrente = righe.find(r=>r.id===item.id);
   if (!corrente) throw errorePiano('riga_non_trovata', 'This dish is no longer in the plan.', 404);
   Object.assign(item, corrente);
@@ -48,9 +51,7 @@ async function proposte(supabase, userId, itemId) {
 
   // I tetti si riferiscono al target della settimana salvata, anche dopo
   // una modifica del profilo. Non prendere un target di un altro utente.
-  let qTarget = supabase.from('energy_targets').select('kcal, protein_g_min').eq('user_id', userId);
-  qTarget = piano.energy_target_id ? qTarget.eq('id', piano.energy_target_id) : qTarget.order('computed_at', { ascending: false }).limit(1);
-  const { data: target, error: eTarget } = await qTarget.maybeSingle();
+  const {data:target,error:eTarget}=leggi(2);
   if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
   if (!(Number(target?.kcal) > 0 && Number(target?.protein_g_min) > 0)) throw new Error('Fabbisogno del piano non disponibile');
   return { item, piano, profilo, giaUsati, gemelliDishIds, kcalTarget: Number(target.kcal), target, righeGiornata: righe.filter(r=>r.stato!=='saltato'), righePiano: righe };
@@ -80,9 +81,12 @@ async function trovaProposte(supabase, userId, itemId) {
       .flatMap(p => FAMIGLIE_PER_CUCINA[p.cucina] || [])
   )];
 
-  const tutti = await caricaPiatti(supabase, famiglie.length ? famiglie : ['mediterranea'], 6);
-  const { ammesso, gradito, categorieVietate } = await caricaVincoli(supabase, userId, profilo?.diet || 'onnivoro');
-  const esiti = await caricaEsiti(supabase, userId);
+  const lettureCatalogo=await Promise.allSettled([
+    caricaPiatti(supabase,famiglie.length?famiglie:['mediterranea'],6),
+    caricaVincoli(supabase,userId,profilo?.diet||'onnivoro'),caricaEsiti(supabase,userId),
+  ]);
+  for(const r of lettureCatalogo)if(r.status==='rejected')throw r.reason;
+  const [tutti,{ammesso,gradito,categorieVietate},esiti]=lettureCatalogo.map(r=>r.value);
   const { rifiutato } = esiti;
   const haVincoloGlutine = categorieVietate.has('glutine');
   // Nello Swap non cede niente: ne' le allergie ne' le preferenze, ne' un

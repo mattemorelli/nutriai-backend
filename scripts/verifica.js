@@ -143,6 +143,7 @@ passo('11. Fabbisogno e profilo: errori di lettura distinti da dati assenti', ()
   lanciaScript('test-date-locali.js');
   lanciaScript('scripts/verifica-calibrazione-db.js');
   lanciaScript('test-errori-profilo.js');
+  lanciaScript('test-letture-parallele.js');
   lanciaScript('test-aggiornamento-fabbisogno.js');
   lanciaScript('scripts/verifica-fabbisogno-db.js');
 });

@@ -1494,19 +1494,23 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
 
   const contestoGenerazione=salva?await caricaContestoGenerazione(supabase,userId):null;
 
-  const { data: prefRaw, error: errPref } = await supabase
-    .from('user_cuisine_preferences')
-    .select('cucina, rank')
-    .eq('user_id', userId);
+  // Dopo il contesto, le cinque letture indipendenti partono insieme.
+  // Gli errori vengono controllati negli stessi punti del flusso normale.
+  const lettureBase=await Promise.allSettled([
+    supabase.from('user_cuisine_preferences').select('cucina, rank').eq('user_id',userId),
+    supabase.from('users').select('cook_days, lunch_away, pasti_casa, evening_minutes, household_size, diet, paesi').eq('id',userId).maybeSingle(),
+    supabase.from('plans').select('id').eq('user_id',userId).order('generated_at',{ascending:false}).order('id',{ascending:false}).limit(1).maybeSingle(),
+    supabase.from('energy_targets').select('id, kcal, protein_g_min').eq('user_id',userId).order('computed_at',{ascending:false}).order('id',{ascending:false}).limit(1).maybeSingle(),
+    caricaEsiti(supabase,userId),
+  ]);
+  const leggiBase=i=>{const r=lettureBase[i];if(r.status==='rejected')throw r.reason;return r.value;};
+
+  const {data:prefRaw,error:errPref}=leggiBase(0);
   if (errPref) throw new Error(errPref.message);
 
   const preferenze = (prefRaw && prefRaw.length) ? prefRaw : [{ cucina: 'europea', rank: 1 }];
 
-  const { data: profiloUtente, error: erroreProfilo } = await supabase
-    .from('users')
-    .select('cook_days, lunch_away, pasti_casa, evening_minutes, household_size, diet, paesi')
-    .eq('id', userId)
-    .maybeSingle();
+  const {data:profiloUtente,error:erroreProfilo}=leggiBase(1);
   if (erroreProfilo) throw new Error('lettura users: ' + erroreProfilo.message);
 
   const giorniCottura = (profiloUtente && Array.isArray(profiloUtente.cook_days) && profiloUtente.cook_days.length)
@@ -1541,10 +1545,7 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   const haVincoloGlutine = categorieVietate.has('glutine');
 
   // Cosa l'utente ha deciso di tenere dalla settimana precedente
-  const { data: pianoVecchio, error: ePiano } = await supabase
-    .from('plans').select('id')
-    .eq('user_id', userId)
-    .order('generated_at', { ascending: false }).order('id',{ascending:false}).limit(1).maybeSingle();
+  const {data:pianoVecchio,error:ePiano}=leggiBase(2);
   if (ePiano) throw new Error('lettura plans: ' + ePiano.message);
 
   // Un piatto bloccato resta esattamente nel suo giorno, pasto e slot,
@@ -1628,19 +1629,12 @@ async function generaESalva(supabase, userId, seedIniziale, opzioni = {}) {
   // ricerca): il tetto sale/saturi (gradino 2b+) deve valutare i valori
   // SCALATI durante la costruzione della giornata, quindi serve conoscere il
   // kcal obiettivo PRIMA che la ricerca inizi, non dopo che ha gia' finito.
-  const { data: target, error: eTarget } = await supabase
-    .from('energy_targets')
-    .select('id, kcal, protein_g_min')
-    .eq('user_id', userId)
-    .order('computed_at', { ascending: false })
-    .order('id', {ascending:false})
-    .limit(1)
-    .maybeSingle();
+  const {data:target,error:eTarget}=leggiBase(3);
   if (eTarget) throw new Error('lettura energy_targets: ' + eTarget.message);
   const obiettivo = target?.kcal ?? null;
   const obiettivoProteine = target?.protein_g_min ?? null;
 
-  const { skipPerTempo, skipTotali, rifiutato } = await caricaEsiti(supabase, userId);
+  const { skipPerTempo, skipTotali, rifiutato } = leggiBase(4);
 
   // Se piu' della meta' dei salti e' per mancanza di tempo, il limite
   // dichiarato non regge la vita reale e va stretto di dieci minuti.
