@@ -1,8 +1,9 @@
+const {salvaDatiOnboarding}=require('./onboarding');
 const {cambiaBlocco}=require('./blocca-piano');
 const {preferenzaFacoltativa,erroreVincoliNonVerificabili,verificaVincoli,leggiVincoliDichiarati}=require('./vincoli-verificabili');
 const { riepilogoIngredienti } = require('./ingredienti-piano');
 console.log('[server] avviato', new Date().toISOString());
-const { calcolaESalvaTarget, preparaTarget, salvaTarget, salvaAggiornamentoFabbisogno } = require('./fabbisogno');
+const { preparaTarget, salvaTarget, salvaAggiornamentoFabbisogno } = require('./fabbisogno');
 const { allenamenti, massaGrassa } = require('./validazione-fabbisogno');
 const { generaESalva, risolviSubject, caricaCatalogoPerRisoluzione } = require('./genera');
 const { calibra } = require('./calibra');
@@ -149,7 +150,7 @@ async function ultimoConsenso(userId) {
     .select('stato, versione_testo, lingua, registrato_at')
     .eq('user_id', userId)
     .eq('tipo', TIPO_CONSENSO)
-    .order('registrato_at', { ascending: false })
+    .order('registrato_at', { ascending: false }).order('stato', { ascending: false }).order('id', { ascending: false })
     .limit(1)
     .maybeSingle();
   if (error) throw new Error('lettura consensi: ' + error.message);
@@ -676,7 +677,7 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
   }
 
   const CUCINE_VALIDE = ['europea', 'usa', 'asiatica', 'sud_americana', 'australiana'];
-  if (b.cuisines.some(c => !CUCINE_VALIDE.includes(c)))
+  if (b.cuisines.some(c => !CUCINE_VALIDE.includes(c)) || new Set(b.cuisines).size!==b.cuisines.length)
     return res.status(400).json({ errore: 'Cucina non riconosciuta' });
 
   // pasti_casa, se arriva, sostituisce cook_days/lunch_away derivandoli -
@@ -723,10 +724,7 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
   const oggi = oggiLocale();
 
   try {
-    // 1. profilo
-    const { error: e1 } = await supabase
-      .from('users')
-      .update({
+    const profilo = {
         sex: b.sex,
         birth_year: b.birth_year,
         height_cm: b.height_cm,
@@ -742,52 +740,12 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
         diet: ['onnivoro','vegetariano','vegano','pescetariano'].includes(b.diet) ? b.diet : 'onnivoro',
         paesi: Array.isArray(b.paesi) ? b.paesi : [],
         occupation_level: b.occupation_level,
-      })
-      .eq('id', utenteId);
-    if (e1) throw new Error(`profilo: ${e1.message}`);
-
-    // Il PAL resta scritto per compatibilità con i profili vecchi,
-    // ma il calcolo userà occupation_level e training_sessions.
-    // Anche [] deve rimuovere gli allenamenti precedenti. Un errore di
-    // scrittura interrompe il flusso, senza calcolare un target su dati vecchi.
-    const { error: eDelAllenamenti } = await supabase.from('training_sessions').delete().eq('user_id', utenteId);
-    if (eDelAllenamenti) throw new Error('allenamenti: ' + eDelAllenamenti.message);
-    if (sessioniValide.length) {
-      const { error: eInsAllenamenti } = await supabase.from('training_sessions').insert(
-        sessioniValide.map(t => ({ user_id: utenteId, ...t }))
-      );
-      if (eInsAllenamenti) throw new Error('allenamenti: ' + eInsAllenamenti.message);
-    }
-
-    // 2. peso - upsert perche' c'e' un vincolo una-misura-al-giorno: se
-    // l'utente ha gia' registrato un peso oggi (es. da Peso.js prima di
-    // finire l'onboarding), lo aggiorna invece di scontrarsi col vincolo.
-    const { error: e2 } = await supabase
-      .from('body_measurements')
-      .upsert({
-        user_id: utenteId,
-        measured_on: oggi,
-        weight_kg: Number(b.weight_kg),
-        source: 'utente',
-        body_fat_pct: massaGrassaValida,
-      }, { onConflict: 'user_id,measured_on' });
-    if (e2) throw new Error(`peso: ${e2.message}`);
-
-    // Risolti e validati prima di qualunque modifica del profilo.
-    if(vincoliDaSalvare.length){
-      const {error:e4}=await supabase.from('user_constraints').insert(vincoliDaSalvare);
-      if(e4)throw new Error('vincoli: '+e4.message);
-    }
-
-    // 5. preferenze cucina (l'ordine dell'array e' il rank)
-    const prefs = b.cuisines.map((c, i) => ({ user_id: utenteId, cucina: c, rank: i + 1 }));
-    const { error: e5 } = await supabase
-      .from('user_cuisine_preferences')
-      .upsert(prefs, { onConflict: 'user_id,cucina' });
-    if (e5) throw new Error(`preferenze: ${e5.message}`);
-
-    // 6. fabbisogno energetico
-    const target = await calcolaESalvaTarget(supabase, utenteId);
+      };
+    const target = await salvaDatiOnboarding(supabase,utenteId,{
+      profilo,
+      misura:{measured_on:oggi,weight_kg:Number(b.weight_kg),source:'utente',body_fat_pct:massaGrassaValida},
+      sessioni:sessioniValide,vincoli:vincoliDaSalvare,preferenze:b.cuisines,
+    });
 
     // 7. primo piano - salta se questo dispositivo ha gia' usato il suo
     // giorno gratis su un altro account (impedisce di rifare l'onboarding

@@ -12,7 +12,7 @@ function contesto(percorso, opzioni = {}) {
     users: [{ id: 'utente', sex: 'M', birth_year: new Date().getFullYear()-30, height_cm: 175,
       goal: 'mantenimento', occupation_level: 'sedentario', ...opzioni.profilo }],
     body_measurements: [{ user_id: 'utente', weight_kg: 78, body_fat_pct: null, ...opzioni.misura }],
-    training_sessions: opzioni.sessioni || [], energy_targets: [], user_cuisine_preferences: [],
+    training_sessions: opzioni.sessioni || [], energy_targets: [], user_cuisine_preferences: [], user_constraints: [],
   };
   const scritture=[]; let generazioni=0;
   const supabase={from(tabella){
@@ -41,22 +41,26 @@ function contesto(percorso, opzioni = {}) {
     return q;
   }};
   supabase.rpc=async(nome,args)=>{
-    assert.equal(nome,'quadrio_salva_fabbisogno_v1');assert.equal(args.p_user_id,'utente');
-    assert.equal(args.p_target.user_id,'utente');assert.ok(args.p_attese.profilo&&args.p_attese.sport);
+    if(nome==='quadrio_contesto_generazione_v1')return {data:{versione:'1'},error:null};
+    assert.ok(['quadrio_salva_fabbisogno_v1','quadrio_salva_onboarding_v1'].includes(nome));assert.equal(args.p_user_id,'utente');
+    assert.equal(args.p_target.user_id,'utente');
+    if(nome==='quadrio_salva_fabbisogno_v1')assert.ok(args.p_attese.profilo&&args.p_attese.sport);
+    else assert.equal(args.p_contesto.versione,'1');
     if(opzioni.erroreRpc)return {error:{code:opzioni.erroreRpc,message:'errore transazione'}};
     const nuove=structuredClone(dati);
     Object.assign(nuove.users[0],args.p_profilo);
     if(args.p_misura)nuove.body_measurements=[{user_id:'utente',...args.p_misura}];
+    if(nome==='quadrio_salva_onboarding_v1'){nuove.training_sessions=args.p_sport.map(t=>({user_id:'utente',...t}));nuove.user_cuisine_preferences=args.p_preferenze.map((c,i)=>({user_id:'utente',cucina:c,rank:i+1}));nuove.user_constraints.push(...args.p_vincoli);}
     nuove.energy_targets.push(args.p_target);
     for(const k of Object.keys(dati))dati[k]=nuove[k];
-    scritture.push({tabella:'rpc',mutazione:'transazione'});return {data:{ok:true},error:null};
+    scritture.push({tabella:'rpc',mutazione:'transazione'});return {data:{ok:true,target_id:'target-nuovo'},error:null};
   };
   let handler;
   const da=sorgente.indexOf(`app.post('${percorso}'`), a=sorgente.indexOf('\n});',da)+5;
   assert.ok(da>=0&&a>da);
   vm.runInNewContext(sorgente.slice(da,a),{
     app:{post:(_,auth,fn)=>{handler=fn;}},richiedeAuth:()=>{},supabase,console,
-    ...fabbisogno,...validazione,...validazioneTarget,
+    ...fabbisogno,...validazione,...validazioneTarget,...require('./onboarding'),
     GOAL_VALIDI:['dimagrimento','mantenimento','massa'],DIET_VALIDI:['onnivoro','vegetariano','vegano','pescetariano'],
     KIND_VALIDI:['allergia','intolleranza','non_gradito'],eSanitario:k=>['allergia','intolleranza'].includes(k),consensoAttivo:async()=>true,
     risolviERighe:opzioni.risolviERighe||(()=>Promise.resolve([])),
@@ -118,3 +122,9 @@ test('onboarding: esclusione irrisolta rifiutata prima di modificare profilo o p
 for(const constraints of [null,'glutine',[null],[{kind:'allergia'}],Array.from({length:41},()=>({kind:'allergia',subject:'glutine'}))])test('onboarding: vincoli malformati o troppi non vengono ignorati',async()=>{
  const c=contesto('/onboarding'),r=await c.chiama({...onboarding,constraints});assert.equal(r.statusCode,400);assert.equal(c.scritture.length,0);
 });
+
+for(const [code,status] of [['PT409',409],['PT403',403],['57014',503],['XX000',500]])test('onboarding: transazione '+code+' non lascia un profilo parziale',async()=>{
+ const c=contesto('/onboarding',{erroreRpc:code}),prima=structuredClone(c.dati);const r=await c.chiama(onboarding);
+ assert.equal(r.statusCode,status);assert.deepEqual(c.dati,prima);assert.equal(c.scritture.length,0);assert.equal(c.generazioni(),0);
+});
+test('onboarding: preferenze duplicate rifiutate prima delle scritture',async()=>{const c=contesto('/onboarding'),r=await c.chiama({...onboarding,cuisines:['europea','europea']});assert.equal(r.statusCode,400);assert.equal(c.scritture.length,0);});

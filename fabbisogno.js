@@ -117,7 +117,7 @@ async function preparaTarget(supabase, userId, modifiche = {}) {
   const u = { ...utenteLetto, ...modifiche.profilo };
   const m = { ...misuraLetta, ...modifiche.misura };
   validaDati(u, m);
-  const sessioniValide = allenamenti(sessioni || []);
+  const sessioniValide = allenamenti(Object.hasOwn(modifiche,'sessioni') ? modifiche.sessioni : (sessioni || []));
 
   const dati = {
     peso: Number(m.weight_kg),

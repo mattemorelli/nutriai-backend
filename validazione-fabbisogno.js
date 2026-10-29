@@ -24,8 +24,8 @@ function allenamenti(sessioni = []) {
   return sessioni.map(s => {
     if (!s || !ATTIVITA.includes(s.activity)) throw erroreDati('Attività di allenamento non riconosciuta');
     if (!INTENSITA.includes(s.intensity)) throw erroreDati('Intensità di allenamento non valida');
-    if (!numero(s.minutes_per_week) || Number(s.minutes_per_week) < 0 || Number(s.minutes_per_week) > 1200) {
-      throw erroreDati('Durata di allenamento non valida: da 0 a 1200 minuti settimanali');
+    if (!numero(s.minutes_per_week) || !Number.isInteger(Number(s.minutes_per_week)) || Number(s.minutes_per_week) < 0 || Number(s.minutes_per_week) > 1200) {
+      throw erroreDati('Durata di allenamento non valida: da 0 a 1200 minuti interi settimanali');
     }
     return { activity: s.activity, intensity: s.intensity, minutes_per_week: Number(s.minutes_per_week) };
   });

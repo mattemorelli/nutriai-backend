@@ -68,6 +68,7 @@ test('profilo legacy con PAL letto correttamente: mantiene la formula esistente'
 for (const [nome, opzioni] of [
  ['sport sconosciuto', {sessioni:[{activity:'sconosciuto',intensity:'moderata',minutes_per_week:120}]}],
  ['intensita sconosciuta', {sessioni:[{activity:'pesi',intensity:'assurda',minutes_per_week:120}]}],
+ ['durata frazionaria', {sessioni:[{activity:'pesi',intensity:'moderata',minutes_per_week:90.5}]}],
  ['durata negativa', {sessioni:[{activity:'pesi',intensity:'moderata',minutes_per_week:-5}]}],
  ['durata eccessiva', {sessioni:[{activity:'pesi',intensity:'moderata',minutes_per_week:1201}]}],
  ['durata vuota', {sessioni:[{activity:'pesi',intensity:'moderata',minutes_per_week:''}]}],

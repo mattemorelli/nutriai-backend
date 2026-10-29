@@ -135,6 +135,8 @@ passo('10. Porzioni e 12 profili con fabbisogni espliciti', () => {
 });
 passo('11. Fabbisogno e profilo: errori di lettura distinti da dati assenti', () => {
   lanciaScript('test-fabbisogno.js');
+  lanciaScript('test-onboarding.js');
+  lanciaScript('scripts/verifica-onboarding-db.js');
   lanciaScript('test-calibrazione.js');
   lanciaScript('test-date-locali.js');
   lanciaScript('scripts/verifica-calibrazione-db.js');
