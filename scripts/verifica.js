@@ -122,6 +122,8 @@ passo('3. Risoluzione allergeni: ogni vincolo esclude la categoria intera', () =
   lanciaScript('test-vincoli-verificabili.js');
   lanciaScript('test-paginazione-vincoli.js');
   lanciaScript('test-risoluzione-vincoli-scrittura.js');
+  lanciaScript('test-salvataggio-vincoli.js');
+  lanciaScript('scripts/verifica-vincoli-contesto-db.js');
 });
 passo('4. Controllo permanente pane/patate', () => lanciaScript('verifica-tipo-amido.js'));
 passo('5. Ricette Cook: azioni/fuoco/quote validi su tutto il database', () => lanciaScript('scripts/verifica-ricette.js --db'));

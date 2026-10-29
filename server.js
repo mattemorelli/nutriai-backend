@@ -1,3 +1,5 @@
+const {caricaContestoGenerazione}=require('./salvataggio-generazione');
+const {salvaVincoli}=require('./salvataggio-vincoli');
 const {validaScelte}=require('./validazione-scelte');
 const {salvaDatiOnboarding}=require('./onboarding');
 const {cambiaBlocco}=require('./blocca-piano');
@@ -719,8 +721,9 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
     }
   }
 
-  let vincoliDaSalvare=[];
+  let vincoliDaSalvare=[],contestoIngresso;
   try {
+    contestoIngresso=await caricaContestoGenerazione(supabase,utenteId);
     if(b.constraints?.length)vincoliDaSalvare=await risolviERighe(b.constraints,utenteId,supabase);
   }catch(e){return res.status(e.status||500).json({errore:e.code||e.message,messaggio:e.message});}
 
@@ -747,7 +750,7 @@ app.post('/onboarding', richiedeAuth, async (req, res) => {
     const target = await salvaDatiOnboarding(supabase,utenteId,{
       profilo,
       misura:{measured_on:oggi,weight_kg:Number(b.weight_kg),source:'utente',body_fat_pct:massaGrassaValida},
-      sessioni:sessioniValide,vincoli:vincoliDaSalvare,preferenze:b.cuisines,
+      sessioni:sessioniValide,vincoli:vincoliDaSalvare,preferenze:b.cuisines,contesto:contestoIngresso,
     });
 
     // 7. primo piano - salta se questo dispositivo ha gia' usato il suo
@@ -960,10 +963,9 @@ app.post('/vincoli', richiedeAuth, async (req, res) => {
   // client riceve l'elenco completo, non una riga sola, e lo sa gestire
   // (vedi aggiungiVincolo in Profilo.js).
   try{
+    const contesto=await caricaContestoGenerazione(supabase,req.utente.id);
     const righe=await risolviERighe([{kind,subject:testo,severity:s}],req.utente.id,supabase);
-    const {data,error}=await supabase.from('user_constraints').insert(righe).select('id, kind, subject, severity');
-    if(error)throw new Error(error.message);
-    res.json(data);
+    res.json(await salvaVincoli(supabase,req.utente.id,contesto,righe));
   }catch(e){res.status(e.status||500).json({errore:e.code||e.message,...(e.code?{messaggio:e.message}:{})});}
 
 });

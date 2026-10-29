@@ -42,7 +42,7 @@ function contesto(percorso, opzioni = {}) {
   }};
   supabase.rpc=async(nome,args)=>{
     if(nome==='quadrio_contesto_generazione_v2')return {data:{versione:'1',catalogo_id:'00000000-0000-4000-8000-000000000099',catalogo_versione:'1'},error:null};
-    assert.ok(['quadrio_salva_fabbisogno_v1','quadrio_salva_onboarding_v1'].includes(nome));assert.equal(args.p_user_id,'utente');
+    assert.ok(['quadrio_salva_fabbisogno_v1','quadrio_salva_onboarding_v2'].includes(nome));assert.equal(args.p_user_id,'utente');
     assert.equal(args.p_target.user_id,'utente');
     if(nome==='quadrio_salva_fabbisogno_v1')assert.ok(args.p_attese.profilo&&args.p_attese.sport);
     else assert.equal(args.p_contesto.versione,'1');
@@ -50,7 +50,7 @@ function contesto(percorso, opzioni = {}) {
     const nuove=structuredClone(dati);
     Object.assign(nuove.users[0],args.p_profilo);
     if(args.p_misura)nuove.body_measurements=[{user_id:'utente',...args.p_misura}];
-    if(nome==='quadrio_salva_onboarding_v1'){nuove.training_sessions=args.p_sport.map(t=>({user_id:'utente',...t}));nuove.user_cuisine_preferences=args.p_preferenze.map((c,i)=>({user_id:'utente',cucina:c,rank:i+1}));nuove.user_constraints.push(...args.p_vincoli);}
+    if(nome==='quadrio_salva_onboarding_v2'){nuove.training_sessions=args.p_sport.map(t=>({user_id:'utente',...t}));nuove.user_cuisine_preferences=args.p_preferenze.map((c,i)=>({user_id:'utente',cucina:c,rank:i+1}));nuove.user_constraints.push(...args.p_vincoli);}
     nuove.energy_targets.push(args.p_target);
     for(const k of Object.keys(dati))dati[k]=nuove[k];
     scritture.push({tabella:'rpc',mutazione:'transazione'});return {data:{ok:true,target_id:'target-nuovo'},error:null};
@@ -60,7 +60,7 @@ function contesto(percorso, opzioni = {}) {
   assert.ok(da>=0&&a>da);
   vm.runInNewContext(sorgente.slice(da,a),{
     app:{post:(_,auth,fn)=>{handler=fn;}},richiedeAuth:()=>{},supabase,console,
-    ...fabbisogno,...validazione,...validazioneTarget,...require('./onboarding'),...require('./validazione-scelte'),
+    ...fabbisogno,...validazione,...validazioneTarget,...require('./onboarding'),...require('./validazione-scelte'),...require('./salvataggio-generazione'),
     GOAL_VALIDI:['dimagrimento','mantenimento','massa'],DIET_VALIDI:['onnivoro','vegetariano','vegano','pescetariano'],
     KIND_VALIDI:['allergia','intolleranza','non_gradito'],eSanitario:k=>['allergia','intolleranza'].includes(k),consensoAttivo:async()=>true,
     risolviERighe:opzioni.risolviERighe||(()=>Promise.resolve([])),
