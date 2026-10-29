@@ -31,7 +31,7 @@ function cliente(dieta, minuti, kcal, proteine, bloccati = []) {
     plan_items: bloccati,
   };
   const CATALOGO = new Set(['dishes', 'dish_ingredients', 'foods', 'categorie_alimenti', 'tag_nutrizionali', 'alias_categoria']);
-  return { from(tabella) {
+  return { rpc:(...args)=>reale.rpc(...args), from(tabella) {
     if (Object.hasOwn(dati, tabella)) return query(dati[tabella]);
     assert.ok(CATALOGO.has(tabella), 'Accesso inatteso: ' + tabella);
     return reale.from(tabella);

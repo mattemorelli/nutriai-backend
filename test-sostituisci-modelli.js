@@ -18,7 +18,7 @@ function contesto(opzioni = {}) {
     user_cuisine_preferences: [], dish_ingredients: [], dishes: piatti };
   opzioni.modifica?.(dataset, piatti);
   let scritture = 0;
-  const supabase = { rpc: async (nome, args) => {if(nome==='quadrio_contesto_generazione_v1')return {data:{versione:'1'},error:opzioni.erroreContestoRpc||null};assert.deepEqual(args.p_contesto,{versione:'1'});if(opzioni.erroreRpc)return {data:null,error:opzioni.erroreRpc};assert.equal(nome,'quadrio_modifica_piano_v2');scritture++;for(const m of args.p_modifiche)Object.assign(dataset.plan_items.find(r=>r.id===m.id),m.patch);return {data:{ok:true,righe_modificate:args.p_modifiche.length},error:null};}, from(tabella) {
+  const supabase = { rpc: async (nome, args) => {if(nome==='quadrio_contesto_generazione_v2')return {data:{versione:'1',catalogo_id:'00000000-0000-4000-8000-000000000099',catalogo_versione:'1'},error:opzioni.erroreContestoRpc||null};assert.deepEqual(args.p_contesto,{versione:'1',catalogo_id:'00000000-0000-4000-8000-000000000099',catalogo_versione:'1'});if(opzioni.erroreRpc)return {data:null,error:opzioni.erroreRpc};assert.equal(nome,'quadrio_modifica_piano_v3');scritture++;for(const m of args.p_modifiche)Object.assign(dataset.plan_items.find(r=>r.id===m.id),m.patch);return {data:{ok:true,righe_modificate:args.p_modifiche.length},error:null};}, from(tabella) {
     assert.ok(Object.hasOwn(dataset, tabella));
     const filtri = [];
     const dati = () => dataset[tabella].filter(r => filtri.every(f => f(r)));

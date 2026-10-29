@@ -57,7 +57,7 @@ function client(caso,reale){const dati={
  users:{diet:caso.dieta,evening_minutes:caso.minuti,paesi:['italia'],household_size:1,cook_days:caso.fuori?[1,3,5]:[1,2,3,4,5,6,7],lunch_away:caso.fuori,pasti_casa:Object.fromEntries([1,2,3,4,5,6,7].map(g=>[g,{pranzo:!caso.fuori,cena:true}]))},
  energy_targets:{id:'target-sintetico',kcal:2000,protein_g_min:85},user_cuisine_preferences:[],meal_outcomes:[],plans:[],plan_items:[],
  user_constraints:caso.fuori?[{kind:'allergia',subject:'glutine',severity:'assoluto',categoria:'glutine',food_id:null}]:[],
- };return{from(t){if(Object.hasOwn(dati,t))return query(dati[t]);assert.ok(CATALOGO.has(t),'Tabella inattesa '+t);return reale.from(t);}};}
+ };return{rpc:(...args)=>reale.rpc(...args),from(t){if(Object.hasOwn(dati,t))return query(dati[t]);assert.ok(CATALOGO.has(t),'Tabella inattesa '+t);return reale.from(t);}};}
 async function verificaMatrice(args=process.argv.slice(2)){
  const minRiuscite=leggiMinRiuscite(args);
  const reale=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_KEY);

@@ -1,3 +1,4 @@
+const {erroreCatalogoModificato}=require('./contesto-catalogo');
 const {caricaContestoGenerazione:caricaContestoModifiche}=require('./salvataggio-generazione');
 const { preservaQuantitaGiornaliere } = require('./quantita-modifiche');
 const { contaGruppi, preservaRuoliDelPasto } = require('./modelli-pasto');
@@ -33,10 +34,11 @@ function verificaModificabile(item, righe, { salto = false } = {}) {
 }
 async function salvaModifiche(supabase, userId, planId, attese, modifiche, contesto) {
   if(!contesto||typeof contesto.versione!=='string'||!/^\d+$/.test(contesto.versione))throw errorePiano('contesto_modifica_mancante','Your choices could not be checked. Refresh the week and try again.',409);
-  const { data,error } = await supabase.rpc('quadrio_modifica_piano_v2', {
+  const { data,error } = await supabase.rpc('quadrio_modifica_piano_v3', {
     p_user_id: userId, p_plan_id: planId, p_attese: attese, p_modifiche: modifiche, p_contesto:contesto,
   });
   if (error) {
+    if(error.code==='PT410')throw erroreCatalogoModificato();
     if(error.code==='PT412')throw errorePiano('scelte_modificate','Your profile or choices changed. Refresh the week and try again.',409);
     if(['57014','55P03'].includes(error.code))throw errorePiano('salvataggio_generazione_temporaneo','Saving is taking too long. Try again.',503);
     if (error.code === '40001' || error.code === '40P01' || error.code === 'PT409') throw errorePiano('piano_modificato', 'The plan changed while you were editing. Refresh it and try again.', 409);

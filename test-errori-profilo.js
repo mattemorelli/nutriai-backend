@@ -5,7 +5,7 @@ const { test } = require('node:test');
 const { generaESalva } = require('./genera');
 
 function clienteConErrore(tabellaErrore) {
-  return { from(tabella) {
+  return { rpc:async()=>({data:{catalogo_id:'00000000-0000-4000-8000-000000000099',catalogo_versione:'1'},error:null}), from(tabella) {
     const risultato = tabella === tabellaErrore
       ? { data: null, error: { message: 'rete interrotta' } }
       : { data: tabella === 'users' ? { diet: 'vegano' } : tabella === 'plans' ? { id: 'precedente' } : [], error: null };

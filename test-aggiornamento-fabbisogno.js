@@ -41,7 +41,7 @@ function contesto(percorso, opzioni = {}) {
     return q;
   }};
   supabase.rpc=async(nome,args)=>{
-    if(nome==='quadrio_contesto_generazione_v1')return {data:{versione:'1'},error:null};
+    if(nome==='quadrio_contesto_generazione_v2')return {data:{versione:'1',catalogo_id:'00000000-0000-4000-8000-000000000099',catalogo_versione:'1'},error:null};
     assert.ok(['quadrio_salva_fabbisogno_v1','quadrio_salva_onboarding_v1'].includes(nome));assert.equal(args.p_user_id,'utente');
     assert.equal(args.p_target.user_id,'utente');
     if(nome==='quadrio_salva_fabbisogno_v1')assert.ok(args.p_attese.profilo&&args.p_attese.sport);

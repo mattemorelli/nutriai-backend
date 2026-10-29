@@ -31,6 +31,7 @@ const SEED = 2026;
 
 function clienteFinto(reale, profiloSintetico, vincoliSintetici) {
   return {
+    rpc:(...args)=>reale.rpc(...args),
     from(tabella) {
       if (tabella === 'users') return { select() { return this; }, eq() { return this; }, maybeSingle: async () => ({ data: profiloSintetico, error: null }) };
       if (tabella === 'user_constraints') { const q={select:()=>q,eq:()=>q,order:()=>q,range:()=>q,then:(a,b)=>Promise.resolve({data:vincoliSintetici,error:null}).then(a,b)};return q;}

@@ -29,7 +29,7 @@ function clientePer(dieta, kcal, proteine) {
     user_cuisine_preferences: [], user_constraints: [], meal_outcomes: [], plans: null,
   };
   const CATALOGO = new Set(['dishes', 'dish_ingredients', 'foods', 'categorie_alimenti', 'tag_nutrizionali', 'alias_categoria']);
-  return { from(tabella) {
+  return { rpc:(...args)=>reale.rpc(...args), from(tabella) {
     if (Object.hasOwn(dati, tabella)) return query(dati[tabella]);
     assert.ok(CATALOGO.has(tabella), 'Accesso inatteso alla tabella ' + tabella);
     return reale.from(tabella);

@@ -1,3 +1,4 @@
+const {caricaContestoCatalogo,ultimoCatalogo}=require('./contesto-catalogo');
 const {caricaContestoGenerazione,salvaGenerazione}=require('./salvataggio-generazione');
 const {preferenzaFacoltativa,riferimentoVerificabile,verificaVincoli,leggiVincoliDichiarati}=require('./vincoli-verificabili');
 const { creaPranzoFlessibile } = require('./pranzo-flessibile');
@@ -915,14 +916,16 @@ const ALIMENTI_VIETATI_PER_DIETA = {
 // cache e' scaduta, la seconda aspetta la STESSA lettura della prima invece
 // di farne una propria.
 const DURATA_CACHE_MS = 10 * 60 * 1000; // 10 minuti
-let cacheRiferimento = null;
-let cachePromessaInCorso = null;
+const cacheRiferimento = new Map();
+const cachePromessaInCorso = new Map();
 
 async function caricaRiferimento(supabase) {
-  if (cacheRiferimento && Date.now() < cacheRiferimento.scadenza) return cacheRiferimento;
-  if (cachePromessaInCorso) return cachePromessaInCorso;
-
-  cachePromessaInCorso = (async () => {
+  const catalogo=await caricaContestoCatalogo(supabase);
+  const chiave=catalogo.catalogo_id+':'+catalogo.catalogo_versione;
+  const nota=cacheRiferimento.get(catalogo.catalogo_id);
+  if(nota?.chiave===chiave&&Date.now()<nota.scadenza)return nota;
+  if(cachePromessaInCorso.has(chiave))return cachePromessaInCorso.get(chiave);
+  const promessa = (async () => {
     const [dishesCrudi, tagRighe, catRighe, foodsRighe] = await Promise.all([
       // Il mercato (MERCATO_ATTIVO) resta un cancello assoluto applicato qui,
       // non un filtro da ripetere in memoria a ogni chiamata - nessun
@@ -965,14 +968,16 @@ async function caricaRiferimento(supabase) {
       for (const r of righe) (ingredientiPerDish[r.dish_id] ||= []).push(r);
     }
 
-    return { scadenza: Date.now() + DURATA_CACHE_MS, dishesCrudi, ingredientiPerDish, tagDi, categorieDi, foodIdsPerCategoria, foodIdsCatalogo:new Set(foodsRighe.map(f=>f.id)) };
+    return { chiave, scadenza: Date.now() + DURATA_CACHE_MS, dishesCrudi, ingredientiPerDish, tagDi, categorieDi, foodIdsPerCategoria, foodIdsCatalogo:new Set(foodsRighe.map(f=>f.id)) };
   })();
 
+  cachePromessaInCorso.set(chiave,promessa);
   try {
-    cacheRiferimento = await cachePromessaInCorso;
-    return cacheRiferimento;
+    const caricata=await promessa;
+    if(ultimoCatalogo(catalogo.catalogo_id)?.catalogo_versione===catalogo.catalogo_versione)cacheRiferimento.set(catalogo.catalogo_id,caricata);
+    return caricata;
   } finally {
-    cachePromessaInCorso = null;
+    if(cachePromessaInCorso.get(chiave)===promessa)cachePromessaInCorso.delete(chiave);
   }
 }
 
